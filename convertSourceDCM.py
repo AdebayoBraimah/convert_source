@@ -4,8 +4,7 @@ Contains all the necessary functions to convert
 dicom images to nifti in
 BIDS format (by default).
 '''
-
-# !/usr/bin/env python3
+# 
 # 
 # -*- coding: utf-8 -*-
 # title           : convertSourceDCM.py
@@ -339,7 +338,7 @@ def data2BIDS_anat(out_dir, dcm, sub, scan, ses=1, scanType='anat'):
             os.makedirs(outDir)
 
         # Create temporary output names/directories
-        tmp_out_dir = os.path.join(out_dir, 'tmp_dir' + str(random.randint(0, n)))
+        tmp_out_dir = os.path.join(out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
         tmp_basename = 'tmp_basename' + str(random.randint(0, n))
 
         # Convert DCM file
@@ -399,7 +398,7 @@ def data2BIDS_func(out_dir, dcm, sub, ses=1, scanType='func', task='rest', acq='
             os.makedirs(outDir)
 
         # Create temporary output names/directories
-        tmp_out_dir = os.path.join(out_dir, 'tmp_dir' + str(random.randint(0, n)))
+        tmp_out_dir = os.path.join(out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
         tmp_basename = 'tmp_basename' + str(random.randint(0, n))
 
         # Convert DCM file
@@ -460,7 +459,7 @@ def data2BIDS_fmap(out_dir, dcm, sub, ses=1, scanType='fmap', task='rest', acq='
             os.makedirs(outDir)
 
         # Create temporary output names/directories
-        tmp_out_dir = os.path.join(out_dir, 'tmp_dir' + str(random.randint(0, n)))
+        tmp_out_dir = os.path.join(out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
         tmp_basename = 'tmp_basename' + str(random.randint(0, n))
 
         # Convert DCM file
@@ -525,7 +524,7 @@ def data2BIDS_dwi(out_dir, dcm, sub, ses=1, scanType='dwi', acq='PA'):
             os.makedirs(outDir)
 
         # Create temporary output names/directories
-        tmp_out_dir = os.path.join(out_dir, 'tmp_dir' + str(random.randint(0, n)))
+        tmp_out_dir = os.path.join(out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
         tmp_basename = 'tmp_basename' + str(random.randint(0, n))
 
         # Additional sequence/modality parameters

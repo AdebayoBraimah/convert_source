@@ -82,7 +82,7 @@ def parBatch(parFiles, out_dir, sub, ses=1, verbose=False):
         convertPAR(out_dir, parFile, sub, ses)
 
     # Check for leftover temporary directories
-    dirs_ = os.path.join(out_dir, '*tmp*')
+    dirs_ = os.path.join(out_dir, f"sub-{sub}",'*tmp*')
     sub_dirs_ = glob.glob(dirs_)
 
     # Temporary directory clean-up
@@ -239,7 +239,7 @@ def dcmBatch(dcms, out_dir, sub, ses=1, verbose=False):
             convertDCM(out_dir, dcmFile, sub, ses)
 
     # Check for leftover temporary directories
-    dirs_ = os.path.join(out_dir, '*tmp*')
+    dirs_ = os.path.join(out_dir, f"sub-{sub}",'*tmp*')
     sub_dirs_ = glob.glob(dirs_)
 
     # Temporary directory clean-up
