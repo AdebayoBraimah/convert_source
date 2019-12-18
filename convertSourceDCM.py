@@ -142,7 +142,7 @@ def updateJSON(jsonFile, bvalue='unknown', acc=1, mb=1, scanTime='unknown'):
     - scan time (s)
     '''
 
-    data = {"AccelerationFactor": acc, "MultiBandFactor": mb,
+    data = {"AccelerationFactor": acc, "MultibandAccelerationFactor": mb,
             "bvalue": bvalue, "ScanTime": scanTime,
             "SourceDataFormat": "DICOM"}
 

@@ -151,7 +151,7 @@ def updateJSON(jsonFile, bvalue='unknown', wfs='unknown', epiFactor='unknown', a
     # for easier JSON parsing.
 
     data = {"WaterFatShift": wfs, "EchoTrainLength": epiFactor,
-            "AccelerationFactor": acc, "MultiBandFactor": mb,
+            "AccelerationFactor": acc, "MultibandAccelerationFactor": mb,
             "bvalue": bvalue, "ScanTime": scanTime,
             "SourceDataFormat": "PAR_REC"}
 
