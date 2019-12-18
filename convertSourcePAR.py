@@ -499,7 +499,7 @@ def data2BIDS_fmap(out_dir, parFile, sub, ses=1, scanType='fmap', task='rest', a
         run = '{:02}'.format(run)
 
         # Create output names
-        outReal = f"sub-{sub}_ses-{ses}_task-{task}_acq-{acq}_run-{run}_real"
+        outReal = f"sub-{sub}_ses-{ses}_task-{task}_acq-{acq}_run-{run}_fieldmap"
         outMag = f"sub-{sub}_ses-{ses}_task-{task}_acq-{acq}_run-{run}_magnitude"
 
         outRealNii = os.path.join(outDir, outReal + '.nii.gz')
