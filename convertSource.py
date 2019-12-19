@@ -30,21 +30,45 @@ import convertSourceDCM as cdm  # Phlips DICOM file conversion
 def convertPAR(out_dir, parFile, sub, ses=1):
     '''convert PAR file to BIDS nifti based on filename.'''
     if 'T1' in parFile:
-        csp.data2BIDS_anat(out_dir, parFile, sub, scan='T1', ses=ses)
+        try:
+            csp.data2BIDS_anat(out_dir, parFile, sub, scan='T1', ses=ses)
+        except ValueError:
+            pass
     elif 'T2' in parFile:
-        csp.data2BIDS_anat(out_dir, parFile, sub, scan='T2', ses=ses)
+        try:
+            csp.data2BIDS_anat(out_dir, parFile, sub, scan='T2', ses=ses)
+        except ValueError:
+            pass
     elif 'SWI' in parFile:
-        csp.data2BIDS_anat(out_dir, parFile, sub, scan='SWI', scanType='fmap', ses=ses)
+        try:
+            csp.data2BIDS_anat(out_dir, parFile, sub, scan='SWI', scanType='fmap', ses=ses)
+        except ValueError:
+            pass
     elif 'vis' in parFile or 'Vis' in parFile or 'VIS' in parFile:
-        csp.data2BIDS_func(out_dir, parFile, sub, ses, task='visualstrobe')
+        try:
+            csp.data2BIDS_func(out_dir, parFile, sub, ses, task='visualstrobe')
+        except ValueError:
+            pass
     elif 'rsfMR' in parFile or 'rsf' in parFile:
-        csp.data2BIDS_func(out_dir, parFile, sub, ses, task='rest')
+        try:
+            csp.data2BIDS_func(out_dir, parFile, sub, ses, task='rest')
+        except ValueError:
+            pass
     elif 'map' in parFile or 'Map' in parFile or 'MAP' in parFile:
-        csp.data2BIDS_fmap(out_dir, parFile, sub, ses)
+        try:
+            csp.data2BIDS_fmap(out_dir, parFile, sub, ses)
+        except ValueError:
+            pass
     elif 'dti' in parFile or 'DTI' in parFile or 'dwi' in parFile or 'DWI' in parFile:
-        csp.data2BIDS_dwi(out_dir, parFile, sub, ses)
+        try:
+            csp.data2BIDS_dwi(out_dir, parFile, sub, ses)
+        except ValueError:
+            pass
     else:
-        csp.data2BIDS_unknown(out_dir, parFile, sub, ses)
+        try:
+            csp.data2BIDS_unknown(out_dir, parFile, sub, ses)
+        except ValueError:
+            pass
 
 
 def parBatch(parFiles, out_dir, sub, ses=1, verbose=False):
@@ -138,21 +162,45 @@ def subPAR(sub, parDir, out_put_BIDS, ses=1, config='exclude.yml', verbose=False
 def convertDCM(out_dir, dcm, sub, ses=1):
     '''convert dicom file to BIDS nifti based on filename.'''
     if 'T1' in dcm:
-        cdm.data2BIDS_anat(out_dir, dcm, sub, scan='T1', ses=ses)
+        try:
+            cdm.data2BIDS_anat(out_dir, dcm, sub, scan='T1', ses=ses)
+        except ValueError:
+            pass
     elif 'T2' in dcm:
-        cdm.data2BIDS_anat(out_dir, dcm, sub, scan='T2', ses=ses)
+        try:
+            cdm.data2BIDS_anat(out_dir, dcm, sub, scan='T2', ses=ses)
+        except ValueError:
+            pass
     elif 'SWI' in dcm:
-        cdm.data2BIDS_anat(out_dir, dcm, sub, scan='SWI', scanType='fmap', ses=ses)
+        try:
+            cdm.data2BIDS_anat(out_dir, dcm, sub, scan='SWI', scanType='fmap', ses=ses)
+        except ValueError:
+            pass
     elif 'vis' in dcm or 'Vis' in dcm or 'VIS' in dcm:
-        cdm.data2BIDS_func(out_dir, dcm, sub, ses, task='visualstrobe')
+        try:
+            cdm.data2BIDS_func(out_dir, dcm, sub, ses, task='visualstrobe')
+        except ValueError:
+            pass
     elif 'rsfMR' in dcm or 'rsf' in dcm:
-        cdm.data2BIDS_func(out_dir, dcm, sub, ses, task='rest')
+        try:
+            cdm.data2BIDS_func(out_dir, dcm, sub, ses, task='rest')
+        except ValueError:
+            pass
     elif 'map' in dcm or 'Map' in dcm or 'MAP' in dcm:
-        cdm.data2BIDS_fmap(out_dir, dcm, sub, ses)
+        try:
+            cdm.data2BIDS_fmap(out_dir, dcm, sub, ses)
+        except ValueError:
+            pass
     elif 'dti' in dcm or 'DTI' in dcm or 'dwi' in dcm or 'DWI' in dcm or 'B0' in dcm or 'b0' in dcm:
-        cdm.data2BIDS_dwi(out_dir, dcm, sub, ses)
+        try:
+            cdm.data2BIDS_dwi(out_dir, dcm, sub, ses)
+        except ValueError:
+            pass
     else:
-        cdm.data2BIDS_unknown(out_dir, dcm, sub, ses)
+        try:
+            cdm.data2BIDS_unknown(out_dir, dcm, sub, ses)
+        except ValueError:
+            pass
 
 
 def getDCMfile(dcmDir):
