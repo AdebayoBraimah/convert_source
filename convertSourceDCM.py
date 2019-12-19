@@ -327,57 +327,54 @@ def data2BIDS_anat(out_dir, dcm, sub, scan, ses=1, scanType='anat'):
     NB: out_dir refers to the parent or RawData directory.
     '''
 
-    try:
-        # Create Output Directory Variables
-        ses = '{:03}'.format(ses)
-        out_dir = os.path.abspath(out_dir)
-        outDir = os.path.join(out_dir, f"sub-{sub}", f"ses-{ses}", f"{scanType}")
+    # Create Output Directory Variables
+    ses = '{:03}'.format(ses)
+    out_dir = os.path.abspath(out_dir)
+    outDir = os.path.join(out_dir, f"sub-{sub}", f"ses-{ses}", f"{scanType}")
 
-        # Make output directory
-        if not os.path.exists(outDir):
-            os.makedirs(outDir)
+    # Make output directory
+    if not os.path.exists(outDir):
+        os.makedirs(outDir)
 
-        # Create temporary output names/directories
-        tmp_out_dir = os.path.join(out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
-        tmp_basename = 'tmp_basename' + str(random.randint(0, n))
+    # Create temporary output names/directories
+    tmp_out_dir = os.path.join(out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
+    tmp_basename = 'tmp_basename' + str(random.randint(0, n))
 
-        # Convert DCM file
-        [niiFile, jsonFile] = convert_dcm(dcm, tmp_out_dir, tmp_basename)
+    # Convert DCM file
+    [niiFile, jsonFile] = convert_dcm(dcm, tmp_out_dir, tmp_basename)
 
-        niiFile = os.path.abspath(niiFile)
-        jsonFile = os.path.abspath(jsonFile)
+    niiFile = os.path.abspath(niiFile)
+    jsonFile = os.path.abspath(jsonFile)
 
-        # Append w to T1/T2 if not already done
-        if scan in 'T1' or scan in 'T2':
-            scan = scan + 'w'
-        else:
-            scan = scan
+    # Append w to T1/T2 if not already done
+    if scan in 'T1' or scan in 'T2':
+        scan = scan + 'w'
+    else:
+        scan = scan
 
-        # Get Run number
-        run = getNumRuns(outDir, scan=scan)
-        run = '{:02}'.format(run)
+    # Get Run number
+    run = getNumRuns(outDir, scan=scan)
+    run = '{:02}'.format(run)
 
-        # Additional sequence/modality parameters
-        bval = getBval(dcm)
-        acc = getAcc(dcm)
-        mb = getMB(dcm)
-        sct = getScanTime(dcm)
+    # Additional sequence/modality parameters
+    bval = getBval(dcm)
+    acc = getAcc(dcm)
+    mb = getMB(dcm)
+    sct = getScanTime(dcm)
 
-        # update JSON file with additional parameters
-        jsonFile = updateJSON(jsonFile, bval, acc, mb, sct)
+    # update JSON file with additional parameters
+    jsonFile = updateJSON(jsonFile, bval, acc, mb, sct)
 
-        # Create output filenames
-        outName = f"sub-{sub}_ses-{ses}_run-{run}_{scan}"
-        outNii = os.path.join(outDir, outName + '.nii.gz')
-        outJson = os.path.join(outDir, outName + '.json')
+    # Create output filenames
+    outName = f"sub-{sub}_ses-{ses}_run-{run}_{scan}"
+    outNii = os.path.join(outDir, outName + '.nii.gz')
+    outJson = os.path.join(outDir, outName + '.json')
 
-        os.rename(niiFile, outNii)
-        os.rename(jsonFile, outJson)
+    os.rename(niiFile, outNii)
+    os.rename(jsonFile, outJson)
 
-        # remove temporary directory and leftover files
-        shutil.rmtree(tmp_out_dir)
-    except:
-        pass
+    # remove temporary directory and leftover files
+    shutil.rmtree(tmp_out_dir)
 
 
 def data2BIDS_func(out_dir, dcm, sub, ses=1, scanType='func', task='rest', acq='PA'):
@@ -387,58 +384,55 @@ def data2BIDS_func(out_dir, dcm, sub, ses=1, scanType='func', task='rest', acq='
     NB: out_dir refers to the parent or RawData directory.
     '''
 
-    try:
-        # Create Output Directory Variables
-        ses = '{:03}'.format(ses)
-        out_dir = os.path.abspath(out_dir)
-        outDir = os.path.join(out_dir, f"sub-{sub}", f"ses-{ses}", f"{scanType}")
+    # Create Output Directory Variables
+    ses = '{:03}'.format(ses)
+    out_dir = os.path.abspath(out_dir)
+    outDir = os.path.join(out_dir, f"sub-{sub}", f"ses-{ses}", f"{scanType}")
 
-        # Make output directory
-        if not os.path.exists(outDir):
-            os.makedirs(outDir)
+    # Make output directory
+    if not os.path.exists(outDir):
+        os.makedirs(outDir)
 
-        # Create temporary output names/directories
-        tmp_out_dir = os.path.join(out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
-        tmp_basename = 'tmp_basename' + str(random.randint(0, n))
+    # Create temporary output names/directories
+    tmp_out_dir = os.path.join(out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
+    tmp_basename = 'tmp_basename' + str(random.randint(0, n))
 
-        # Convert DCM file
-        [niiFile, jsonFile] = convert_dcm(dcm, tmp_out_dir, tmp_basename)
+    # Convert DCM file
+    [niiFile, jsonFile] = convert_dcm(dcm, tmp_out_dir, tmp_basename)
 
-        niiFile = os.path.abspath(niiFile)
-        jsonFile = os.path.abspath(jsonFile)
+    niiFile = os.path.abspath(niiFile)
+    jsonFile = os.path.abspath(jsonFile)
 
-        # Decide if file is 4D timeseries or single-band reference
-        numFrames = getNumFrames(niiFile)
-        if numFrames == 1:
-            acq = 'AP'
-            run = getNumRuns(outDir, scan='sbref', acq=acq, task=task)
-            run = '{:02}'.format(run)
-            outName = f"sub-{sub}_ses-{ses}_task-{task}_acq-{acq}_run-{run}_sbref"
-        else:
-            run = getNumRuns(outDir, scan='bold', acq=acq, task=task)
-            run = '{:02}'.format(run)
-            outName = f"sub-{sub}_ses-{ses}_task-{task}_acq-{acq}_run-{run}_bold"
+    # Decide if file is 4D timeseries or single-band reference
+    numFrames = getNumFrames(niiFile)
+    if numFrames == 1:
+        acq = 'AP'
+        run = getNumRuns(outDir, scan='sbref', acq=acq, task=task)
+        run = '{:02}'.format(run)
+        outName = f"sub-{sub}_ses-{ses}_task-{task}_dir-{acq}_run-{run}_sbref"
+    else:
+        run = getNumRuns(outDir, scan='bold', acq=acq, task=task)
+        run = '{:02}'.format(run)
+        outName = f"sub-{sub}_ses-{ses}_task-{task}_dir-{acq}_run-{run}_bold"
 
-        # Additional sequence/modality parameters
-        bval = getBval(dcm)
-        acc = getAcc(dcm)
-        mb = getMB(dcm)
-        sct = getScanTime(dcm)
+    # Additional sequence/modality parameters
+    bval = getBval(dcm)
+    acc = getAcc(dcm)
+    mb = getMB(dcm)
+    sct = getScanTime(dcm)
 
-        # update JSON file with additional parameters
-        jsonFile = updateJSON(jsonFile, bval, acc, mb, sct)
+    # update JSON file with additional parameters
+    jsonFile = updateJSON(jsonFile, bval, acc, mb, sct)
 
-        # Create output filenames
-        outNii = os.path.join(outDir, outName + '.nii.gz')
-        outJson = os.path.join(outDir, outName + '.json')
+    # Create output filenames
+    outNii = os.path.join(outDir, outName + '.nii.gz')
+    outJson = os.path.join(outDir, outName + '.json')
 
-        os.rename(niiFile, outNii)
-        os.rename(jsonFile, outJson)
+    os.rename(niiFile, outNii)
+    os.rename(jsonFile, outJson)
 
-        # remove temporary directory and leftover files
-        shutil.rmtree(tmp_out_dir)
-    except:
-        pass
+    # remove temporary directory and leftover files
+    shutil.rmtree(tmp_out_dir)
 
 
 def data2BIDS_fmap(out_dir, dcm, sub, ses=1, scanType='fmap', task='rest', acq='PA'):
@@ -448,62 +442,59 @@ def data2BIDS_fmap(out_dir, dcm, sub, ses=1, scanType='fmap', task='rest', acq='
     NB: out_dir refers to the parent or RawData directory.
     '''
 
-    try:
-        # Create Output Directory Variables
-        ses = '{:03}'.format(ses)
-        out_dir = os.path.abspath(out_dir)
-        outDir = os.path.join(out_dir, f"sub-{sub}", f"ses-{ses}", f"{scanType}")
+    # Create Output Directory Variables
+    ses = '{:03}'.format(ses)
+    out_dir = os.path.abspath(out_dir)
+    outDir = os.path.join(out_dir, f"sub-{sub}", f"ses-{ses}", f"{scanType}")
 
-        # Make output directory
-        if not os.path.exists(outDir):
-            os.makedirs(outDir)
+    # Make output directory
+    if not os.path.exists(outDir):
+        os.makedirs(outDir)
 
-        # Create temporary output names/directories
-        tmp_out_dir = os.path.join(out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
-        tmp_basename = 'tmp_basename' + str(random.randint(0, n))
+    # Create temporary output names/directories
+    tmp_out_dir = os.path.join(out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
+    tmp_basename = 'tmp_basename' + str(random.randint(0, n))
 
-        # Convert DCM file
-        [niiReal, jsonReal, niiMag, jsonMag] = convert_dcm_fmap(dcm, tmp_out_dir, tmp_basename)
+    # Convert DCM file
+    [niiReal, jsonReal, niiMag, jsonMag] = convert_dcm_fmap(dcm, tmp_out_dir, tmp_basename)
 
-        niiReal = os.path.abspath(niiReal)
-        jsonReal = os.path.abspath(jsonReal)
-        niiMag = os.path.abspath(niiMag)
-        jsonMag = os.path.abspath(jsonMag)
+    niiReal = os.path.abspath(niiReal)
+    jsonReal = os.path.abspath(jsonReal)
+    niiMag = os.path.abspath(niiMag)
+    jsonMag = os.path.abspath(jsonMag)
 
-        # Additional sequence/modality parameters
-        bval = getBval(dcm)
-        acc = getAcc(dcm)
-        mb = getMB(dcm)
-        sct = getScanTime(dcm)
+    # Additional sequence/modality parameters
+    bval = getBval(dcm)
+    acc = getAcc(dcm)
+    mb = getMB(dcm)
+    sct = getScanTime(dcm)
 
-        # update JSON file with additional parameters
-        jsonReal = updateJSON(jsonReal, bval, acc, mb, sct)
-        jsonMag = updateJSON(jsonMag, bval, acc, mb, sct)
+    # update JSON file with additional parameters
+    jsonReal = updateJSON(jsonReal, bval, acc, mb, sct)
+    jsonMag = updateJSON(jsonMag, bval, acc, mb, sct)
 
-        # Get run number
-        run = getNumRuns(outDir, scan='magnitude', acq=acq, task=task)
-        run = '{:02}'.format(run)
+    # Get run number
+    run = getNumRuns(outDir, scan='magnitude', acq=acq, task=task)
+    run = '{:02}'.format(run)
 
-        # Create output names
-        outReal = f"sub-{sub}_ses-{ses}_task-{task}_acq-{acq}_run-{run}_fieldmap"
-        outMag = f"sub-{sub}_ses-{ses}_task-{task}_acq-{acq}_run-{run}_magnitude"
+    # Create output names
+    outReal = f"sub-{sub}_ses-{ses}_task-{task}_dir-{acq}_run-{run}_fieldmap"
+    outMag = f"sub-{sub}_ses-{ses}_task-{task}_dir-{acq}_run-{run}_magnitude"
 
-        outRealNii = os.path.join(outDir, outReal + '.nii.gz')
-        outMagNii = os.path.join(outDir, outMag + '.nii.gz')
+    outRealNii = os.path.join(outDir, outReal + '.nii.gz')
+    outMagNii = os.path.join(outDir, outMag + '.nii.gz')
 
-        outRealJson = os.path.join(outDir, outReal + '.json')
-        outMagJson = os.path.join(outDir, outMag + '.json')
+    outRealJson = os.path.join(outDir, outReal + '.json')
+    outMagJson = os.path.join(outDir, outMag + '.json')
 
-        os.rename(niiReal, outRealNii)
-        os.rename(niiMag, outMagNii)
+    os.rename(niiReal, outRealNii)
+    os.rename(niiMag, outMagNii)
 
-        os.rename(jsonReal, outRealJson)
-        os.rename(jsonMag, outMagJson)
+    os.rename(jsonReal, outRealJson)
+    os.rename(jsonMag, outMagJson)
 
-        # remove temporary directory and leftover files
-        shutil.rmtree(tmp_out_dir)
-    except:
-        pass
+    # remove temporary directory and leftover files
+    shutil.rmtree(tmp_out_dir)
 
 
 def data2BIDS_dwi(out_dir, dcm, sub, ses=1, scanType='dwi', acq='PA'):
@@ -513,96 +504,93 @@ def data2BIDS_dwi(out_dir, dcm, sub, ses=1, scanType='dwi', acq='PA'):
     NB: out_dir refers to the parent or RawData directory.
     '''
 
-    try:
-        # Create Output Directory Variables
-        ses = '{:03}'.format(ses)
-        out_dir = os.path.abspath(out_dir)
-        outDir = os.path.join(out_dir, f"sub-{sub}", f"ses-{ses}", f"{scanType}")
+    # Create Output Directory Variables
+    ses = '{:03}'.format(ses)
+    out_dir = os.path.abspath(out_dir)
+    outDir = os.path.join(out_dir, f"sub-{sub}", f"ses-{ses}", f"{scanType}")
 
-        # Make output directory
-        if not os.path.exists(outDir):
-            os.makedirs(outDir)
+    # Make output directory
+    if not os.path.exists(outDir):
+        os.makedirs(outDir)
 
-        # Create temporary output names/directories
-        tmp_out_dir = os.path.join(out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
-        tmp_basename = 'tmp_basename' + str(random.randint(0, n))
+    # Create temporary output names/directories
+    tmp_out_dir = os.path.join(out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
+    tmp_basename = 'tmp_basename' + str(random.randint(0, n))
 
-        # Additional sequence/modality parameters
-        bval = getBval(dcm)
-        acc = getAcc(dcm)
-        mb = getMB(dcm)
-        sct = getScanTime(dcm)
+    # Additional sequence/modality parameters
+    bval = getBval(dcm)
+    acc = getAcc(dcm)
+    mb = getMB(dcm)
+    sct = getScanTime(dcm)
 
-        # IF statement to handle either a B0 or b > 0 acquisition.
-        if bval == 0:
-            # Convert dcm file
-            [niiFile, jsonFile] = convert_dcm(dcm, tmp_out_dir, tmp_basename)
+    # IF statement to handle either a B0 or b > 0 acquisition.
+    if bval == 0:
+        # Convert dcm file
+        [niiFile, jsonFile] = convert_dcm(dcm, tmp_out_dir, tmp_basename)
 
-            niiFile = os.path.abspath(niiFile)
-            jsonFile = os.path.abspath(jsonFile)
+        niiFile = os.path.abspath(niiFile)
+        jsonFile = os.path.abspath(jsonFile)
 
-            # Hard-coded to differentiate between the 
-            # different echo B0s of the b800 or b2000
-            # acquisitions.
-            echo = getEcho(jsonFile)
-            if echo < 0.093:
-                dirs = 6
-            else:
-                dirs = 7
-            dirs = '{:03}'.format(dirs)
-
-            # update JSON file with additional parameters
-            jsonFile = updateJSON(jsonFile, bval, acc, mb, sct)
-
-            # Get Run Number
-            acq = 'AP'
-            run = getNumRuns(outDir, scan='dwi', acq=acq, dirs=dirs, bval=bval)
-            run = '{:02}'.format(run)
-            outName = f"sub-{sub}_ses-{ses}_acq-{acq}_dirs-{dirs}_bval-b{bval}_run-{run}_dwi"
-
-            # Create output filenames
-            outNii = os.path.join(outDir, outName + '.nii.gz')
-            outJson = os.path.join(outDir, outName + '.json')
-
-            os.rename(niiFile, outNii)
-            os.rename(jsonFile, outJson)
+        # Hard-coded to differentiate between the 
+        # different echo B0s of the b800 or b2000
+        # acquisitions.
+        echo = getEcho(jsonFile)
+        if echo < 0.093:
+            dirs = 6
         else:
-            # Convert dcm file
-            [niiFile, jsonFile, bvals, bvecs] = convert_dcm_dwi(dcm, tmp_out_dir, tmp_basename)
+            dirs = 7
+        dirs = '{:03}'.format(dirs)
 
-            niiFile = os.path.abspath(niiFile)
-            jsonFile = os.path.abspath(jsonFile)
-            bvals = os.path.abspath(bvals)
-            bvecs = os.path.abspath(bvecs)
+        # update JSON file with additional parameters
+        jsonFile = updateJSON(jsonFile, bval, acc, mb, sct)
 
-            # Number of directions for CCHMC diffusion protocol correspond
-            # to the number of frames in the 4D nifti file.
-            dirs = getNumFrames(niiFile)
-            dirs = '{:03}'.format(dirs)
+        # Get Run Number
+        acq = 'AP'
+        run = getNumRuns(outDir, scan='dwi', acq=acq, dirs=dirs, bval=bval)
+        run = '{:02}'.format(run)
+        outName = f"sub-{sub}_ses-{ses}_dir-{acq}_acq-{dirs}dirs_bval-b{bval}_run-{run}_dwi"
 
-            # update JSON file with additional parameters
-            jsonFile = updateJSON(jsonFile, bval, acc, mb, sct)
+        # Create output filenames
+        outNii = os.path.join(outDir, outName + '.nii.gz')
+        outJson = os.path.join(outDir, outName + '.json')
 
-            # Get Run Number
-            run = getNumRuns(outDir, scan='dwi', acq=acq, dirs=dirs, bval=bval)
-            run = '{:02}'.format(run)
-            outName = f"sub-{sub}_ses-{ses}_acq-{acq}_dirs-{dirs}_bval-b{bval}_run-{run}_dwi"
+        os.rename(niiFile, outNii)
+        os.rename(jsonFile, outJson)
+    else:
+        # Convert dcm file
+        [niiFile, jsonFile, bvals, bvecs] = convert_dcm_dwi(dcm, tmp_out_dir, tmp_basename)
 
-            # Create output filenames
-            outNii = os.path.join(outDir, outName + '.nii.gz')
-            outJson = os.path.join(outDir, outName + '.json')
-            outBvals = os.path.join(outDir, outName + '.bval')
-            outBvecs = os.path.join(outDir, outName + '.bvec')
+        niiFile = os.path.abspath(niiFile)
+        jsonFile = os.path.abspath(jsonFile)
+        bvals = os.path.abspath(bvals)
+        bvecs = os.path.abspath(bvecs)
 
-            os.rename(niiFile, outNii)
-            os.rename(jsonFile, outJson)
-            os.rename(bvals, outBvals)
-            os.rename(bvecs, outBvecs)
+        # Number of directions for CCHMC diffusion protocol correspond
+        # to the number of frames in the 4D nifti file.
+        dirs = getNumFrames(niiFile)
+        dirs = '{:03}'.format(dirs)
 
-        # remove temporary directory and leftover files
-        shutil.rmtree(tmp_out_dir)
-    except:
-        pass
+        # update JSON file with additional parameters
+        jsonFile = updateJSON(jsonFile, bval, acc, mb, sct)
+
+        # Get Run Number
+        run = getNumRuns(outDir, scan='dwi', acq=acq, dirs=dirs, bval=bval)
+        run = '{:02}'.format(run)
+        outName = f"sub-{sub}_ses-{ses}_dir-{acq}_acq-{dirs}dirs_bval-b{bval}_run-{run}_dwi"
+
+        # Create output filenames
+        outNii = os.path.join(outDir, outName + '.nii.gz')
+        outJson = os.path.join(outDir, outName + '.json')
+        outBvals = os.path.join(outDir, outName + '.bval')
+        outBvecs = os.path.join(outDir, outName + '.bvec')
+
+        os.rename(niiFile, outNii)
+        os.rename(jsonFile, outJson)
+        os.rename(bvals, outBvals)
+        os.rename(bvecs, outBvecs)
+
+    # remove temporary directory and leftover files
+    shutil.rmtree(tmp_out_dir)
 
 
 def data2BIDS_unknown(out_dir, dcm, sub, ses=1):

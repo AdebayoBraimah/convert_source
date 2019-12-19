@@ -30,45 +30,21 @@ import convertSourceDCM as cdm  # Phlips DICOM file conversion
 def convertPAR(out_dir, parFile, sub, ses=1):
     '''convert PAR file to BIDS nifti based on filename.'''
     if 'T1' in parFile:
-        try:
-            csp.data2BIDS_anat(out_dir, parFile, sub, scan='T1', ses=ses)
-        except:
-            pass
+        csp.data2BIDS_anat(out_dir, parFile, sub, scan='T1', ses=ses)
     elif 'T2' in parFile:
-        try:
-            csp.data2BIDS_anat(out_dir, parFile, sub, scan='T2', ses=ses)
-        except:
-            pass
+        csp.data2BIDS_anat(out_dir, parFile, sub, scan='T2', ses=ses)
     elif 'SWI' in parFile:
-        try:
-            csp.data2BIDS_anat(out_dir, parFile, sub, scan='SWI', scanType='fmap', ses=ses)
-        except:
-            pass
+        csp.data2BIDS_anat(out_dir, parFile, sub, scan='SWI', scanType='fmap', ses=ses)
     elif 'vis' in parFile or 'Vis' in parFile or 'VIS' in parFile:
-        try:
-            csp.data2BIDS_func(out_dir, parFile, sub, ses, task='visualstrobe')
-        except:
-            pass
+        csp.data2BIDS_func(out_dir, parFile, sub, ses, task='visualstrobe')
     elif 'rsfMR' in parFile or 'rsf' in parFile:
-        try:
-            csp.data2BIDS_func(out_dir, parFile, sub, ses, task='rest')
-        except:
-            pass
+        csp.data2BIDS_func(out_dir, parFile, sub, ses, task='rest')
     elif 'map' in parFile or 'Map' in parFile or 'MAP' in parFile:
-        try:
-            csp.data2BIDS_fmap(out_dir, parFile, sub, ses)
-        except:
-            pass
+        csp.data2BIDS_fmap(out_dir, parFile, sub, ses)
     elif 'dti' in parFile or 'DTI' in parFile or 'dwi' in parFile or 'DWI' in parFile:
-        try:
-            csp.data2BIDS_dwi(out_dir, parFile, sub, ses)
-        except:
-            pass
+        csp.data2BIDS_dwi(out_dir, parFile, sub, ses)
     else:
-        try:
-            csp.data2BIDS_unknown(out_dir, parFile, sub, ses)
-        except:
-            pass
+        csp.data2BIDS_unknown(out_dir, parFile, sub, ses)
 
 
 def parBatch(parFiles, out_dir, sub, ses=1, verbose=False):
@@ -111,7 +87,7 @@ def excludePAR(dataDir, configExclude='exclude.yml'):
     # YML file format for exclusion:
     # exclude: SWI,SURVEY,Reg
 
-    dataDir = csp.renamePAR_REC_Dir(dataDir)
+    # dataDir = csp.renamePAR_REC_Dir(dataDir)
 
     # Create List of PAR Files
     parFileHeaders = os.path.join(dataDir, "*.PAR")
@@ -162,45 +138,21 @@ def subPAR(sub, parDir, out_put_BIDS, ses=1, config='exclude.yml', verbose=False
 def convertDCM(out_dir, dcm, sub, ses=1):
     '''convert dicom file to BIDS nifti based on filename.'''
     if 'T1' in dcm:
-        try:
-            cdm.data2BIDS_anat(out_dir, dcm, sub, scan='T1', ses=ses)
-        except:
-            pass
+        cdm.data2BIDS_anat(out_dir, dcm, sub, scan='T1', ses=ses)
     elif 'T2' in dcm:
-        try:
-            cdm.data2BIDS_anat(out_dir, dcm, sub, scan='T2', ses=ses)
-        except:
-            pass
+        cdm.data2BIDS_anat(out_dir, dcm, sub, scan='T2', ses=ses)
     elif 'SWI' in dcm:
-        try:
-            cdm.data2BIDS_anat(out_dir, dcm, sub, scan='SWI', scanType='fmap', ses=ses)
-        except:
-            pass
+        cdm.data2BIDS_anat(out_dir, dcm, sub, scan='SWI', scanType='fmap', ses=ses)
     elif 'vis' in dcm or 'Vis' in dcm or 'VIS' in dcm:
-        try:
-            cdm.data2BIDS_func(out_dir, dcm, sub, ses, task='visualstrobe')
-        except:
-            pass
+        cdm.data2BIDS_func(out_dir, dcm, sub, ses, task='visualstrobe')
     elif 'rsfMR' in dcm or 'rsf' in dcm:
-        try:
-            cdm.data2BIDS_func(out_dir, dcm, sub, ses, task='rest')
-        except:
-            pass
+        cdm.data2BIDS_func(out_dir, dcm, sub, ses, task='rest')
     elif 'map' in dcm or 'Map' in dcm or 'MAP' in dcm:
-        try:
-            cdm.data2BIDS_fmap(out_dir, dcm, sub, ses)
-        except:
-            pass
+        cdm.data2BIDS_fmap(out_dir, dcm, sub, ses)
     elif 'dti' in dcm or 'DTI' in dcm or 'dwi' in dcm or 'DWI' in dcm or 'B0' in dcm or 'b0' in dcm:
-        try:
-            cdm.data2BIDS_dwi(out_dir, dcm, sub, ses)
-        except:
-            pass
+        cdm.data2BIDS_dwi(out_dir, dcm, sub, ses)
     else:
-        try:
-            cdm.data2BIDS_unknown(out_dir, dcm, sub, ses)
-        except:
-            pass
+        cdm.data2BIDS_unknown(out_dir, dcm, sub, ses)
 
 
 def getDCMfile(dcmDir):
