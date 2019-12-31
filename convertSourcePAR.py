@@ -28,6 +28,7 @@ import random
 import re
 import json
 import pandas as pd
+import nibabel as nib
 from scipy import stats
 
 # Random integer max range value
@@ -57,7 +58,11 @@ def renamePAR_REC_Dir(rawDataDir):
 def getNumFrames(niiFile):
     '''Gets the number of frames for a DW or fMR image series.'''
 
-    numFrames = subprocess.check_output(["fslval", niiFile, "dim4"])
+    img = nib.load(niiFile)
+    frames = img.header.get_data_shape()
+    numFrames = frames[3]
+
+    # numFrames = subprocess.check_output(["fslval", niiFile, "dim4"])
     numFrames = str(numFrames)
     numFrames = int(re.sub('[^0-9]', '', numFrames))  # Strip non-numeric information
     return (numFrames)
@@ -162,11 +167,6 @@ def updateJSON(jsonFile, bvalue='unknown', wfs='unknown', epiFactor='unknown', a
             "AccelerationFactor": acc, "MultibandAccelerationFactor": mb,
             "bvalue": bvalue, "ScanTime": scanTime, "TaskName": task_name,
             "SourceDataFormat": "PAR_REC"}
-
-    # data = {"WaterFatShift": wfs, "EchoTrainLength": epiFactor,
-    #         "AccelerationFactor": acc, "MultibandAccelerationFactor": mb,
-    #         "bvalue": bvalue, "ScanTime": scanTime,
-    #         "SourceDataFormat": "PAR_REC"}
 
     with open(jsonFile, "r") as read_file:
         data2 = json.load(read_file)

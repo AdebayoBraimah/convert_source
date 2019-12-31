@@ -28,6 +28,7 @@ import shutil
 import glob
 import random
 import subprocess
+import nibabel as nib
 
 # Random integer max range value
 n = 10000
@@ -155,10 +156,6 @@ def updateJSON(jsonFile, bvalue='unknown', acc=1, mb=1, scanTime='unknown', task
             "bvalue": bvalue, "ScanTime": scanTime, "TaskName": task_name,
             "SourceDataFormat": "DICOM"}
 
-    # data = {"AccelerationFactor": acc, "MultibandAccelerationFactor": mb,
-    #         "bvalue": bvalue, "ScanTime": scanTime,
-    #         "SourceDataFormat": "DICOM"}
-
     with open(jsonFile, "r") as read_file:
         data2 = json.load(read_file)
 
@@ -183,11 +180,14 @@ def getNumRuns(out_dir, task="", acq="", dirs="", bval="", scan=""):
 
     return (runNum)
 
-
 def getNumFrames(niiFile):
     '''Gets the number of frames for a DW or fMR image series.'''
 
-    numFrames = subprocess.check_output(["fslval", niiFile, "dim4"])
+    img = nib.load(niiFile)
+    frames = img.header.get_data_shape()
+    numFrames = frames[3]
+
+    # numFrames = subprocess.check_output(["fslval", niiFile, "dim4"])
     numFrames = str(numFrames)
     numFrames = int(re.sub('[^0-9]', '', numFrames))  # Strip non-numeric information
     return (numFrames)
