@@ -1,0 +1,52 @@
+# This YAML exclusion configuration (config) file
+# lists all the types of modalities/sequences to 
+# be excluded during the DICOM and/or PAR REC to
+# nifti (BIDS) conversion.
+# 
+# The keyword that convertSource is looking for
+# is exclude, followed by the different types 
+# exclusion names e.g.:
+# 
+# exclude: SWI,swi,PRESS,press
+
+# The files being exluded here
+# are consistent with the 
+# neonatal scanning protocol
+# for the IRC 287 and 317 studies.
+
+# The corresponding files in the 
+# exclude list are those not needed
+# for conventional neuroimaging
+# analyses:
+# 
+# - Surveys (or Default)
+# - Reg Images (exported by the scanner)
+# - Any spectroscopic modalities:
+#     - PRESS
+# - Secondary Screen Captures
+# - Proton Density (PD)
+
+# exclude: SURVEY,survey,Reg,SHORT,LONG,MRS,PRESS,DEFAULT,press,ScreenCapture,PD,ALL,SPECTRO
+
+# exclude: SWI,swi,SURVEY,survey,Reg,SHORT,LONG,MRS,PRESS,DEFAULT,press,ScreenCapture,PD,ALL,SPECTRO
+
+# Anatomical Scans
+T1w: T1,T1w,TFE
+T2w: T2,T2w,TSE
+
+# Functional Scans
+bold: 
+  rest: rsfMR,rest
+  visualstrobe: vis,visual
+
+# Field Maps
+fmap: map
+
+# Susceptiblity Weighted Images
+swi: swi 
+
+# Diffusion Weighted Scans
+dwi: diffusion, DTI, DWI
+
+# Exclusion List (these filenames are not converted)
+exclude: SURVEY,survey,Reg,SHORT,LONG,MRS,PRESS,DEFAULT,press,ScreenCapture,PD,ALL,SPECTRO

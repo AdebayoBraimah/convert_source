@@ -141,7 +141,7 @@ def getMB(parFile):
     return (mb)
 
 
-def updateJSON(jsonFile, bvalue='unknown', wfs='unknown', epiFactor='unknown', acc=1, mb=1, scanTime='unknown'):
+def updateJSON(jsonFile, bvalue='unknown', wfs='unknown', epiFactor='unknown', acc=1, mb=1, scanTime='unknown', task_name=""):
     '''
     Appends additional information not normally included in the JSON file side car
     as dcm2niix does not normally look for these in PAR/XML REC headers.
@@ -150,10 +150,23 @@ def updateJSON(jsonFile, bvalue='unknown', wfs='unknown', epiFactor='unknown', a
     # "EPIFactor":epiFactor changed to "EchoTrainLength":epiFactor
     # for easier JSON parsing.
 
-    data = {"WaterFatShift": wfs, "EchoTrainLength": epiFactor,
+    if task_name == "":
+        # In the case of empty task_name string
+        data = {"WaterFatShift": wfs, "EchoTrainLength": epiFactor,
             "AccelerationFactor": acc, "MultibandAccelerationFactor": mb,
             "bvalue": bvalue, "ScanTime": scanTime,
             "SourceDataFormat": "PAR_REC"}
+    else:
+        # In the case of populated task_name string
+        data = {"WaterFatShift": wfs, "EchoTrainLength": epiFactor,
+            "AccelerationFactor": acc, "MultibandAccelerationFactor": mb,
+            "bvalue": bvalue, "ScanTime": scanTime, "TaskName": task_name,
+            "SourceDataFormat": "PAR_REC"}
+
+    # data = {"WaterFatShift": wfs, "EchoTrainLength": epiFactor,
+    #         "AccelerationFactor": acc, "MultibandAccelerationFactor": mb,
+    #         "bvalue": bvalue, "ScanTime": scanTime,
+    #         "SourceDataFormat": "PAR_REC"}
 
     with open(jsonFile, "r") as read_file:
         data2 = json.load(read_file)
