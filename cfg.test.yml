@@ -1,23 +1,17 @@
-# This YAML exclusion configuration (config) file
-# lists all the types of modalities/sequences to 
-# be excluded during the DICOM and/or PAR REC to
-# nifti (BIDS) conversion.
+# This YAML exclusion configuration (config) file lists all the types of modalities/sequences to 
+# be converted during the DICOM and/or PAR REC to nifti (BIDS) conversion. The config file requires
+# that lists of keywords be comma separated and to not contain spaces.
 # 
-# The keyword that convertSource is looking for
-# is exclude, followed by the different types 
-# exclusion names e.g.:
+# The keyword that convert_source is looking for is exclude, followed by the substrings to be matched 
+# and excluded. The substrings used for matching are not case sensitive.
 # 
-# exclude: SWI,swi,PRESS,press
+# example:
+# 
+# exclude: SWI,press
 
-# The files being exluded here
-# are consistent with the 
-# neonatal scanning protocol
-# for the IRC 287 and 317 studies.
+# The files being exluded here are consistent with the neonatal scanning protocol for the IRC 287 and 317 studies.
 
-# The corresponding files in the 
-# exclude list are those not needed
-# for conventional neuroimaging
-# analyses:
+# The corresponding files in the exclude list are those not needed for conventional volumetric neuroimaging analyses:
 # 
 # - Surveys (or Default)
 # - Reg Images (exported by the scanner)
@@ -26,27 +20,63 @@
 # - Secondary Screen Captures
 # - Proton Density (PD)
 
-# exclude: SURVEY,survey,Reg,SHORT,LONG,MRS,PRESS,DEFAULT,press,ScreenCapture,PD,ALL,SPECTRO
+# Configuration based on BIDS' directory names
 
-# exclude: SWI,swi,SURVEY,survey,Reg,SHORT,LONG,MRS,PRESS,DEFAULT,press,ScreenCapture,PD,ALL,SPECTRO
+# Anatomical scans
+anat:
+  T1w: T1,T1w,TFE
+  T2w: T2,T2w,TSE
+  # flair: flair
 
-# Anatomical Scans
-T1w: T1,T1w,TFE
-T2w: T2,T2w,TSE
+# Functional scans
+func:
+  bold: 
+    rest: rsfMR,rest
+    visualstrobe: vis,visual
+  # asl:
+  #   rest: pcasl
 
-# Functional Scans
-bold: 
-  rest: rsfMR,rest
-  visualstrobe: vis,visual
+# # Arterial Spin Labeling
+# asl:
+#   asl: casl,pcas
 
-# Field Maps
-fmap: map
+# Field maps 
+fmap:
+  fmap: map
 
 # Susceptiblity Weighted Images
-swi: swi 
+swi:
+  swi: swi 
 
 # Diffusion Weighted Scans
-dwi: diffusion, DTI, DWI
+dwi:
+  dwi: diffusion,DTI,DWI
 
 # Exclusion List (these filenames are not converted)
-exclude: SURVEY,survey,Reg,SHORT,LONG,MRS,PRESS,DEFAULT,press,ScreenCapture,PD,ALL,SPECTRO
+exclude: SURVEY,Reg,SHORT,LONG,MRS,PRESS,DEFAULT,press,ScreenCapture,PD,ALL,SPECTRO
+
+# Old configuration format
+
+# # Anatomical Scans
+# T1w: T1,T1w,TFE
+# T2w: T2,T2w,TSE
+
+# # Functional Scans
+# bold: 
+#   rest: rsfMR,rest
+#   visualstrobe: vis,visual
+
+# # asl:
+# #   rest: pcasl
+
+# # Field Maps
+# fmap: map
+
+# # Susceptiblity Weighted Images
+# swi: swi 
+
+# # Diffusion Weighted Scans
+# dwi: diffusion,DTI,DWI
+
+# # Exclusion List (these filenames are not converted)
+# exclude: SURVEY,survey,Reg,SHORT,LONG,MRS,PRESS,DEFAULT,press,ScreenCapture,PD,ALL,SPECTRO

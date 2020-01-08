@@ -35,8 +35,12 @@ from scipy import stats
 n = 10000
 
 
-def renamePAR_REC_Dir(rawDataDir):
+def rename_par_rec_dir(raw_data_dir):
     '''
+    DEPRICATED: This function should not be used. As many problems 
+        are caused, on only one or several parts of the filename are 
+        changed. One should just put the file name in quotes.
+
     Renames The PAR REC raw data directory such that
     the spaces in PAR REC are replaced with an underscore.
     ---
@@ -46,46 +50,46 @@ def renamePAR_REC_Dir(rawDataDir):
     Returns: 
     - Renamed PAR_REC directory with an underscore.
     '''
-    if "PAR REC" in rawDataDir:
-        newDir = os.path.join(os.path.dirname(rawDataDir), "PAR_REC")
-        os.rename(rawDataDir, newDir)
+    if "PAR REC" in raw_data_dir:
+        new_dir = os.path.join(os.path.dirname(raw_data_dir), "PAR_REC")
+        os.rename(raw_data_dir, new_dir)
     else:
-        newDir = rawDataDir
-    newDir = os.path.abspath(newDir)
-    return (newDir)
+        new_dir = raw_data_dir
+    new_dir = os.path.abspath(new_dir)
+    return (new_dir)
 
 
-def getNumFrames(niiFile):
+def get_num_frames(nii_file):
     '''Gets the number of frames for a DW or fMR image series.'''
 
-    img = nib.load(niiFile)
+    img = nib.load(nii_file)
     frames = img.header.get_data_shape()
-    numFrames = frames[3]
+    num_frames = frames[3]
 
-    # numFrames = subprocess.check_output(["fslval", niiFile, "dim4"])
-    numFrames = str(numFrames)
-    numFrames = int(re.sub('[^0-9]', '', numFrames))  # Strip non-numeric information
-    return (numFrames)
+    # num_frames = subprocess.check_output(["fslval", nii_file, "dim4"])
+    num_frames = str(num_frames)
+    num_frames = int(re.sub('[^0-9]', '', num_frames))  # Strip non-numeric information
+    return (num_frames)
 
 
-def getEPIfactor(parFile):
+def get_epi_factor(par_file):
     '''
-    Gets EPI factor from Philips' PAR/XML Header.
+    Gets EPI factor (Echo Train Length) from Philips' PAR/XML Header.
     This uses the RegEx '.    EPI factor        <0,1=no EPI>     : '
     and searches for the corresponding integer for this value.
     Returns integer.
     '''
     regexp = re.compile(r'.    EPI factor        <0,1=no EPI>     :   .*?([0-9.-]+)')  # Search string for RegEx
-    with open(parFile) as f:
+    with open(par_file) as f:
         for line in f:
             match = regexp.match(line)
             if match:
-                epiFactor = match.group(1)
-                epiFactor = int(epiFactor)
-    return (epiFactor)
+                epi_factor = match.group(1)
+                epi_factor = int(epi_factor)
+    return (epi_factor)
 
 
-def getWFS(parFile):
+def get_wfs(par_file):
     '''
     Gets Water Fat Shift from Philips' PAR/XML Header.
     This uses the RegEx '.    Water Fat shift \[pixels\]           :   '
@@ -94,7 +98,7 @@ def getWFS(parFile):
     '''
     regexp = re.compile(
         r'.    Water Fat shift \[pixels\]           :   .*?([0-9.-]+)')  # Search string for RegEx, escape the []
-    with open(parFile) as f:
+    with open(par_file) as f:
         for line in f:
             match = regexp.match(line)
             if match:
@@ -103,7 +107,7 @@ def getWFS(parFile):
     return (wfs)
 
 
-def getBval(parFile):
+def get_bval(par_file):
     '''
     Extracts bvalue from PAR/XML REC Header.
     This assumes a single shell acquisition,
@@ -111,20 +115,20 @@ def getBval(parFile):
     Default is 0.
     '''
     bvalue = 0
-    bvalDF = pd.read_csv(parFile, sep="\s+", skiprows=98,
+    bval_df = pd.read_csv(par_file, sep="\s+", skiprows=98,
                          low_memory=False)  # Skip the first 99 rows as this is extraneous information
-    arr = bvalDF['echo'].values  # All the b-values are listed under 'echo' using this method.
-    modeArr = stats.mode(arr, nan_policy='omit')  # Obtain the mode (most frequent number)
-    bvalue = int(re.sub('[^0-9]', '', str(modeArr[0])))
+    arr = bval_df['echo'].values  # All the b-values are listed under 'echo' using this method.
+    mode_arr = stats.mode(arr, nan_policy='omit')  # Obtain the mode (most frequent number)
+    bvalue = int(re.sub('[^0-9]', '', str(mode_arr[0])))
 
     return (bvalue)
 
 
-def getAcc(parFile):
+def get_acc(par_file):
     '''Acceleration (SENSE) factor for Scanner. Default is 1.'''
     acc = 1
     regexp = re.compile(r' SENSE *?([0-9.-]+)')
-    with open(parFile) as f:
+    with open(par_file) as f:
         for line in f:
             match = regexp.search(line)
             if match:
@@ -133,11 +137,11 @@ def getAcc(parFile):
     return (acc)
 
 
-def getMB(parFile):
+def get_mb(par_file):
     '''Multi-Band factor for Scanner. Default is 1.'''
     mb = 1
     regexp = re.compile(r' MB *?([0-9.-]+)')
-    with open(parFile) as f:
+    with open(par_file) as f:
         for line in f:
             match = regexp.search(line)
             if match:
@@ -146,40 +150,40 @@ def getMB(parFile):
     return (mb)
 
 
-def updateJSON(jsonFile, bvalue='unknown', wfs='unknown', epiFactor='unknown', acc=1, mb=1, scanTime='unknown', task_name=""):
+def update_json(json_file, bvalue='unknown', wfs='unknown', epi_factor='unknown', acc=1, mb=1, scan_time='unknown', task_name=""):
     '''
     Appends additional information not normally included in the JSON file side car
     as dcm2niix does not normally look for these in PAR/XML REC headers.
     '''
 
-    # "EPIFactor":epiFactor changed to "EchoTrainLength":epiFactor
+    # "epi_factor":epi_factor changed to "EchoTrainLength":epi_factor
     # for easier JSON parsing.
 
     if task_name == "":
         # In the case of empty task_name string
-        data = {"WaterFatShift": wfs, "EchoTrainLength": epiFactor,
+        data = {"WaterFatShift": wfs, "EchoTrainLength": epi_factor,
             "AccelerationFactor": acc, "MultibandAccelerationFactor": mb,
-            "bvalue": bvalue, "ScanTime": scanTime,
+            "bvalue": bvalue, "scan_time": scan_time,
             "SourceDataFormat": "PAR_REC"}
     else:
         # In the case of populated task_name string
-        data = {"WaterFatShift": wfs, "EchoTrainLength": epiFactor,
+        data = {"WaterFatShift": wfs, "EchoTrainLength": epi_factor,
             "AccelerationFactor": acc, "MultibandAccelerationFactor": mb,
-            "bvalue": bvalue, "ScanTime": scanTime, "TaskName": task_name,
+            "bvalue": bvalue, "scan_time": scan_time, "TaskName": task_name,
             "SourceDataFormat": "PAR_REC"}
 
-    with open(jsonFile, "r") as read_file:
+    with open(json_file, "r") as read_file:
         data2 = json.load(read_file)
 
     data2.update(data)
 
-    with open(jsonFile, 'w+') as outfile:
+    with open(json_file, 'w+') as outfile:
         json.dump(data2, outfile, indent=4)
 
-    return (jsonFile)
+    return (json_file)
 
 
-def getNumRuns(out_dir, task="", acq="", dirs="", bval="", scan=""):
+def get_num_runs(out_dir, task="", acq="", dirs="", bval="", scan=""):
     '''
     Determines run number of a scan (e.g. T1w, T2w, bold, dwi etc.)
     in an output directory by globbing the directory for the number
@@ -187,13 +191,13 @@ def getNumRuns(out_dir, task="", acq="", dirs="", bval="", scan=""):
     '''
 
     runs = os.path.join(out_dir, f"*{task}*{acq}*{dirs}*{bval}*{scan}*.nii*")
-    runNum = len(glob.glob(runs))
-    runNum = runNum + 1
+    run_num = len(glob.glob(runs))
+    run_num = run_num + 1
 
-    return (runNum)
+    return (run_num)
 
 
-def scanTech(parFile):
+def scan_tech(par_file):
     '''
     Parses PAR/XML REC header for sequence/technique
     used to obtain the image (if not mentioned in the
@@ -201,50 +205,50 @@ def scanTech(parFile):
     protocol names specific to CCHMC scanners.
     '''
     regexp = re.compile(r'.    Technique                          :  .*', re.M | re.I)
-    with open(parFile) as f:
+    with open(par_file) as f:
         for line in f:
             match = regexp.match(line)
             if match:
-                scanID = match.group()
-    if 'T1' in scanID or 'TFE' in scanID:
+                scan_id = match.group()
+    if 'T1' in scan_id or 'TFE' in scan_id:
         scan = 'T1'
-    elif 'T2' in scanID or 'TSE' in scanID:
+    elif 'T2' in scan_id or 'TSE' in scan_id:
         scan = 'T2'
-    elif 'DwiSE' in scanID:
+    elif 'DwiSE' in scan_id:
         scan = 'dwi'
-    elif 'FEEPI' in scanID:
+    elif 'FEEPI' in scan_id:
         scan = 'func'
     else:
-        scan = 'unknownScan'
+        scan = 'unknown_scan'
 
     return (scan)
 
 
-def getScanTime(parFile):
+def get_scan_time(par_file):
     '''
     Gets Water Fat Shift from Philips' PAR/XML Header.
     This uses the RegEx 'Scan Duration [sec]' string
     and searches for the corresponding integer for this value.
     Returns integer.
     '''
-    scanTime = 'unknown'
+    scan_time = 'unknown'
     regexp = re.compile(
         r'.    Scan Duration \[sec\]                :   .*?([0-9.-]+)')  # Search string for RegEx, escape the []
-    with open(parFile) as f:
+    with open(par_file) as f:
         for line in f:
             match = regexp.match(line)
             if match:
-                scanTime = match.group(1)
-                scanTime = float(scanTime)
-    return (scanTime)
+                scan_time = match.group(1)
+                scan_time = float(scan_time)
+    return (scan_time)
 
 
-def getEcho(jsonFile):
+def get_echo(json_file):
     '''
     Gets the echo time (TE) from a 
     JSON sidecar file for an acquisition.
     '''
-    with open(jsonFile, "r") as read_file:
+    with open(json_file, "r") as read_file:
         data = json.load(read_file)
 
     echo = data.get("EchoTime")
@@ -252,7 +256,7 @@ def getEcho(jsonFile):
     return (echo)
 
 
-def convert_par_file(parFile, out_dir, basename):
+def convert_par_file(par_file, out_dir, basename):
     '''
     Converts PAR/XML REC File to NifTI.
     This works best using a temporary directory
@@ -265,21 +269,21 @@ def convert_par_file(parFile, out_dir, basename):
 
     # Convert the data
     subprocess.call(
-        ["dcm2niix", "-f", f"{basename}", "-b", "y", "-ba", "y", "-o", f"{out_dir}", "-z", "y", f"{parFile}"])
+        ["dcm2niix", "-f", f"{basename}", "-b", "y", "-ba", "y", "-o", f"{out_dir}", "-z", "y", f"{par_file}"])
 
     # Get filenames
-    dirPath = os.path.join(out_dir, basename)
-    niiFile = glob.glob(dirPath + '*.nii*')
-    jsonFile = glob.glob(dirPath + '*.json')
+    dir_path = os.path.join(out_dir, basename)
+    nii_file = glob.glob(dir_path + '*.nii*')
+    json_file = glob.glob(dir_path + '*.json')
 
     # Convert lists to strings
-    niiFile = ''.join(niiFile)
-    jsonFile = ''.join(jsonFile)
+    nii_file = ''.join(nii_file)
+    json_file = ''.join(json_file)
 
-    return (niiFile, jsonFile)
+    return (nii_file, json_file)
 
 
-def convert_par_dwi(parFile, out_dir, basename):
+def convert_par_dwi(par_file, out_dir, basename):
     '''
     Converts PAR/XML REC File to DWI NifTI.
     This works best using a temporary directory
@@ -292,25 +296,25 @@ def convert_par_dwi(parFile, out_dir, basename):
 
     # Convert the data
     subprocess.call(
-        ["dcm2niix", "-f", f"{basename}", "-b", "y", "-ba", "y", "-o", f"{out_dir}", "-z", "y", f"{parFile}"])
+        ["dcm2niix", "-f", f"{basename}", "-b", "y", "-ba", "y", "-o", f"{out_dir}", "-z", "y", f"{par_file}"])
 
     # Get filenames
-    dirPath = os.path.join(out_dir, basename)
-    niiFile = glob.glob(dirPath + '*.nii*')
-    jsonFile = glob.glob(dirPath + '*.json')
-    bval = glob.glob(dirPath + '*.bval')
-    bvec = glob.glob(dirPath + '*.bvec')
+    dir_path = os.path.join(out_dir, basename)
+    nii_file = glob.glob(dir_path + '*.nii*')
+    json_file = glob.glob(dir_path + '*.json')
+    bval = glob.glob(dir_path + '*.bval')
+    bvec = glob.glob(dir_path + '*.bvec')
 
     # Convert lists to strings
-    niiFile = ''.join(niiFile)
-    jsonFile = ''.join(jsonFile)
+    nii_file = ''.join(nii_file)
+    json_file = ''.join(json_file)
     bval = ''.join(bval)
     bvec = ''.join(bvec)
 
-    return (niiFile, jsonFile, bval, bvec)
+    return (nii_file, json_file, bval, bvec)
 
 
-def convert_par_fmap(parFile, out_dir, basename):
+def convert_par_fmap(par_file, out_dir, basename):
     '''
     Converts PAR/XML REC File to DWI NifTI.
     This works best using a temporary directory
@@ -323,25 +327,25 @@ def convert_par_fmap(parFile, out_dir, basename):
 
     # Convert the data
     subprocess.call(
-        ["dcm2niix", "-f", f"{basename}", "-b", "y", "-ba", "y", "-o", f"{out_dir}", "-z", "y", f"{parFile}"])
+        ["dcm2niix", "-f", f"{basename}", "-b", "y", "-ba", "y", "-o", f"{out_dir}", "-z", "y", f"{par_file}"])
 
     # Get filenames
-    dirPath = os.path.join(out_dir, basename)
-    niiReal = glob.glob(dirPath + '*real*.nii*')
-    jsonReal = glob.glob(dirPath + '*real*.json')
-    niiMag = glob.glob(dirPath + '.nii*')
-    jsonMag = glob.glob(dirPath + '.json')
+    dir_path = os.path.join(out_dir, basename)
+    nii_real = glob.glob(dir_path + '*real*.nii*')
+    json_real = glob.glob(dir_path + '*real*.json')
+    nii_mag = glob.glob(dir_path + '.nii*')
+    json_mag = glob.glob(dir_path + '.json')
 
     # Convert lists to strings
-    niiReal = ''.join(niiReal)
-    jsonReal = ''.join(jsonReal)
-    niiMag = ''.join(niiMag)
-    jsonMag = ''.join(jsonMag)
+    nii_real = ''.join(nii_real)
+    json_real = ''.join(json_real)
+    nii_mag = ''.join(nii_mag)
+    json_mag = ''.join(json_mag)
 
-    return (niiReal, jsonReal, niiMag, jsonMag)
+    return (nii_real, json_real, nii_mag, json_mag)
 
 
-def data2BIDS_anat(out_dir, parFile, sub, scan, ses=1, scanType='anat'):
+def data_to_bids_anat(out_dir, par_file, sub, scan, ses=1, scan_type='anat'):
     '''
     Renames converted nifti files to conform with BIDS format
     (in the case of anatomical files).
@@ -351,21 +355,21 @@ def data2BIDS_anat(out_dir, parFile, sub, scan, ses=1, scanType='anat'):
     # Create Output Directory Variables
     ses = '{:03}'.format(ses)
     out_dir = os.path.abspath(out_dir)
-    outDir = os.path.join(out_dir, f"sub-{sub}", f"ses-{ses}", f"{scanType}")
+    outdir = os.path.join(out_dir, f"sub-{sub}", f"ses-{ses}", f"{scan_type}")
 
     # Make output directory
-    if not os.path.exists(outDir):
-        os.makedirs(outDir)
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
 
     # Create temporary output names/directories
     tmp_out_dir = os.path.join(out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
     tmp_basename = 'tmp_basename' + str(random.randint(0, n))
 
     # Convert PAR file
-    [niiFile, jsonFile] = convert_par_file(parFile, tmp_out_dir, tmp_basename)
+    [nii_file, json_file] = convert_par_file(par_file, tmp_out_dir, tmp_basename)
 
-    niiFile = os.path.abspath(niiFile)
-    jsonFile = os.path.abspath(jsonFile)
+    nii_file = os.path.abspath(nii_file)
+    json_file = os.path.abspath(json_file)
 
     # Append w to T1/T2 if not already done
     if scan in 'T1' or scan in 'T2':
@@ -374,33 +378,33 @@ def data2BIDS_anat(out_dir, parFile, sub, scan, ses=1, scanType='anat'):
         scan = scan
 
     # Get Run number
-    run = getNumRuns(outDir, scan=scan)
+    run = get_num_runs(outdir, scan=scan)
     run = '{:02}'.format(run)
 
     # Additional sequence/modality parameters
-    epiFactor = getEPIfactor(parFile)
-    wfs = getWFS(parFile)
-    bval = getBval(parFile)
-    acc = getAcc(parFile)
-    mb = getMB(parFile)
-    sct = getScanTime(parFile)
+    epi_factor = get_epi_factor(par_file)
+    wfs = get_wfs(par_file)
+    bval = get_bval(par_file)
+    acc = get_acc(par_file)
+    mb = get_mb(par_file)
+    sct = get_scan_time(par_file)
 
     # update JSON file with additional parameters
-    jsonFile = updateJSON(jsonFile, bval, wfs, epiFactor, acc, mb, sct)
+    json_file = update_json(json_file, bval, wfs, epi_factor, acc, mb, sct)
 
     # Create output filenames
-    outName = f"sub-{sub}_ses-{ses}_run-{run}_{scan}"
-    outNii = os.path.join(outDir, outName + '.nii.gz')
-    outJson = os.path.join(outDir, outName + '.json')
+    out_name = f"sub-{sub}_ses-{ses}_run-{run}_{scan}"
+    out_nii = os.path.join(outdir, out_name + '.nii.gz')
+    out_json = os.path.join(outdir, out_name + '.json')
 
-    os.rename(niiFile, outNii)
-    os.rename(jsonFile, outJson)
+    os.rename(nii_file, out_nii)
+    os.rename(json_file, out_json)
 
     # remove temporary directory and leftover files
     shutil.rmtree(tmp_out_dir)
 
 
-def data2BIDS_func(out_dir, parFile, sub, ses=1, scanType='func', task='rest', acq='PA'):
+def data_to_bids_func(out_dir, par_file, sub, ses=1, scan_type='func', task='rest', acq='PA'):
     '''
     Renames converted nifti files to conform with BIDS format
     (in the case of anatomical files).
@@ -410,57 +414,57 @@ def data2BIDS_func(out_dir, parFile, sub, ses=1, scanType='func', task='rest', a
     # Create Output Directory Variables
     ses = '{:03}'.format(ses)
     out_dir = os.path.abspath(out_dir)
-    outDir = os.path.join(out_dir, f"sub-{sub}", f"ses-{ses}", f"{scanType}")
+    outdir = os.path.join(out_dir, f"sub-{sub}", f"ses-{ses}", f"{scan_type}")
 
     # Make output directory
-    if not os.path.exists(outDir):
-        os.makedirs(outDir)
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
 
     # Create temporary output names/directories
     tmp_out_dir = os.path.join(out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
     tmp_basename = 'tmp_basename' + str(random.randint(0, n))
 
     # Convert PAR file
-    [niiFile, jsonFile] = convert_par_file(parFile, tmp_out_dir, tmp_basename)
+    [nii_file, json_file] = convert_par_file(par_file, tmp_out_dir, tmp_basename)
 
-    niiFile = os.path.abspath(niiFile)
-    jsonFile = os.path.abspath(jsonFile)
+    nii_file = os.path.abspath(nii_file)
+    json_file = os.path.abspath(json_file)
 
     # Decide if file is 4D timeseries or single-band reference
-    numFrames = getNumFrames(niiFile)
-    if numFrames == 1:
+    num_frames = get_num_frames(nii_file)
+    if num_frames == 1:
         acq = 'AP'
-        run = getNumRuns(outDir, scan='sbref', acq=acq, task=task)
+        run = get_num_runs(outdir, scan='sbref', acq=acq, task=task)
         run = '{:02}'.format(run)
-        outName = f"sub-{sub}_ses-{ses}_task-{task}_dir-{acq}_run-{run}_sbref"
+        out_name = f"sub-{sub}_ses-{ses}_task-{task}_dir-{acq}_run-{run}_sbref"
     else:
-        run = getNumRuns(outDir, scan='bold', acq=acq, task=task)
+        run = get_num_runs(outdir, scan='bold', acq=acq, task=task)
         run = '{:02}'.format(run)
-        outName = f"sub-{sub}_ses-{ses}_task-{task}_dir-{acq}_run-{run}_bold"
+        out_name = f"sub-{sub}_ses-{ses}_task-{task}_dir-{acq}_run-{run}_bold"
 
     # Additional sequence/modality parameters
-    epiFactor = getEPIfactor(parFile)
-    wfs = getWFS(parFile)
-    bval = getBval(parFile)
-    acc = getAcc(parFile)
-    mb = getMB(parFile)
-    sct = getScanTime(parFile)
+    epi_factor = get_epi_factor(par_file)
+    wfs = get_wfs(par_file)
+    bval = get_bval(par_file)
+    acc = get_acc(par_file)
+    mb = get_mb(par_file)
+    sct = get_scan_time(par_file)
 
     # update JSON file with additional parameters
-    jsonFile = updateJSON(jsonFile, bval, wfs, epiFactor, acc, mb, sct)
+    json_file = update_json(json_file, bval, wfs, epi_factor, acc, mb, sct)
 
     # Create output filenames
-    outNii = os.path.join(outDir, outName + '.nii.gz')
-    outJson = os.path.join(outDir, outName + '.json')
+    out_nii = os.path.join(outdir, out_name + '.nii.gz')
+    out_json = os.path.join(outdir, out_name + '.json')
 
-    os.rename(niiFile, outNii)
-    os.rename(jsonFile, outJson)
+    os.rename(nii_file, out_nii)
+    os.rename(json_file, out_json)
 
     # remove temporary directory and leftover files
     shutil.rmtree(tmp_out_dir)
 
 
-def data2BIDS_fmap(out_dir, parFile, sub, ses=1, scanType='fmap', task='rest', acq='PA'):
+def data_to_bids_fmap(out_dir, par_file, sub, ses=1, scan_type='fmap', task='rest', acq='PA'):
     '''
     Renames converted nifti files to conform with BIDS format
     (in the case of anatomical files).
@@ -470,61 +474,61 @@ def data2BIDS_fmap(out_dir, parFile, sub, ses=1, scanType='fmap', task='rest', a
     # Create Output Directory Variables
     ses = '{:03}'.format(ses)
     out_dir = os.path.abspath(out_dir)
-    outDir = os.path.join(out_dir, f"sub-{sub}", f"ses-{ses}", f"{scanType}")
+    outdir = os.path.join(out_dir, f"sub-{sub}", f"ses-{ses}", f"{scan_type}")
 
     # Make output directory
-    if not os.path.exists(outDir):
-        os.makedirs(outDir)
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
 
     # Create temporary output names/directories
     tmp_out_dir = os.path.join(out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
     tmp_basename = 'tmp_basename' + str(random.randint(0, n))
 
     # Convert PAR file
-    [niiReal, jsonReal, niiMag, jsonMag] = convert_par_fmap(parFile, tmp_out_dir, tmp_basename)
+    [nii_real, json_real, nii_mag, json_mag] = convert_par_fmap(par_file, tmp_out_dir, tmp_basename)
 
-    niiReal = os.path.abspath(niiReal)
-    jsonReal = os.path.abspath(jsonReal)
-    niiMag = os.path.abspath(niiMag)
-    jsonMag = os.path.abspath(jsonMag)
+    nii_real = os.path.abspath(nii_real)
+    json_real = os.path.abspath(json_real)
+    nii_mag = os.path.abspath(nii_mag)
+    json_mag = os.path.abspath(json_mag)
 
     # Additional sequence/modality parameters
-    epiFactor = getEPIfactor(parFile)
-    wfs = getWFS(parFile)
-    bval = getBval(parFile)
-    acc = getAcc(parFile)
-    mb = getMB(parFile)
-    sct = getScanTime(parFile)
+    epi_factor = get_epi_factor(par_file)
+    wfs = get_wfs(par_file)
+    bval = get_bval(par_file)
+    acc = get_acc(par_file)
+    mb = get_mb(par_file)
+    sct = get_scan_time(par_file)
 
     # update JSON file with additional parameters
-    jsonReal = updateJSON(jsonReal, bval, wfs, epiFactor, acc, mb, sct)
-    jsonMag = updateJSON(jsonMag, bval, wfs, epiFactor, acc, mb, sct)
+    json_real = update_json(json_real, bval, wfs, epi_factor, acc, mb, sct)
+    json_mag = update_json(json_mag, bval, wfs, epi_factor, acc, mb, sct)
 
     # Get run number
-    run = getNumRuns(outDir, scan='magnitude', acq=acq, task=task)
+    run = get_num_runs(outdir, scan='magnitude', acq=acq, task=task)
     run = '{:02}'.format(run)
 
     # Create output names
-    outReal = f"sub-{sub}_ses-{ses}_task-{task}_dir-{acq}_run-{run}_fieldmap"
-    outMag = f"sub-{sub}_ses-{ses}_task-{task}_dir-{acq}_run-{run}_magnitude"
+    out_real = f"sub-{sub}_ses-{ses}_task-{task}_dir-{acq}_run-{run}_fieldmap"
+    out_mag = f"sub-{sub}_ses-{ses}_task-{task}_dir-{acq}_run-{run}_magnitude"
 
-    outRealNii = os.path.join(outDir, outReal + '.nii.gz')
-    outMagNii = os.path.join(outDir, outMag + '.nii.gz')
+    out_real_nii = os.path.join(outdir, out_real + '.nii.gz')
+    out_mag_nii = os.path.join(outdir, out_mag + '.nii.gz')
 
-    outRealJson = os.path.join(outDir, outReal + '.json')
-    outMagJson = os.path.join(outDir, outMag + '.json')
+    out_real_json = os.path.join(outdir, out_real + '.json')
+    out_mag_json = os.path.join(outdir, out_mag + '.json')
 
-    os.rename(niiReal, outRealNii)
-    os.rename(niiMag, outMagNii)
+    os.rename(nii_real, out_real_nii)
+    os.rename(nii_mag, out_mag_nii)
 
-    os.rename(jsonReal, outRealJson)
-    os.rename(jsonMag, outMagJson)
+    os.rename(json_real, out_real_json)
+    os.rename(json_mag, out_mag_json)
 
     # remove temporary directory and leftover files
     shutil.rmtree(tmp_out_dir)
 
 
-def data2BIDS_dwi(out_dir, parFile, sub, ses=1, scanType='dwi', acq='PA'):
+def data_to_bids_dwi(out_dir, par_file, sub, ses=1, scan_type='dwi', acq='PA'):
     '''
     Renames converted nifti files to conform with BIDS format
     (in the case of anatomical files).
@@ -534,36 +538,36 @@ def data2BIDS_dwi(out_dir, parFile, sub, ses=1, scanType='dwi', acq='PA'):
     # Create Output Directory Variables
     ses = '{:03}'.format(ses)
     out_dir = os.path.abspath(out_dir)
-    outDir = os.path.join(out_dir, f"sub-{sub}", f"ses-{ses}", f"{scanType}")
+    outdir = os.path.join(out_dir, f"sub-{sub}", f"ses-{ses}", f"{scan_type}")
 
     # Make output directory
-    if not os.path.exists(outDir):
-        os.makedirs(outDir)
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
 
     # Create temporary output names/directories
     tmp_out_dir = os.path.join(out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
     tmp_basename = 'tmp_basename' + str(random.randint(0, n))
 
     # Additional sequence/modality parameters
-    epiFactor = getEPIfactor(parFile)
-    wfs = getWFS(parFile)
-    bval = getBval(parFile)
-    acc = getAcc(parFile)
-    mb = getMB(parFile)
-    sct = getScanTime(parFile)
+    epi_factor = get_epi_factor(par_file)
+    wfs = get_wfs(par_file)
+    bval = get_bval(par_file)
+    acc = get_acc(par_file)
+    mb = get_mb(par_file)
+    sct = get_scan_time(par_file)
 
     # IF statement to handle either a B0 or b > 0 acquisition.
     if bval == 0:
         # Convert PAR file
-        [niiFile, jsonFile] = convert_par_file(parFile, tmp_out_dir, tmp_basename)
+        [nii_file, json_file] = convert_par_file(par_file, tmp_out_dir, tmp_basename)
 
-        niiFile = os.path.abspath(niiFile)
-        jsonFile = os.path.abspath(jsonFile)
+        nii_file = os.path.abspath(nii_file)
+        json_file = os.path.abspath(json_file)
 
         # Hard-coded to differentiate between the 
         # different echo B0s of the b800 or b2000
         # acquisitions.
-        echo = getEcho(jsonFile)
+        echo = get_echo(json_file)
         if echo < 0.093:
             dirs = 6
         else:
@@ -571,59 +575,59 @@ def data2BIDS_dwi(out_dir, parFile, sub, ses=1, scanType='dwi', acq='PA'):
         dirs = '{:03}'.format(dirs)
 
         # update JSON file with additional parameters
-        jsonFile = updateJSON(jsonFile, bval, wfs, epiFactor, acc, mb, sct)
+        json_file = update_json(json_file, bval, wfs, epi_factor, acc, mb, sct)
 
         # Get Run Number
         acq = 'AP'
-        run = getNumRuns(outDir, scan='dwi', acq=acq, dirs=dirs, bval=bval)
+        run = get_num_runs(outdir, scan='dwi', acq=acq, dirs=dirs, bval=bval)
         run = '{:02}'.format(run)
-        outName = f"sub-{sub}_ses-{ses}_dir-{acq}_acq-{dirs}dirs_bval-b{bval}_run-{run}_dwi"
+        out_name = f"sub-{sub}_ses-{ses}_dir-{acq}_acq-{dirs}dirs_bval-b{bval}_run-{run}_dwi"
 
         # Create output filenames
-        outNii = os.path.join(outDir, outName + '.nii.gz')
-        outJson = os.path.join(outDir, outName + '.json')
+        out_nii = os.path.join(outdir, out_name + '.nii.gz')
+        out_json = os.path.join(outdir, out_name + '.json')
 
-        os.rename(niiFile, outNii)
-        os.rename(jsonFile, outJson)
+        os.rename(nii_file, out_nii)
+        os.rename(json_file, out_json)
     else:
         # Convert PAR file
-        [niiFile, jsonFile, bvals, bvecs] = convert_par_dwi(parFile, tmp_out_dir, tmp_basename)
+        [nii_file, json_file, bvals, bvecs] = convert_par_dwi(par_file, tmp_out_dir, tmp_basename)
 
-        niiFile = os.path.abspath(niiFile)
-        jsonFile = os.path.abspath(jsonFile)
+        nii_file = os.path.abspath(nii_file)
+        json_file = os.path.abspath(json_file)
         bvals = os.path.abspath(bvals)
         bvecs = os.path.abspath(bvecs)
 
         # Number of directions for CCHMC diffusion protocol correspond
         # to the number of frames in the 4D nifti file.
         # This information can also be obtained from the PAR/XML REC Header
-        dirs = getNumFrames(niiFile)
+        dirs = get_num_frames(nii_file)
         dirs = '{:03}'.format(dirs)
 
         # update JSON file with additional parameters
-        jsonFile = updateJSON(jsonFile, bval, wfs, epiFactor, acc, mb, sct)
+        json_file = update_json(json_file, bval, wfs, epi_factor, acc, mb, sct)
 
         # Get Run Number
-        run = getNumRuns(outDir, scan='dwi', acq=acq, dirs=dirs, bval=bval)
+        run = get_num_runs(outdir, scan='dwi', acq=acq, dirs=dirs, bval=bval)
         run = '{:02}'.format(run)
-        outName = f"sub-{sub}_ses-{ses}_dir-{acq}_acq-{dirs}dirs_bval-b{bval}_run-{run}_dwi"
+        out_name = f"sub-{sub}_ses-{ses}_dir-{acq}_acq-{dirs}dirs_bval-b{bval}_run-{run}_dwi"
 
         # Create output filenames
-        outNii = os.path.join(outDir, outName + '.nii.gz')
-        outJson = os.path.join(outDir, outName + '.json')
-        outBvals = os.path.join(outDir, outName + '.bval')
-        outBvecs = os.path.join(outDir, outName + '.bvec')
+        out_nii = os.path.join(outdir, out_name + '.nii.gz')
+        out_json = os.path.join(outdir, out_name + '.json')
+        out_bvals = os.path.join(outdir, out_name + '.bval')
+        out_bvecs = os.path.join(outdir, out_name + '.bvec')
 
-        os.rename(niiFile, outNii)
-        os.rename(jsonFile, outJson)
-        os.rename(bvals, outBvals)
-        os.rename(bvecs, outBvecs)
+        os.rename(nii_file, out_nii)
+        os.rename(json_file, out_json)
+        os.rename(bvals, out_bvals)
+        os.rename(bvecs, out_bvecs)
 
     # remove temporary directory and leftover files
     shutil.rmtree(tmp_out_dir)
 
 
-def data2BIDS_unknown(out_dir, parFile, sub, ses=1):
+def data_to_bids_unknown(out_dir, par_file, sub, ses=1):
     '''
     Renames converted nifti files to conform with BIDS format
     (in the case of anatomical files).
@@ -632,31 +636,31 @@ def data2BIDS_unknown(out_dir, parFile, sub, ses=1):
 
     # Get Acquisition Technique from PAR/REC
     # Header.
-    scan = scanTech(parFile)
+    scan = scan_tech(par_file)
 
     # Convert PAR file
     if 'T1' in scan:
         try:
-            data2BIDS_anat(out_dir, parFile, sub, scan=scan, ses=ses)
+            data_to_bids_anat(out_dir, par_file, sub, scan=scan, ses=ses)
         except UnboundLocalError:
             pass
     elif 'T2' in scan:
         try:
-            data2BIDS_anat(out_dir, parFile, sub, scan=scan, ses=ses)
+            data_to_bids_anat(out_dir, par_file, sub, scan=scan, ses=ses)
         except UnboundLocalError:
             pass
     elif 'func' in scan:
         try:
-            data2BIDS_func(out_dir, parFile, sub, ses=ses)
+            data_to_bids_func(out_dir, par_file, sub, ses=ses)
         except UnboundLocalError:
             pass
     elif 'dwi' in scan:
         try:
-            data2BIDS_dwi(out_dir, parFile, sub, ses=ses)
+            data_to_bids_dwi(out_dir, par_file, sub, ses=ses)
         except UnboundLocalError:
             pass
     else:
         try:
-            data2BIDS_anat(out_dir, parFile, sub, scan='unknownScan', scanType='unknown', ses=ses)
+            data_to_bids_anat(out_dir, par_file, sub, scan='unknown_scan', scan_type='unknown', ses=ses)
         except UnboundLocalError:
             pass
