@@ -7,7 +7,9 @@
 # 
 # example:
 # 
-# exclude: SWI,press
+# exclude: 
+#   - SWI
+#   - press
 
 # The files being exluded here are consistent with the neonatal scanning protocol for the IRC 287 and 317 studies.
 
@@ -24,36 +26,104 @@
 
 # Anatomical scans
 anat:
-  T1w: T1,T1w,TFE
-  T2w: T2,T2w,TSE
-  # flair: flair
+  T1w: 
+    - T1
+    - T1w
+    - TFE
+  T2w: 
+    - T2
+    - T2w
+    - TSE
+  # flair: 
+  #   - flair
 
 # Functional scans
 func:
   bold: 
-    rest: rsfMR,rest
-    visualstrobe: vis,visual
-  # asl:
-  #   rest: pcasl
+    rest: 
+      - rsfMR
+      - rest
+    visualstrobe: 
+      - vis
+      - visual
 
 # # Arterial Spin Labeling
 # asl:
-#   asl: casl,pcas
+#   asl: 
+#     - casl
+#     - pcas
 
 # Field maps 
 fmap:
-  fmap: map
+  fmap: 
+    - map
 
 # Susceptiblity Weighted Images
 swi:
-  swi: swi 
+  swi: 
+    - swi 
 
 # Diffusion Weighted Scans
 dwi:
-  dwi: diffusion,DTI,DWI
+  dwi: 
+    - diffusion
+    - DTI
+    - DWI
 
 # Exclusion List (these filenames are not converted)
-exclude: SURVEY,Reg,SHORT,LONG,MRS,PRESS,DEFAULT,press,ScreenCapture,PD,ALL,SPECTRO
+exclude: 
+  - SURVEY
+  - Reg
+  - SHORT
+  - LONG
+  - MRS
+  - PRESS
+  - DEFAULT
+  - ScreenCapture
+  - PD
+  - ALL
+  - SPECTRO
+
+# Configuration Settings
+settings:
+  func_acq_dir:
+    - PA
+  dwi_acq_dir:
+    - PA
+
+# # Working format
+# # Anatomical scans
+# anat:
+#   T1w: T1,T1w,TFE
+#   T2w: T2,T2w,TSE
+#   # flair: flair
+# 
+# # Functional scans
+# func:
+#   bold: 
+#     rest: rsfMR,rest
+#     visualstrobe: vis,visual
+#   # asl:
+#   #   rest: pcasl
+# 
+# # # Arterial Spin Labeling
+# # asl:
+# #   asl: casl,pcas
+# 
+# # Field maps 
+# fmap:
+#   fmap: map
+# 
+# # Susceptiblity Weighted Images
+# swi:
+#   swi: swi 
+# 
+# # Diffusion Weighted Scans
+# dwi:
+#   dwi: diffusion,DTI,DWI
+# 
+# # Exclusion List (these filenames are not converted)
+# exclude: SURVEY,Reg,SHORT,LONG,MRS,PRESS,DEFAULT,press,ScreenCapture,PD,ALL,SPECTRO
 
 # Old configuration format
 

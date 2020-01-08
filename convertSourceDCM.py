@@ -131,7 +131,7 @@ def get_scan_time(dcm_dir):
     return (scan_time)
 
 
-def update_json(json_file, bvalue='unknown', acc=1, mb=1, scan_time='unknown', task_name=""):
+def update_json(json_file, bvalue='unknown', acc=1, mb=1, scan_time='unknown', acq_tech ='unknown', task_name=""):
     '''
     Updates JSON sidecar file
     for an associated nifti file.
@@ -146,13 +146,15 @@ def update_json(json_file, bvalue='unknown', acc=1, mb=1, scan_time='unknown', t
     if task_name == "":
         # In the case of empty task_name string
         data = {"WaterFatShift": wfs, "EchoTrainLength": epi_factor,
-            "AccelerationFactor": acc, "MultibandAccelerationFactor": mb,
+            "ParallelAcquisitionTechnique": acq_tech,
+            "ParallelReductionFactorInPlane": acc, "MultibandAccelerationFactor": mb,
             "bvalue": bvalue, "scan_time": scan_time,
             "SourceDataFormat": "DICOM"}
     else:
         # In the case of populated task_name string
         data = {"WaterFatShift": wfs, "EchoTrainLength": epi_factor,
-            "AccelerationFactor": acc, "MultibandAccelerationFactor": mb,
+            "ParallelAcquisitionTechnique": acq_tech,
+            "ParallelReductionFactorInPlane": acc, "MultibandAccelerationFactor": mb,
             "bvalue": bvalue, "scan_time": scan_time, "TaskName": task_name,
             "SourceDataFormat": "DICOM"}
 
