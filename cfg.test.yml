@@ -24,6 +24,8 @@
 
 # Configuration based on BIDS' directory names
 
+# line endings: https://forum.sublimetext.com/t/is-there-any-way-to-convert-files-line-ending-on-saving/25456/5
+
 # Anatomical scans
 anat:
   T1w: 
@@ -85,11 +87,13 @@ exclude:
   - SPECTRO
 
 # Configuration Settings
-settings:
-  func_acq_dir:
-    - PA
-  dwi_acq_dir:
-    - PA
+# settings:
+#   func_acq_dir:
+#     - PA
+#   dwi_acq_dir:
+#     - PA
+#   parallel_acq:
+#     - SENSE 
 
 # # Working format
 # # Anatomical scans
