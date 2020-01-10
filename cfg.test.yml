@@ -45,6 +45,8 @@ func:
     rest: 
       - rsfMR
       - rest
+      - FFE
+      - FEEPI
     visualstrobe: 
       - vis
       - visual
@@ -71,6 +73,8 @@ dwi:
     - diffusion
     - DTI
     - DWI
+    - 6_DIR
+
 
 # Exclusion List (these filenames are not converted)
 exclude: 
@@ -85,6 +89,21 @@ exclude:
   - PD
   - ALL
   - SPECTRO
+
+# Metadata Settings
+settings:
+  general:
+    metadata:
+      Manufacturer: Philips
+      ManufacturersModelName: Ingenia
+      InstitutionName: Cincinnati Children's Hospital Medical Center
+      ParallelAcquisitionTechnique: SENSE # GRAPPA, for the general term
+  func:
+    metadata:
+      PhaseEncodingDirection: "j" # "PA"
+
+
+# make function to calculate EffectiveEchoSpacing
 
 # Configuration Settings
 # settings:
