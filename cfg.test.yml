@@ -91,7 +91,7 @@ exclude:
   - SPECTRO
 
 # Metadata Settings
-settings:
+metadata:
   general:
     Manufacturer: Philips
     ManufacturersModelName: Ingenia
