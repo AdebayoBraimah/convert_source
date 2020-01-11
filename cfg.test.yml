@@ -93,18 +93,15 @@ exclude:
 # Metadata Settings
 settings:
   general:
-    metadata:
-      Manufacturer: Philips
-      ManufacturersModelName: Ingenia
-      MagneticFieldStrength: 3
-      InstitutionName: Cincinnati Children's Hospital Medical Center
-      ParallelAcquisitionTechnique: SENSE # GRAPPA, for the general term
+    Manufacturer: Philips
+    ManufacturersModelName: Ingenia
+    MagneticFieldStrength: 3
+    InstitutionName: Cincinnati Children's Hospital Medical Center
+    ParallelAcquisitionTechnique: SENSE # GRAPPA, for the general term
   func:
-    metadata:
-      PhaseEncodingDirection: "j" # "PA"
+    PhaseEncodingDirection: "j" # "PA"
   dwi:
-    metadata:
-      PhaseEncodingDirection: "j"
+    PhaseEncodingDirection: "j"
 
 
 # make function to calculate EffectiveEchoSpacing
