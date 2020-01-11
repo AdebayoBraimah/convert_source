@@ -99,7 +99,10 @@ metadata:
     InstitutionName: Cincinnati Children's Hospital Medical Center
     ParallelAcquisitionTechnique: SENSE # GRAPPA, for the general term
   func:
-    PhaseEncodingDirection: "j" # "PA"
+    rest:
+      PhaseEncodingDirection: "j" # "PA"
+    visualstrobe:
+      PhaseEncodingDirection: "j" # "PA"
   dwi:
     PhaseEncodingDirection: "j"
 
