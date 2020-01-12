@@ -97,10 +97,11 @@ metadata:
     ManufacturersModelName: Ingenia
     MagneticFieldStrength: 3
     InstitutionName: Cincinnati Children's Hospital Medical Center
-    ParallelAcquisitionTechnique: SENSE # GRAPPA, for the general term
   func:
     rest:
+      ParallelAcquisitionTechnique: SENSE # GRAPPA, for the general term
       PhaseEncodingDirection: "j" # "PA"
+      MultibandAccelerationFactor: 6
     visualstrobe:
       PhaseEncodingDirection: "j" # "PA"
   dwi:
