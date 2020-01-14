@@ -100,10 +100,12 @@ metadata:
   func:
     rest:
       ParallelAcquisitionTechnique: SENSE # GRAPPA, for the general term
-      PhaseEncodingDirection: "j" # "PA"
+      PhaseEncodingDirection: "j"
       MultibandAccelerationFactor: 6
+      TaskName: Rest
     visualstrobe:
-      PhaseEncodingDirection: "j" # "PA"
+      PhaseEncodingDirection: "j"
+      TaskName: Visual (Strobe) Task
   dwi:
     PhaseEncodingDirection: "j"
 
