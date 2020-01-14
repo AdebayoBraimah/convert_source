@@ -92,7 +92,7 @@ exclude:
 
 # Metadata Settings
 metadata:
-  general:
+  common:
     Manufacturer: Philips
     ManufacturersModelName: Ingenia
     MagneticFieldStrength: 3
