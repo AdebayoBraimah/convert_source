@@ -72,7 +72,7 @@ def get_dcm_files(dcm_dir):
 
   return dcm_files
 
-def is_valid_mr(dcm_file, verbose=False):
+def is_valid_dcm(dcm_file, verbose=False):
   '''
   Checks for a valid DICOM file by inspecting the conversion type label in the DICOM file header.
   This field should be blank. If this label is populated, then it is likely a secondary capture image 
