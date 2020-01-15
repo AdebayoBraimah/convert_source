@@ -103,6 +103,7 @@ metadata:
       PhaseEncodingDirection: 'j'
       MultibandAccelerationFactor: 6
       TaskName: Rest
+      dir: PA
       NumberOfVolumesDiscardedByScanner: 4
     visualstrobe:
       PhaseEncodingDirection: "j"
@@ -110,6 +111,7 @@ metadata:
       NumberOfVolumesDiscardedByScanner: 4
   dwi:
     PhaseEncodingDirection: 'j'
+    dir: PA
   fmap:
     Units: 'Hz'
 

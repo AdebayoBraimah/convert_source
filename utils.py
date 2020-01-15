@@ -61,6 +61,24 @@ def get_echo(json_file):
 
   return echo
 
+def get_num_runs(out_dir, task="", acq="", dirs="", bval="", scan=""):
+  '''
+  Determines run number of a scan (e.g. T1w, T2w, bold, dwi etc.)
+  in an output directory by globbing the directory for the number
+  of compressed niftis of the same scan.
+
+  Needs work...
+
+  Arguments:
+
+  '''
+
+  runs = os.path.join(out_dir, f"*{task}*{acq}*{dirs}*{bval}*{scan}*.nii*")
+  run_num = len(glob.glob(runs))
+  run_num = run_num + 1
+
+  return run_num
+
 def file_parts(file):
   '''
   Divides file with file path into: path, filename, extension.
