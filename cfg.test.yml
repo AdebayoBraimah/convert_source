@@ -92,7 +92,7 @@ exclude:
 
 # Metadata Settings
 metadata:
-  general:
+  common:
     Manufacturer: Philips
     ManufacturersModelName: Ingenia
     MagneticFieldStrength: 3
@@ -114,3 +114,5 @@ metadata:
     Units: 'Hz'
 
 # make function to calculate EffectiveEchoSpacing
+# add option to create participant tsv
+# read and convert physio data(?)

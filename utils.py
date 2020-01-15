@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-Utility functions for the convert_source package.
+Utility functions for convert_source.
 '''
 
 # Import packages and modules
@@ -9,15 +9,9 @@ import json
 import re
 import os
 import sys
-import shutil
-import glob
-import random
 import subprocess
-import pathlib
-import yaml
 import nibabel as nib
 import gzip
-import pandas as pd
 import numpy as np
 import platform
 
@@ -59,7 +53,7 @@ def get_echo(json_file):
   Returns:
     echo (float): Returns the echo time as a float.
   '''
-  
+
   with open(json_file, "r") as read_file:
     data = json.load(read_file)
 
@@ -151,7 +145,9 @@ def gunzip_file(file,rm_orig=True):
 def update_json(json_file,dictionary):
   '''
   Updates JavaScript Object Notation (JSON) file. If the file does not exist, it is created once
-  this function is invoked.
+  this function is invoked. If the JSON file contains text/fields, then the contents are stored as
+  a (nested) dictionary and then updated with the new dictionary. The updated dictionary is then 
+  written to the JSON file.
   
   Arguments:
     json_file (string): Input file
@@ -261,14 +257,14 @@ def convert_image_data(file,basename,out_dir,cprss_lvl=6,bids=True,anon_bids=Tru
     ignore_2D (bool): Ignore derived, localizer and 2D images (default: True)
     merge_2D (bool): Merge 2D slices from same series regardless of echo, exposure, etc. (default: True)
     text (bool): Text notes includes private patient details in separate text file (default: False)
-    progress (bool): Report progress, slicer format progress information (default: True)
+    progress (bool): Report progress, slicer format progress information (default: False)
     verbose (bool): Enable verbosity (default: False)
     write_conflicts (string): Write behavior for name conflicts:
       - 'suffix' = Add suffix to name conflict (default)
       - 'overwrite' = Overwrite name conflict
       - 'skip' = Skip name conflict
     crop_3D (bool): crop 3D acquisitions (default: False)
-    lossless (bool): Losslessly scale 16-bit integers to use dynamic range (default: True)
+    lossless (bool): Losslessly scale 16-bit integers to use dynamic range (default: False)
     big_endian (string): Byte order:
       - 'optimal' or 'native' = optimal/native byte order (default)
       - 'little-end' = little endian
