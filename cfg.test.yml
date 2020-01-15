@@ -115,6 +115,5 @@ metadata:
   fmap:
     Units: 'Hz'
 
-# make function to calculate EffectiveEchoSpacing
 # add option to create participant tsv
 # read and convert physio data(?)
