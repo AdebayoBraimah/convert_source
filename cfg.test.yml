@@ -100,13 +100,17 @@ metadata:
   func:
     rest:
       ParallelAcquisitionTechnique: SENSE # GRAPPA, for the general term
-      PhaseEncodingDirection: "j"
+      PhaseEncodingDirection: 'j'
       MultibandAccelerationFactor: 6
       TaskName: Rest
+      NumberOfVolumesDiscardedByScanner: 4
     visualstrobe:
       PhaseEncodingDirection: "j"
       TaskName: Visual (Strobe) Task
+      NumberOfVolumesDiscardedByScanner: 4
   dwi:
-    PhaseEncodingDirection: "j"
+    PhaseEncodingDirection: 'j'
+  fmap:
+    Units: 'Hz'
 
 # make function to calculate EffectiveEchoSpacing
