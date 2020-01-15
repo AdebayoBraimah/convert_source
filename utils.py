@@ -61,19 +61,29 @@ def get_echo(json_file):
 
   return echo
 
-def get_num_runs(out_dir, task="", acq="", dirs="", bval="", scan=""):
+def get_num_runs(out_dir,scan,ses="",task="",acq="",ce="",dirs="",rec="",echo=""):
   '''
-  Determines run number of a scan (e.g. T1w, T2w, bold, dwi etc.)
-  in an output directory by globbing the directory for the number
-  of compressed niftis of the same scan.
+  Determines run number of a scan (e.g. T1w, T2w, bold, dwi etc.) in an output directory by globbing the 
+  directory for the number of NifTis of the same scan.
 
-  Needs work...
+  Arguments (required):
+    out_dir (string): Absolute path to output directory
+    scan (string): Modality (e.g. T1w, T2w, bold, dwi, etc.)
 
-  Arguments:
+  Arguments (optional):
+    ses (string): Session ID
+    task (string): Task ID
+    acq (string): Acquisition ID
+    ce (string): Contrast Enhanced ID
+    dirs (string): Directions ID string
+    rec (string): Reconstruction algorithm string
+    echo (int or string): Echo number from multi-echo functional scan
 
+  Returns:
+    run_num (int): Returns the run number for the specific scan
   '''
 
-  runs = os.path.join(out_dir, f"*{task}*{acq}*{dirs}*{bval}*{scan}*.nii*")
+  runs = os.path.join(out_dir, f"*{ses}*{task}*{acq}*{ce}*{dirs}*{rec}*{echo}*{scan}*.nii*")
   run_num = len(glob.glob(runs))
   run_num = run_num + 1
 
