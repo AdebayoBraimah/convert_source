@@ -102,7 +102,7 @@ metadata:
       ParallelAcquisitionTechnique: SENSE # GRAPPA, for the general term
       PhaseEncodingDirection: 'j'
       MultibandAccelerationFactor: 6
-      TaskName: Rest
+      TaskName: Resting State
       dir: PA
       NumberOfVolumesDiscardedByScanner: 4
     visualstrobe:
