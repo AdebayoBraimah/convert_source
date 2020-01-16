@@ -29,7 +29,7 @@ def get_echo(json_file):
     '''
 
     with open(json_file, "r") as read_file:
-    data = json.load(read_file)
+        data = json.load(read_file)
 
     echo = data.get("EchoTime")
 
@@ -454,14 +454,15 @@ def calc_read_time(file, json_file=""):
         TotalReadoutTime = 0.001 * EffectiveEchoSpacing * EchoTrainLength
     
     Approach 3 (Philips/GE method - DICOM):
-        EffectiveEchoSpacing = ((1/(PixelBandwidth * EchoTrainLength)) * (EchoTrainLength - 1))
+        EffectiveEchoSpacing = ((1/(PixelBandwidth * EchoTrainLength)) * (EchoTrainLength - 1)) * 1.3
         TotalReadoutTime = EffectiveEchoSpacing * (EchoTrainLength - 1)
         
     Approach 4 (Philips/GE method - DICOM):
-        EffectiveEchoSpacing = ((1/(PixelBandwidth * ReconMatrixPE)) * (ReconMatrixPE - 1))
+        EffectiveEchoSpacing = ((1/(PixelBandwidth * ReconMatrixPE)) * (ReconMatrixPE - 1)) * 1.3
         tot_read_time = EffectiveEchoSpacing * (ReconMatrixPE - 1)
         
         Note: EchoTrainLength is assumed to be equal to ReconMatrixPE for approaches 3 and 4, as these values are generally close.
+        Note: Approaches 3 and 4 appear to have about a 30% decrease in Siemens data when this was tested. The solution was to implement a fudge factor that accounted for the 30% decrease.
     
     Arguments:
         file (string): Absolute filepath to raw image data file (DICOM or PAR REC)
@@ -546,13 +547,118 @@ def calc_read_time(file, json_file=""):
         eff_echo_sp = (((1000 * wfs)/(434.215 * (etl + 1)))/red_fact)
         tot_read_time = 0.001 * eff_echo_sp * etl
     elif pix_band and etl:
-        eff_echo_sp = ((1/(pix_band * etl)) * (etl - 1))
+        eff_echo_sp = ((1/(pix_band * etl)) * (etl - 1)) * 1.3
         tot_read_time = eff_echo_sp * (etl - 1)
     elif pix_band and recon_mat:
-        eff_echo_sp = ((1/(pix_band * recon_mat)) * (recon_mat - 1))
+        eff_echo_sp = ((1/(pix_band * recon_mat)) * (recon_mat - 1)) * 1.3
         tot_read_time = eff_echo_sp * (recon_mat - 1)
     else:
         eff_echo_sp = "unknown"
         tot_read_time = "unknown"
         
     return eff_echo_sp,tot_read_time
+
+def convert_anat(file,work_dir,work_name):
+    '''
+    Converts raw anatomical (and functional) MR images to NifTi file format, with a BIDS JSON sidecar.
+    Returns a NifTi file and a JSON sidecar (file) by globbing an isolated directory.
+    
+    Arguments:
+        file (string): Absolute filepath to raw image data
+        work_dir (string): Working directory
+        work_name (string): Output file name
+        
+    Returns:
+        nii_file (string): Absolute file path to NifTi image
+        json_file (string): Absolute file path to JSON sidecar
+    '''
+    
+    # Convert (anatomical) iamge data
+    convert_image_data(file, work_name, work_dir)
+    
+    # Get files
+    dir_path = os.path.join(work_dir, basename)
+    nii_file = glob.glob(dir_path + '*.nii*')
+    json_file = glob.glob(dir_path + '*.json')
+    
+    # Convert lists to strings
+    nii_file = ''.join(nii_file)
+    json_file = ''.join(json_file)
+    
+    return nii_file, json_file
+
+def convert_dwi(file,work_dir,work_name):
+    '''
+    Converts raw diffusion weigthed MR images to NifTi file format, with a BIDS JSON sidecar.
+    Returns a NifTi file, JSON sidecar (file), and (FSL-style) bval and bvec files by globbing 
+    an isolated directory.
+    
+    Arguments:
+        file (string): Absolute filepath to raw image data
+        work_dir (string): Working directory
+        work_name (string): Output file name
+        
+    Returns:
+        nii_file (string): Absolute file path to NifTi image
+        json_file (string): Absolute file path to JSON sidecar
+        bval (string): Absolute file path to bval file
+        bvec (string): Absolute file path to bvec file
+    '''
+    
+    # Convert diffusion iamge data
+    convert_image_data(file, work_name, work_dir)
+    
+    # Get files
+    dir_path = os.path.join(out_dir, basename)
+    nii_file = glob.glob(dir_path + '*.nii*')
+    json_file = glob.glob(dir_path + '*.json')
+    bval = glob.glob(dir_path + '*.bval*')
+    bvec = glob.glob(dir_path + '*.bvec*')
+    
+    # Convert lists to strings
+    nii_file = ''.join(nii_file)
+    json_file = ''.join(json_file)
+    bval = ''.join(bval)
+    bvec = ''.join(bvec)
+    
+    return nii_file, json_file, bval, bvec
+
+def convert_fmap(file,work_dir,work_name):
+    '''
+    Converts raw precomputed fieldmap MR images to NifTi file format, with a BIDS JSON sidecar.
+    Returns two NifTi files, and their corresponding JSON sidecars (files), by globbing an isolated directory.
+    
+    N.B.: This function is mainly designed to handle fieldmap data case 3 from bids-specifications document. Furhter support for 
+    the additional cases requires test/validation data. 
+    BIDS-specifications document located here: 
+    https://github.com/bids-standard/bids-specification/blob/master/src/04-modality-specific-files/01-magnetic-resonance-imaging-data.md
+    
+    Arguments:
+        file (string): Absolute filepath to raw image data
+        work_dir (string): Working directory
+        work_name (string): Output file name
+        
+    Returns:
+        nii_fmap (string): Absolute file path to NifTi image fieldmap
+        json_fmap (string): Absolute file path to corresponding JSON sidecar
+        nii_mag (string): Absolute file path to NifTi magnitude image
+        json_mag (string): Absolute file path to corresponding JSON sidecar
+    '''
+    
+    # Convert diffusion iamge data
+    convert_image_data(file, work_name, work_dir)
+    
+    # Get files
+    dir_path = os.path.join(out_dir, basename)
+    nii_fmap = glob.glob(dir_path + '*real*.nii*')
+    json_fmap = glob.glob(dir_path + '*real*.json')
+    nii_mag = glob.glob(dir_path + '.nii*')
+    json_mag = glob.glob(dir_path + '.json')
+    
+    # Convert lists to strings
+    nii_fmap = ''.join(nii_real)
+    json_fmap = ''.join(json_real)
+    nii_mag = ''.join(nii_mag)
+    json_mag = ''.join(json_mag)
+
+    return nii_fmap, json_fmap, nii_mag, json_mag
