@@ -435,4 +435,43 @@ def get_data_params(file,json_file="", bval_file=""):
     
     return info
 
+def get_metadata(dictionary,scan_type="",task=""):
+    '''
+    Reads the metadata dictionary and looks for keywords to indicate what metadata should be written to which
+    dictionary. For example, the keyword 'common' is used to indicate the common information for the imaging
+    protocol and may contain information such as: field strength, phase encoding direction, institution name, etc.
+    Additional keywords that are BIDS sub-directories names (e.g. anat, func, dwi) will return an additional
+    dictionary which contains metadata specific for those modalities. Func also has additional keywords based on
+    the task specified.
+    
+    Arguments:
+        dictionary (dict): Nest dictionary of key mapped items from the 'read_config' function
+        scan_type (string): BIDS scan type (e.g. anat, func, dwi, etc., default="")
+        task (string): Task name to search in the key mapped dictionary
+        
+    Returns: 
+        com_param_dict (dict): Common parameters dictionary
+        scan_param_dict (dict): Scan/modality type parameters dictionary
+    '''
+    
+    # Create empty dictionaries
+    com_param_dict = dict()
+    scan_param_dict = dict()
+    scan_task_dict = dict()
+    
+    # Iterate through, looking for key words (e.g. common and scan_type)
+    for key,item in dictionary.items():
+        if key.lower() in 'common':
+            com_param_dict = dictionary[key]
 
+        if key.lower() in scan_type:
+            scan_param_dict = dictionary[key]
+            if task.lower() in scan_param_dict:
+                for dict_key,dict_item in scan_param_dict.items():
+                    if task.lower() in dict_key:
+                        scan_task_dict = scan_param_dict[dict_key]
+                        
+        if len(scan_task_dict) != 0:
+            scan_param_dict = scan_task_dict
+    
+    return com_param_dict, scan_param_dict 
