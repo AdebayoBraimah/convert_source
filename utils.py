@@ -473,7 +473,10 @@ def calc_read_time(file, json_file=""):
         
     References:
     Approach 1: https://github.com/bids-standard/bids-specification/blob/master/src/04-modality-specific-files/01-magnetic-resonance-imaging-data.md
-    Approach 2: https://osf.io/hks7x/ - page 7
+    Approach 2: https://osf.io/hks7x/ - page 7; 
+    https://support.brainvoyager.com/brainvoyager/functional-analysis-preparation/29-pre-processing/78-epi-distortion-correction-echo-spacing-and-bandwidth
+    
+    Forum that raised this specific issue with Philips: https://neurostars.org/t/consolidating-epi-echo-spacing-and-readout-time-for-philips-scanner/4406
     
     Approaches 3 and 4 were found thorugh trial and error and yielded similar, but not the same values as approaches 1 and 2.
     '''
