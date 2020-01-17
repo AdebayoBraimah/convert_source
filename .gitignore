@@ -1,7 +1,7 @@
 # Files to ignore
 
-__pycache__
-*.ipynb
-jpynb.tmp/*
+# __pycache__
+# *.ipynb
+# jpynb.tmp/*
 examples.scripts/*
 nifti2BIDS/*
