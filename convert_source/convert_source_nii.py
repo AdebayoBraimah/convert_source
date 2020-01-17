@@ -787,7 +787,7 @@ def data_to_bids_dwi(bids_out_dir, file, sub, scan='dwi', meta_dict_com=dict(), 
     if bvals:
         vals = ""
         for val in bvals:
-            vals = vals + 'b' + str(val)
+            vals = vals + 'b' + str(int(val))
     
     if bvals and acq and echo_time:
         out_name = out_name + f"_acq-{acq}{vals}TE{echo_time}"
