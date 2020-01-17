@@ -1,8 +1,0 @@
-
-need:
-
-numpy
-pydicom
-nibabel
-numpy
-pyyaml
