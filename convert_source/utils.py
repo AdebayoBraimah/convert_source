@@ -9,11 +9,22 @@ import json
 import re
 import os
 import sys
+import shutil
+import glob
+import random
 import subprocess
+import pathlib
+import yaml
 import nibabel as nib
 import gzip
+import pandas as pd
 import numpy as np
 import platform
+import multiprocessing
+
+# Import third party packages and modules
+import convert_source_dcm as cdm
+import convert_source_par as csp
 
 # Define functions
 
@@ -597,7 +608,7 @@ def calc_read_time(file, json_file=""):
     red_fact = ''
         
     if calc_method.lower() == 'dcm':
-        bwpppe = get_bwpppe(file)
+        bwpppe = cdm.get_bwpppe(file)
         if json_file:
             recon_mat = get_recon_mat(json_file)
             pix_band = get_pix_band(json_file)
@@ -615,9 +626,9 @@ def calc_read_time(file, json_file=""):
                 pass
             etl = recon_mat
     elif calc_method.lower() == 'par':
-        wfs = get_wfs(file)
-        etl = get_etl(file)
-        red_fact = get_red_fact(file)
+        wfs = csp.get_wfs(file)
+        etl = csp.get_etl(file)
+        red_fact = csp.get_red_fact(file)
         # set water fat shift to empty if unknown
         try:
             if wfs.lower() == 'unknown':
@@ -677,7 +688,7 @@ def convert_anat(file,work_dir,work_name):
     convert_image_data(file, work_name, work_dir)
     
     # Get files
-    dir_path = os.path.join(work_dir, basename)
+    dir_path = os.path.join(work_dir, work_name)
     nii_file = glob.glob(dir_path + '*.nii*')
     json_file = glob.glob(dir_path + '*.json')
     
@@ -709,7 +720,7 @@ def convert_dwi(file,work_dir,work_name):
     convert_image_data(file, work_name, work_dir)
     
     # Get files
-    dir_path = os.path.join(out_dir, basename)
+    dir_path = os.path.join(work_dir, work_name)
     nii_file = glob.glob(dir_path + '*.nii*')
     json_file = glob.glob(dir_path + '*.json')
     bval = glob.glob(dir_path + '*.bval*')
@@ -749,15 +760,15 @@ def convert_fmap(file,work_dir,work_name):
     convert_image_data(file, work_name, work_dir)
     
     # Get files
-    dir_path = os.path.join(out_dir, basename)
+    dir_path = os.path.join(work_dir, work_name)
     nii_fmap = glob.glob(dir_path + '*real*.nii*')
     json_fmap = glob.glob(dir_path + '*real*.json')
     nii_mag = glob.glob(dir_path + '.nii*')
     json_mag = glob.glob(dir_path + '.json')
     
     # Convert lists to strings
-    nii_fmap = ''.join(nii_real)
-    json_fmap = ''.join(json_real)
+    nii_fmap = ''.join(nii_fmap)
+    json_fmap = ''.join(json_fmap)
     nii_mag = ''.join(nii_mag)
     json_mag = ''.join(json_mag)
 

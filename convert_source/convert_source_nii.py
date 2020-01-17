@@ -9,11 +9,18 @@ import json
 import re
 import os
 import sys
+import shutil
+import glob
+import random
 import subprocess
+import pathlib
+import yaml
 import nibabel as nib
 import gzip
+import pandas as pd
 import numpy as np
 import platform
+import multiprocessing
 
 # Import third party packages and modules
 import convert_source_dcm as cdm
@@ -59,9 +66,13 @@ def get_num_frames(nii_file):
         num_frames (int): Number of temporal frames or volumes in NifTi file.
     '''
     
-    img = nib.load(nii_file)
-    dims = img.header.get_data_shape()
-    num_frames = dims[3]
+    try:
+        img = nib.load(nii_file)
+        dims = img.header.get_data_shape()
+        num_frames = dims[3]
+    except IndexError:
+        num_frames = 1
+        pass
     
     return num_frames
 
@@ -175,7 +186,7 @@ def data_to_bids_anat(bids_out_dir, file, sub, scan, meta_dict_com=dict(), meta_
     
     # Create temporary output names/directories
     n = 10000 # maximum N for random number generator
-    tmp_out_dir = os.path.join(out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
+    tmp_out_dir = os.path.join(bids_out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
     tmp_basename = 'tmp_basename' + str(random.randint(0, n))
     
     if not os.path.exists(tmp_out_dir):
@@ -185,7 +196,7 @@ def data_to_bids_anat(bids_out_dir, file, sub, scan, meta_dict_com=dict(), meta_
     # Check file extension in file
     if '.nii.gz' in file:
         nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
-        [path,filename] = utils.file_parts(file)
+        [path,filename,ext] = utils.file_parts(file)
         json_file = os.path.join(path,filename + '.json')
         try:
             json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
@@ -195,6 +206,7 @@ def data_to_bids_anat(bids_out_dir, file, sub, scan, meta_dict_com=dict(), meta_
     elif '.nii' in file:
         nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
         nii_file = utils.gzip_file(nii_file)
+        [path,filename,ext] = utils.file_parts(file)
         json_file = os.path.join(path,filename + '.json')
         try:
             json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
@@ -232,14 +244,17 @@ def data_to_bids_anat(bids_out_dir, file, sub, scan, meta_dict_com=dict(), meta_
     try:
         acq = info['acq']
     except KeyError:
+        acq = ""
         pass
     try:
         ce = info['ce']
     except KeyError:
+        ce = ""
         pass
     try:
         rec = info['rec']
     except KeyError:
+        rec = ""
         pass
     
     # Create output filename
@@ -262,7 +277,7 @@ def data_to_bids_anat(bids_out_dir, file, sub, scan, meta_dict_com=dict(), meta_
         name_run_dict.update(tmp_dict)
         
     # Get Run number
-    run = utils.get_num_runs(outdir, scan=scan, **name_run_dict)
+    run = utils.get_num_runs(out_dir, scan=scan, **name_run_dict)
     run = '{:02}'.format(run)
 
     if run:
@@ -328,7 +343,7 @@ def data_to_bids_func(bids_out_dir, file, sub, scan, task = 'rest', meta_dict_co
     
     # Create temporary output names/directories
     n = 10000 # maximum N for random number generator
-    tmp_out_dir = os.path.join(out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
+    tmp_out_dir = os.path.join(bids_out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
     tmp_basename = 'tmp_basename' + str(random.randint(0, n))
     
     if not os.path.exists(tmp_out_dir):
@@ -338,7 +353,7 @@ def data_to_bids_func(bids_out_dir, file, sub, scan, task = 'rest', meta_dict_co
     # Check file extension in file
     if '.nii.gz' in file:
         nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
-        [path,filename] = utils.file_parts(file)
+        [path,filename,ext] = utils.file_parts(file)
         json_file = os.path.join(path,filename + '.json')
         try:
             json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
@@ -348,6 +363,7 @@ def data_to_bids_func(bids_out_dir, file, sub, scan, task = 'rest', meta_dict_co
     elif '.nii' in file:
         nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
         nii_file = utils.gzip_file(nii_file)
+        [path,filename,ext] = utils.file_parts(file)
         json_file = os.path.join(path,filename + '.json')
         try:
             json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
@@ -370,7 +386,7 @@ def data_to_bids_func(bids_out_dir, file, sub, scan, task = 'rest', meta_dict_co
     info = dict()
     info = utils.dict_multi_update(info,**meta_dict_params)
     info = utils.dict_multi_update(info,**meta_dict_com)
-    info = utils.dict_multi_update(info,**meta_dict_anat)
+    info = utils.dict_multi_update(info,**meta_dict_func)
     
     json_file = utils.update_json(json_file,info)
     
@@ -386,22 +402,27 @@ def data_to_bids_func(bids_out_dir, file, sub, scan, task = 'rest', meta_dict_co
     try:
         acq = info['acq']
     except KeyError:
+        acq = ""
         pass
     try:
         ce = info['ce']
     except KeyError:
+        ce = ""
         pass
     try:
         direction = info['dir']
     except KeyError:
+        direction = ""
         pass
     try:
         rec = info['rec']
     except KeyError:
+        rec = ""
         pass
     try:
         echo = info['echo']
     except KeyError:
+        echo = ""
         pass
     
     # Create output filename    
@@ -436,7 +457,7 @@ def data_to_bids_func(bids_out_dir, file, sub, scan, task = 'rest', meta_dict_co
         name_run_dict.update(tmp_dict)
         
     # Get Run number
-    run = utils.get_num_runs(outdir, scan=scan, **name_run_dict)
+    run = utils.get_num_runs(out_dir, scan=scan, **name_run_dict)
     run = '{:02}'.format(run)
 
     if run:
@@ -511,7 +532,7 @@ def data_to_bids_fmap(bids_out_dir, file, sub, scan='fieldmap', meta_dict_com=di
     
     # Create temporary output names/directories
     n = 10000 # maximum N for random number generator
-    tmp_out_dir = os.path.join(out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
+    tmp_out_dir = os.path.join(bids_out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
     tmp_basename = 'tmp_basename' + str(random.randint(0, n))
     
     if not os.path.exists(tmp_out_dir):
@@ -521,7 +542,7 @@ def data_to_bids_fmap(bids_out_dir, file, sub, scan='fieldmap', meta_dict_com=di
     # Check file extension in file
     if '.nii.gz' in file:
         nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
-        [path,filename] = utils.file_parts(file)
+        [path,filename,ext] = utils.file_parts(file)
         json_file = os.path.join(path,filename + '.json')
         try:
             json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
@@ -531,6 +552,7 @@ def data_to_bids_fmap(bids_out_dir, file, sub, scan='fieldmap', meta_dict_com=di
     elif '.nii' in file:
         nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
         nii_file = utils.gzip_file(nii_file)
+        [path,filename,ext] = utils.file_parts(file)
         json_file = os.path.join(path,filename + '.json')
         try:
             json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
@@ -553,7 +575,7 @@ def data_to_bids_fmap(bids_out_dir, file, sub, scan='fieldmap', meta_dict_com=di
     info = dict()
     info = utils.dict_multi_update(info,**meta_dict_params)
     info = utils.dict_multi_update(info,**meta_dict_com)
-    info = utils.dict_multi_update(info,**meta_dict_anat)
+    info = utils.dict_multi_update(info,**meta_dict_fmap)
     
     json_fmap = utils.update_json(json_fmap,info)
     json_mag = utils.update_json(json_mag,info)
@@ -568,6 +590,7 @@ def data_to_bids_fmap(bids_out_dir, file, sub, scan='fieldmap', meta_dict_com=di
     try:
         acq = info['acq']
     except KeyError:
+        acq = ""
         pass
     
     # Create output filename    
@@ -580,7 +603,7 @@ def data_to_bids_fmap(bids_out_dir, file, sub, scan='fieldmap', meta_dict_com=di
         name_run_dict.update(tmp_dict)
         
     # Get Run number
-    run = utils.get_num_runs(outdir, scan=scan, **name_run_dict)
+    run = utils.get_num_runs(out_dir, scan=scan, **name_run_dict)
     run = '{:02}'.format(run)
 
     if run:
@@ -654,7 +677,7 @@ def data_to_bids_dwi(bids_out_dir, file, sub, scan='dwi', meta_dict_com=dict(), 
     
     # Create temporary output names/directories
     n = 10000 # maximum N for random number generator
-    tmp_out_dir = os.path.join(out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
+    tmp_out_dir = os.path.join(bids_out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
     tmp_basename = 'tmp_basename' + str(random.randint(0, n))
     
     if not os.path.exists(tmp_out_dir):
@@ -664,7 +687,7 @@ def data_to_bids_dwi(bids_out_dir, file, sub, scan='dwi', meta_dict_com=dict(), 
     # Check file extension in file
     if '.nii.gz' in file:
         nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
-        [path,filename] = utils.file_parts(file)
+        [path,filename,ext] = utils.file_parts(file)
         json_file = os.path.join(path,filename + '.json')
         bval = os.path.join(path,filename + '.bval*')
         bvec = os.path.join(path,filename + '.bvec*')
@@ -680,6 +703,7 @@ def data_to_bids_dwi(bids_out_dir, file, sub, scan='dwi', meta_dict_com=dict(), 
     elif '.nii' in file:
         nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
         nii_file = utils.gzip_file(nii_file)
+        [path,filename,ext] = utils.file_parts(file)
         json_file = os.path.join(path,filename + '.json')
         bval = os.path.join(path,filename + '.bval*')
         bvec = os.path.join(path,filename + '.bvec*')
@@ -715,7 +739,7 @@ def data_to_bids_dwi(bids_out_dir, file, sub, scan='dwi', meta_dict_com=dict(), 
     info = dict()
     info = utils.dict_multi_update(info,**meta_dict_params)
     info = utils.dict_multi_update(info,**meta_dict_com)
-    info = utils.dict_multi_update(info,**meta_dict_anat)
+    info = utils.dict_multi_update(info,**meta_dict_dwi)
     
     json_file = utils.update_json(json_file,info)
     
@@ -734,10 +758,12 @@ def data_to_bids_dwi(bids_out_dir, file, sub, scan='dwi', meta_dict_com=dict(), 
     try:
         acq = info['acq']
     except KeyError:
+        acq = ""
         pass
     try:
         direction = info['dir']
     except KeyError:
+        direction = ""
         pass
     
     # Non-standard acquisition/naming keys
@@ -745,10 +771,12 @@ def data_to_bids_dwi(bids_out_dir, file, sub, scan='dwi', meta_dict_com=dict(), 
     try:
         bvals = info['bval']
     except KeyError:
+        bvals = list()
         pass
     try:
         echo_time = info['EchoTime']
     except KeyError:
+        echo = ""
         pass
     
     # Create output filename    
@@ -792,7 +820,7 @@ def data_to_bids_dwi(bids_out_dir, file, sub, scan='dwi', meta_dict_com=dict(), 
         name_run_dict.update(tmp_dict)
         
     # Get Run number
-    run = utils.get_num_runs(outdir, scan=scan, **name_run_dict)
+    run = utils.get_num_runs(out_dir, scan=scan, **name_run_dict)
     run = '{:02}'.format(run)
 
     if run:

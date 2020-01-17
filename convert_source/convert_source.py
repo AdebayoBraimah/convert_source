@@ -201,17 +201,20 @@ def file_exclude(file_list, data_dir, exclusion_list = [], verbose = False):
     
     return currated_list
 
-def get_scan_tech(bids_out_dir, sub, file, search_dict, meta_dict="", ses=1, keep_unknown=True, verbose=False):
+def get_scan_tech(bids_out_dir, sub, file, search_dict, meta_dict=dict(), ses=1, keep_unknown=True, verbose=False):
     '''
     Searches DICOM or PAR file header for scan technique/MR modality used in accordance with the search terms provided
     by the nested dictionary.
     
-    Note: This function is still undergoing active development.
-    Note: accomodate extra dictionaries passed as arguments
-    
     Arguments:
+        bids_out_dir (string): Output BIDS directory
+        sub (int or string): Subject ID
+        file (string): Source image filename with absolute filepath
         search_dict (dict): Nested dictionary from the 'read_config' function
-        dcm_file (string): Source image filename with absolute filepath
+        meta_dict (dict): Nested metadata dictionary
+        ses (int or string): Session ID
+        keep_unknown (bool): Convert modalities/scans which cannot be identified (default: True)
+        verbose (bool): Prints the scan_type, modality, and search terms used (e.g. func - bold - rest - ['rest', 'FFE'])
     
     Returns: 
         None
@@ -219,13 +222,15 @@ def get_scan_tech(bids_out_dir, sub, file, search_dict, meta_dict="", ses=1, kee
     
     if not meta_dict:
         meta_dict = dict()
+
+    converted_files = list()
     
     # Check file extension in file
     # Perform Scanning Techniqe Search
     if '.dcm' in file.lower():
-        cdm.get_dcm_scan_tech(bids_out_dir=bids_out_dir, sub=sub, dcm_file=file, search_dict=search_dict, meta_dict=meta_dict, ses=1, keep_unknown=keep_unknown, verbose=verbose)
+        converted_files = cdm.get_dcm_scan_tech(bids_out_dir=bids_out_dir, sub=sub, dcm_file=file, search_dict=search_dict, meta_dict=meta_dict, ses=1, keep_unknown=keep_unknown, verbose=verbose)
     elif '.PAR' in file.upper():
-        csp.get_par_scan_tech(bids_out_dir=bids_out_dir, sub=sub, par_file=file, search_dict=search_dict, meta_dict=meta_dict, ses=1, keep_unknown=keep_unknown, verbose=verbose)
+        converted_files = csp.get_par_scan_tech(bids_out_dir=bids_out_dir, sub=sub, par_file=file, search_dict=search_dict, meta_dict=meta_dict, ses=1, keep_unknown=keep_unknown, verbose=verbose)
     else:
         if verbose:
             print("unknown modality")
@@ -235,11 +240,11 @@ def get_scan_tech(bids_out_dir, sub, file, search_dict, meta_dict="", ses=1, kee
             scan_type = 'unknown_modality'
             scan = 'unknown'
             [com_param_dict, scan_param_dict] = utils.get_metadata(dictionary=meta_dict,scan_type=scan_type)
-            csn.data_to_bids_anat(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_anat=scan_param_dict,ses=ses,scan_type=scan_type)
+            converted_files = csn.data_to_bids_anat(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_anat=scan_param_dict,ses=ses,scan_type=scan_type)
         
-    return None
+    return converted_files
 
-def convert_modality(bids_out_dir, sub, file, search_dict, meta_dict="", ses=1, keep_unknown=True, verbose=False):
+def convert_modality(bids_out_dir, sub, file, search_dict, meta_dict=dict(), ses=1, keep_unknown=True, verbose=False):
     '''
     Converts an image file and extracts information from the filename (such as the modality). 
     
@@ -247,15 +252,23 @@ def convert_modality(bids_out_dir, sub, file, search_dict, meta_dict="", ses=1, 
     Note: Add support for extra dictionaries
     
     Arguments:
+        bids_out_dir (string): Output BIDS directory
+        sub (int or string): Subject ID
+        file (string): Source image filename with absolute filepath
         search_dict (dict): Nested dictionary from the 'read_config' function
-        file (string): Filename with absolute filepath
-        verbose (boolean): Enable verbosity
+        meta_dict (dict): Nested metadata dictionary
+        ses (int or string): Session ID
+        keep_unknown (bool): Convert modalities/scans which cannot be identified (default: True)
+        verbose (bool): Prints the scan_type, modality, and search terms used (e.g. func - bold - rest - ['rest', 'FFE'])
+    
     
     Returns: 
         None
     '''
     
     mod_found = False
+
+    converted_files = list()
     
     # Check file type
     if 'nii' in file:
@@ -278,11 +291,11 @@ def convert_modality(bids_out_dir, sub, file, search_dict, meta_dict="", ses=1, 
                     scan = dict_key
                     [com_param_dict, scan_param_dict] = utils.get_metadata(dictionary=meta_dict,scan_type=scan_type)
                     if scan_type.lower() == 'dwi':
-                        csn.data_to_bids_dwi(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_dwi=scan_param_dict,ses=ses,scan_type=scan_type)
+                        converted_files = csn.data_to_bids_dwi(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_dwi=scan_param_dict,ses=ses,scan_type=scan_type)
                     elif scan_type.lower() == 'fmap':
-                        csn.data_to_bids_fmap(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_fmap=scan_param_dict,ses=ses,scan_type=scan_type)
+                        converted_files = csn.data_to_bids_fmap(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_fmap=scan_param_dict,ses=ses,scan_type=scan_type)
                     else:
-                        csn.data_to_bids_anat(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_anat=scan_param_dict,ses=ses,scan_type=scan_type)
+                        converted_files = csn.data_to_bids_anat(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_anat=scan_param_dict,ses=ses,scan_type=scan_type)
                     if mod_found:
                         break
             elif isinstance(dict_item,dict):
@@ -297,40 +310,47 @@ def convert_modality(bids_out_dir, sub, file, search_dict, meta_dict="", ses=1, 
                         task = d_key
                         [com_param_dict, scan_param_dict] = utils.get_metadata(dictionary=meta_dict,scan_type=scan_type,task=task)
                         if scan_type.lower() == 'func':
-                            csn.data_to_bids_func(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,task=task,meta_dict_com=com_param_dict,meta_dict_func=scan_param_dict,ses=ses,scan_type=scan_type)
+                            converted_files = csn.data_to_bids_func(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,task=task,meta_dict_com=com_param_dict,meta_dict_func=scan_param_dict,ses=ses,scan_type=scan_type)
                         elif scan_type.lower() == 'dwi':
-                            csn.data_to_bids_dwi(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_dwi=scan_param_dict,ses=ses,scan_type=scan_type)
+                            converted_files = csn.data_to_bids_dwi(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_dwi=scan_param_dict,ses=ses,scan_type=scan_type)
                         elif scan_type.lower() == 'fmap':
-                            csn.data_to_bids_fmap(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_fmap=scan_param_dict,ses=ses,scan_type=scan_type)
+                            converted_files = csn.data_to_bids_fmap(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_fmap=scan_param_dict,ses=ses,scan_type=scan_type)
                         else:
-                            csn.data_to_bids_anat(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_anat=scan_param_dict,ses=ses,scan_type=scan_type)
+                            converted_files = csn.data_to_bids_anat(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_anat=scan_param_dict,ses=ses,scan_type=scan_type)
                         if mod_found:
                             break
                         
     if not mod_found:
-        get_scan_tech(bids_out_dir, sub, file, search_dict, meta_dict="", ses=1, keep_unknown=keep_unknown, verbose=verbose)
+        converted_files = get_scan_tech(bids_out_dir, sub, file, search_dict, meta_dict="", ses=1, keep_unknown=keep_unknown, verbose=verbose)
     
-    return None
+    return converted_files
 
-def batch_convert(bids_out_dir,sub,file_list, search_dict, meta_dict={}, ses=1, keep_unknown=True,verbose=False):
+def batch_convert(bids_out_dir,sub,file_list, search_dict, meta_dict=dict(), ses=1, keep_unknown=True,verbose=False):
     '''
     Batch conversion function for image files.
     
     Note: This function is still undergoing active development.
-    
+
     Arguments:
-        file_list (list): List of filenames with absolute filepaths
-        dictionary (dict): Nested dictionary from the 'read_config' function
-        verbose (boolean): Enable verbosity
-    
+        bids_out_dir (string): Output BIDS directory
+        sub (int or string): Subject ID
+        file (string): Source image filename with absolute filepath
+        search_dict (dict): Nested dictionary from the 'read_config' function
+        meta_dict (dict): Nested metadata dictionary
+        ses (int or string): Session ID
+        keep_unknown (bool): Convert modalities/scans which cannot be identified (default: True)
+        verbose (bool): Prints the scan_type, modality, and search terms used (e.g. func - bold - rest - ['rest', 'FFE'])
+
     Returns: 
         None
     '''
+
+    converted_files = list()
     
     for file in file_list:
         try:
-            convert_modality(bids_out_dir=bids_out_dir, sub=sub, file=file, search_dict=search_dict, meta_dict=meta_dict, ses=1, keep_unknown=True, verbose=False)
+            converted_files = convert_modality(bids_out_dir=bids_out_dir, sub=sub, file=file, search_dict=search_dict, meta_dict=meta_dict, ses=1, keep_unknown=True, verbose=False)
         except SystemExit:
             pass
     
-    return None
+    return converted_files
