@@ -567,6 +567,10 @@ def data_to_bids_fmap(bids_out_dir, file, sub, scan='fieldmap', meta_dict_com=di
             except FileNotFoundError:
                 json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
                 pass
+            json_fmap = json_file
+            json_mag = json_file
+            nii_fmap = nii_file
+            nii_mag = nii_file
         elif '.nii' in file:
             nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
             nii_file = utils.gzip_file(nii_file)
@@ -577,6 +581,10 @@ def data_to_bids_fmap(bids_out_dir, file, sub, scan='fieldmap', meta_dict_com=di
             except FileNotFoundError:
                 json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
                 pass
+            json_fmap = json_file
+            json_mag = json_file
+            nii_fmap = nii_file
+            nii_mag = nii_file
         elif '.dcm' in file or '.PAR' in file:
             [nii_fmap, json_fmap, nii_mag, json_mag] = utils.convert_fmap(file,tmp_out_dir,tmp_basename)
         else:
@@ -624,13 +632,13 @@ def data_to_bids_fmap(bids_out_dir, file, sub, scan='fieldmap', meta_dict_com=di
             name_run_dict.update(tmp_dict)
 
         # Get Run number
-        run = utils.get_num_runs(out_dir, scan=scan, **name_run_dict)
+        run = utils.get_num_runs(out_dir, scan=scan_type, **name_run_dict)
         run = '{:02}'.format(run)
 
         if run:
             out_name = out_name + f"_run-{run}"
 
-        out_name = out_name + f"_{scan}"
+        # out_name = out_name + f"_{scan}"
 
         out_nii_fmap = os.path.join(out_dir, out_name + '_fieldmap' + '.nii.gz')
         out_nii_mag = os.path.join(out_dir, out_name + '_magnitude' + '.nii.gz')
@@ -638,16 +646,23 @@ def data_to_bids_fmap(bids_out_dir, file, sub, scan='fieldmap', meta_dict_com=di
         out_json_fmap = os.path.join(out_dir, out_name + '_fieldmap' + '.json')
         out_json_mag = os.path.join(out_dir, out_name + '_magnitude' + '.json')
 
-        os.rename(nii_fmap, out_nii_fmap)
-        os.rename(nii_mag, out_nii_mag)
+        if not 'nii' in file:
+            os.rename(nii_fmap, out_nii_fmap)
+            os.rename(nii_mag, out_nii_mag)
 
-        os.rename(json_fmap, out_json_fmap)
-        os.rename(json_mag, out_json_mag)
+            os.rename(json_fmap, out_json_fmap)
+            os.rename(json_mag, out_json_mag)
 
-        # Remove temporary directory and leftover files
-        shutil.rmtree(tmp_out_dir)
+            # Remove temporary directory and leftover files
+            shutil.rmtree(tmp_out_dir)
+            return out_nii_fmap, out_nii_mag, out_json_fmap, out_json_mag
+        else:
+            os.rename(nii_fmap, out_nii_fmap)
+            os.rename(json_fmap, out_json_fmap)
 
-        return out_nii_fmap, out_nii_mag, out_json_fmap, out_json_mag
+            # Remove temporary directory and leftover files
+            shutil.rmtree(tmp_out_dir)
+            return out_nii_fmap, out_json_fmap
     except FileNotFoundError:
         print(f"Error: unable to convert {file}")
         pass
