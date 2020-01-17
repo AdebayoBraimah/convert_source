@@ -750,6 +750,7 @@ def data_to_bids_dwi(bids_out_dir, file, sub, scan='dwi', meta_dict_com=dict(), 
     bvec = os.path.abspath(bvec)
     
     # Decide if file is 4D timeseries or single-band reference
+    # make edits here, switch to convert_anat or bids_to_anat
     num_frames = get_num_frames(nii_file)
     if num_frames == 1:
         scan = 'sbref'
@@ -776,7 +777,7 @@ def data_to_bids_dwi(bids_out_dir, file, sub, scan='dwi', meta_dict_com=dict(), 
     try:
         echo_time = info['EchoTime']
     except KeyError:
-        echo = ""
+        echo_time = ""
         pass
     
     # Create output filename    
@@ -786,7 +787,7 @@ def data_to_bids_dwi(bids_out_dir, file, sub, scan='dwi', meta_dict_com=dict(), 
     if bvals:
         vals = ""
         for val in bvals:
-            vals = vals + 'b' + val
+            vals = vals + 'b' + str(val)
     
     if bvals and acq and echo_time:
         out_name = out_name + f"_acq-{acq}{vals}TE{echo_time}"

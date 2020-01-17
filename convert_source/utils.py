@@ -431,15 +431,15 @@ def convert_image_data(file,basename,out_dir,cprss_lvl=6,bids=True,
         conv_cmd.append("-w")
         conv_cmd.append("0")
 
-    if big_endian.lower() == "optimal" or big_endian.lower() == "native":
-        conv_cmd.append("--big_endian")
-        conv_cmd.append("o")
-    elif big_endian.lower() == "little-end":
-        conv_cmd.append("--big_endian")
-        conv_cmd.append("n")
-    elif big_endian.lower() == "big-end":
-        conv_cmd.append("--big_endian")
-        conv_cmd.append("y")
+    # if big_endian.lower() == "optimal" or big_endian.lower() == "native":
+    #     conv_cmd.append("--big_endian")
+    #     conv_cmd.append("o")
+    # elif big_endian.lower() == "little-end":
+    #     conv_cmd.append("--big_endian")
+    #     conv_cmd.append("n")
+    # elif big_endian.lower() == "big-end":
+    #     conv_cmd.append("--big_endian")
+    #     conv_cmd.append("y")
 
 
     for idx,var in enumerate(bool_opts):
