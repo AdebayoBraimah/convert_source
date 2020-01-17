@@ -162,140 +162,148 @@ def data_to_bids_anat(bids_out_dir, file, sub, scan, meta_dict_com=dict(), meta_
         out_json (string): Absolute filepath to corresponding JSON file
     '''
 
-    # Create Output Directory Variables
-    # Zeropad subject ID if possible
+    # Use try-except statement here in the case of invalid/incomplete image files that will throw errors in dcm2niix
     try:
-        ses = '{:03}'.format(int(ses))
-    except ValueError:
-        pass
-    # Zeropad session ID if possible
-    try:
-        ses = '{:03}'.format(int(ses))
-    except ValueError:
-        pass
-    
-    out_dir = os.path.join(bids_out_dir, f"sub-{sub}", f"ses-{ses}", f"{scan_type}")
-
-    # Make output directory
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir)
-
-    # Get absolute filepaths
-    bids_out_dir = os.path.abspath(bids_out_dir)
-    out_dir = os.path.abspath(out_dir)
-    
-    # Create temporary output names/directories
-    n = 10000 # maximum N for random number generator
-    tmp_out_dir = os.path.join(bids_out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
-    tmp_basename = 'tmp_basename' + str(random.randint(0, n))
-    
-    if not os.path.exists(tmp_out_dir):
-        os.makedirs(tmp_out_dir)
-
-    # Convert image file
-    # Check file extension in file
-    if '.nii.gz' in file:
-        nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
-        [path,filename,ext] = utils.file_parts(file)
-        json_file = os.path.join(path,filename + '.json')
+        # Create Output Directory Variables
+        # Zeropad subject ID if possible
         try:
-            json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
-        except FileNotFoundError:
-            json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
+            ses = '{:03}'.format(int(ses))
+        except ValueError:
             pass
-    elif '.nii' in file:
-        nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
-        nii_file = utils.gzip_file(nii_file)
-        [path,filename,ext] = utils.file_parts(file)
-        json_file = os.path.join(path,filename + '.json')
+        # Zeropad session ID if possible
         try:
-            json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
-        except FileNotFoundError:
-            json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
+            ses = '{:03}'.format(int(ses))
+        except ValueError:
             pass
-    elif '.dcm' in file or '.PAR' in file:
-        [nii_file, json_file] = utils.convert_anat(file,tmp_out_dir,tmp_basename)
-    else:
-        [nii_file, json_file] = utils.convert_anat(file,tmp_out_dir,tmp_basename)
-    
-    # Get additional sequence/modality parameters
-    if os.path.exists(json_file):
-        meta_dict_params = get_data_params(file, json_file)
-    else:
-        tmp_json = ""
-        meta_dict_params = get_data_params(file, tmp_json)
-    
-    # Update JSON file
-    info = dict()
-    info = utils.dict_multi_update(info,**meta_dict_params)
-    info = utils.dict_multi_update(info,**meta_dict_com)
-    info = utils.dict_multi_update(info,**meta_dict_anat)
-    
-    json_file = utils.update_json(json_file,info)
-    
-    nii_file = os.path.abspath(nii_file)
-    json_file = os.path.abspath(json_file)
 
-    # Append w to T1/T2 if not already done
-    if scan in 'T1' or scan in 'T2':
-        scan = scan + 'w'
+        out_dir = os.path.join(bids_out_dir, f"sub-{sub}", f"ses-{ses}", f"{scan_type}")
 
-    # Query dictionary for acquisition/naming keys
-    try:
-        acq = info['acq']
-    except KeyError:
-        acq = ""
+        # Make output directory
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+
+        # Get absolute filepaths
+        bids_out_dir = os.path.abspath(bids_out_dir)
+        out_dir = os.path.abspath(out_dir)
+
+        # Create temporary output names/directories
+        n = 10000 # maximum N for random number generator
+        tmp_out_dir = os.path.join(bids_out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
+        tmp_basename = 'tmp_basename' + str(random.randint(0, n))
+
+        if not os.path.exists(tmp_out_dir):
+            os.makedirs(tmp_out_dir)
+
+        # Convert image file
+        # Check file extension in file
+        if '.nii.gz' in file:
+            nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
+            [path,filename,ext] = utils.file_parts(file)
+            json_file = os.path.join(path,filename + '.json')
+            try:
+                json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
+            except FileNotFoundError:
+                json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
+                pass
+        elif '.nii' in file:
+            nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
+            nii_file = utils.gzip_file(nii_file)
+            [path,filename,ext] = utils.file_parts(file)
+            json_file = os.path.join(path,filename + '.json')
+            try:
+                json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
+            except FileNotFoundError:
+                json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
+                pass
+        elif '.dcm' in file or '.PAR' in file:
+            [nii_file, json_file] = utils.convert_anat(file,tmp_out_dir,tmp_basename)
+        else:
+            [nii_file, json_file] = utils.convert_anat(file,tmp_out_dir,tmp_basename)
+
+        # Get additional sequence/modality parameters
+        if os.path.exists(json_file):
+            meta_dict_params = get_data_params(file, json_file)
+        else:
+            tmp_json = ""
+            meta_dict_params = get_data_params(file, tmp_json)
+
+        # Update JSON file
+        info = dict()
+        info = utils.dict_multi_update(info,**meta_dict_params)
+        info = utils.dict_multi_update(info,**meta_dict_com)
+        info = utils.dict_multi_update(info,**meta_dict_anat)
+
+        json_file = utils.update_json(json_file,info)
+
+        nii_file = os.path.abspath(nii_file)
+        json_file = os.path.abspath(json_file)
+
+        info = dict()
+        info = utils.read_json(json_file)
+
+        # Append w to T1/T2 if not already done
+        if scan in 'T1' or scan in 'T2':
+            scan = scan + 'w'
+
+        # Query dictionary for acquisition/naming keys
+        try:
+            acq = info['acq']
+        except KeyError:
+            acq = ""
+            pass
+        try:
+            ce = info['ce']
+        except KeyError:
+            ce = ""
+            pass
+        try:
+            rec = info['rec']
+        except KeyError:
+            rec = ""
+            pass
+
+        # Create output filename
+        out_name = f"sub-{sub}" + f"_ses-{sub}"
+        name_run_dict = dict()
+
+        if acq:
+            out_name = out_name + f"_acq-{acq}"
+            tmp_dict = {"acq":f"{acq}"}
+            name_run_dict.update(tmp_dict)
+
+        if ce:
+            out_name = out_name + f"_ce-{ce}"
+            tmp_dict = {"ce":f"{ce}"}
+            name_run_dict.update(tmp_dict)
+
+        if rec:
+            out_name = out_name + f"_rec-{rec}"
+            tmp_dict = {"rec":f"{rec}"}
+            name_run_dict.update(tmp_dict)
+
+        # Get Run number
+        run = utils.get_num_runs(out_dir, scan=scan, **name_run_dict)
+        run = '{:02}'.format(run)
+
+        if run:
+            out_name = out_name + f"_run-{run}"
+
+        out_name = out_name + f"_{scan}"
+
+
+        out_nii = os.path.join(out_dir, out_name + '.nii.gz')
+        out_json = os.path.join(out_dir, out_name + '.json')
+
+        os.rename(nii_file, out_nii)
+        os.rename(json_file, out_json)
+
+        # remove temporary directory and leftover files
+        shutil.rmtree(tmp_out_dir)
+
+        return out_nii,out_json
+    except FileNotFoundError:
+        print(f"Error: unable to convert {file}")
         pass
-    try:
-        ce = info['ce']
-    except KeyError:
-        ce = ""
-        pass
-    try:
-        rec = info['rec']
-    except KeyError:
-        rec = ""
-        pass
-    
-    # Create output filename
-    out_name = f"sub-{sub}" + f"_ses-{sub}"
-    name_run_dict = dict()
-
-    if acq:
-        out_name = out_name + f"_acq-{acq}"
-        tmp_dict = {"acq":f"{acq}"}
-        name_run_dict.update(tmp_dict)
-
-    if ce:
-        out_name = out_name + f"_ce-{ce}"
-        tmp_dict = {"ce":f"{ce}"}
-        name_run_dict.update(tmp_dict)
-
-    if rec:
-        out_name = out_name + f"_rec-{rec}"
-        tmp_dict = {"rec":f"{rec}"}
-        name_run_dict.update(tmp_dict)
-        
-    # Get Run number
-    run = utils.get_num_runs(out_dir, scan=scan, **name_run_dict)
-    run = '{:02}'.format(run)
-
-    if run:
-        out_name = out_name + f"_run-{run}"
-
-    out_name = out_name + f"_{scan}"
-
-
-    out_nii = os.path.join(out_dir, out_name + '.nii.gz')
-    out_json = os.path.join(out_dir, out_name + '.json')
-
-    os.rename(nii_file, out_nii)
-    os.rename(json_file, out_json)
-
-    # remove temporary directory and leftover files
-    shutil.rmtree(tmp_out_dir)
-    
-    return out_nii,out_json
 
 def data_to_bids_func(bids_out_dir, file, sub, scan, task = 'rest', meta_dict_com=dict(), meta_dict_func=dict(), ses=1, scan_type='func'):
     '''
@@ -319,166 +327,174 @@ def data_to_bids_func(bids_out_dir, file, sub, scan, task = 'rest', meta_dict_co
         out_json (string): Absolute filepath to corresponding JSON file
     '''
 
-    # Create Output Directory Variables
-    # Zeropad subject ID if possible
+    # Use try-except statement here in the case of invalid/incomplete image files that will throw errors in dcm2niix
     try:
-        ses = '{:03}'.format(int(ses))
-    except ValueError:
-        pass
-    # Zeropad session ID if possible
-    try:
-        ses = '{:03}'.format(int(ses))
-    except ValueError:
-        pass
-    
-    out_dir = os.path.join(bids_out_dir, f"sub-{sub}", f"ses-{ses}", f"{scan_type}")
-
-    # Make output directory
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir)
-
-    # Get absolute filepaths
-    bids_out_dir = os.path.abspath(bids_out_dir)
-    out_dir = os.path.abspath(out_dir)
-    
-    # Create temporary output names/directories
-    n = 10000 # maximum N for random number generator
-    tmp_out_dir = os.path.join(bids_out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
-    tmp_basename = 'tmp_basename' + str(random.randint(0, n))
-    
-    if not os.path.exists(tmp_out_dir):
-        os.makedirs(tmp_out_dir)
-
-    # Convert image file
-    # Check file extension in file
-    if '.nii.gz' in file:
-        nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
-        [path,filename,ext] = utils.file_parts(file)
-        json_file = os.path.join(path,filename + '.json')
+        # Create Output Directory Variables
+        # Zeropad subject ID if possible
         try:
-            json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
-        except FileNotFoundError:
-            json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
+            ses = '{:03}'.format(int(ses))
+        except ValueError:
             pass
-    elif '.nii' in file:
-        nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
-        nii_file = utils.gzip_file(nii_file)
-        [path,filename,ext] = utils.file_parts(file)
-        json_file = os.path.join(path,filename + '.json')
+        # Zeropad session ID if possible
         try:
-            json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
-        except FileNotFoundError:
-            json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
+            ses = '{:03}'.format(int(ses))
+        except ValueError:
             pass
-    elif '.dcm' in file or '.PAR' in file:
-        [nii_file, json_file] = utils.convert_anat(file,tmp_out_dir,tmp_basename)
-    else:
-        [nii_file, json_file] = utils.convert_anat(file,tmp_out_dir,tmp_basename)
-    
-    # Get additional sequence/modality parameters
-    if os.path.exists(json_file):
-        meta_dict_params = get_data_params(file, json_file)
-    else:
-        tmp_json = ""
-        meta_dict_params = get_data_params(file, tmp_json)
-    
-    # Update JSON file
-    info = dict()
-    info = utils.dict_multi_update(info,**meta_dict_params)
-    info = utils.dict_multi_update(info,**meta_dict_com)
-    info = utils.dict_multi_update(info,**meta_dict_func)
-    
-    json_file = utils.update_json(json_file,info)
-    
-    nii_file = os.path.abspath(nii_file)
-    json_file = os.path.abspath(json_file)
-    
-    # Decide if file is 4D timeseries or single-band reference
-    num_frames = get_num_frames(nii_file)
-    if num_frames == 1:
-        scan = 'sbref'
 
-    # Query dictionary for acquisition/naming keys
-    try:
-        acq = info['acq']
-    except KeyError:
-        acq = ""
-        pass
-    try:
-        ce = info['ce']
-    except KeyError:
-        ce = ""
-        pass
-    try:
-        direction = info['dir']
-    except KeyError:
-        direction = ""
-        pass
-    try:
-        rec = info['rec']
-    except KeyError:
-        rec = ""
-        pass
-    try:
-        echo = info['echo']
-    except KeyError:
-        echo = ""
-        pass
-    
-    # Create output filename    
-    out_name = f"sub-{sub}" + f"_ses-{ses}" + f"_task-{task}"
-    
-    name_run_dict = dict()
-    tmp_dict = {"task":f"{task}"}
-    name_run_dict.update(tmp_dict)
+        out_dir = os.path.join(bids_out_dir, f"sub-{sub}", f"ses-{ses}", f"{scan_type}")
 
-    if acq:
-        out_name = out_name + f"_acq-{acq}"
-        tmp_dict = {"acq":f"{acq}"}
+        # Make output directory
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+
+        # Get absolute filepaths
+        bids_out_dir = os.path.abspath(bids_out_dir)
+        out_dir = os.path.abspath(out_dir)
+
+        # Create temporary output names/directories
+        n = 10000 # maximum N for random number generator
+        tmp_out_dir = os.path.join(bids_out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
+        tmp_basename = 'tmp_basename' + str(random.randint(0, n))
+
+        if not os.path.exists(tmp_out_dir):
+            os.makedirs(tmp_out_dir)
+
+        # Convert image file
+        # Check file extension in file
+        if '.nii.gz' in file:
+            nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
+            [path,filename,ext] = utils.file_parts(file)
+            json_file = os.path.join(path,filename + '.json')
+            try:
+                json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
+            except FileNotFoundError:
+                json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
+                pass
+        elif '.nii' in file:
+            nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
+            nii_file = utils.gzip_file(nii_file)
+            [path,filename,ext] = utils.file_parts(file)
+            json_file = os.path.join(path,filename + '.json')
+            try:
+                json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
+            except FileNotFoundError:
+                json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
+                pass
+        elif '.dcm' in file or '.PAR' in file:
+            [nii_file, json_file] = utils.convert_anat(file,tmp_out_dir,tmp_basename)
+        else:
+            [nii_file, json_file] = utils.convert_anat(file,tmp_out_dir,tmp_basename)
+
+        # Get additional sequence/modality parameters
+        if os.path.exists(json_file):
+            meta_dict_params = get_data_params(file, json_file)
+        else:
+            tmp_json = ""
+            meta_dict_params = get_data_params(file, tmp_json)
+
+        # Update JSON file
+        info = dict()
+        info = utils.dict_multi_update(info,**meta_dict_params)
+        info = utils.dict_multi_update(info,**meta_dict_com)
+        info = utils.dict_multi_update(info,**meta_dict_func)
+
+        json_file = utils.update_json(json_file,info)
+
+        nii_file = os.path.abspath(nii_file)
+        json_file = os.path.abspath(json_file)
+
+        info = dict()
+        info = utils.read_json(json_file)
+
+        # Decide if file is 4D timeseries or single-band reference
+        num_frames = get_num_frames(nii_file)
+        if num_frames == 1:
+            scan = 'sbref'
+
+        # Query dictionary for acquisition/naming keys
+        try:
+            acq = info['acq']
+        except KeyError:
+            acq = ""
+            pass
+        try:
+            ce = info['ce']
+        except KeyError:
+            ce = ""
+            pass
+        try:
+            direction = info['dir']
+        except KeyError:
+            direction = ""
+            pass
+        try:
+            rec = info['rec']
+        except KeyError:
+            rec = ""
+            pass
+        try:
+            echo = info['echo']
+        except KeyError:
+            echo = ""
+            pass
+
+        # Create output filename    
+        out_name = f"sub-{sub}" + f"_ses-{ses}" + f"_task-{task}"
+
+        name_run_dict = dict()
+        tmp_dict = {"task":f"{task}"}
         name_run_dict.update(tmp_dict)
 
-    if ce:
-        out_name = out_name + f"_ce-{ce}"
-        tmp_dict = {"ce":f"{ce}"}
-        name_run_dict.update(tmp_dict)
+        if acq:
+            out_name = out_name + f"_acq-{acq}"
+            tmp_dict = {"acq":f"{acq}"}
+            name_run_dict.update(tmp_dict)
 
-    if direction:
-        out_name = out_name + f"_dir-{direction}"
-        tmp_dict = {"dirs":f"{direction}"}
-        name_run_dict.update(tmp_dict)
+        if ce:
+            out_name = out_name + f"_ce-{ce}"
+            tmp_dict = {"ce":f"{ce}"}
+            name_run_dict.update(tmp_dict)
 
-    if rec:
-        out_name = out_name + f"_rec-{rec}"
-        tmp_dict = {"rec":f"{rec}"}
-        name_run_dict.update(tmp_dict)
-        
-    if echo:
-        tmp_dict = {"echo":f"{echo}"}
-        name_run_dict.update(tmp_dict)
-        
-    # Get Run number
-    run = utils.get_num_runs(out_dir, scan=scan, **name_run_dict)
-    run = '{:02}'.format(run)
+        if direction:
+            out_name = out_name + f"_dir-{direction}"
+            tmp_dict = {"dirs":f"{direction}"}
+            name_run_dict.update(tmp_dict)
 
-    if run:
-        out_name = out_name + f"_run-{run}"
+        if rec:
+            out_name = out_name + f"_rec-{rec}"
+            tmp_dict = {"rec":f"{rec}"}
+            name_run_dict.update(tmp_dict)
 
-    if echo:
-        out_name = out_name + f"_echo-{echo}"
+        if echo:
+            tmp_dict = {"echo":f"{echo}"}
+            name_run_dict.update(tmp_dict)
 
-    out_name = out_name + f"_{scan}"
+        # Get Run number
+        run = utils.get_num_runs(out_dir, scan=scan, **name_run_dict)
+        run = '{:02}'.format(run)
+
+        if run:
+            out_name = out_name + f"_run-{run}"
+
+        if echo:
+            out_name = out_name + f"_echo-{echo}"
+
+        out_name = out_name + f"_{scan}"
 
 
-    out_nii = os.path.join(out_dir, out_name + '.nii.gz')
-    out_json = os.path.join(out_dir, out_name + '.json')
+        out_nii = os.path.join(out_dir, out_name + '.nii.gz')
+        out_json = os.path.join(out_dir, out_name + '.json')
 
-    os.rename(nii_file, out_nii)
-    os.rename(json_file, out_json)
+        os.rename(nii_file, out_nii)
+        os.rename(json_file, out_json)
 
-    # remove temporary directory and leftover files
-    shutil.rmtree(tmp_out_dir)
-    
-    return out_nii,out_json
+        # remove temporary directory and leftover files
+        shutil.rmtree(tmp_out_dir)
+
+        return out_nii,out_json
+    except FileNotFoundError:
+        print(f"Error: unable to convert {file}")
+        pass
 
 def data_to_bids_fmap(bids_out_dir, file, sub, scan='fieldmap', meta_dict_com=dict(), meta_dict_fmap=dict(), ses=1, scan_type='fmap'):
     '''
@@ -508,125 +524,133 @@ def data_to_bids_fmap(bids_out_dir, file, sub, scan='fieldmap', meta_dict_com=di
         out_json_mag (string): Absolute filepath to correspond magnitude image JSON sidecare
     '''
 
-    # Create Output Directory Variables
-    # Zeropad subject ID if possible
+    # Use try-except statement here in the case of invalid/incomplete image files that will throw errors in dcm2niix
     try:
-        ses = '{:03}'.format(int(ses))
-    except ValueError:
-        pass
-    # Zeropad session ID if possible
-    try:
-        ses = '{:03}'.format(int(ses))
-    except ValueError:
-        pass
-    
-    out_dir = os.path.join(bids_out_dir, f"sub-{sub}", f"ses-{ses}", f"{scan_type}")
-
-    # Make output directory
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir)
-
-    # Get absolute filepaths
-    bids_out_dir = os.path.abspath(bids_out_dir)
-    out_dir = os.path.abspath(out_dir)
-    
-    # Create temporary output names/directories
-    n = 10000 # maximum N for random number generator
-    tmp_out_dir = os.path.join(bids_out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
-    tmp_basename = 'tmp_basename' + str(random.randint(0, n))
-    
-    if not os.path.exists(tmp_out_dir):
-        os.makedirs(tmp_out_dir)
-
-    # Convert image file
-    # Check file extension in file
-    if '.nii.gz' in file:
-        nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
-        [path,filename,ext] = utils.file_parts(file)
-        json_file = os.path.join(path,filename + '.json')
+        # Create Output Directory Variables
+        # Zeropad subject ID if possible
         try:
-            json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
-        except FileNotFoundError:
-            json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
+            ses = '{:03}'.format(int(ses))
+        except ValueError:
             pass
-    elif '.nii' in file:
-        nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
-        nii_file = utils.gzip_file(nii_file)
-        [path,filename,ext] = utils.file_parts(file)
-        json_file = os.path.join(path,filename + '.json')
+        # Zeropad session ID if possible
         try:
-            json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
-        except FileNotFoundError:
-            json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
+            ses = '{:03}'.format(int(ses))
+        except ValueError:
             pass
-    elif '.dcm' in file or '.PAR' in file:
-        [nii_fmap, json_fmap, nii_mag, json_mag] = utils.convert_fmap(file,tmp_out_dir,tmp_basename)
-    else:
-        [nii_fmap, json_fmap, nii_mag, json_mag] = utils.convert_fmap(file,tmp_out_dir,tmp_basename)
-    
-    # Get additional sequence/modality parameters
-    if os.path.exists(json_fmap):
-        meta_dict_params = get_data_params(file, json_fmap)
-    else:
-        tmp_json = ""
-        meta_dict_params = get_data_params(file, tmp_json)
-    
-    # Update JSON file
-    info = dict()
-    info = utils.dict_multi_update(info,**meta_dict_params)
-    info = utils.dict_multi_update(info,**meta_dict_com)
-    info = utils.dict_multi_update(info,**meta_dict_fmap)
-    
-    json_fmap = utils.update_json(json_fmap,info)
-    json_mag = utils.update_json(json_mag,info)
-    
-    nii_fmap = os.path.abspath(nii_fmap)
-    nii_mag = os.path.abspath(nii_mag)
-    
-    json_fmap = os.path.abspath(json_fmap)
-    json_mag = os.path.abspath(json_mag)
 
-    # Query dictionary for acquisition/naming keys
-    try:
-        acq = info['acq']
-    except KeyError:
-        acq = ""
+        out_dir = os.path.join(bids_out_dir, f"sub-{sub}", f"ses-{ses}", f"{scan_type}")
+
+        # Make output directory
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+
+        # Get absolute filepaths
+        bids_out_dir = os.path.abspath(bids_out_dir)
+        out_dir = os.path.abspath(out_dir)
+
+        # Create temporary output names/directories
+        n = 10000 # maximum N for random number generator
+        tmp_out_dir = os.path.join(bids_out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
+        tmp_basename = 'tmp_basename' + str(random.randint(0, n))
+
+        if not os.path.exists(tmp_out_dir):
+            os.makedirs(tmp_out_dir)
+
+        # Convert image file
+        # Check file extension in file
+        if '.nii.gz' in file:
+            nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
+            [path,filename,ext] = utils.file_parts(file)
+            json_file = os.path.join(path,filename + '.json')
+            try:
+                json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
+            except FileNotFoundError:
+                json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
+                pass
+        elif '.nii' in file:
+            nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
+            nii_file = utils.gzip_file(nii_file)
+            [path,filename,ext] = utils.file_parts(file)
+            json_file = os.path.join(path,filename + '.json')
+            try:
+                json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
+            except FileNotFoundError:
+                json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
+                pass
+        elif '.dcm' in file or '.PAR' in file:
+            [nii_fmap, json_fmap, nii_mag, json_mag] = utils.convert_fmap(file,tmp_out_dir,tmp_basename)
+        else:
+            [nii_fmap, json_fmap, nii_mag, json_mag] = utils.convert_fmap(file,tmp_out_dir,tmp_basename)
+
+        # Get additional sequence/modality parameters
+        if os.path.exists(json_fmap):
+            meta_dict_params = get_data_params(file, json_fmap)
+        else:
+            tmp_json = ""
+            meta_dict_params = get_data_params(file, tmp_json)
+
+        # Update JSON file
+        info = dict()
+        info = utils.dict_multi_update(info,**meta_dict_params)
+        info = utils.dict_multi_update(info,**meta_dict_com)
+        info = utils.dict_multi_update(info,**meta_dict_fmap)
+
+        json_fmap = utils.update_json(json_fmap,info)
+        json_mag = utils.update_json(json_mag,info)
+
+        nii_fmap = os.path.abspath(nii_fmap)
+        nii_mag = os.path.abspath(nii_mag)
+
+        json_fmap = os.path.abspath(json_fmap)
+        json_mag = os.path.abspath(json_mag)
+
+        info = dict()
+        info = utils.read_json(json_fmap)
+
+        # Query dictionary for acquisition/naming keys
+        try:
+            acq = info['acq']
+        except KeyError:
+            acq = ""
+            pass
+
+        # Create output filename    
+        out_name = f"sub-{sub}" + f"_ses-{ses}"
+        name_run_dict = dict()
+
+        if acq:
+            out_name = out_name + f"_acq-{acq}"
+            tmp_dict = {"acq":f"{acq}"}
+            name_run_dict.update(tmp_dict)
+
+        # Get Run number
+        run = utils.get_num_runs(out_dir, scan=scan, **name_run_dict)
+        run = '{:02}'.format(run)
+
+        if run:
+            out_name = out_name + f"_run-{run}"
+
+        out_name = out_name + f"_{scan}"
+
+        out_nii_fmap = os.path.join(out_dir, out_name + '_fieldmap' + '.nii.gz')
+        out_nii_mag = os.path.join(out_dir, out_name + '_magnitude' + '.nii.gz')
+
+        out_json_fmap = os.path.join(out_dir, out_name + '_fieldmap' + '.json')
+        out_json_mag = os.path.join(out_dir, out_name + '_magnitude' + '.json')
+
+        os.rename(nii_fmap, out_nii_fmap)
+        os.rename(nii_mag, out_nii_mag)
+
+        os.rename(json_fmap, out_json_fmap)
+        os.rename(json_mag, out_json_mag)
+
+        # Remove temporary directory and leftover files
+        shutil.rmtree(tmp_out_dir)
+
+        return out_nii_fmap, out_nii_mag, out_json_fmap, out_json_mag
+    except FileNotFoundError:
+        print(f"Error: unable to convert {file}")
         pass
-    
-    # Create output filename    
-    out_name = f"sub-{sub}" + f"_ses-{ses}"
-    name_run_dict = dict()
-
-    if acq:
-        out_name = out_name + f"_acq-{acq}"
-        tmp_dict = {"acq":f"{acq}"}
-        name_run_dict.update(tmp_dict)
-        
-    # Get Run number
-    run = utils.get_num_runs(out_dir, scan=scan, **name_run_dict)
-    run = '{:02}'.format(run)
-
-    if run:
-        out_name = out_name + f"_run-{run}"
-
-    out_name = out_name + f"_{scan}"
-    
-    out_nii_fmap = os.path.join(out_dir, out_name + '_fieldmap' + '.nii.gz')
-    out_nii_mag = os.path.join(out_dir, out_name + '_magnitude' + '.nii.gz')
-    
-    out_json_fmap = os.path.join(out_dir, out_name + '_fieldmap' + '.json')
-    out_json_mag = os.path.join(out_dir, out_name + '_magnitude' + '.json')
-
-    os.rename(nii_fmap, out_nii_fmap)
-    os.rename(nii_mag, out_nii_mag)
-    
-    os.rename(json_fmap, out_json_fmap)
-    os.rename(json_mag, out_json_mag)
-
-    # Remove temporary directory and leftover files
-    shutil.rmtree(tmp_out_dir)
-    
-    return out_nii_fmap, out_nii_mag, out_json_fmap, out_json_mag
 
 def data_to_bids_dwi(bids_out_dir, file, sub, scan='dwi', meta_dict_com=dict(), meta_dict_dwi=dict(), ses=1, scan_type='dwi'):
     '''
@@ -653,198 +677,233 @@ def data_to_bids_dwi(bids_out_dir, file, sub, scan='dwi', meta_dict_com=dict(), 
         out_bvec (string): Absolute filepath to corresponding b-vectors file
     '''
 
-    # Create Output Directory Variables
-    # Zeropad subject ID if possible
+    # Use try-except statement here in the case of invalid/incomplete image files that will throw errors in dcm2niix
     try:
-        ses = '{:03}'.format(int(ses))
-    except ValueError:
-        pass
-    # Zeropad session ID if possible
-    try:
-        ses = '{:03}'.format(int(ses))
-    except ValueError:
-        pass
-    
-    out_dir = os.path.join(bids_out_dir, f"sub-{sub}", f"ses-{ses}", f"{scan_type}")
-
-    # Make output directory
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir)
-
-    # Get absolute filepaths
-    bids_out_dir = os.path.abspath(bids_out_dir)
-    out_dir = os.path.abspath(out_dir)
-    
-    # Create temporary output names/directories
-    n = 10000 # maximum N for random number generator
-    tmp_out_dir = os.path.join(bids_out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
-    tmp_basename = 'tmp_basename' + str(random.randint(0, n))
-    
-    if not os.path.exists(tmp_out_dir):
-        os.makedirs(tmp_out_dir)
-
-    # Convert image file
-    # Check file extension in file
-    if '.nii.gz' in file:
-        nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
-        [path,filename,ext] = utils.file_parts(file)
-        json_file = os.path.join(path,filename + '.json')
-        bval = os.path.join(path,filename + '.bval*')
-        bvec = os.path.join(path,filename + '.bvec*')
+        # Create Output Directory Variables
+        # Zeropad subject ID if possible
         try:
-            json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
-            bval = utils.cp_file(bval, tmp_out_dir, tmp_basename)
-            bvec = utils.cp_file(bvec, tmp_out_dir, tmp_basename)
-        except FileNotFoundError:
-            json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
-            bval = os.path.join(tmp_out_dir, tmp_basename + '.bval')
-            bvec = os.path.join(tmp_out_dir, tmp_basename + '.bvec')
+            ses = '{:03}'.format(int(ses))
+        except ValueError:
             pass
-    elif '.nii' in file:
-        nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
-        nii_file = utils.gzip_file(nii_file)
-        [path,filename,ext] = utils.file_parts(file)
-        json_file = os.path.join(path,filename + '.json')
-        bval = os.path.join(path,filename + '.bval*')
-        bvec = os.path.join(path,filename + '.bvec*')
+        # Zeropad session ID if possible
         try:
-            json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
-            bval = utils.cp_file(bval, tmp_out_dir, tmp_basename)
-            bvec = utils.cp_file(bvec, tmp_out_dir, tmp_basename)
-        except FileNotFoundError:
-            json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
-            bval = os.path.join(tmp_out_dir, tmp_basename + '.bval')
-            bvec = os.path.join(tmp_out_dir, tmp_basename + '.bvec')
+            ses = '{:03}'.format(int(ses))
+        except ValueError:
             pass
-    elif '.dcm' in file or '.PAR' in file:
-        [nii_file, json_file, bval, bvec] = utils.convert_dwi(file,tmp_out_dir,tmp_basename)
-    else:
-        [nii_file, json_file, bval, bvec] = utils.convert_dwi(file,tmp_out_dir,tmp_basename)
-    
-    # Get additional sequence/modality parameters
-    if os.path.exists(json_file) and os.path.exists(bval):
-        meta_dict_params = get_data_params(file, json_file, bval)
-    elif os.path.exists(bval):
-        tmp_json = ""
-        meta_dict_params = get_data_params(file, tmp_json, bval)
-    elif os.path.exists(json_file):
-        tmp_bval = ""
-        meta_dict_params = get_data_params(file, json_file, tmp_bval)
-    else:
-        tmp_json = ""
-        tmp_bval = ""
-        meta_dict_params = get_data_params(file, tmp_json, tmp_bval)
-    
-    # Update JSON file
-    info = dict()
-    info = utils.dict_multi_update(info,**meta_dict_params)
-    info = utils.dict_multi_update(info,**meta_dict_com)
-    info = utils.dict_multi_update(info,**meta_dict_dwi)
-    
-    json_file = utils.update_json(json_file,info)
-    
-    nii_file = os.path.abspath(nii_file)
-    json_file = os.path.abspath(json_file)
-    
-    bval = os.path.abspath(bval)
-    bvec = os.path.abspath(bvec)
-    
-    # Decide if file is 4D timeseries or single-band reference
-    # make edits here, switch to convert_anat or bids_to_anat
-    num_frames = get_num_frames(nii_file)
-    if num_frames == 1:
-        scan = 'sbref'
 
-    # Query dictionary for acquisition/naming keys
-    try:
-        acq = info['acq']
-    except KeyError:
-        acq = ""
-        pass
-    try:
-        direction = info['dir']
-    except KeyError:
-        direction = ""
-        pass
-    
-    # Non-standard acquisition/naming keys
-    # Used in order to differentiate between DWI scans for multiple bvalues
-    try:
-        bvals = info['bval']
-    except KeyError:
-        bvals = list()
-        pass
-    try:
-        echo_time = info['EchoTime']
-    except KeyError:
-        echo_time = ""
-        pass
-    
-    # Create output filename    
-    out_name = f"sub-{sub}" + f"_ses-{ses}"
-    name_run_dict = dict()
-    
-    if bvals:
-        vals = ""
-        for val in bvals:
-            vals = vals + 'b' + str(int(val))
-    
-    if bvals and acq and echo_time:
-        out_name = out_name + f"_acq-{acq}{vals}TE{echo_time}"
-        tmp_dict = {"acq":f"{acq}{vals}TE{echo_time}"}
-    elif bvals and acq:
-        out_name = out_name + f"_acq-{acq}{vals}"
-        tmp_dict = {"acq":f"{acq}{vals}"}
-    elif bvals and echo_time:
-        out_name = out_name + f"_acq-{vals}TE{echo_time}"
-        tmp_dict = {"acq":f"{vals}TE{echo_time}"}
-    elif acq and echo_time:
-        out_name = out_name + f"_acq-{acq}TE{echo_time}"
-        tmp_dict = {"acq":f"{acq}TE{echo_time}"}
-    elif acq:
-        out_name = out_name + f"_acq-{acq}"
-        tmp_dict = {"acq":f"{acq}"}
-    elif bvals:
-        out_name = out_name + f"_acq-{vals}"
-        tmp_dict = {"acq":f"{vals}"}
-    elif echo_time:
-        out_name = out_name + f"_acq-TE{echo_time}"
-        tmp_dict = {"acq":f"TE{echo_time}"}
-    else:
-        tmp_dict = dict()
-        
-    name_run_dict.update(tmp_dict)
+        out_dir = os.path.join(bids_out_dir, f"sub-{sub}", f"ses-{ses}", f"{scan_type}")
 
-    if direction:
-        out_name = out_name + f"_dir-{direction}"
-        tmp_dict = {"dirs":f"{direction}"}
+        # Make output directory
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+
+        # Get absolute filepaths
+        bids_out_dir = os.path.abspath(bids_out_dir)
+        out_dir = os.path.abspath(out_dir)
+
+        # Create temporary output names/directories
+        n = 10000 # maximum N for random number generator
+        tmp_out_dir = os.path.join(bids_out_dir, f"sub-{sub}", 'tmp_dir' + str(random.randint(0, n)))
+        tmp_basename = 'tmp_basename' + str(random.randint(0, n))
+
+        if not os.path.exists(tmp_out_dir):
+            os.makedirs(tmp_out_dir)
+
+        # Convert image file
+        # Check file extension in file
+        if '.nii.gz' in file:
+            nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
+            [path,filename,ext] = utils.file_parts(file)
+            json_file = os.path.join(path,filename + '.json')
+            bval = os.path.join(path,filename + '.bval*')
+            bvec = os.path.join(path,filename + '.bvec*')
+            try:
+                json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
+                # Decide if file is DWI or single-band reference
+                num_frames = get_num_frames(nii_file)
+                if num_frames == 1:
+                    scan = 'sbref'; bval = ""; bvec = ""
+                else:
+                    bval = utils.cp_file(bval, tmp_out_dir, tmp_basename)
+                    bvec = utils.cp_file(bvec, tmp_out_dir, tmp_basename)
+            except FileNotFoundError:
+                json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
+                bval = os.path.join(tmp_out_dir, tmp_basename + '.bval')
+                bvec = os.path.join(tmp_out_dir, tmp_basename + '.bvec')
+                # Decide if file is DWI or single-band reference
+                num_frames = get_num_frames(nii_file)
+                if num_frames == 1:
+                    scan = 'sbref'; bval = ""; bvec = ""
+                pass
+        elif '.nii' in file:
+            nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
+            nii_file = utils.gzip_file(nii_file)
+            [path,filename,ext] = utils.file_parts(file)
+            json_file = os.path.join(path,filename + '.json')
+            bval = os.path.join(path,filename + '.bval*')
+            bvec = os.path.join(path,filename + '.bvec*')
+            try:
+                json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
+                # Decide if file is DWI or single-band reference
+                num_frames = get_num_frames(nii_file)
+                if num_frames == 1:
+                    scan = 'sbref'; bval = ""; bvec = ""
+                else:
+                    bval = utils.cp_file(bval, tmp_out_dir, tmp_basename)
+                    bvec = utils.cp_file(bvec, tmp_out_dir, tmp_basename)
+            except FileNotFoundError:
+                json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
+                bval = os.path.join(tmp_out_dir, tmp_basename + '.bval')
+                bvec = os.path.join(tmp_out_dir, tmp_basename + '.bvec')
+                # Decide if file is DWI or single-band reference
+                num_frames = get_num_frames(nii_file)
+                if num_frames == 1:
+                    scan = 'sbref'; bval = ""; bvec = ""
+                pass
+        elif '.dcm' in file or '.PAR' in file:
+            [nii_file, json_file, bval, bvec] = utils.convert_dwi(file,tmp_out_dir,tmp_basename)
+            # Decide if file is DWI or single-band reference
+            num_frames = get_num_frames(nii_file)
+            if num_frames == 1:
+                scan = 'sbref'; bval = ""; bvec = ""
+        else:
+            [nii_file, json_file, bval, bvec] = utils.convert_dwi(file,tmp_out_dir,tmp_basename)
+            # Decide if file is DWI or single-band reference
+            num_frames = get_num_frames(nii_file)
+            if num_frames == 1:
+                scan = 'sbref'; bval = ""; bvec = ""
+
+        # Get additional sequence/modality parameters
+        if os.path.exists(json_file) and os.path.exists(bval):
+            meta_dict_params = get_data_params(file, json_file, bval)
+        elif os.path.exists(bval):
+            tmp_json = ""
+            meta_dict_params = get_data_params(file, tmp_json, bval)
+        elif os.path.exists(json_file):
+            tmp_bval = ""
+            meta_dict_params = get_data_params(file, json_file, tmp_bval)
+        else:
+            tmp_json = ""
+            tmp_bval = ""
+            meta_dict_params = get_data_params(file, tmp_json, tmp_bval)
+
+        # Update JSON file
+        info = dict()
+        info = utils.dict_multi_update(info,**meta_dict_params)
+        info = utils.dict_multi_update(info,**meta_dict_com)
+        info = utils.dict_multi_update(info,**meta_dict_dwi)
+
+        json_file = utils.update_json(json_file,info)
+
+        nii_file = os.path.abspath(nii_file)
+        json_file = os.path.abspath(json_file)
+
+        info = dict()
+        info = utils.read_json(json_file)
+
+        if bval and bvec:
+            bval = os.path.abspath(bval)
+            bvec = os.path.abspath(bvec)
+
+        # Query dictionary for acquisition/naming keys
+        try:
+            acq = info['acq']
+        except KeyError:
+            acq = ""
+            pass
+        try:
+            direction = info['dir']
+        except KeyError:
+            direction = ""
+            pass
+
+        # Non-standard acquisition/naming keys
+        # Used in order to differentiate between DWI scans for multiple bvalues
+        try:
+            bvals = info['bval']
+        except KeyError:
+            bvals = list()
+            pass
+        try:
+            echo_time = info['EchoTime']
+            echo_time = int(echo_time * 1000)
+        except KeyError:
+            echo_time = ""
+            pass
+
+        # Create output filename    
+        out_name = f"sub-{sub}" + f"_ses-{ses}"
+        name_run_dict = dict()
+
+        if bvals:
+            vals = ""
+            for val in bvals:
+                vals = vals + 'b' + str(int(val))
+        else:
+            vals = 'b0'
+
+        if vals and acq and echo_time:
+            out_name = out_name + f"_acq-{acq}{vals}TE{echo_time}"
+            tmp_dict = {"acq":f"{acq}{vals}TE{echo_time}"}
+        elif vals and acq:
+            out_name = out_name + f"_acq-{acq}{vals}"
+            tmp_dict = {"acq":f"{acq}{vals}"}
+        elif vals and echo_time:
+            out_name = out_name + f"_acq-{vals}TE{echo_time}"
+            tmp_dict = {"acq":f"{vals}TE{echo_time}"}
+        elif acq and echo_time:
+            out_name = out_name + f"_acq-{acq}TE{echo_time}"
+            tmp_dict = {"acq":f"{acq}TE{echo_time}"}
+        elif acq:
+            out_name = out_name + f"_acq-{acq}"
+            tmp_dict = {"acq":f"{acq}"}
+        elif vals:
+            out_name = out_name + f"_acq-{vals}"
+            tmp_dict = {"acq":f"{vals}"}
+        elif echo_time:
+            out_name = out_name + f"_acq-TE{echo_time}"
+            tmp_dict = {"acq":f"TE{echo_time}"}
+        else:
+            tmp_dict = dict()
+
         name_run_dict.update(tmp_dict)
-        
-    # Get Run number
-    run = utils.get_num_runs(out_dir, scan=scan, **name_run_dict)
-    run = '{:02}'.format(run)
 
-    if run:
-        out_name = out_name + f"_run-{run}"
+        if direction:
+            out_name = out_name + f"_dir-{direction}"
+            tmp_dict = {"dirs":f"{direction}"}
+            name_run_dict.update(tmp_dict)
 
-    out_name = out_name + f"_{scan}"
+        # Get Run number
+        run = utils.get_num_runs(out_dir, scan=scan, **name_run_dict)
+        run = '{:02}'.format(run)
 
-    out_nii = os.path.join(out_dir, out_name + '.nii.gz')
-    out_json = os.path.join(out_dir, out_name + '.json')
-    
-    out_bval = os.path.join(out_dir, out_name + '.bval')
-    out_bvec = os.path.join(out_dir, out_name + '.bvec')
+        if run:
+            out_name = out_name + f"_run-{run}"
 
-    os.rename(nii_file, out_nii)
-    os.rename(json_file, out_json)
-    
-    if bval:
-        os.rename(bval,out_bval)
-        
-    if bvec:
-        os.rename(bvec,out_bvec)
+        out_name = out_name + f"_{scan}"
 
-    # remove temporary directory and leftover files
-    shutil.rmtree(tmp_out_dir)
-    
-    return out_nii,out_json,out_bval,out_bvec
+        out_nii = os.path.join(out_dir, out_name + '.nii.gz')
+        out_json = os.path.join(out_dir, out_name + '.json')
+
+        out_bval = os.path.join(out_dir, out_name + '.bval')
+        out_bvec = os.path.join(out_dir, out_name + '.bvec')
+
+        os.rename(nii_file, out_nii)
+        os.rename(json_file, out_json)
+
+        if bval:
+            os.rename(bval,out_bval)
+
+        if bvec:
+            os.rename(bvec,out_bvec)
+
+        # remove temporary directory and leftover files
+        shutil.rmtree(tmp_out_dir)
+
+        if bval and bvec:
+            return out_nii,out_json,out_bval,out_bvec
+        elif not bval and bvec:
+            return out_nii,out_json
+    except FileNotFoundError:
+        print(f"Error: unable to convert {file}")
+        pass

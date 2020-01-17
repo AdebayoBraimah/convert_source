@@ -155,6 +155,28 @@ def gunzip_file(file,rm_orig=True):
     
     return out_file
 
+def read_json(json_file):
+    '''
+    Reads JavaScript Object Notation (JSON) file.
+    
+    Arguments:
+        json_file (string): Input file
+        
+    Returns: 
+        data (dict): Dictionary of key mapped items in JSON file
+    '''
+    
+    # Read JSON file
+    # Try-Except statement has empty exception as JSONDecodeError is not a valid exception to pass, 
+    # thus throwing a name error
+    try:
+        with open(json_file) as file:
+            data = json.load(file)
+    except:
+        data = dict()
+        
+    return data
+
 def update_json(json_file,dictionary):
     '''
     Updates JavaScript Object Notation (JSON) file. If the file does not exist, it is created once
@@ -171,16 +193,9 @@ def update_json(json_file,dictionary):
     # Check if JSON file exists, if not, then create JSON file
     if not os.path.exists(json_file):
         with open(json_file,"w"): pass
-        
+
     # Read JSON file
-    # Try-Except statement has empty exception as JSONDecodeError is not a valid exception to pass, 
-    # thus throwing a name error
-    try:
-        with open(json_file) as file:
-            data_orig = json.load(file)
-    except:
-        pass
-        data_orig = dict()
+    data_orig = read_json(json_file)
         
     # Update original data from JSON file
     data_orig.update(dictionary)
@@ -190,6 +205,42 @@ def update_json(json_file,dictionary):
         json.dump(data_orig,file,indent=4)
         
     return json_file
+
+# def update_json(json_file,dictionary):
+#     '''
+#     Updates JavaScript Object Notation (JSON) file. If the file does not exist, it is created once
+#     this function is invoked.
+    
+#     Arguments:
+#         json_file (string): Input file
+#         dictionary (dict): Dictionary of key mapped items to write to JSON file
+        
+#     Returns: 
+#         json_file (string): Updated JSON file
+#     '''
+    
+#     # Check if JSON file exists, if not, then create JSON file
+#     if not os.path.exists(json_file):
+#         with open(json_file,"w"): pass
+        
+#     # Read JSON file
+#     # Try-Except statement has empty exception as JSONDecodeError is not a valid exception to pass, 
+#     # thus throwing a name error
+#     try:
+#         with open(json_file) as file:
+#             data_orig = json.load(file)
+#     except:
+#         data_orig = dict()
+#         pass
+        
+#     # Update original data from JSON file
+#     data_orig.update(dictionary)
+    
+#     # Write updated JSON file
+#     with open(json_file,"w") as file:
+#         json.dump(data_orig,file,indent=4)
+        
+#     return json_file
 
 def dict_multi_update(dictionary,**kwargs):
     '''
@@ -230,7 +281,7 @@ def get_bvals(bval_file):
         bval_file (string): Absolute filepath to bval (.bval) file
         
     Returns: 
-        bvals_list (list): List of unique, non-zero bvalues.
+        bvals_list (list): List of unique, non-zero bvalues (as floats).
     '''
     
     vals = np.loadtxt(bval_file)
