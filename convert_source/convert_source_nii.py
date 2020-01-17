@@ -16,7 +16,9 @@ import numpy as np
 import platform
 
 # Import third party packages and modules
-# import ...
+import convert_source_dcm as cdm
+import convert_source_par as csp
+import utils
 
 # define functions
 
@@ -45,6 +47,88 @@ def get_nii_tr(nii_file):
         tr = "unknown"
     
     return tr
+
+def get_num_frames(nii_file):
+    '''
+    Determines the number of frames/volumes/TRs in a NifTi-2 file.
+
+    Arguments:
+        nii_file (string): Absolute filepath to NifTi image file
+
+    Returns:
+        num_frames (int): Number of temporal frames or volumes in NifTi file.
+    '''
+    
+    img = nib.load(nii_file)
+    dims = img.header.get_data_shape()
+    num_frames = dims[3]
+    
+    return num_frames
+
+def get_data_params(file,json_file="", bval_file=""):
+    '''
+    Creates a dictionary of key mapped parameter items that are often not written to the BIDS JSON sidecar
+    when converting Philips DICOM and PAR REC files.
+    
+    Arguments:
+        file (string): Absolute filepath to raw image data file (DICOM or PAR REC)
+        json_file (string, optional): Corresponding JSON sidecare file
+        bval_file (string, optional): Corresponding bval file for DWI acquisitions
+    
+    Returns:
+        info (dict): Dictionary of key mapped items/values
+    '''
+    
+    # Create empty dictionary
+    tmp_dict = dict()
+    
+    # Check and write bvalue(s) to file
+    if bval_file:
+        bval_list = utils.get_bvals(bval_file)
+        tmp_dict.update({"bval":bval_list})
+    
+    # Check file type
+    if '.dcm' in file.lower():
+        red_fact = cdm.get_red_fact(file)
+        mb = cdm.get_mb(file)
+        scan_time = cdm.get_scan_time(file)
+        [eff_echo_sp, tot_read_time]  = utils.calc_read_time(file,json_file)
+        source_format = "DICOM"
+        tmp_dict.update({"ParallelReductionFactorInPlane": red_fact,
+                         "MultibandAccelerationFactor": mb,
+                         "EffectiveEchoSpacing": eff_echo_sp,
+                         "TotalReadoutTime": tot_read_time,
+                         "AcquisitionDuration": scan_time,
+                         "SourceDataFormat": source_format})
+    elif 'PAR' in file.upper():
+        wfs = csp.get_wfs(file)
+        red_fact = csp.get_red_fact(file)
+        mb = csp.get_mb(file)
+        scan_time = csp.get_scan_time(file)
+        etl = csp.get_etl(file)
+        [eff_echo_sp, tot_read_time]  = utils.calc_read_time(file,json_file)
+        source_format = "PAR REC"
+        tmp_dict.update({"WaterFatShift": wfs,
+                         "ParallelAcquisitionTechnique": 'SENSE',
+                         "ParallelReductionFactorInPlane": red_fact,
+                         "MultibandAccelerationFactor": mb,
+                         "EffectiveEchoSpacing": eff_echo_sp,
+                         "TotalReadoutTime": tot_read_time,
+                         "AcquisitionDuration": scan_time,
+                         "EchoTrainLength": etl,
+                         "SourceDataFormat": source_format})
+    elif 'nii' in file.lower():
+        tr = get_nii_tr(file)
+        source_format = "NIFTI"
+        tmp_dict.update({"RepetitionTime": tr,
+                         "SourceDataFormat": source_format})
+    else:
+        pass
+        
+    info = dict()
+    info.update(tmp_dict)
+    
+    return info
 
 def data_to_bids_anat(bids_out_dir, file, sub, scan, meta_dict_com=dict(), meta_dict_anat=dict(), ses=1, scan_type='anat'):
     '''
@@ -100,27 +184,27 @@ def data_to_bids_anat(bids_out_dir, file, sub, scan, meta_dict_com=dict(), meta_
     # Convert image file
     # Check file extension in file
     if '.nii.gz' in file:
-        nii_file = cp_file(file, tmp_out_dir, tmp_basename)
-        [path,filename] = file_parts(file)
+        nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
+        [path,filename] = utils.file_parts(file)
         json_file = os.path.join(path,filename + '.json')
         try:
-            json_file = cp_file(json_file, tmp_out_dir, tmp_basename)
+            json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
         except FileNotFoundError:
             json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
             pass
     elif '.nii' in file:
-        nii_file = cp_file(file, tmp_out_dir, tmp_basename)
-        nii_file = gzip_file(nii_file)
+        nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
+        nii_file = utils.gzip_file(nii_file)
         json_file = os.path.join(path,filename + '.json')
         try:
-            json_file = cp_file(json_file, tmp_out_dir, tmp_basename)
+            json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
         except FileNotFoundError:
             json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
             pass
     elif '.dcm' in file or '.PAR' in file:
-        [nii_file, json_file] = convert_anat(file,tmp_out_dir,tmp_basename)
+        [nii_file, json_file] = utils.convert_anat(file,tmp_out_dir,tmp_basename)
     else:
-        [nii_file, json_file] = convert_anat(file,tmp_out_dir,tmp_basename)
+        [nii_file, json_file] = utils.convert_anat(file,tmp_out_dir,tmp_basename)
     
     # Get additional sequence/modality parameters
     if os.path.exists(json_file):
@@ -131,11 +215,11 @@ def data_to_bids_anat(bids_out_dir, file, sub, scan, meta_dict_com=dict(), meta_
     
     # Update JSON file
     info = dict()
-    info = dict_multi_update(info,**meta_dict_com)
-    info = dict_multi_update(info,**meta_dict_params)
-    info = dict_multi_update(info,**meta_dict_anat)
+    info = utils.dict_multi_update(info,**meta_dict_params)
+    info = utils.dict_multi_update(info,**meta_dict_com)
+    info = utils.dict_multi_update(info,**meta_dict_anat)
     
-    json_file = update_json(json_file,info)
+    json_file = utils.update_json(json_file,info)
     
     nii_file = os.path.abspath(nii_file)
     json_file = os.path.abspath(json_file)
@@ -178,7 +262,7 @@ def data_to_bids_anat(bids_out_dir, file, sub, scan, meta_dict_com=dict(), meta_
         name_run_dict.update(tmp_dict)
         
     # Get Run number
-    run = get_num_runs(outdir, scan=scan, **name_run_dict)
+    run = utils.get_num_runs(outdir, scan=scan, **name_run_dict)
     run = '{:02}'.format(run)
 
     if run:
@@ -253,27 +337,27 @@ def data_to_bids_func(bids_out_dir, file, sub, scan, task = 'rest', meta_dict_co
     # Convert image file
     # Check file extension in file
     if '.nii.gz' in file:
-        nii_file = cp_file(file, tmp_out_dir, tmp_basename)
-        [path,filename] = file_parts(file)
+        nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
+        [path,filename] = utils.file_parts(file)
         json_file = os.path.join(path,filename + '.json')
         try:
-            json_file = cp_file(json_file, tmp_out_dir, tmp_basename)
+            json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
         except FileNotFoundError:
             json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
             pass
     elif '.nii' in file:
-        nii_file = cp_file(file, tmp_out_dir, tmp_basename)
-        nii_file = gzip_file(nii_file)
+        nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
+        nii_file = utils.gzip_file(nii_file)
         json_file = os.path.join(path,filename + '.json')
         try:
-            json_file = cp_file(json_file, tmp_out_dir, tmp_basename)
+            json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
         except FileNotFoundError:
             json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
             pass
     elif '.dcm' in file or '.PAR' in file:
-        [nii_file, json_file] = convert_anat(file,tmp_out_dir,tmp_basename)
+        [nii_file, json_file] = utils.convert_anat(file,tmp_out_dir,tmp_basename)
     else:
-        [nii_file, json_file] = convert_anat(file,tmp_out_dir,tmp_basename)
+        [nii_file, json_file] = utils.convert_anat(file,tmp_out_dir,tmp_basename)
     
     # Get additional sequence/modality parameters
     if os.path.exists(json_file):
@@ -284,11 +368,11 @@ def data_to_bids_func(bids_out_dir, file, sub, scan, task = 'rest', meta_dict_co
     
     # Update JSON file
     info = dict()
-    info = dict_multi_update(info,**meta_dict_com)
-    info = dict_multi_update(info,**meta_dict_params)
-    info = dict_multi_update(info,**meta_dict_func)
+    info = utils.dict_multi_update(info,**meta_dict_params)
+    info = utils.dict_multi_update(info,**meta_dict_com)
+    info = utils.dict_multi_update(info,**meta_dict_anat)
     
-    json_file = update_json(json_file,info)
+    json_file = utils.update_json(json_file,info)
     
     nii_file = os.path.abspath(nii_file)
     json_file = os.path.abspath(json_file)
@@ -352,7 +436,7 @@ def data_to_bids_func(bids_out_dir, file, sub, scan, task = 'rest', meta_dict_co
         name_run_dict.update(tmp_dict)
         
     # Get Run number
-    run = get_num_runs(outdir, scan=scan, **name_run_dict)
+    run = utils.get_num_runs(outdir, scan=scan, **name_run_dict)
     run = '{:02}'.format(run)
 
     if run:
@@ -375,7 +459,7 @@ def data_to_bids_func(bids_out_dir, file, sub, scan, task = 'rest', meta_dict_co
     
     return out_nii,out_json
 
-def data_to_bids_fmap(bids_out_dir, file, sub, scan='magnitude', meta_dict_com=dict(), meta_dict_fmap=dict(), ses=1, scan_type='fmap'):
+def data_to_bids_fmap(bids_out_dir, file, sub, scan='fieldmap', meta_dict_com=dict(), meta_dict_fmap=dict(), ses=1, scan_type='fmap'):
     '''
     Renames converted NifTi-2 files to conform with the BIDS naming convension (in the case of fieldmap files).
     This function accepts any image file (DICOM, PAR REC, and NifTi-2). If the image file is a raw data file (e.g. DICOM, PAR REC)
@@ -436,27 +520,27 @@ def data_to_bids_fmap(bids_out_dir, file, sub, scan='magnitude', meta_dict_com=d
     # Convert image file
     # Check file extension in file
     if '.nii.gz' in file:
-        nii_file = cp_file(file, tmp_out_dir, tmp_basename)
-        [path,filename] = file_parts(file)
+        nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
+        [path,filename] = utils.file_parts(file)
         json_file = os.path.join(path,filename + '.json')
         try:
-            json_file = cp_file(json_file, tmp_out_dir, tmp_basename)
+            json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
         except FileNotFoundError:
             json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
             pass
     elif '.nii' in file:
-        nii_file = cp_file(file, tmp_out_dir, tmp_basename)
-        nii_file = gzip_file(nii_file)
+        nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
+        nii_file = utils.gzip_file(nii_file)
         json_file = os.path.join(path,filename + '.json')
         try:
-            json_file = cp_file(json_file, tmp_out_dir, tmp_basename)
+            json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
         except FileNotFoundError:
             json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
             pass
     elif '.dcm' in file or '.PAR' in file:
-        [nii_fmap, json_fmap, nii_mag, json_mag] = convert_fmap(file,tmp_out_dir,tmp_basename)
+        [nii_fmap, json_fmap, nii_mag, json_mag] = utils.convert_fmap(file,tmp_out_dir,tmp_basename)
     else:
-        [nii_fmap, json_fmap, nii_mag, json_mag] = convert_fmap(file,tmp_out_dir,tmp_basename)
+        [nii_fmap, json_fmap, nii_mag, json_mag] = utils.convert_fmap(file,tmp_out_dir,tmp_basename)
     
     # Get additional sequence/modality parameters
     if os.path.exists(json_fmap):
@@ -467,12 +551,12 @@ def data_to_bids_fmap(bids_out_dir, file, sub, scan='magnitude', meta_dict_com=d
     
     # Update JSON file
     info = dict()
-    info = dict_multi_update(info,**meta_dict_com)
-    info = dict_multi_update(info,**meta_dict_params)
-    info = dict_multi_update(info,**meta_dict_fmap)
+    info = utils.dict_multi_update(info,**meta_dict_params)
+    info = utils.dict_multi_update(info,**meta_dict_com)
+    info = utils.dict_multi_update(info,**meta_dict_anat)
     
-    json_fmap = update_json(json_fmap,info)
-    json_mag = update_json(json_mag,info)
+    json_fmap = utils.update_json(json_fmap,info)
+    json_mag = utils.update_json(json_mag,info)
     
     nii_fmap = os.path.abspath(nii_fmap)
     nii_mag = os.path.abspath(nii_mag)
@@ -496,7 +580,7 @@ def data_to_bids_fmap(bids_out_dir, file, sub, scan='magnitude', meta_dict_com=d
         name_run_dict.update(tmp_dict)
         
     # Get Run number
-    run = get_num_runs(outdir, scan=scan, **name_run_dict)
+    run = utils.get_num_runs(outdir, scan=scan, **name_run_dict)
     run = '{:02}'.format(run)
 
     if run:
@@ -579,54 +663,61 @@ def data_to_bids_dwi(bids_out_dir, file, sub, scan='dwi', meta_dict_com=dict(), 
     # Convert image file
     # Check file extension in file
     if '.nii.gz' in file:
-        nii_file = cp_file(file, tmp_out_dir, tmp_basename)
-        [path,filename] = file_parts(file)
+        nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
+        [path,filename] = utils.file_parts(file)
         json_file = os.path.join(path,filename + '.json')
         bval = os.path.join(path,filename + '.bval*')
         bvec = os.path.join(path,filename + '.bvec*')
         try:
-            json_file = cp_file(json_file, tmp_out_dir, tmp_basename)
-            bval = cp_file(bval, tmp_out_dir, tmp_basename)
-            bvec = cp_file(bvec, tmp_out_dir, tmp_basename)
+            json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
+            bval = utils.cp_file(bval, tmp_out_dir, tmp_basename)
+            bvec = utils.cp_file(bvec, tmp_out_dir, tmp_basename)
         except FileNotFoundError:
             json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
             bval = os.path.join(tmp_out_dir, tmp_basename + '.bval')
             bvec = os.path.join(tmp_out_dir, tmp_basename + '.bvec')
             pass
     elif '.nii' in file:
-        nii_file = cp_file(file, tmp_out_dir, tmp_basename)
-        nii_file = gzip_file(nii_file)
+        nii_file = utils.cp_file(file, tmp_out_dir, tmp_basename)
+        nii_file = utils.gzip_file(nii_file)
         json_file = os.path.join(path,filename + '.json')
         bval = os.path.join(path,filename + '.bval*')
         bvec = os.path.join(path,filename + '.bvec*')
         try:
-            json_file = cp_file(json_file, tmp_out_dir, tmp_basename)
-            bval = cp_file(bval, tmp_out_dir, tmp_basename)
-            bvec = cp_file(bvec, tmp_out_dir, tmp_basename)
+            json_file = utils.cp_file(json_file, tmp_out_dir, tmp_basename)
+            bval = utils.cp_file(bval, tmp_out_dir, tmp_basename)
+            bvec = utils.cp_file(bvec, tmp_out_dir, tmp_basename)
         except FileNotFoundError:
             json_file = os.path.join(tmp_out_dir, tmp_basename + '.json')
             bval = os.path.join(tmp_out_dir, tmp_basename + '.bval')
             bvec = os.path.join(tmp_out_dir, tmp_basename + '.bvec')
             pass
     elif '.dcm' in file or '.PAR' in file:
-        [nii_file, json_file, bval, bvec] = convert_dwi(file,tmp_out_dir,tmp_basename)
+        [nii_file, json_file, bval, bvec] = utils.convert_dwi(file,tmp_out_dir,tmp_basename)
     else:
-        [nii_file, json_file, bval, bvec] = convert_dwi(file,tmp_out_dir,tmp_basename)
+        [nii_file, json_file, bval, bvec] = utils.convert_dwi(file,tmp_out_dir,tmp_basename)
     
     # Get additional sequence/modality parameters
-    if os.path.exists(json_file):
+    if os.path.exists(json_file) and os.path.exists(bval):
         meta_dict_params = get_data_params(file, json_file, bval)
-    else:
+    elif os.path.exists(bval):
         tmp_json = ""
         meta_dict_params = get_data_params(file, tmp_json, bval)
+    elif os.path.exists(json_file):
+        tmp_bval = ""
+        meta_dict_params = get_data_params(file, json_file, tmp_bval)
+    else:
+        tmp_json = ""
+        tmp_bval = ""
+        meta_dict_params = get_data_params(file, tmp_json, tmp_bval)
     
     # Update JSON file
     info = dict()
-    info = dict_multi_update(info,**meta_dict_com)
-    info = dict_multi_update(info,**meta_dict_params)
-    info = dict_multi_update(info,**meta_dict_dwi)
+    info = utils.dict_multi_update(info,**meta_dict_params)
+    info = utils.dict_multi_update(info,**meta_dict_com)
+    info = utils.dict_multi_update(info,**meta_dict_anat)
     
-    json_file = update_json(json_file,info)
+    json_file = utils.update_json(json_file,info)
     
     nii_file = os.path.abspath(nii_file)
     json_file = os.path.abspath(json_file)
@@ -701,14 +792,13 @@ def data_to_bids_dwi(bids_out_dir, file, sub, scan='dwi', meta_dict_com=dict(), 
         name_run_dict.update(tmp_dict)
         
     # Get Run number
-    run = get_num_runs(outdir, scan=scan, **name_run_dict)
+    run = utils.get_num_runs(outdir, scan=scan, **name_run_dict)
     run = '{:02}'.format(run)
 
     if run:
         out_name = out_name + f"_run-{run}"
 
     out_name = out_name + f"_{scan}"
-
 
     out_nii = os.path.join(out_dir, out_name + '.nii.gz')
     out_json = os.path.join(out_dir, out_name + '.json')

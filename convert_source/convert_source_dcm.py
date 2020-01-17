@@ -15,7 +15,8 @@ import subprocess
 import nibabel as nib
 
 # Import third party packages and modules
-# import ...
+import utils
+import convert_source_nii as csn
 
 # Define functions
 
@@ -35,10 +36,10 @@ def get_scan_time(dcm_file):
 
     # Gets scan time
     try:
-    scan_time = ds.AcquisitionDuration
+        scan_time = ds.AcquisitionDuration
     except AttributeError:
-    pass
-    scan_time = 'unknown'
+        pass
+        scan_time = 'unknown'
 
     return scan_time
 
@@ -134,89 +135,11 @@ def get_bwpppe(dcm_file):
     
     return bwpppe
 
-def get_dcm_scan_tech(dictionary, dcm_file):
-    '''
-    Searches DICOM file header for scan technique/MR modality used in accordance with the search terms provided by the
-    nested dictionary. The DICOM header field searched is a Philips DICOM private tag (2001,1020) [Scanning Technique 
-    Description MR]. In the case that field does not match, is empty, or does not exist, then more common DICOM tags
-    are searched - and they include: Series Description, Protocol Name, and Image Type.
-    
-    Note: This function is still undergoing active development.
-    
-    Arguments:
-        dictionary (dict): Nested dictionary from the 'read_config' function
-        dcm_file (string): DICOM filename with absolute filepath
-    
-    Returns: 
-        None
-    '''
-    
-    mod_found = False
-    
-    # Load DICOM data and read header
-    ds = pydicom.dcmread(dcm_file)
-    
-    # Search DICOM header for Scan Technique used
-    dcm_scan_tech_str = str(ds[0x2001,0x1020])
-    
-    for key,item in dictionary.items():
-        for dict_key,dict_item in dictionary[key].items():
-            if isinstance(dict_item,list):
-                if list_in_substr(dict_item,dcm_scan_tech_str):
-                    mod_found = True
-                    print(f"{key} - {dict_key}: {dict_item}")
-                    if mod_found:
-                        break
-            elif isinstance(dict_item,dict):
-                tmp_dict = dictionary[key]
-                for d_key,d_item in tmp_dict[dict_key].items():
-                    if list_in_substr(d_item,dcm_scan_tech_str):
-                        mod_found = True
-                        print(f"{key} - {dict_key} - {d_key}: {d_item}")
-                        if mod_found:
-                            break
-                            
-        if mod_found:
-            break
-    
-    # Secondary look in the case Private Field (2001, 1020) [Scanning Technique Description MR] is empty
-    if not mod_found:
-        # Define list of DICOM header fields
-        dcm_fields = ['SeriesDescription', 'ImageType', 'ProtocolName']
-        
-        for dcm_field in dcm_fields:
-            dcm_scan_tech_str = str(eval(f"ds.{dcm_field}")) # This makes me dangerously uncomfortable
-            
-            for key,item in dictionary.items():
-                for dict_key,dict_item in dictionary[key].items():
-                    if isinstance(dict_item,list):
-                        if list_in_substr(dict_item,dcm_scan_tech_str):
-                            mod_found = True
-                            print(f"{key} - {dict_key}: {dict_item}")
-                            if mod_found:
-                                break
-                    elif isinstance(dict_item,dict):
-                        tmp_dict = dictionary[key]
-                        for d_key,d_item in tmp_dict[dict_key].items():
-                            if list_in_substr(d_item,dcm_scan_tech_str):
-                                mod_found = True
-                                print(f"{key} - {dict_key} - {d_key}: {d_item}")
-                                if mod_found:
-                                    break
-
-            if mod_found:
-                break
-                
-    if not mod_found:
-        print("unknown modality")
-        
-    return None
-
 def get_red_fact(dcm_file):
     '''
     Extracts parallel reduction factor in-plane value (GRAPPA/SENSE) from file description in the DICOM 
-    header for MR scanners. This reduction factor is assumed to be 1 if a value cannot be found from witin
-    the DICOM header.
+    header for Philips MR scanners. This reduction factor is assumed to be 1 if a value cannot be found 
+    from witin the DICOM header.
     
     Arguments:
         dcm_file (string): Absolute filepath to DICOM file
@@ -275,7 +198,7 @@ def get_mb(dcm_file):
 
     return mb
 
-def get_dcm_scan_tech(dcm_file, search_dict, keep_unknown=True, verbose=False):
+def get_dcm_scan_tech(bids_out_dir, sub, dcm_file, search_dict, meta_dict={}, ses=1, keep_unknown=True, verbose=False):
     '''
     Searches DICOM file header for scan technique/MR modality used in accordance with the search terms provided by the
     nested dictionary. The DICOM header field searched is a Philips DICOM private tag (2001,1020) [Scanning Technique 
@@ -285,12 +208,21 @@ def get_dcm_scan_tech(dcm_file, search_dict, keep_unknown=True, verbose=False):
     Note: This function is still undergoing active development.
     
     Arguments:
-        search_dict (dict): Nested dictionary from the 'read_config' function
+        bids_out_dir (string): Output BIDS directory
+        sub (int or string): Subject ID
         dcm_file (string): DICOM filename with absolute filepath
+        search_dict (dict): Nested dictionary from the 'read_config' function
+        meta_dict (dict): Nested metadata dictionary
+        ses (int or string): Session ID
+        keep_unknown (bool): Convert modalities/scans which cannot be identified (default: True)
+        verbose (bool): Prints the scan_type, modality, and search terms used (e.g. func - bold - rest - ['rest', 'FFE'])
     
     Returns: 
         None
     '''
+
+    if not meta_dict:
+        meta_dict = dict()
     
     mod_found = False
     
@@ -303,38 +235,40 @@ def get_dcm_scan_tech(dcm_file, search_dict, keep_unknown=True, verbose=False):
     for key,item in search_dict.items():
         for dict_key,dict_item in search_dict[key].items():
             if isinstance(dict_item,list):
-                if list_in_substr(dict_item,dcm_scan_tech_str):
+                if utils.list_in_substr(dict_item,dcm_scan_tech_str):
                     mod_found = True
                     if verbose:
                         print(f"{key} - {dict_key}: {dict_item}")
                     scan_type = key
                     scan = dict_key
+                    [com_param_dict, scan_param_dict] = utils.get_metadata(dictionary=meta_dict,scan_type=scan_type)
                     if scan_type.lower() == 'dwi':
-                        data_to_bids_dwi(bids_out_dir,file,sub,scan,meta_dict_com,meta_dict_dwi="",ses="",scan_type=scan_type)
+                        csn.data_to_bids_dwi(bids_out_dir=bids_out_dir,file=dcm_file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_dwi=scan_param_dict,ses=ses,scan_type=scan_type)
                     elif scan_type.lower() == 'fmap':
-                        data_to_bids_fmap(bids_out_dir,file,sub,scan,meta_dict_com,meta_dict_fmap="",ses="",scan_type=scan_type)
+                        csn.data_to_bids_fmap(bids_out_dir=bids_out_dir,file=dcm_file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_fmap=scan_param_dict,ses=ses,scan_type=scan_type)
                     else:
-                        data_to_bids_anat(bids_out_dir,file,sub,scan,meta_dict_com,meta_dict_anat="",ses="",scan_type=scan_type)
+                        csn.data_to_bids_anat(bids_out_dir=bids_out_dir,file=dcm_file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_anat=scan_param_dict,ses=ses,scan_type=scan_type)
                     if mod_found:
                         break
             elif isinstance(dict_item,dict):
                 tmp_dict = search_dict[key]
                 for d_key,d_item in tmp_dict[dict_key].items():
-                    if list_in_substr(d_item,dcm_scan_tech_str):
+                    if utils.list_in_substr(d_item,dcm_scan_tech_str):
                         mod_found = True
                         if verbose:
                             print(f"{key} - {dict_key} - {d_key}: {d_item}")
                         scan_type = key
                         scan = dict_key
                         task = d_key
+                        [com_param_dict, scan_param_dict] = utils.get_metadata(dictionary=meta_dict,scan_type=scan_type,task=task)
                         if scan_type.lower() == 'func':
-                            data_to_bids_func(bids_out_dir,file,sub,scan,task="",meta_dict_com,meta_dict_func="",ses="",scan_type=scan_type)
+                            csn.data_to_bids_func(bids_out_dir=bids_out_dir,file=dcm_file,sub=sub,scan=scan,task=task,meta_dict_com=com_param_dict,meta_dict_func=scan_param_dict,ses=ses,scan_type=scan_type)
                         elif scan_type.lower() == 'dwi':
-                            data_to_bids_dwi(bids_out_dir,file,sub,scan,meta_dict_com,meta_dict_dwi="",ses="",scan_type=scan_type)
+                            csn.data_to_bids_dwi(bids_out_dir=bids_out_dir,file=dcm_file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_dwi=scan_param_dict,ses=ses,scan_type=scan_type)
                         elif scan_type.lower() == 'fmap':
-                            data_to_bids_fmap(bids_out_dir,file,sub,scan,meta_dict_com,meta_dict_fmap="",ses="",scan_type=scan_type)
+                            csn.data_to_bids_fmap(bids_out_dir=bids_out_dir,file=dcm_file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_fmap=scan_param_dict,ses=ses,scan_type=scan_type)
                         else:
-                            data_to_bids_anat(bids_out_dir,file,sub,scan,meta_dict_com,meta_dict_anat="",ses="",scan_type=scan_type)
+                            csn.data_to_bids_anat(bids_out_dir=bids_out_dir,file=dcm_file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_anat=scan_param_dict,ses=ses,scan_type=scan_type)
                         if mod_found:
                             break
                             
@@ -352,38 +286,40 @@ def get_dcm_scan_tech(dcm_file, search_dict, keep_unknown=True, verbose=False):
             for key,item in search_dict.items():
                 for dict_key,dict_item in search_dict[key].items():
                     if isinstance(dict_item,list):
-                        if list_in_substr(dict_item,dcm_scan_tech_str):
+                        if utils.list_in_substr(dict_item,dcm_scan_tech_str):
                             mod_found = True
                             if verbose:
                                 print(f"{key} - {dict_key}: {dict_item}")
                             scan_type = key
                             scan = dict_key
+                            [com_param_dict, scan_param_dict] = utils.get_metadata(dictionary=meta_dict,scan_type=scan_type)
                             if scan_type.lower() == 'dwi':
-                                data_to_bids_dwi(bids_out_dir,file,sub,scan,meta_dict_com,meta_dict_dwi="",ses="",scan_type=scan_type)
+                                csn.data_to_bids_dwi(bids_out_dir=bids_out_dir,file=dcm_file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_dwi=scan_param_dict,ses=ses,scan_type=scan_type)
                             elif scan_type.lower() == 'fmap':
-                                data_to_bids_fmap(bids_out_dir,file,sub,scan,meta_dict_com,meta_dict_fmap="",ses="",scan_type=scan_type)
+                                csn.data_to_bids_fmap(bids_out_dir=bids_out_dir,file=dcm_file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_fmap=scan_param_dict,ses=ses,scan_type=scan_type)
                             else:
-                                data_to_bids_anat(bids_out_dir,file,sub,scan,meta_dict_com,meta_dict_anat="",ses="",scan_type=scan_type)
+                                csn.data_to_bids_anat(bids_out_dir=bids_out_dir,file=dcm_file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_anat=scan_param_dict,ses=ses,scan_type=scan_type)
                             if mod_found:
                                 break
                     elif isinstance(dict_item,dict):
                         tmp_dict = search_dict[key]
                         for d_key,d_item in tmp_dict[dict_key].items():
-                            if list_in_substr(d_item,dcm_scan_tech_str):
+                            if utils.list_in_substr(d_item,dcm_scan_tech_str):
                                 mod_found = True
                                 if verbose:
                                     print(f"{key} - {dict_key} - {d_key}: {d_item}")
                                 scan_type = key
                                 scan = dict_key
                                 task = d_key
+                                [com_param_dict, scan_param_dict] = utils.get_metadata(dictionary=meta_dict,scan_type=scan_type,task=task)
                                 if scan_type.lower() == 'func':
-                                    data_to_bids_func(bids_out_dir,file,sub,scan,task="",meta_dict_com,meta_dict_func="",ses="",scan_type=scan_type)
+                                    csn.data_to_bids_func(bids_out_dir=bids_out_dir,file=dcm_file,sub=sub,scan=scan,task=task,meta_dict_com=com_param_dict,meta_dict_func=scan_param_dict,ses=ses,scan_type=scan_type)
                                 elif scan_type.lower() == 'dwi':
-                                    data_to_bids_dwi(bids_out_dir,file,sub,scan,meta_dict_com,meta_dict_dwi="",ses="",scan_type=scan_type)
+                                    csn.data_to_bids_dwi(bids_out_dir=bids_out_dir,file=dcm_file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_dwi=scan_param_dict,ses=ses,scan_type=scan_type)
                                 elif scan_type.lower() == 'fmap':
-                                    data_to_bids_fmap(bids_out_dir,file,sub,scan,meta_dict_com,meta_dict_fmap="",ses="",scan_type=scan_type)
+                                    csn.data_to_bids_fmap(bids_out_dir=bids_out_dir,file=dcm_file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_fmap=scan_param_dict,ses=ses,scan_type=scan_type)
                                 else:
-                                    data_to_bids_anat(bids_out_dir,file,sub,scan,meta_dict_com,meta_dict_anat="",ses="",scan_type=scan_type)
+                                    csn.data_to_bids_anat(bids_out_dir=bids_out_dir,file=dcm_file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_anat=scan_param_dict,ses=ses,scan_type=scan_type)
                                 if mod_found:
                                     break
 
@@ -396,7 +332,7 @@ def get_dcm_scan_tech(dcm_file, search_dict, keep_unknown=True, verbose=False):
         if keep_unknown:
             scan_type = 'unknown_modality'
             scan = 'unknown'
-            data_to_bids_anat(bids_out_dir,file,sub,scan,meta_dict_com,meta_dict_anat="",ses="",scan_type=scan_type)
+            csn.data_to_bids_anat(bids_out_dir=bids_out_dir,file=dcm_file,sub=sub,scan=scan,meta_dict_com={},meta_dict_anat={},ses=ses,scan_type=scan_type)
         
     return None
 

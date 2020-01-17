@@ -228,6 +228,106 @@ def get_bvals(bval_file):
     
     return bvals_list
 
+def get_metadata(dictionary="",scan_type="",task=""):
+    '''
+    Reads the metadata dictionary and looks for keywords to indicate what metadata should be written to which
+    dictionary. For example, the keyword 'common' is used to indicate the common information for the imaging
+    protocol and may contain information such as: field strength, phase encoding direction, institution name, etc.
+    Additional keywords that are BIDS sub-directories names (e.g. anat, func, dwi) will return an additional
+    dictionary which contains metadata specific for those modalities. Func also has additional keywords based on
+    the task specified. If an empty dictionary is passed as an argument, then this function returns empty dictionaries
+    as a result.
+    
+    Arguments:
+        dictionary (dict,optional): Nest dictionary of key mapped items from the 'read_config' function
+        scan_type (string, optional): BIDS scan type (e.g. anat, func, dwi, etc.)
+        task (string, optional): Task name to search in the key mapped dictionary
+        
+    Returns: 
+        com_param_dict (dict): Common parameters dictionary
+        scan_param_dict (dict): Scan/modality type parameters dictionary
+    '''
+
+    if not dictionary:
+        dictionary = dict()
+    
+    # Create empty dictionaries
+    com_param_dict = dict()
+    scan_param_dict = dict()
+    scan_task_dict = dict()
+    
+    # Iterate through, looking for key words (e.g. common and scan_type)
+    for key,item in dictionary.items():
+        if key.lower() in 'common':
+            com_param_dict = dictionary[key]
+
+        if key.lower() in scan_type:
+            scan_param_dict = dictionary[key]
+            if task.lower() in scan_param_dict:
+                for dict_key,dict_item in scan_param_dict.items():
+                    if task.lower() in dict_key:
+                        scan_task_dict = scan_param_dict[dict_key]
+                        
+        if len(scan_task_dict) != 0:
+            scan_param_dict = scan_task_dict
+    
+    return com_param_dict, scan_param_dict
+
+def str_in_substr(sub_str_,str_):
+    '''
+    DEPRECATED: Should only be used if config_file uses comma separated
+        lists to denote search terms.
+    
+    Searches a (longer) string using a comma separated string 
+    consisting of substrings. Returns 'True' or 'False' if any part
+    of the substring is found within the larger string.
+    
+    Example:
+        str_in_substr('T1,TFE','sub_T1_image_file') would return True.
+        str_in_substr('T2,TSE','sub_T1_image_file') would return False.
+    
+    Arguments:
+        sub_str_ (string): Substring used for matching.
+        str_ (string): Larger string to be searched for matches within substring.
+    
+    Returns: 
+        bool_var (bool): Boolean - True or False
+    '''
+    
+    bool_var = False
+    
+    for word in sub_str_.split(","):
+        if any(word in str_ for element in str_):
+            bool_var = True
+            
+    return bool_var
+
+def list_in_substr(list_,str_):
+    '''
+    Searches a string using a list that contains substrings. 
+    Returns 'True' or 'False' if any elements of the list are 
+    found within the string.
+    
+    Example:
+        list_in_substr('['T1','TFE']','sub_T1_image_file') would return True.
+        list_in_substr('['T2','TSE']','sub_T1_image_file') would return False.
+    
+    Arguments:
+        list_ (string): list containing strings used for matching.
+        str_ (string): Larger string to be searched for matches within substring.
+    
+    Returns: 
+        bool_var (bool): Boolean - True or False
+    '''
+    
+    bool_var = False
+    
+    for word in list_:
+        if any(word.lower() in str_.lower() for element in str_.lower()):
+            bool_var = True
+            
+    return bool_var
+
 def convert_image_data(file,basename,out_dir,cprss_lvl=6,bids=True,
                        anon_bids=True,gzip=True,comment=True,
                        adjacent=False,dir_search=5,nrrd=False,
