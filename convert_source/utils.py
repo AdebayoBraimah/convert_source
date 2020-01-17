@@ -206,42 +206,6 @@ def update_json(json_file,dictionary):
         
     return json_file
 
-# def update_json(json_file,dictionary):
-#     '''
-#     Updates JavaScript Object Notation (JSON) file. If the file does not exist, it is created once
-#     this function is invoked.
-    
-#     Arguments:
-#         json_file (string): Input file
-#         dictionary (dict): Dictionary of key mapped items to write to JSON file
-        
-#     Returns: 
-#         json_file (string): Updated JSON file
-#     '''
-    
-#     # Check if JSON file exists, if not, then create JSON file
-#     if not os.path.exists(json_file):
-#         with open(json_file,"w"): pass
-        
-#     # Read JSON file
-#     # Try-Except statement has empty exception as JSONDecodeError is not a valid exception to pass, 
-#     # thus throwing a name error
-#     try:
-#         with open(json_file) as file:
-#             data_orig = json.load(file)
-#     except:
-#         data_orig = dict()
-#         pass
-        
-#     # Update original data from JSON file
-#     data_orig.update(dictionary)
-    
-#     # Write updated JSON file
-#     with open(json_file,"w") as file:
-#         json.dump(data_orig,file,indent=4)
-        
-#     return json_file
-
 def dict_multi_update(dictionary,**kwargs):
     '''
     Updates a dictionary multiple times depending on the number key word mapped pairs that are provided and 
