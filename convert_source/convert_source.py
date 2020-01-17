@@ -13,23 +13,12 @@
 #==============================================================================
 
 # Import packages and modules
-import pydicom
-import json
-import re
 import os
 import sys
-import shutil
 import glob
-import random
-import subprocess
-import pathlib
 import yaml
-import nibabel as nib
-import gzip
-import pandas as pd
-import numpy as np
-import platform
-import multiprocessing
+import argparse
+
 
 # Import third party packages and modules
 import convert_source_dcm as cdm
@@ -133,7 +122,7 @@ def create_file_list(data_dir, file_ext="", order="size"):
     
     # Create file list
     if file_ext == ".dcm":
-        file_list = sorted(get_dcm_files(data_dir), key=order_key, reverse=False)
+        file_list = sorted(cdm.get_dcm_files(data_dir), key=order_key, reverse=False)
     elif file_ext != ".dcm":
         file_names = os.path.join(data_dir, f"*{file_ext}")
         file_list = sorted(glob.glob(file_names, recursive=True), key=order_key, reverse=False)
@@ -271,13 +260,8 @@ def convert_modality(bids_out_dir, sub, file, search_dict, meta_dict=dict(), ses
     converted_files = list()
     
     # Check file type
-    if 'nii' in file:
-        file_ext = "nii"
-        file_ext = f".{file_ext.lower()}"
-    elif 'dcm' in file:
-        file_ext = "dcm"
-        file_ext = f".{file_ext.lower()}"
-        if not is_valid_dcm(file,verbose):
+    if 'dcm' in file:
+        if not cdm.is_valid_dcm(file,verbose):
             sys.exit(f"Invalid DICOM file. Please check {file}")
     
     for key,item in search_dict.items():
@@ -321,7 +305,7 @@ def convert_modality(bids_out_dir, sub, file, search_dict, meta_dict=dict(), ses
                             break
                         
     if not mod_found:
-        converted_files = get_scan_tech(bids_out_dir, sub, file, search_dict, meta_dict="", ses=1, keep_unknown=keep_unknown, verbose=verbose)
+        converted_files = get_scan_tech(bids_out_dir, sub, file, search_dict, meta_dict=dict(), ses=1, keep_unknown=keep_unknown, verbose=verbose)
     
     return converted_files
 
@@ -334,7 +318,7 @@ def batch_convert(bids_out_dir,sub,file_list, search_dict, meta_dict=dict(), ses
     Arguments:
         bids_out_dir (string): Output BIDS directory
         sub (int or string): Subject ID
-        file (string): Source image filename with absolute filepath
+        file_list (list): List of image files with absolute paths
         search_dict (dict): Nested dictionary from the 'read_config' function
         meta_dict (dict): Nested metadata dictionary
         ses (int or string): Session ID
@@ -349,8 +333,113 @@ def batch_convert(bids_out_dir,sub,file_list, search_dict, meta_dict=dict(), ses
     
     for file in file_list:
         try:
-            converted_files = convert_modality(bids_out_dir=bids_out_dir, sub=sub, file=file, search_dict=search_dict, meta_dict=meta_dict, ses=1, keep_unknown=True, verbose=False)
+            converted_files = convert_modality(bids_out_dir=bids_out_dir, sub=sub, file=file, search_dict=search_dict, meta_dict=meta_dict, ses=ses, keep_unknown=keep_unknown, verbose=verbose)
         except SystemExit:
             pass
     
     return converted_files
+
+if __name__ == "__main__":
+    # Argument Parser
+    parser = argparse.ArgumentParser(
+        description='Performs conversion of source DICOM, PAR REC, and Nifti data to BIDS directory layout.')
+
+    # Parse Arguments
+    # Required Arguments
+    reqoptions = parser.add_argument_group('Required arguments')
+    reqoptions.add_argument('-s', '-sub', '--sub',
+                            type=str,
+                            dest="sub",
+                            metavar="subject_ID",
+                            required=True,
+                            help="Unique subject identifier given to each participant. This indentifier CAN contain letters and numbers. This identifier CANNOT contain: underscores, hyphens, colons, semi-colons, spaces, or any other special characters.")
+    reqoptions.add_argument('-o', '-out', '--out',
+                            type=str,
+                            dest="out_bids",
+                            metavar="Output_BIDS_Directory",
+                            required=True,
+                            help="BIDS output directory. This directory does not need to exist at runtime. The resulting directory will be populated with BIDS named and structured data.")
+    reqoptions.add_argument('-d', '-data', '--data',
+                            type=str,
+                            dest="data_dir",
+                            metavar="data_directory",
+                            required=True,
+                            help="Parent directory that contains that subuject's unconverted source data. This directory can contain either all the PAR REC files, or all the directories of the DICOM files. NOTE: filepaths with spaces either need to replaced with underscores or placed in quotes. NOTE: The PAR REC directory is rename PAR_REC automaticaly.")
+    reqoptions.add_argument('-c', '-config', '--config',
+                            type=str,
+                            dest="conf",
+                            metavar="config.yml",
+                            required=True,
+                            help="YAML configuruation file that contains modality search, parameters, metadata, and exclusion list.")
+    reqoptions.add_argument('-f', '-file', '--file-type',
+                            type=str,
+                            dest="conv",
+                            metavar="file_type",
+                            required=True,
+                            help="File type that is to be used with the converter. Acceptable choices include: DCM, PAR, or, NII.")
+
+    # Optional Arguments
+    optoptions = parser.add_argument_group('Optional arguments')
+    optoptions.add_argument('-ses', '--ses',
+                            type=str,
+                            dest="ses",
+                            metavar="session",
+                            required=False,
+                            default=1,
+                            help="Session label for the acquired source data. [default: 1]")
+    optoptions.add_argument('-k', '-keep', '--keep-unknown',
+                            dest="keep_unknown",
+                            required=False,
+                            default=True,
+                            action="store_true",
+                            help="Keep or remove unknown modalities [default: True].")
+    optoptions.add_argument('-v', '-verbose', '--verbose',
+                            dest="verbose",
+                            required=False,
+                            default=False,
+                            action="store_true",
+                            help="Prints additional information to screen. [default: False]")
+
+    args = parser.parse_args()
+
+    # Print help message in the case
+    # of no arguments
+    try:
+        args = parser.parse_args()
+    except SystemExit as err:
+        if err.code == 2:
+            parser.print_help()
+
+    # Verbose flag
+    if args.verbose:
+        args.verbose = True
+
+    # Convert Source Data Files
+    if args.conv.upper() == 'PAR':
+        file_ext = "PAR"
+    elif args.conv.upper() == 'DCM':
+        file_ext = "dcm"
+    elif args.conv.upper() == 'NII':
+        file_ext = "nii"
+    else:
+        print(
+            "Option not recognized. Please use the \'--fileType\' option with either \'PAR\' or \'DCM\' as specified.")
+
+    # Read config file
+    [search_dict, exclude_list, meta_dict] = read_config(config_file=args.conf, verbose=args.verbose)
+
+    # Create file list
+    file_list_all = create_file_list(data_dir=args.data_dir,file_ext=file_ext)
+    file_list = file_exclude(file_list_all, data_dir=args.data_dir, exclusion_list=exclude_list, verbose=args.verbose)
+
+    # Batch convert files in file list
+    batch_convert(bids_out_dir=args.out_bids,
+                  sub=args.sub,
+                  file_list=file_list,
+                  search_dict=search_dict,
+                  meta_dict=meta_dict,
+                  ses=args.ses,
+                  keep_unknown=args.keep_unknown,
+                  verbose=args.verbose)
+
+    print(f"Completed sub-{args.sub}")

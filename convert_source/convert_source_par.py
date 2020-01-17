@@ -4,23 +4,7 @@ PAR REC specific functions for convert_source. Primarily intended for converting
 '''
 
 # Import packages and modules
-import pydicom
-import json
 import re
-import os
-import sys
-import shutil
-import glob
-import random
-import subprocess
-import pathlib
-import yaml
-import nibabel as nib
-import gzip
-import pandas as pd
-import numpy as np
-import platform
-import multiprocessing
 
 # Import third party packages and modules
 import utils
@@ -149,7 +133,6 @@ def get_scan_time(par_file):
             if match:
                 scan_time = match.group(1)
                 scan_time = float(scan_time)
-    return scan_time
 
     return scan_time
 

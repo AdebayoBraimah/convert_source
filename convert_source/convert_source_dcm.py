@@ -5,22 +5,9 @@ DICOM specific functions for convert_source. Primarily intended for converting a
 
 # Import packages and modules
 import pydicom
-import json
 import re
 import os
-import sys
-import shutil
 import glob
-import random
-import subprocess
-import pathlib
-import yaml
-import nibabel as nib
-import gzip
-import pandas as pd
-import numpy as np
-import platform
-import multiprocessing
 
 # Import third party packages and modules
 import utils
