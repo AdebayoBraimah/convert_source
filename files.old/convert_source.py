@@ -27,59 +27,59 @@ import convertSourcePAR as csp  # PAR REC file conversion
 import convertSourceDCM as cdm  # Phlips DICOM file conversion
 
 
-def convertPAR(out_dir, parFile, sub, ses=1):
+def convert_par(out_dir, par_file, sub, ses=1):
     '''convert PAR file to BIDS nifti based on filename.'''
-    if 'T1' in parFile:
+    if 'T1' in par_file:
         try:
-            csp.data2BIDS_anat(out_dir, parFile, sub, scan='T1', ses=ses)
-        except:
+            csp.data_to_bids_anat(out_dir, par_file, sub, scan='T1', ses=ses)
+        except ValueError:
             pass
-    elif 'T2' in parFile:
+    elif 'T2' in par_file:
         try:
-            csp.data2BIDS_anat(out_dir, parFile, sub, scan='T2', ses=ses)
-        except:
+            csp.data_to_bids_anat(out_dir, par_file, sub, scan='T2', ses=ses)
+        except ValueError:
             pass
-    elif 'SWI' in parFile:
+    elif 'SWI' in par_file:
         try:
-            csp.data2BIDS_anat(out_dir, parFile, sub, scan='SWI', scanType='fmap', ses=ses)
-        except:
+            csp.data_to_bids_anat(out_dir, par_file, sub, scan='SWI', scanType='fmap', ses=ses)
+        except ValueError:
             pass
-    elif 'vis' in parFile or 'Vis' in parFile or 'VIS' in parFile:
+    elif 'vis' in par_file or 'Vis' in par_file or 'VIS' in par_file:
         try:
-            csp.data2BIDS_func(out_dir, parFile, sub, ses, task='visualstrobe')
-        except:
+            csp.data_to_bids_func(out_dir, par_file, sub, ses, task='visualstrobe')
+        except ValueError:
             pass
-    elif 'rsfMR' in parFile or 'rsf' in parFile:
+    elif 'rsfMR' in par_file or 'rsf' in par_file:
         try:
-            csp.data2BIDS_func(out_dir, parFile, sub, ses, task='rest')
-        except:
+            csp.data_to_bids_func(out_dir, par_file, sub, ses, task='rest')
+        except ValueError:
             pass
-    elif 'map' in parFile or 'Map' in parFile or 'MAP' in parFile:
+    elif 'map' in par_file or 'Map' in par_file or 'MAP' in par_file:
         try:
-            csp.data2BIDS_fmap(out_dir, parFile, sub, ses)
-        except:
+            csp.data_to_bids_fmap(out_dir, par_file, sub, ses)
+        except ValueError:
             pass
-    elif 'dti' in parFile or 'DTI' in parFile or 'dwi' in parFile or 'DWI' in parFile:
+    elif 'dti' in par_file or 'DTI' in par_file or 'dwi' in par_file or 'DWI' in par_file:
         try:
-            csp.data2BIDS_dwi(out_dir, parFile, sub, ses)
-        except:
+            csp.data_to_bids_dwi(out_dir, par_file, sub, ses)
+        except ValueError:
             pass
     else:
         try:
-            csp.data2BIDS_unknown(out_dir, parFile, sub, ses)
-        except:
+            csp.data_to_bids_unknown(out_dir, par_file, sub, ses)
+        except ValueError:
             pass
 
 
-def parBatch(parFiles, out_dir, sub, ses=1, verbose=False):
+def par_batch(par_files, out_dir, sub, ses=1, verbose=False):
     '''
-    parFiles is a list of parFiles.
+    par_files is a list of par_files.
     This should not be run in parallel.
     '''
-    for parFile in parFiles:
+    for par_file in par_files:
         if verbose in [True]:
-            print(parFile)
-        convertPAR(out_dir, parFile, sub, ses)
+            print(par_file)
+        convert_par(out_dir, par_file, sub, ses)
 
     # Check for leftover temporary directories
     dirs_ = os.path.join(out_dir, f"sub-{sub}",'*tmp*')
@@ -93,14 +93,14 @@ def parBatch(parFiles, out_dir, sub, ses=1, verbose=False):
     # Check for number of files in unknown
     if verbose in [True]:
         ses = '{:03}'.format(ses)
-        unknwnDir = os.path.join(out_dir, f"sub-{sub}", f"ses-{ses}", "unknown", "*.nii*")
-        numFiles = glob.glob(unknwnDir)
+        unknown_dir = os.path.join(out_dir, f"sub-{sub}", f"ses-{ses}", "unknown", "*.nii*")
+        num_files = glob.glob(unknown_dir)
         print("")
-        print(f"Number of unknown modalities for sub-{sub}_ses-{ses}: {numFiles}")
+        print(f"Number of unknown modalities for sub-{sub}_ses-{ses}: {num_files}")
         print("")
 
 
-def excludePAR(dataDir, configExclude='exclude.yml'):
+def exclude_par(data_dir, config_exclude=''):
     '''
     Takes the PAR REC (parent directory), and creates
     a list of PAR header files for conversion.
@@ -111,121 +111,121 @@ def excludePAR(dataDir, configExclude='exclude.yml'):
     # YML file format for exclusion:
     # exclude: SWI,SURVEY,Reg
 
-    dataDir = csp.renamePAR_REC_Dir(dataDir)
+    # data_dir = csp.renamePAR_REC_Dir(data_dir)
 
     # Create List of PAR Files
-    parFileHeaders = os.path.join(dataDir, "*.PAR")
-    parFiles = glob.glob(parFileHeaders, recursive=True)
+    par_file_headers = os.path.join(data_dir, "*.PAR")
+    par_files = glob.glob(par_file_headers, recursive=True)
 
-    if pathlib.Path(configExclude).exists():
+    if pathlib.Path(config_exclude).exists():
         # Load in exclusion config file
-        with open(configExclude) as f:
-            dataMap = yaml.safe_load(f)
+        with open(config_exclude) as f:
+            data_map = yaml.safe_load(f)
 
         # Create seculded exclusion dictionary
-        exL = [[k, v] for k, v in dataMap.items()]
+        exclude_ = [[k, v] for k, v in data_map.items()]
 
         # Create Set of PAR files
-        parSet = set(parFiles)
+        par_set = set(par_files)
 
         # Find difference in sets (e.g. PAR_s \ exclude_s)
-        for ex in exL:
-            ex = (exL[0])
+        for ex in exclude_:
+            ex = (exclude_[0])
             ex_tmp = ex[1:2]
             exs = ex_tmp[0].split(",")
 
             for x in exs:
-                dir_ = os.path.join(dataDir, f"*{x}*.PAR")
-                exSet = set(glob.glob(dir_, recursive=True))
-                parSet = parSet.difference(exSet)
+                dir_ = os.path.join(data_dir, f"*{x}*.PAR")
+                ex_set = set(glob.glob(dir_, recursive=True))
+                par_set = par_set.difference(ex_set)
 
-        parFilesincluded = list(parSet)
+        par_files_included = list(par_set)
     else:
-        parFilesincluded = parFiles
+        par_files_included = par_files
 
-    return (parFilesincluded)
+    return (par_files_included)
 
 
-def subPAR(sub, parDir, out_put_BIDS, ses=1, config='exclude.yml', verbose=False):
+def sub_par(sub, par_dir, out_put_bids, ses=1, config='', verbose=False):
     '''
     SUBject PAR conversion function.
-    parDir is PAR REC directory.
+    par_dir is PAR REC directory.
     The PAR REC files are batch-
     converted to nifti BIDS format.
     '''
 
-    parFiles = excludePAR(parDir, config)
+    par_files = exclude_par(par_dir, config)
 
-    parBatch(parFiles, out_put_BIDS, sub, ses, verbose)
+    par_batch(par_files, out_put_bids, sub, ses, verbose)
 
 
-def convertDCM(out_dir, dcm, sub, ses=1):
+def convert_dcm(out_dir, dcm, sub, ses=1):
     '''convert dicom file to BIDS nifti based on filename.'''
     if 'T1' in dcm:
         try:
-            cdm.data2BIDS_anat(out_dir, dcm, sub, scan='T1', ses=ses)
-        except:
+            cdm.data_to_bids_anat(out_dir, dcm, sub, scan='T1', ses=ses)
+        except ValueError:
             pass
     elif 'T2' in dcm:
         try:
-            cdm.data2BIDS_anat(out_dir, dcm, sub, scan='T2', ses=ses)
-        except:
+            cdm.data_to_bids_anat(out_dir, dcm, sub, scan='T2', ses=ses)
+        except ValueError:
             pass
     elif 'SWI' in dcm:
         try:
-            cdm.data2BIDS_anat(out_dir, dcm, sub, scan='SWI', scanType='fmap', ses=ses)
-        except:
+            cdm.data_to_bids_anat(out_dir, dcm, sub, scan='SWI', scanType='fmap', ses=ses)
+        except ValueError:
             pass
     elif 'vis' in dcm or 'Vis' in dcm or 'VIS' in dcm:
         try:
-            cdm.data2BIDS_func(out_dir, dcm, sub, ses, task='visualstrobe')
-        except:
+            cdm.data_to_bids_func(out_dir, dcm, sub, ses, task='visualstrobe')
+        except ValueError:
             pass
     elif 'rsfMR' in dcm or 'rsf' in dcm:
         try:
-            cdm.data2BIDS_func(out_dir, dcm, sub, ses, task='rest')
-        except:
+            cdm.data_to_bids_func(out_dir, dcm, sub, ses, task='rest')
+        except ValueError:
             pass
     elif 'map' in dcm or 'Map' in dcm or 'MAP' in dcm:
         try:
-            cdm.data2BIDS_fmap(out_dir, dcm, sub, ses)
-        except:
+            cdm.data_to_bids_fmap(out_dir, dcm, sub, ses)
+        except ValueError:
             pass
     elif 'dti' in dcm or 'DTI' in dcm or 'dwi' in dcm or 'DWI' in dcm or 'B0' in dcm or 'b0' in dcm:
         try:
-            cdm.data2BIDS_dwi(out_dir, dcm, sub, ses)
-        except:
+            cdm.data_to_bids_dwi(out_dir, dcm, sub, ses)
+        except ValueError:
             pass
     else:
         try:
-            cdm.data2BIDS_unknown(out_dir, dcm, sub, ses)
-        except:
+            cdm.data_to_bids_unknown(out_dir, dcm, sub, ses)
+        except ValueError:
             pass
 
 
-def getDCMfile(dcmDir):
+def get_dcm_file(dcm_dir):
     '''
     Goes to the specified dicom
     directory and returns the 
     first dicom file.
     '''
 
-    dcmDir = os.path.abspath(dcmDir)
-    # os.chdir(dcmDir)
-    dcmDIRList = glob.glob(dcmDir + '*/*', recursive=True)
+    dcm_dir = os.path.abspath(dcm_dir)
+    # os.chdir(dcm_dir)
+    dcm_dir_list = glob.glob(dcm_dir + '*/*', recursive=True)
 
-    # Initilized dcmFile
-    dcmFile = ""
+    # Initilized dcm_file
+    dcm_file = ""
 
-    for file in dcmDIRList:
-        dcmFile = os.path.abspath(file)
-        # print(dcmFile)
+    for file in dcm_dir_list:
+        dcm_file = os.path.abspath(file)
+        # print(dcm_file)
         break
 
-    return (dcmFile)
+    return (dcm_file)
 
 
-def dcmBatch(dcms, out_dir, sub, ses=1, verbose=False):
+def dcm_batch(dcms, out_dir, sub, ses=1, verbose=False):
     '''
     dcms is a list of dcm directories.
     This should not be run in parallel.
@@ -233,10 +233,10 @@ def dcmBatch(dcms, out_dir, sub, ses=1, verbose=False):
     for dcm in dcms:
         if verbose in [True]:
             print(dcm)
-        dcmFile = getDCMfile(dcm)
-        isValid = isValidMR(dcmFile)
-        if isValid in [True]:
-            convertDCM(out_dir, dcmFile, sub, ses)
+        dcm_file = get_dcm_file(dcm)
+        is_valid = is_valid_mr(dcm_file)
+        if is_valid in [True]:
+            convert_dcm(out_dir, dcm_file, sub, ses)
 
     # Check for leftover temporary directories
     dirs_ = os.path.join(out_dir, f"sub-{sub}",'*tmp*')
@@ -250,14 +250,14 @@ def dcmBatch(dcms, out_dir, sub, ses=1, verbose=False):
     # Check for number of files in unknown
     if verbose in [True]:
         ses = '{:03}'.format(ses)
-        unknwnDir = os.path.join(out_dir, f"sub-{sub}", f"ses-{ses}", 'unknown', "*.nii*")
-        numFiles = len(glob.glob(unknwnDir))
+        unknown_dir = os.path.join(out_dir, f"sub-{sub}", f"ses-{ses}", 'unknown', "*.nii*")
+        num_files = len(glob.glob(unknown_dir))
         print("")
-        print(f"Number of unknown modalities for sub-{sub}_ses-{ses}: {numFiles}")
+        print(f"Number of unknown modalities for sub-{sub}_ses-{ses}: {num_files}")
         print("")
 
 
-def excludeDCM(dataDir, configExclude='exclude.yml'):
+def exclude_dcm(data_dir, config_exclude=''):
     '''
     Takes the DICOM (parent directory), and creates
     a list of the first DICOM files from the parent 
@@ -270,38 +270,38 @@ def excludeDCM(dataDir, configExclude='exclude.yml'):
     # exclude: SWI,SURVEY,Reg etc.
 
     # Create List of DICOM Files
-    dcmDIRS = glob.glob(dataDir + '*/*', recursive=True)
+    dcm_dirs = glob.glob(data_dir + '*/*', recursive=True)
 
-    if pathlib.Path(configExclude).exists():
+    if pathlib.Path(config_exclude).exists():
         # Load in exclusion config file
-        with open(configExclude) as f:
-            dataMap = yaml.safe_load(f)
+        with open(config_exclude) as f:
+            data_map = yaml.safe_load(f)
 
         # Create seculded exclusion dictionary
-        exL = [[k, v] for k, v in dataMap.items()]
+        exclude_ = [[k, v] for k, v in data_map.items()]
 
         # Create Set of DICOM directories
-        dcmSet = set(dcmDIRS)
+        dcm_set = set(dcm_dirs)
 
         # Find difference in sets (e.g. DCM_s \ exclude_s)
-        for ex in exL:
-            ex = (exL[0])
+        for ex in exclude_:
+            ex = (exclude_[0])
             ex_tmp = ex[1:2]
             exs = ex_tmp[0].split(",")
 
             for x in exs:
-                dir_ = os.path.join(dataDir, f"*{x}*")
-                exSet = set(glob.glob(dir_, recursive=True))
-                dcmSet = dcmSet.difference(exSet)
+                dir_ = os.path.join(data_dir, f"*{x}*")
+                ex_set = set(glob.glob(dir_, recursive=True))
+                dcm_set = dcm_set.difference(ex_set)
 
-        dcmDIRSincluded = list(dcmSet)
+        dcm_dirs_included = list(dcm_set)
     else:
-        dcmDIRSincluded = dcmDIRS
+        dcm_dirs_included = dcm_dirs
 
-    return (dcmDIRSincluded)
+    return (dcm_dirs_included)
 
 
-def isValidMR(dcm):
+def is_valid_mr(dcm):
     '''
     Checks for valid DICOM file(s) by inspecting
     the ConversionType label in the dicom header.
@@ -315,35 +315,35 @@ def isValidMR(dcm):
 
     # Invalid files include secondary image captures, and are not suitable for 
     # nifti conversion.
-    isValid = ds.ConversionType
+    is_valid = ds.ConversionType
 
-    if isValid in '':
-        isValid = True
+    if is_valid in '':
+        is_valid = True
     else:
-        isValid = False
+        is_valid = False
         print(
             f"Please check Conversion Type (0008, 0064) in dicom header. The presented DICOM file is not a valid file: {dcm}.")
 
-    return (isValid)
+    return (is_valid)
 
 
-def subDCM(sub, parDir, out_put_BIDS, ses=1, config='exclude.yml', verbose=False):
+def sub_dcm(sub, par_dir, out_put_bids, ses=1, config='', verbose=False):
     '''
     SUBject DiCoM conversion function.
-    parDir is parent DICOM directory.
+    par_dir is parent DICOM directory.
     The DICOM files are batch-
     converted to nifti BIDS format.
     '''
 
-    dcmFiles = excludeDCM(parDir, config)
+    dcm_files = exclude_dcm(par_dir, config)
 
-    dcmBatch(dcmFiles, out_put_BIDS, sub, ses, verbose)
+    dcm_batch(dcm_files, out_put_bids, sub, ses, verbose)
 
 
 if __name__ == "__main__":
     # Argument Parser
     parser = argparse.ArgumentParser(
-        description='Script to perform source data conversion from either PAR REC or DICOM to BIDS NifTi. This script is intended for the IRC 287 and 317 Neonatal studies and their corresponding imaging protocol(s).')
+        description='Script to perform source data conversion from either PAR REC or DICOM to BIDS NifTi.')
 
     # Parse Arguments
     # Required Arguments
@@ -363,7 +363,7 @@ if __name__ == "__main__":
 
     reqoptions.add_argument('-d', '-data', '--data',
                             type=str,
-                            dest="dataDir",
+                            dest="data_dir",
                             metavar="Data_Directory",
                             required=True,
                             help="Parent directory that contains that subuject's unconverted source data. This directory can contain either all the PAR REC files, or all the directories of the DICOM files. NOTE: filepaths with spaces either need to replaced with underscores or placed in quotes. NOTE: The PAR REC directory is rename PAR_REC automaticaly.")
@@ -413,10 +413,10 @@ if __name__ == "__main__":
 
     # Convert Source Data Files
     if args.conv == 'PAR':
-        subPAR(sub=args.sub, parDir=args.dataDir, out_put_BIDS=args.out_bids, ses=args.ses, config=args.exCfg,
+        sub_par(sub=args.sub, par_dir=args.data_dir, out_put_bids=args.out_bids, ses=args.ses, config=args.exCfg,
                verbose=args.verbose)
     elif args.conv == 'DCM':
-        subDCM(sub=args.sub, parDir=args.dataDir, out_put_BIDS=args.out_bids, ses=args.ses, config=args.exCfg,
+        sub_dcm(sub=args.sub, par_dir=args.data_dir, out_put_bids=args.out_bids, ses=args.ses, config=args.exCfg,
                verbose=args.verbose)
     else:
         print(

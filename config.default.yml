@@ -1,0 +1,119 @@
+# This YAML exclusion configuration (config) file lists all the types of modalities/sequences to 
+# be converted during the DICOM and/or PAR REC to nifti (BIDS) conversion. The config file requires
+# that lists of keywords be comma separated and to not contain spaces.
+# 
+# The keyword that convert_source is looking for is exclude, followed by the substrings to be matched 
+# and excluded. The substrings used for matching are not case sensitive.
+# 
+# example:
+# 
+# exclude: 
+#   - SWI
+#   - press
+
+# The files being exluded here are consistent with the neonatal scanning protocol for the IRC 287 and 317 studies.
+
+# The corresponding files in the exclude list are those not needed for conventional volumetric neuroimaging analyses:
+# 
+# - Surveys (or Default)
+# - Reg Images (exported by the scanner)
+# - Any spectroscopic modalities:
+#     - PRESS
+# - Secondary Screen Captures
+# - Proton Density (PD)
+
+# Configuration based on BIDS' directory names
+
+# line endings: https://forum.sublimetext.com/t/is-there-any-way-to-convert-files-line-ending-on-saving/25456/5
+
+# Anatomical scans
+anat:
+  T1w: 
+    - T1
+    - T1w
+    - TFE
+  T2w: 
+    - T2
+    - T2w
+    - TSE
+  # flair: 
+  #   - flair
+
+# Functional scans
+func:
+  bold: 
+    rest: 
+      - rsfMR
+      - rest
+      - FFE
+      - FEEPI
+    visualstrobe: 
+      - vis
+      - visual
+
+# # Arterial Spin Labeling
+# asl:
+#   asl: 
+#     - casl
+#     - pcas
+
+# Field maps 
+fmap:
+  fmap: 
+    - map
+
+# Susceptiblity Weighted Images
+swi:
+  swi: 
+    - swi 
+
+# Diffusion Weighted Scans
+dwi:
+  dwi: 
+    - diffusion
+    - DTI
+    - DWI
+    - 6_DIR
+
+
+# Exclusion List (these filenames are not converted)
+exclude: 
+  - SURVEY
+  - Reg
+  - SHORT
+  - LONG
+  - MRS
+  - PRESS
+  - DEFAULT
+  - ScreenCapture
+  - PD
+  - ALL
+  - SPECTRO
+
+# Metadata Settings
+metadata:
+  common:
+    Manufacturer: Philips
+    ManufacturersModelName: Ingenia
+    MagneticFieldStrength: 3
+    InstitutionName: Cincinnati Children's Hospital Medical Center
+  func:
+    rest:
+      ParallelAcquisitionTechnique: SENSE # GRAPPA, for the general term
+      PhaseEncodingDirection: 'j'
+      MultibandAccelerationFactor: 6
+      TaskName: Resting State
+      dir: PA
+      NumberOfVolumesDiscardedByScanner: 4
+    visualstrobe:
+      PhaseEncodingDirection: "j"
+      TaskName: Visual (Strobe) Task
+      NumberOfVolumesDiscardedByScanner: 4
+  dwi:
+    PhaseEncodingDirection: 'j'
+    dir: PA
+  fmap:
+    Units: 'Hz'
+
+# add option to create participant tsv
+# read and convert physio data(?)
