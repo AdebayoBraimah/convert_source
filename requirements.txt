@@ -1,0 +1,7 @@
+numpy
+pydicom
+nibabel
+numpy
+pyyaml
+
+# dcm2niix. Should be added to system path.

@@ -340,9 +340,14 @@ def batch_convert(bids_out_dir,sub,file_list, search_dict, meta_dict=dict(), ses
     return converted_files
 
 if __name__ == "__main__":
+
+    # Info
+    v_txt = os.path.join(os.path.dirname(__file__),'..','version.txt')
+    version = utils.file_to_screen(v_txt)
+
     # Argument Parser
     parser = argparse.ArgumentParser(
-        description='Performs conversion of source DICOM, PAR REC, and Nifti data to BIDS directory layout.')
+        description=f'Performs conversion of source DICOM, PAR REC, and Nifti data to BIDS directory layout.\t\n\n convert_source v{version}\n\n')
 
     # Parse Arguments
     # Required Arguments
@@ -399,6 +404,12 @@ if __name__ == "__main__":
                             default=False,
                             action="store_true",
                             help="Prints additional information to screen. [default: False]")
+    optoptions.add_argument('-version', '--version',
+                            dest="vers",
+                            required=False,
+                            default=False,
+                            action="store_true",
+                            help=f"Prints version to screen and exits. convert_source v{version}")
 
     args = parser.parse_args()
 
@@ -409,6 +420,13 @@ if __name__ == "__main__":
     except SystemExit as err:
         if err.code == 2:
             parser.print_help()
+
+    # version flag
+    if args.vers:
+        print("")
+        print(f"convert_source v{version}")
+        print("")
+        sys.exit()
 
     # Verbose flag
     if args.verbose:

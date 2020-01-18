@@ -19,6 +19,23 @@ import convert_source_par as csp
 
 # Define functions
 
+def file_to_screen(file):
+    '''
+    Reads the contents of a file and prints it to screen.
+
+    Arguments:
+        file: Path to file
+
+    Returns:
+        None
+    '''
+
+    with open(file,"r") as f:
+        file_contents = f.read()
+        f.close()
+
+    return file_contents
+
 def get_echo(json_file):
     '''
     Reads the echo time (TE) from the NifTi JSON sidecar and returns it.
