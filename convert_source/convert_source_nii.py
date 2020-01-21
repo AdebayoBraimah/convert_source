@@ -250,7 +250,7 @@ def data_to_bids_anat(bids_out_dir, file, sub, scan, meta_dict_com=dict(), meta_
             pass
 
         # Create output filename
-        out_name = f"sub-{sub}" + f"_ses-{sub}"
+        out_name = f"sub-{sub}" + f"_ses-{ses}"
         name_run_dict = dict()
 
         if acq:
