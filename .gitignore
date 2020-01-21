@@ -3,4 +3,4 @@
 files.old/*
 convert_source/.ipynb_checkpoints/*
 convert_source/__pycache__/*
-convert_source/debug_file_parts.ipynb
+convert_source/*.ipynb

@@ -305,7 +305,7 @@ def convert_modality(bids_out_dir, sub, file, search_dict, meta_dict=dict(), ses
                             break
                         
     if not mod_found:
-        converted_files = get_scan_tech(bids_out_dir, sub, file, search_dict, meta_dict=dict(), ses=1, keep_unknown=keep_unknown, verbose=verbose)
+        converted_files = get_scan_tech(bids_out_dir=bids_out_dir, sub=sub, file=file, search_dict=search_dict, meta_dict=dict(), ses=ses, keep_unknown=keep_unknown, verbose=verbose)
     
     return converted_files
 

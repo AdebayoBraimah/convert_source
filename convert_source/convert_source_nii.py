@@ -154,7 +154,7 @@ def data_to_bids_anat(bids_out_dir, file, sub, scan, meta_dict_com=dict(), meta_
         # Create Output Directory Variables
         # Zeropad subject ID if possible
         try:
-            ses = '{:03}'.format(int(ses))
+            sub = '{:03}'.format(int(sub))
         except ValueError:
             pass
         # Zeropad session ID if possible
@@ -319,7 +319,7 @@ def data_to_bids_func(bids_out_dir, file, sub, scan, task = 'rest', meta_dict_co
         # Create Output Directory Variables
         # Zeropad subject ID if possible
         try:
-            ses = '{:03}'.format(int(ses))
+            sub = '{:03}'.format(int(sub))
         except ValueError:
             pass
         # Zeropad session ID if possible
@@ -516,7 +516,7 @@ def data_to_bids_fmap(bids_out_dir, file, sub, scan='fieldmap', meta_dict_com=di
         # Create Output Directory Variables
         # Zeropad subject ID if possible
         try:
-            ses = '{:03}'.format(int(ses))
+            sub = '{:03}'.format(int(sub))
         except ValueError:
             pass
         # Zeropad session ID if possible
@@ -684,7 +684,7 @@ def data_to_bids_dwi(bids_out_dir, file, sub, scan='dwi', meta_dict_com=dict(), 
         # Create Output Directory Variables
         # Zeropad subject ID if possible
         try:
-            ses = '{:03}'.format(int(ses))
+            sub = '{:03}'.format(int(sub))
         except ValueError:
             pass
         # Zeropad session ID if possible
