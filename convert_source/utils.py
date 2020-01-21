@@ -96,7 +96,14 @@ def file_parts(file):
     '''
     
     [path, file_with_ext] = os.path.split(file)
-    [filename,ext] = os.path.splitext(file_with_ext)
+    
+    # Make condition for gzipped files
+    if '.gz' in file_with_ext:
+        file_with_ext = file_with_ext[:-3]
+        [filename,ext] = os.path.splitext(file_with_ext)
+        ext = ext + '.gz'
+    else:
+        [filename,ext] = os.path.splitext(file_with_ext)
     
     path = str(path)
     filename = str(filename)
