@@ -437,19 +437,6 @@ def convert_image_data(file,basename,out_dir,cprss_lvl=6,bids=True,
     if cprss_lvl:
         conv_cmd.append(f"-{cprss_lvl}")
 
-    # Required option(s)
-    if basename:
-        conv_cmd.append("-f")
-        conv_cmd.append(f"{basename}")
-
-    if basename:
-        conv_cmd.append("-f")
-        conv_cmd.append(f"{basename}")
-
-    if out_dir:
-        conv_cmd.append("-o")
-        conv_cmd.append(f"{out_dir}")
-
     # Keyword option(s)
     if write_conflicts.lower() == "suffix":
         conv_cmd.append("-w")
