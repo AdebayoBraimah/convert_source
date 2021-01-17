@@ -46,7 +46,7 @@ subs=(
 for sub in ${subs[@]}; do
     echo ""
     echo "Processing: sub-${sub}"
-    
+
     if [[ ! -d ${test_dir}/${sub}/NIFTI ]]; then
         mkdir -p ${test_dir}/${sub}/NIFTI
         mkdir -p "${test_dir}/${sub}/PAR REC"
@@ -128,4 +128,8 @@ for sub in ${subs[@]}; do
         done
     done
 done
+
+echo ""
+echo "Done"
+echo ""
 
