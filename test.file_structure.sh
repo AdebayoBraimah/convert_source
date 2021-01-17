@@ -85,9 +85,9 @@ done
 # Edge raw data directory layout cases 
 # subject arrays
 subs=( 
-    100XXT5
-    101XXP5
-    102XXY8
+    900XXT5
+    901XXP5
+    902XXY8
 )
 
 for sub in ${subs[@]}; do
