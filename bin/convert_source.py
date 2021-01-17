@@ -78,12 +78,12 @@ def read_config(config_file: str,
         
     if any("metadata" in data_map for element in data_map):
         if verbose:
-            print("implementing additional settings for metadata")
+            print("Including additional settings for metadata")
         meta_dict = data_map["metadata"]
         del data_map["metadata"]
     else:
         if verbose:
-            print("no metadata settings")
+            print("No metadata settings")
         meta_dict = dict()
         
     return search_dict,exclusion_list,meta_dict

@@ -26,54 +26,56 @@
 
 # line endings: https://forum.sublimetext.com/t/is-there-any-way-to-convert-files-line-ending-on-saving/25456/5
 
-# Anatomical scans
-anat:
-  T1w: 
-    - T1
-    - T1w
-    - TFE
-  T2w: 
-    - T2
-    - T2w
-    - TSE
-  # flair: 
-  #   - flair
+# Heurestic search terms for each modality
+search:
+  # Anatomical scans
+  anat:
+    T1w: 
+      - T1
+      - T1w
+      - TFE
+    T2w: 
+      - T2
+      - T2w
+      - TSE
+    # flair: 
+    #   - flair
 
-# Functional scans
-func:
-  bold: 
-    rest: 
-      - rsfMR
-      - rest
-      - FFE
-      - FEEPI
-    visualstrobe: 
-      - vis
-      - visual
+  # Functional scans
+  func:
+    bold: 
+      rest: 
+        - rsfMR
+        - rest
+        - FFE
+        - FEEPI
+      visualstrobe: 
+        - vis
+        - visual
 
-# # Arterial Spin Labeling
-# asl:
-#   asl: 
-#     - casl
-#     - pcas
+  # # Arterial Spin Labeling
+  # asl:
+  #   asl: 
+  #     - casl
+  #     - pcas
 
-# Field maps 
-fmap:
-  fmap: 
-    - map
+  # Field maps 
+  fmap:
+    fmap: 
+      - map
 
-# Susceptiblity Weighted Images
-swi:
-  swi: 
-    - swi 
+  # Susceptiblity Weighted Images
+  swi:
+    swi: 
+      - swi 
 
-# Diffusion Weighted Scans
-dwi:
-  dwi: 
-    - diffusion
-    - DTI
-    - DWI
-    - 6_DIR
+  # Diffusion Weighted Scans
+  dwi:
+    dwi: 
+      - diffusion
+      - DTI
+      - DWI
+      - 6_DIR
 
 
 # Exclusion List (these filenames are not converted)

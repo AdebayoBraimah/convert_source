@@ -2,5 +2,7 @@
 
 files.old/*
 convert_source/.ipynb_checkpoints/*
-convert_source/__pycache__/*
+bin/*/__pycache__/*
+bin/__pycache__/*
 convert_source/*.ipynb
+tests/img.test.dir/*

@@ -2,6 +2,13 @@
 # 
 # -*- coding: utf-8 -*-
 
+'''
+TODO:
+    - Enable gzipping/gunzipping utility function(s) for cases when interacting with 
+        uncompressed image files.
+            - Or in the case the desired output files need to be uncompressed.  
+'''
+
 def batch_convert():
 
     # Read configurations file, and define search terms
