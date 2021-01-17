@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 # -*- coding: utf-8 -*-
 
-# TO-DO:
-# - Be sure to add gzip functionality to convert_source as gunzipped files
-#     may introduce some variability.
-# - Add option parser
+# Style:
+# - See style guide(s):
+#   https://google.github.io/styleguide/shellguide.html#s5.2-line-length-and-long-strings
 
 # Define functions
 
