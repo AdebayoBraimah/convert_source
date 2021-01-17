@@ -24,10 +24,13 @@ import os
 import random
 import shutil
 import platform
-from typing import Optional, Union, Tuple
+from typing import List, Dict, Optional, Union, Tuple
 
 # Define classes
 class DependencyError(Exception):
+    pass
+
+class ConversionError(Exception):
     pass
 
 class File(object):

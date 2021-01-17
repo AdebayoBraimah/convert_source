@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 '''
 Determines file paths of child directories that contain medical images, and their corresponding image types from some parent directory. 
@@ -14,7 +14,7 @@ from typing import List, Dict, Optional, Union, Tuple
 import argparse
 
 # Define functions
-def id_img_file(dir_names: str,
+def id_img_file(dir_names: List[str],
                 verbose: bool = False
                 ) -> List[str]:
     '''
@@ -28,7 +28,7 @@ def id_img_file(dir_names: str,
     '''
     
     # Init empty list
-    file_types: List = list()
+    file_types: List[str] = list()
     
     # Iterate through directory names list
     for dir_name in dir_names:
@@ -73,7 +73,7 @@ def img_dir_list(directory: str,
     '''
     
     # Init empty list
-    dir_names: List = list()
+    dir_names: List[str] = list()
 
     # Recursively iterate through all files in directory - find parent directory of image files
     if verbose:
@@ -94,7 +94,7 @@ def img_dir_list(directory: str,
     # Create sorted list of unique directory paths
     if verbose:
         print("Creating unique list of directories...")
-    dir_names = list(set(dir_names))
+    dir_names: List[str] = list(set(dir_names))
     dir_names.sort()
     
     # Create file-type list
@@ -105,7 +105,7 @@ def img_dir_list(directory: str,
 
     return dir_names,file_types
 
-def list_to_file(in_list: List, 
+def list_to_file(in_list: List[str], 
                  out_file: str
                  ) -> str:
     '''

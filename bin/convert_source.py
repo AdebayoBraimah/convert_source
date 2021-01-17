@@ -19,17 +19,20 @@ import glob
 import yaml
 import argparse
 
+from typing import List, Dict, Optional, Union, Tuple
+
 
 # Import third party packages and modules
 import convert_source_dcm as cdm
 import convert_source_par as csp
 import convert_source_nii as csn
-import utils
+import utils.file_utils
 
 # Define functions
-def read_config(config_file, verbose = False):
-    '''
-    Reads configuration file and creates a dictionary of search terms for 
+def read_config(config_file: str, 
+                verbose: bool = False
+                ) -> Tuple[Dict,List[str],Dict]:
+    '''Reads configuration file and creates a dictionary of search terms for 
     certain modalities provided that BIDS modalities are used as keys. If
     exclusions are provided (via the key 'exclude') then an exclusion list is 
     created. Otherwise, 'exclusion_list' is returned as an empty list. If 
@@ -38,28 +41,39 @@ def read_config(config_file, verbose = False):
     empty dictionary is returned.
     
     Arguments:
-        config_file (string): file path to yaml configuration file.
-        verbose (boolean): Prints additional information to screen.
+        config_file: file path to yaml configuration file.
+        verbose: Prints additional information to screen.
     
     Returns: 
-        data_map (dict): Nested dictionary of search terms for BIDS modalities
-        exclusion_list (list): List of exclusion terms
-        meta_dict (dict): Nested dictionary of metadata terms to write to JSON file(s)
+        search_dict: Nested dictionary of search terms for BIDS modalities
+        exclusion_list: List of exclusion terms
+        meta_dict: Nested dictionary of metadata terms to write to JSON file(s)
     '''
     
     with open(config_file) as file:
         data_map = yaml.safe_load(file)
         if verbose:
             print("Initialized parameters from configuration file")
+    
+    # Required search terms
+    if any("search" in data_map for element in data_map):
+        if verbose:
+            print("Categorizing search terms")
+        search_dict = data_map["search"]
+        del data_map["search"]
+    else:
+        if verbose:
+            print("Heuristic search terms required. Exiting...")
+        sys.exit(1)
         
     if any("exclude" in data_map for element in data_map):
         if verbose:
-            print("exclusion option implemented")
+            print("Exclusion option implemented")
         exclusion_list = data_map["exclude"]
         del data_map["exclude"]
     else:
         if verbose:
-            print("exclusion option not implemented")
+            print("Exclusion option not implemented")
         exclusion_list = list()
         
     if any("metadata" in data_map for element in data_map):
@@ -72,7 +86,7 @@ def read_config(config_file, verbose = False):
             print("no metadata settings")
         meta_dict = dict()
         
-    return data_map,exclusion_list,meta_dict
+    return search_dict,exclusion_list,meta_dict
 
 def create_file_list(data_dir, file_ext="", order="size"):
     '''
