@@ -6,6 +6,7 @@
     * Wrapper class for UNIX command line executables.
 
 Todo:
+    * Add context manager methods to each class
     * Add gzipping/gunzipping functions to File class
         * See these links:
             * https://stackoverflow.com/questions/8156707/gzip-a-file-in-python
@@ -216,6 +217,14 @@ class TmpDir(object):
             _cwd = os.getcwd()
             self.tmp_dir = os.path.join(_cwd,self.tmp_dir)
             self.parent_tmp_dir = os.path.dirname(self.tmp_dir)
+
+    def __enter__(self):
+        '''doc-string'''
+        return self
+
+    def __exit__(self, exc_type, exc_val, traceback):
+        '''doc-string'''
+        return False
         
     def mk_tmp_dir(self) -> None:
         '''Creates/makes temporary directory.
@@ -472,7 +481,7 @@ class Command(object):
             return True
         
     def run(self,
-            log: LogFile = "",
+            log: Optional[LogFile] = None,
             debug: bool = False,
             dryrun: bool = False,
             env: dict = {},
