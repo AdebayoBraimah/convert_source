@@ -108,15 +108,15 @@ if [[ ${cleanup} = "false" ]]; then
 
   # subject arrays
   subs=( 
-    001
-    002
-    003
-    P01
-    P02
-    P03
-    C01
-    C02
-    C03
+    001-001
+    002-001
+    003-001
+    P01-001
+    P02-001
+    P03-001
+    C01-001
+    C02-001
+    C03-001
   )
 
   # Create test directory file structure for PAR REC/NIFTI file(s)
