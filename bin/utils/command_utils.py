@@ -6,7 +6,7 @@
     * Wrapper class for UNIX command line executables.
 
 Todo:
-    * Add context manager methods to each class
+    * [X] Add context manager methods to each class
     * Add gzipping/gunzipping functions to File class
         * See these links:
             * https://stackoverflow.com/questions/8156707/gzip-a-file-in-python
