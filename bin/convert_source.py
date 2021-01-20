@@ -39,6 +39,18 @@ def read_config(config_file: str,
     additional settings are specified, they should be done so via the key
     'metadata' to enable writing of additional metadata. Otherwise, an 
     empty dictionary is returned.
+
+    BIDS modalities:
+        - anat:
+            - T1w, T2w, FLAIR, etc.
+        - func:
+            - task:
+                - resting state, <task-name>
+        - dwi
+        - fmap
+
+    Usage example:
+        >>> [search_dict, exclusion_list, meta_dict] 
     
     Arguments:
         config_file: file path to yaml configuration file.

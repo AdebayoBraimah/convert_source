@@ -50,8 +50,14 @@ class File(object):
         '''Init doc-string for File object class.
         
         Usage example:
-            >>> file_obj = File("file_name.txt")
-            >>> file_obj.file 
+            >>> with File("file_name.txt") as file:
+            ...     file.touch()
+            ...     file.write_txt("some text")
+            ...
+            >>> # or
+            >>> 
+            >>> file = File("file_name.txt")
+            >>> file.file 
             "file_name.txt"
 
         Args:
@@ -66,6 +72,12 @@ class File(object):
             self.ext: str = self.file[-(7):]
         else:
             self.ext: str = self.file[-(4):]
+    
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, traceback):
+        return False
         
     def touch(self) -> None:
         '''Creates empty file.
@@ -201,8 +213,16 @@ class TmpDir(object):
         '''Init doc-string for TmpDir class.
         
         Usage example:
-            >>> tmp_directory = TmpDir("/path/to/temporary_directory")
-            >>> tmp_directory.tmp_dir() 
+            >>> with TmpDir("/path/to/temporary_directory",False) as tmp_dir:
+            ...     tmp_dir.mk_tmp_dir()
+            ...     # do more stuff
+            ...     tmp_dir.rm_tmp_dir(rm_parent=False)
+            ...
+            >>> # or
+            >>> tmp_dir = TmpDir("/path/to/temporary_directory")
+            >>> tmp_dir.tmp_dir()
+            "/path/to/temporary_directory"
+            >>> tmp_dir.rm_tmp_dir(rm_parent=False)
         
         Args:
             tmp_dir: Temporary parent directory name/path.
@@ -219,11 +239,9 @@ class TmpDir(object):
             self.parent_tmp_dir = os.path.dirname(self.tmp_dir)
 
     def __enter__(self):
-        '''doc-string'''
         return self
 
     def __exit__(self, exc_type, exc_val, traceback):
-        '''doc-string'''
         return False
         
     def mk_tmp_dir(self) -> None:
@@ -407,7 +425,7 @@ class LogFile(File):
         self.logger.warning(msg)
     
     def log(self,
-        log_cmd: str = "") -> None:
+            log_cmd: str = "") -> None:
         '''Log function for logging commands and messages to some log file.
         
         Usage examples:
@@ -537,8 +555,11 @@ class Command(object):
             merged_env.update(env)
         
         # Execute/run command
-        p = subprocess.Popen(self.cmd_list,shell=shell,env=merged_env,
-                        stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        p = subprocess.Popen(self.cmd_list,
+                             shell=shell,
+                             env=merged_env,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
 
         # Write log files
         out,err = p.communicate()
