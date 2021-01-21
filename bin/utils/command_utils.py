@@ -457,7 +457,7 @@ class Command(object):
     '''
 
     def __init__(self,
-                 command: str) -> list:
+                 command: str) -> List:
         '''Init doc-string for Command class. Initializes a command to be used on UNIX command line.
         The input argument is a command (string), and a mutable list is returned (, that can later
         be appended to).
@@ -479,8 +479,8 @@ class Command(object):
         Returns:
             cmd_list: Mutable list that can be appended to.
         '''
-        self.command = command
-        self.cmd_list = [f"{self.command}"]
+        self.command: str = command
+        self.cmd_list: List[str] = [f"{self.command}"]
     
     def __repr__(self):
         '''NOTE: This returns a string represnted as a joined list of strings.'''
@@ -520,7 +520,7 @@ class Command(object):
             log: Optional[LogFile] = None,
             debug: bool = False,
             dryrun: bool = False,
-            env: dict = {},
+            env: Dict = {},
             stdout: File = "",
             shell: bool = False
            ) -> Tuple[int,File,File]:
@@ -568,7 +568,7 @@ class Command(object):
                 return (0,'','')
         
         # Define environment variables
-        merged_env: dict = os.environ
+        merged_env: Dict = os.environ
         if env:
             merged_env.update(env)
         
