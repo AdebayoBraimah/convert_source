@@ -57,7 +57,7 @@ class File(object):
             >>> # or
             >>> 
             >>> file = File("file_name.txt")
-            >>> file.file 
+            >>> file
             "file_name.txt"
 
         Args:
@@ -78,6 +78,9 @@ class File(object):
 
     def __exit__(self, exc_type, exc_val, traceback):
         return False
+
+    def __repr__(self):
+        return self.file
         
     def touch(self) -> None:
         '''Creates empty file.
@@ -220,7 +223,7 @@ class TmpDir(object):
             ...
             >>> # or
             >>> tmp_dir = TmpDir("/path/to/temporary_directory")
-            >>> tmp_dir.tmp_dir()
+            >>> tmp_dir
             "/path/to/temporary_directory"
             >>> tmp_dir.rm_tmp_dir(rm_parent=False)
         
@@ -243,6 +246,9 @@ class TmpDir(object):
 
     def __exit__(self, exc_type, exc_val, traceback):
         return False
+    
+    def __repr__(self):
+        return self.tmp_dir
         
     def mk_tmp_dir(self) -> None:
         '''Creates/makes temporary directory.
@@ -296,7 +302,7 @@ class TmpDir(object):
             Usage example:
                 >>> tmp_directory = TmpDir("/path/to/temporary_directory")
                 >>> temp_file = TmpDir.TmpFile("temporary_file", tmp_directory.tmp_dir)
-                >>> temp_file.tmp_file
+                >>> temp_file
                 "/path/to/temporary_directory/temporary_file"
             
             Args:
@@ -307,7 +313,7 @@ class TmpDir(object):
             self.tmp_dir = tmp_dir
             self.tmp_file = os.path.join(self.tmp_dir,self.tmp_file)
             File.__init__(self,self.tmp_file)
-
+        
 class NiiFile(File):
     '''NIFTI file class object for handling NIFTI files. Inherits methods and 
     properties from the File class.
@@ -321,13 +327,12 @@ class NiiFile(File):
         
         Usage example:
             >>> nii_file = NiiFile("file.nii")
-            >>> nii_file.file 
+            >>> nii_file
             "file.nii"
         '''
         self.file = file
         File.__init__(self,self.file)
-
-
+        
 class LogFile(File):
     '''Class that creates a log file for logging purposes. Due to how this 
     class is constructed - its intended use case requires that this class 
@@ -347,7 +352,7 @@ class LogFile(File):
         
         Usage examples:
             >>> log = LogFile("file.log")
-            >>> log.file 
+            >>> log
             "file.log"
         
         Args:
@@ -371,6 +376,9 @@ class LogFile(File):
         
         # Define logging
         self.logger = logging.getLogger(__name__)
+    
+    def __repr__(self):
+        return self.log_file
         
     def info(self,
             msg: str = "") -> None:
@@ -458,6 +466,12 @@ class Command(object):
             >>> echo = Command("echo")
             >>> echo.cmd_list.append("Hi!")
             >>> echo.cmd_list.append("I have arrived!")
+            >>>
+            >>> echo
+            echo Hi! I have arrived!
+            >>>
+            >>> echo.run()
+            Hi! I have arrived!
         
         Arguments:
             command: Command to be used. Note: command used must be in system path
@@ -467,6 +481,10 @@ class Command(object):
         '''
         self.command = command
         self.cmd_list = [f"{self.command}"]
+    
+    def __repr__(self):
+        '''NOTE: This returns a string represnted as a joined list of strings.'''
+        return ' '.join(self.cmd_list)
         
     def check_dependency(self,
                          err_msg: Optional[str] = None) -> Union[bool,None]:
