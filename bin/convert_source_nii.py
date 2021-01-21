@@ -8,6 +8,7 @@ import os
 import shutil
 import random
 import nibabel as nib
+from typing import List, Dict, Optional, Union, Tuple
 
 # Import third party packages and modules
 import convert_source_dcm as cdm
@@ -16,16 +17,15 @@ import utils
 
 # define functions
 
-def get_nii_tr(nii_file):
-    '''
-    Reads the NifTi file header and returns the repetition time (TR, sec) as a value if it is not zero, otherwise this 
+def get_nii_tr(nii_file: str) -> Union[float,str]:
+    '''Reads the NIFTI file header and returns the repetition time (TR, sec) as a value if it is not zero, otherwise this 
     function returns the string 'unknown'.
     
     Arguments:
-        nii_file (string): NifTi image filename with absolute filepath
+        nii_file: NIFTI image filename with absolute filepath
         
     Returns: 
-        tr (float or string): Repetition time (TR, sec), if not zero, otherwise 'unknown' is returned.
+        tr: Repetition time (TR, sec), if not zero, otherwise 'unknown' is returned.
     '''
     
     # Load nifti file
@@ -42,15 +42,14 @@ def get_nii_tr(nii_file):
     
     return tr
 
-def get_num_frames(nii_file):
-    '''
-    Determines the number of frames/volumes/TRs in a NifTi-2 file.
+def get_num_frames(nii_file: str) -> int:
+    '''Determines the number of frames/volumes/TRs in a NIFTI-2 file.
 
     Arguments:
-        nii_file (string): Absolute filepath to NifTi image file
+        nii_file: Absolute filepath to NIFTI image file
 
     Returns:
-        num_frames (int): Number of temporal frames or volumes in NifTi file.
+        num_frames: Number of temporal frames or volumes in NIFTI file.
     '''
     
     try:
@@ -63,18 +62,20 @@ def get_num_frames(nii_file):
     
     return num_frames
 
-def get_data_params(file,json_file="", bval_file=""):
-    '''
-    Creates a dictionary of key mapped parameter items that are often not written to the BIDS JSON sidecar
+def get_data_params(file: str,
+                    json_file: Optional[str] = None, 
+                    bval_file: Optional[str] = None
+                    ) -> Dict:
+    '''Creates a dictionary of key mapped parameter items that are often not written to the BIDS JSON sidecar
     when converting Philips DICOM and PAR REC files.
     
     Arguments:
-        file (string): Absolute filepath to raw image data file (DICOM or PAR REC)
-        json_file (string, optional): Corresponding JSON sidecare file
-        bval_file (string, optional): Corresponding bval file for DWI acquisitions
+        file: Absolute filepath to raw image data file (DICOM or PAR REC)
+        json_file: Corresponding JSON sidecare file
+        bval_file: Corresponding bval file for DWI acquisitions
     
     Returns:
-        info (dict): Dictionary of key mapped items/values
+        info: Dictionary of key mapped items/values
     '''
     
     # Create empty dictionary
