@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-NifTi specific functions for convert_source. Primarily intended for renaming NifTi to be BIDS compliant.
+NIFTI specific functions for convert_source. Primarily intended for renaming NifTi to be BIDS compliant.
 '''
 
 # Import packages and modules
@@ -13,7 +13,7 @@ from typing import List, Dict, Optional, Union, Tuple
 # Import third party packages and modules
 import convert_source_dcm as cdm
 import convert_source_par as csp
-import utils
+from utils import file_utils as utils
 
 # define functions
 
