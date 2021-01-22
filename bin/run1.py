@@ -10,6 +10,7 @@ TODO:
             - Should have option for native gzipping/gunzipping in the case of 
                 U/NIX systems
     - Add (hidden) log file directory and .gitignore file
+    - Add simpler example configurations file
 '''
 
 from utils.command_utils import Command, DependencyError
