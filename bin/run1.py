@@ -4,13 +4,13 @@
 
 '''
 TODO:
-    - Enable gzipping/gunzipping utility function(s) for cases when interacting with 
-        uncompressed image files.
-            - Or in the case the desired output files need to be uncompressed. 
-            - Should have option for native gzipping/gunzipping in the case of 
-                U/NIX systems
     - Add (hidden) log file directory and .gitignore file
     - Add simpler example configurations file
+    - Add file handling capabilities of task csv/tsv files
+        - use BIDSimg class to keep track of files
+            or
+        - create new class
+    - Add option for creating sessions TSV file(s)
 '''
 
 from utils.command_utils import Command, DependencyError

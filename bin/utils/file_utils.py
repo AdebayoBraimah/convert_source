@@ -300,9 +300,11 @@ def get_bvals(bval_file: str) -> List[float]:
     vals_nonzero = vals[vals.astype(bool)]
     return list(np.unique(vals_nonzero))
 
-def get_metadata(dictionary="",scan_type="",task=""):
-    '''
-    Reads the metadata dictionary and looks for keywords to indicate what metadata should be written to which
+def get_metadata(dictionary: Optional[Dict] = None,
+                 scan_type: Optional [str] = None,
+                 task: Optional[str] = None
+                 ) -> Tuple[Dict,Dict]:
+    '''Reads the metadata dictionary and looks for keywords to indicate what metadata should be written to which
     dictionary. For example, the keyword 'common' is used to indicate the common information for the imaging
     protocol and may contain information such as: field strength, phase encoding direction, institution name, etc.
     Additional keywords that are BIDS sub-directories names (e.g. anat, func, dwi) will return an additional
@@ -311,28 +313,33 @@ def get_metadata(dictionary="",scan_type="",task=""):
     as a result.
     
     Arguments:
-        dictionary (dict,optional): Nest dictionary of key mapped items from the 'read_config' function
-        scan_type (string, optional): BIDS scan type (e.g. anat, func, dwi, etc.)
-        task (string, optional): Task name to search in the key mapped dictionary
+        dictionary: Nested dictionary of key mapped items from the 'read_config' function.
+        scan_type: BIDS scan type (e.g. anat, func, dwi, etc.).
+        task: Task name to search in the key mapped dictionary.
         
-    Returns: 
-        com_param_dict (dict): Common parameters dictionary
-        scan_param_dict (dict): Scan/modality type parameters dictionary
+    Returns:
+        Tuple of dictionaries that contain:
+            - Common metadata dictionary
+            - Modality specific metadata dictionaries.
     '''
 
-    if not dictionary:
-        dictionary = dict()
+    if dictionary:
+        pass
+    else:
+        dictionary: Dict = {}
     
     # Create empty dictionaries
-    com_param_dict = dict()
-    scan_param_dict = dict()
-    scan_task_dict = dict()
+    com_param_dict: Dict = {}
+    scan_param_dict: Dict = {}
+    scan_task_dict: Dict = {}
     
     # Iterate through, looking for key words (e.g. common and scan_type)
     for key,item in dictionary.items():
+        # BIDS common metadata fields (normally shared by all modalities)
         if key.lower() in 'common':
             com_param_dict = dictionary[key]
 
+        # BIDS modality specific metadata fields
         if key.lower() in scan_type:
             scan_param_dict = dictionary[key]
             if task.lower() in scan_param_dict:
@@ -345,60 +352,32 @@ def get_metadata(dictionary="",scan_type="",task=""):
     
     return com_param_dict, scan_param_dict
 
-def str_in_substr(sub_str_,str_):
-    '''
-    DEPRECATED: Should only be used if config_file uses comma separated
-        lists to denote search terms.
+def list_in_substr(in_list: List[str],
+                   in_str: str
+                   ) -> bool:
+    '''Searches a string using a list that contains substrings. Returns boolean 'True' or 'False' 
+    if any elements of the list are found within the string.
     
-    Searches a (longer) string using a comma separated string 
-    consisting of substrings. Returns 'True' or 'False' if any part
-    of the substring is found within the larger string.
-    
-    Example:
-        str_in_substr('T1,TFE','sub_T1_image_file') would return True.
-        str_in_substr('T2,TSE','sub_T1_image_file') would return False.
+    Example usage:
+        >>> list_in_substr('['T1','TFE']','sub_T1_image_file')
+        True
+        >>> 
+        >>> list_in_substr('['T2','TSE']','sub_T1_image_file')
+        False
     
     Arguments:
-        sub_str_ (string): Substring used for matching.
-        str_ (string): Larger string to be searched for matches within substring.
+        in_list (string): list containing strings used for matching.
+        in_str (string): Larger string to be searched for matches within substring.
     
     Returns: 
-        bool_var (bool): Boolean - True or False
+        boolean True or False.
     '''
-    
-    bool_var = False
-    
-    for word in sub_str_.split(","):
-        if any(word in str_ for element in str_):
-            bool_var = True
-            
-    return bool_var
 
-def list_in_substr(list_,str_):
-    '''
-    Searches a string using a list that contains substrings. 
-    Returns 'True' or 'False' if any elements of the list are 
-    found within the string.
-    
-    Example:
-        list_in_substr('['T1','TFE']','sub_T1_image_file') would return True.
-        list_in_substr('['T2','TSE']','sub_T1_image_file') would return False.
-    
-    Arguments:
-        list_ (string): list containing strings used for matching.
-        str_ (string): Larger string to be searched for matches within substring.
-    
-    Returns: 
-        bool_var (bool): Boolean - True or False
-    '''
-    
-    bool_var = False
-    
-    for word in list_:
-        if any(word.lower() in str_.lower() for element in str_.lower()):
-            bool_var = True
-            
-    return bool_var
+    for word in in_list:
+        if any(word.lower() in in_str.lower() for element in in_str.lower()):
+            return True
+        else:
+            return False
 
 def convert_image_data(file,basename,out_dir,cprss_lvl=6,bids=True,
                        anon_bids=True,gzip=True,comment=True,
