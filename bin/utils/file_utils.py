@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-Utility functions for convert_source.
+File utility functions for convert_source.
 '''
 
 # Import packages and modules
@@ -12,6 +12,8 @@ import subprocess
 import gzip
 import numpy as np
 import platform
+from command_utils import Command, DependencyError, File
+from typing import List, Dict, Optional, Union, Tuple
 
 # Import third party packages and modules
 import convert_source_dcm as cdm
@@ -19,43 +21,41 @@ import convert_source_par as csp
 
 # Define functions
 
-def file_to_screen(file):
-    '''
-    Reads the contents of a file and prints it to screen.
+def file_to_screen(file: str) -> str:
+    '''Reads the contents of a file and prints it to screen.
 
     Arguments:
-        file: Path to file
+        file: Path to file.
 
     Returns:
-        None
+        File contents returned as string, printed to screen.
     '''
 
     with open(file,"r") as f:
         file_contents = f.read()
         f.close()
-
     return file_contents
 
-def get_echo(json_file):
-    '''
-    Reads the echo time (TE) from the NifTi JSON sidecar and returns it.
+def get_echo(json_file: str) -> float:
+    '''Reads the echo time (TE) from the NIFTI JSON sidecar and returns it.
 
     Arguments:
-        json_file (string): Absolute path to JSON sidecar
+        json_file (string): Absolute path to JSON sidecar.
 
     Returns:
-        echo (float): Returns the echo time as a float.
+        Echo time as a float.
     '''
 
     with open(json_file, "r") as read_file:
         data = json.load(read_file)
-
     echo = data.get("EchoTime")
-
     return echo
 
 def get_num_runs(out_dir,scan,ses="",task="",acq="",ce="",dirs="",rec="",echo=""):
     '''
+
+    * This should use a dictionary - update function later *
+
     Determines run number of a scan (e.g. T1w, T2w, bold, dwi etc.) in an output directory by globbing the 
     directory for the number of NifTis of the same scan.
 
@@ -82,127 +82,159 @@ def get_num_runs(out_dir,scan,ses="",task="",acq="",ce="",dirs="",rec="",echo=""
 
     return run_num
 
-def file_parts(file):
-    '''
-    Divides file with file path into: path, filename, extension.
+# This is implemented in command_utils
+# def file_parts(file):
+#     '''
+#     Divides file with file path into: path, filename, extension.
+    
+#     Arguments:
+#         file (string): File with absolute filepath
+        
+#     Returns: 
+#         path (string): Path of input file
+#         filename (string): Filename of input file, without the extension
+#         ext (string): Extension of input file
+#     '''
+    
+#     [path, file_with_ext] = os.path.split(file)
+    
+#     # Make condition for gzipped files
+#     if '.gz' in file_with_ext:
+#         file_with_ext = file_with_ext[:-3]
+#         [filename,ext] = os.path.splitext(file_with_ext)
+#         ext = ext + '.gz'
+#     else:
+#         [filename,ext] = os.path.splitext(file_with_ext)
+    
+#     path = str(path)
+#     filename = str(filename)
+#     ext = str(ext)
+    
+#     return path,filename,ext
+
+def gzip_file(file: str,
+              native: bool = True
+              ) -> str:
+    '''Gzips file. Native implementation of gzipping files is prefered with
+    this function provided that the system is UNIX. Otherwise, a pythonic 
+    implementation of gzipping is performed.
     
     Arguments:
-        file (string): File with absolute filepath
+        file: Input file.
+        native: Uses native implementation of gzip.
         
     Returns: 
-        path (string): Path of input file
-        filename (string): Filename of input file, without the extension
-        ext (string): Extension of input file
+        Gzipped file.
     '''
+
+    # Check if native method was enabled.
+    if native:
+        if platform.system().lower() == 'windows':
+            native = False
+        else:
+            native = True
     
-    [path, file_with_ext] = os.path.split(file)
-    
-    # Make condition for gzipped files
-    if '.gz' in file_with_ext:
-        file_with_ext = file_with_ext[:-3]
-        [filename,ext] = os.path.splitext(file_with_ext)
-        ext = ext + '.gz'
+    if native:
+        # Native implementation
+        file: File = File(file)
+        [ path, filename, ext ] = file.file_parts()
+        out_file: str = os.path.join(path,filename + ext + '.gz')
+        gzip_cmd: Command = Command("gzip")
+        gzip_cmd.cmd_list.append(file.file)
+        gzip_cmd.cmd_list.append(out_file)
+        gzip_cmd.run()
+        return out_file
     else:
-        [filename,ext] = os.path.splitext(file_with_ext)
-    
-    path = str(path)
-    filename = str(filename)
-    ext = str(ext)
-    
-    return path,filename,ext
+        # Define tempory file for I/O buffer stream
+        tmp_file: File = File(file)
+        [ path, filename, ext ] = tmp_file.file_parts()
+        out_file: str = os.path.join(path,filename + ext + '.gz')
+        
+        # Pythonic gzip
+        with open(file,"rb") as in_file:
+            data = in_file.read(); in_file.close()
+            with gzip.GzipFile(out_file,"wb") as tmp_out:
+                tmp_out.write(data)
+                tmp_out.close()
+                os.remove(file) 
+        return out_file
 
-def gzip_file(file,rm_orig=True):
-    '''
-    Gzips file.
+def gunzip_file(file: str,
+                native: bool = True
+                ) -> str:
+    '''Gunzips file. Native implementation of gunzipping files is prefered with
+    this function provided that the system is UNIX. Otherwise, a pythonic 
+    implementation of gunzipping is performed.
     
     Arguments:
-        file (string): Input file
-        rm_orig (boolean): If true (default), removes original file
+        file: Input file.
+        native: Uses native implementation of gunzip.
         
     Returns: 
-        out_file (string): Gzipped file
+        Gunzipped file.
     '''
-    
-    # Define tempory file for I/O buffer stream
-    tmp_file = file
-    path,f_name_,ext_ = file_parts(tmp_file)
-    f_name = f_name_ + ext_ + ".gz"
-    out_file = os.path.join(path,f_name)
-    
-    # Gzip file
-    with open(file,"rb") as in_file:
-        data = in_file.read(); in_file.close()
-        with gzip.GzipFile(out_file,"wb") as tmp_out:
-            tmp_out.write(data)
-            tmp_out.close()
-            
-    if rm_orig:
-        os.remove(file)
-            
-    return out_file
 
-def gunzip_file(file,rm_orig=True):
-    '''
-    Gunzips file.
+    # Check if native method was enabled.
+    if native:
+        if platform.system().lower() == 'windows':
+            native = False
+        else:
+            native = True
+    
+    if native:
+        # Native implementation
+        file: File = File(file)
+        [ path, filename, ext ] = file.file_parts()
+        out_file: str = os.path.join(path,filename + ext[:-3])
+        gunzip_cmd: Command = Command("gunzip")
+        gunzip_cmd.cmd_list.append(file.file)
+        gunzip_cmd.cmd_list.append(out_file)
+        gunzip_cmd.run()
+        return out_file
+    else:
+        # Define tempory file for I/O buffer stream
+        tmp_file: File = File(file)
+        [ path, filename, ext ] = tmp_file.file_parts()
+        out_file: str = os.path.join(path,filename + ext[:-3])
+        
+        # Pythonic gunzip
+        with gzip.GzipFile(file,"rb") as in_file:
+            data = in_file.read(); in_file.close()
+            with open(out_file,"wb") as tmp_out:
+                tmp_out.write(data)
+                tmp_out.close()
+                os.remove(file)
+        return out_file
+
+def read_json(json_file: str) -> Dict:
+    '''Reads JavaScript Object Notation (JSON) file.
     
     Arguments:
-        file (string): Input file
-        rm_orig (boolean): If true (default), removes original file
+        json_file: Input file.
         
     Returns: 
-        out_file (string): Gunzipped file
-    '''
-    
-    # Define tempory file for I/O buffer stream
-    tmp_file = file
-    path,f_name_,ext_ = file_parts(tmp_file)
-    f_name = f_name_ # + ext_[:-3]
-    out_file = os.path.join(path,f_name)
-    
-    with gzip.GzipFile(file,"rb") as in_file:
-        data = in_file.read(); in_file.close()
-        with open(out_file,"wb") as tmp_out:
-            tmp_out.write(data)
-            tmp_out.close()
-            
-    if rm_orig:
-        os.remove(file)
-    
-    return out_file
-
-def read_json(json_file):
-    '''
-    Reads JavaScript Object Notation (JSON) file.
-    
-    Arguments:
-        json_file (string): Input file
-        
-    Returns: 
-        data (dict): Dictionary of key mapped items in JSON file
+        Dictionary of key mapped items from JSON file.
     '''
     
     # Read JSON file
-    # Try-Except statement has empty exception as JSONDecodeError is not a valid exception to pass, 
-    # thus throwing a name error
-    try:
+    if json_file:
         with open(json_file) as file:
-            data = json.load(file)
-    except:
-        data = dict()
-        
-    return data
+            return json.load(file)
+    else:
+        return dict()
 
-def update_json(json_file,dictionary):
-    '''
-    Updates JavaScript Object Notation (JSON) file. If the file does not exist, it is created once
-    this function is invoked.
+def update_json(json_file: str,
+                dictionary: Dict
+                ) -> str:
+    '''Updates JavaScript Object Notation (JSON) file. If the file does not exist, it is created once
+    this function is called.
     
     Arguments:
-        json_file (string): Input file
-        dictionary (dict): Dictionary of key mapped items to write to JSON file
+        json_file: Input file.
+        dictionary: Dictionary of key mapped items to write to JSON file.
         
     Returns: 
-        json_file (string): Updated JSON file
+        Updated JSON file.
     '''
     
     # Check if JSON file exists, if not, then create JSON file
@@ -210,7 +242,7 @@ def update_json(json_file,dictionary):
         with open(json_file,"w"): pass
 
     # Read JSON file
-    data_orig = read_json(json_file)
+    data_orig: Dict = read_json(json_file)
         
     # Update original data from JSON file
     data_orig.update(dictionary)
@@ -218,56 +250,55 @@ def update_json(json_file,dictionary):
     # Write updated JSON file
     with open(json_file,"w") as file:
         json.dump(data_orig,file,indent=4)
-        
+    
     return json_file
 
-def dict_multi_update(dictionary,**kwargs):
-    '''
-    Updates a dictionary multiple times depending on the number key word mapped pairs that are provided and 
-    returns a separate updated dictionary. The dictionary passed as an argument must exist prior to this 
-    function being invoked.
+def dict_multi_update(dictionary: Optional[Dict] = None,
+                      **kwargs
+                      ) -> Dict:
+    '''Updates a dictionary multiple times depending on the number key word mapped pairs that are provided and 
+    returns a separate updated dictionary. The dictionary passed as an argument need not exist at runtime.
     
     Example usage:
-    
-        new_dict = dict_multi_update(old_dict,
-                                    Manufacturer="Philips",
-                                    ManufacturersModelName="Ingenia",
-                                    MagneticFieldStrength=3,
-                                    InstitutionName="CCHMC")
+        >>> new_dict = dict_multi_update(old_dict,
+        ...                              Manufacturer="Philips",
+        ...                              ManufacturersModelName="Ingenia",
+        ...                              MagneticFieldStrength=3,
+        ...                              InstitutionName="CCHMC")
     
     Arguments:
-        dictionary (dict): Dictionary of key mapped items to write to JSON file
-        **kwargs (string, key,value pairs): key=value pairs
+        dictionary: Dictionary of key mapped items to write to JSON file.
+        **kwargs: key=value pairs.
         
     Returns: 
-        new_dict (dict): New updated dictionary
+        New updated dictionary.
     '''
     
     # Create new dictionary
-    new_dict = dictionary.copy()
+    if dictionary:
+        new_dict: Dict = dictionary.copy()
+    else:
+        new_dict: Dict = {}
     
     for key,item in kwargs.items():
-        tmp_dict = {key:item}
+        tmp_dict: Dict = {key:item}
         new_dict.update(tmp_dict)
-        
+    
     return new_dict
 
-def get_bvals(bval_file):
-    '''
-    Reads the bvals from the (FSL-style) bvalue file and returns a list of unique non-zero bvalues
+def get_bvals(bval_file: str) -> List[float]:
+    '''Reads the bvals from the (FSL-style) bvalue file and returns a list of unique non-zero bvalues
     
     Arguments:
-        bval_file (string): Absolute filepath to bval (.bval) file
+        bval_file: Bval (.bval) file.
         
     Returns: 
-        bvals_list (list): List of unique, non-zero bvalues (as floats).
+        List of unique, non-zero bvalues (as floats).
     '''
-    
+    bval_file: str = os.path.abspath(bval_file)
     vals = np.loadtxt(bval_file)
     vals_nonzero = vals[vals.astype(bool)]
-    bvals_list = list(np.unique(vals_nonzero))
-    
-    return bvals_list
+    return list(np.unique(vals_nonzero))
 
 def get_metadata(dictionary="",scan_type="",task=""):
     '''
