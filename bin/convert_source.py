@@ -19,7 +19,13 @@ import glob
 import yaml
 import argparse
 
-from typing import List, Dict, Optional, Union, Tuple
+from typing import (
+    List, 
+    Dict, 
+    Optional, 
+    Union, 
+    Tuple
+)
 
 
 # Import third party packages and modules
@@ -50,18 +56,25 @@ def read_config(config_file: str,
         - fmap
 
     Usage example:
-        >>> [search_dict, exclusion_list, meta_dict] 
+        >>> [search_dict, exclusion_list, meta_dict] = read_config(config_file)
     
     Arguments:
         config_file: file path to yaml configuration file.
         verbose: Prints additional information to screen.
     
     Returns: 
-        search_dict: Nested dictionary of search terms for BIDS modalities
-        exclusion_list: List of exclusion terms
-        meta_dict: Nested dictionary of metadata terms to write to JSON file(s)
-    '''
+        search_dict: Nested dictionary of search terms for BIDS modalities.
+        exclusion_list: List of exclusion terms.
+        meta_dict: Nested dictionary of metadata terms to write to JSON file(s).
     
+    Raises:
+        ConfigFileReadError: Error that arises if no heuristic search terms are provided.
+    '''
+    class ConfigFileReadError(Exception):
+        pass
+
+    config_file: str = os.path.abspath(config_file)
+
     with open(config_file) as file:
         data_map = yaml.safe_load(file)
         if verbose:
@@ -76,8 +89,9 @@ def read_config(config_file: str,
     else:
         if verbose:
             print("Heuristic search terms required. Exiting...")
-        sys.exit(1)
-        
+        raise ConfigFileReadError("Heuristic search terms required. Exiting...")
+
+    # Exclusion terms  
     if any("exclude" in data_map for element in data_map):
         if verbose:
             print("Exclusion option implemented")
@@ -87,7 +101,8 @@ def read_config(config_file: str,
         if verbose:
             print("Exclusion option not implemented")
         exclusion_list = list()
-        
+    
+    # Metadata terms
     if any("metadata" in data_map for element in data_map):
         if verbose:
             print("Including additional settings for metadata")

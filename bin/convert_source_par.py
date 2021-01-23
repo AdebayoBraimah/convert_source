@@ -6,6 +6,13 @@ PAR REC specific functions for convert_source. Primarily intended for converting
 # Import packages and modules
 import os
 import re
+from typing import (
+    List, 
+    Dict, 
+    Optional, 
+    Union, 
+    Tuple
+)
 
 # Import third party packages and modules
 import utils

@@ -8,6 +8,13 @@ import pydicom
 import re
 import os
 import glob
+from typing import (
+    List, 
+    Dict, 
+    Optional, 
+    Union, 
+    Tuple
+)
 
 # Import third party packages and modules
 import utils

@@ -8,7 +8,13 @@ import os
 import shutil
 import random
 import nibabel as nib
-from typing import List, Dict, Optional, Union, Tuple
+from typing import (
+    List, 
+    Dict, 
+    Optional, 
+    Union, 
+    Tuple
+)
 
 # Import third party packages and modules
 import convert_source_dcm as cdm
