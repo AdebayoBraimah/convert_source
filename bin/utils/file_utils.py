@@ -5,19 +5,35 @@ File utility functions for convert_source.
 
 # Import packages and modules
 import json
+from json import JSONDecodeError
 import os
-import shutil
+from shutil import copy
 import glob
-import subprocess
+# import subprocess
 import gzip
 import numpy as np
 import platform
-from command_utils import Command, DependencyError, File
-from typing import List, Dict, Optional, Union, Tuple
+from typing import (
+    List, 
+    Dict, 
+    Optional, 
+    Union, 
+    Tuple
+)
 
 # Import third party packages and modules
 import convert_source_dcm as cdm
 import convert_source_par as csp
+
+from utils.command_utils import ( 
+    Command, 
+    DependencyError, 
+    ConversionError, 
+    TmpDir, 
+    LogFile, 
+    File, 
+    NiiFile
+)
 
 # Define functions
 
@@ -379,197 +395,390 @@ def list_in_substr(in_list: List[str],
         else:
             return False
 
-def convert_image_data(file,basename,out_dir,cprss_lvl=6,bids=True,
-                       anon_bids=True,gzip=True,comment=True,
-                       adjacent=False,dir_search=5,nrrd=False,
-                       ignore_2D=True,merge_2D=True,text=False,
-                       progress=False,verbose=False,
-                       write_conflicts="suffix",crop_3D=False,
-                       lossless=False,big_endian="optimal",xml=False):
-    '''
-    Converts raw image data (DICOM, PAR REC, or Bruker) to NifTi (or NRRD) using dcm2niix.
-    This is a wrapper function for dcm2niix (v1.0.20190902+). This wrapper functions has no returns, 
-    however output files are generated in a specified directory that must exist prior to the 
-    invokation of this function.
+class BIDSimg():
+    '''File collection and organization object intended for handling 
+    Brain Imaging Data Structure (BIDS) data in the processing of being converted from source data to 
+    NIFTI.
     
-    Note: Most of the defaults for dcm2niix have been preserved aside from those starred (*) in the
-    (optional) arguments section, in order to be BIDS compliant.
+    Attributes:
+        imgs: List of NIFTI files.
+        jsons: Corresponding list of JSON sidecar(s).
+        bvals: Corresponding list of bval file(s).
+        bvecs: Corresponding list of bvec file(s).
+    '''
 
-    Arguments (Required):
-        file (string): Absolute path to raw image data file
-        basename (string): Output file(s) basename
-        out_dir (string): Absolute path to output directory (must exist at runtime)
+    def __init__(self,
+                 work_dir: str):
+        '''Constructs class instance lists for NIFTI, JSON, bval, and bvec files.
+        
+        Arguments:
+            work_dir: Input working directory that contains the image files and 
+                their associated output files.
+        '''
+        # Working directory
+        self.work_dir: str = os.path.abspath(work_dir)
 
-    Arguments (Optional):
-        cprss_lvl (int): Compression level [1 - 9] - 1 is fastest, 9 is smallest (default: 6)
-        bids (bool): BIDS (JSON) sidecar (default: True) * 
-        anon_bids (bool): Anonymize BIDS (default: True) * 
-        gzip (bool): Gzip compress images (default: True) *
-        comment (bool): Image comment(s) stored in NifTi header (default: True) *
-        adjacent (bool): Assumes adjacent DICOMs/Image data (images from same series always in same folder) for faster conversion (default: False)
-        dir_search (int): Directory search depth (default: 5)
-        nrrd (bool): Export as NRRD instead of NifTi, not recommended (default: False)
-        ignore_2D (bool): Ignore derived, localizer and 2D images (default: True)
-        merge_2D (bool): Merge 2D slices from same series regardless of echo, exposure, etc. (default: True)
-        text (bool): Text notes includes private patient details in separate text file (default: False)
-        progress (bool): Report progress, slicer format progress information (default: True)
-        verbose (bool): Enable verbosity (default: False)
-        write_conflicts (string): Write behavior for name conflicts:
+        # Init empty lists
+        self.imgs: List[str] = []
+        self.jsons: List[str] = []
+        self.bvals: List[str] = []
+        self.bvecs: List[str] = []
+            
+        # Find, organize, and sort NIFTI files
+        search_dir: str = os.path.join(self.work_dir,"*.nii*")
+        imgs: List[str] = glob.glob(search_dir)
+        self.imgs: List[str] = imgs
+        self.imgs.sort(reverse=False)
+        del search_dir, imgs
+
+        # Find and organize associated JSON, bval & bvec files
+        for img in self.imgs:
+            img_file: NiiFile = NiiFile(img)
+            [path, file, ext] = img_file.file_parts()
+
+            json: str = os.path.join(path,file + ".json")
+            bval: str = os.path.join(path,file + ".bval")
+            bvec: str = os.path.join(path,file + ".bvec")
+
+            # JSON
+            if os.path.exists(json):
+                self.jsons.append(json)
+            else:
+                self.jsons.append("")
+            
+            # bval
+            if os.path.exists(bval):
+                self.bvals.append(bval)
+            else:
+                self.bvals.append("")
+            
+            # bvec
+            if os.path.exists(bvec):
+                self.bvecs.append(bvec)
+            else:
+                self.bvecs.append("")
+
+            del img_file,path,file,ext,json,bval,bvec
+    
+    def __repr__(self):
+        '''NOTE: Returns a string represented as a dictionary of list items.'''
+        return ( str({"imgs": self.imgs,
+                      "jsons": self.jsons,
+                      "bvals": self.bvals,
+                      "bvecs": self.bvecs}) )
+    
+    def copy_img_data(self,
+                      target_dir: str
+                     ) -> Tuple[List[str],List[str],List[str],List[str]]:
+        '''Copies image data and their associated files to some target directory.
+
+        NOTE: This function resets the class attributes of the class instance with the
+            returns of this function.
+        
+        Arguments:
+            target_dir: Target directory to copy files to.
+            
+        Returns:
+            Tuple of four lists of strings that correspond to:
+                - NIFTI image files
+                - Corresponding JSON file(s)
+                - Corresponding bval file(s)
+                - Corresponding bvec file(s)
+        '''
+        
+        # Init new lists
+        imgs: List[str] = self.imgs
+        jsons: List[str] = self.jsons
+        bvals: List[str] = self.bvals
+        bvecs: List[str] = self.bvecs
+            
+        # Clear class (public) list attributes
+        self.imgs: List[str] = []
+        self.jsons: List[str] = []
+        self.bvals: List[str] = []
+        self.bvecs: List[str] = []
+        
+        # Copy image files
+        for img in imgs:
+            file = copy(img,target_dir)
+            self.imgs.append(file)
+            
+        # Copy JSON files
+        for json in jsons:
+            try:
+                file = copy(json,target_dir)
+                self.jsons.append(file)
+            except FileNotFoundError:
+                self.jsons.append("")
+                
+            
+        # Copy bval files
+        for bval in bvals:
+            try:
+                file = copy(bval,target_dir)
+                self.bvals.append(file)
+            except FileNotFoundError:
+                self.bvals.append("")
+        
+        # Copy bvec files
+        for bvec in bvecs:
+            try:
+                file = copy(bvec,target_dir)
+                self.bvecs.append(file)
+            except FileNotFoundError:
+                self.bvecs.append("")
+        
+        return self.imgs, self.jsons, self.bvals, self.bvecs
+
+def convert_image_data(file: str,
+                       basename: str,
+                       out_dir: str,
+                       cprss_lvl: int = 6,
+                       bids: bool = True,
+                       anon_bids: bool = True,
+                       gzip: bool = True,
+                       comment: bool = True,
+                       adjacent: bool = False,
+                       dir_search: int = 5,
+                       nrrd: bool = False,
+                       ignore_2D: bool = True,
+                       merge_2D: bool = True,
+                       text: bool = False,
+                       progress: bool = False,
+                       verbose: bool = False,
+                       write_conflicts: str = "suffix",
+                       crop_3D: bool = False,
+                       lossless: bool = False,
+                       big_endian: str = "o",
+                       xml: bool = False,
+                       log: Optional[LogFile] = None,
+                       env: Optional[Dict] = None,
+                       dryrun: bool = False
+                       ) -> BIDSimg:
+                    #   ) -> Tuple[List[str],List[str],List[str],List[str]]:
+    '''Converts medical image data (DICOM, PAR REC, or Bruker) to NifTi (or NRRD) using dcm2niix.
+    This is a wrapper function for dcm2niix (v1.0.20190902+).
+
+    Usage example:
+        >>> data = convert_image_data("IM00001.dcm",
+        ...                           "img0001",
+        ...                           "<path/to/out/directory>")
+        >>> data.imgs[0]
+        "<path/to/image.nii>"
+        >>>
+        >>> data.jsons[0]
+        "<path/to/image.json>"
+        >>>
+        >>> data.bvals[0]
+        "<path/to/image.bval>"
+        >>>
+        >>> data.bvecs[0]
+        "<path/to/image.bvec>"
+
+    Arguments:
+        file: Absolute path to raw image data file.
+        basename: Output file(s) basename.
+        out_dir: Absolute path to output directory (must exist at runtime).
+        cprss_lvl: Compression level [1 - 9] - 1 is fastest, 9 is smallest (default: 6).
+        bids: BIDS (JSON) sidecar (default: True).
+        anon_bids: Anonymize BIDS (default: True).
+        gzip: Gzip compress images (default: True).
+        comment: Image comment(s) stored in NifTi header (default: True).
+        adjacent: Assumes adjacent DICOMs/Image data (images from same series always in same folder) for faster conversion (default: False).
+        dir_search (int): Directory search depth (default: 5).
+        nrrd: Export as NRRD instead of NifTi, not recommended (default: False).
+        ignore_2D: Ignore derived, localizer and 2D images (default: True).
+        merge_2D: Merge 2D slices from same series regardless of echo, exposure, etc. (default: True).
+        text: Text notes includes private patient details in separate text file (default: False).
+        progress: Report progress, slicer format progress information (default: True).
+        verbose: Enable verbosity (default: False).
+        write_conflicts: Write behavior for name conflicts:
             - 'suffix' = Add suffix to name conflict (default)
             - 'overwrite' = Overwrite name conflict
             - 'skip' = Skip name conflict
-        crop_3D (bool): crop 3D acquisitions (default: False)
-        lossless (bool): Losslessly scale 16-bit integers to use dynamic range (default: True)
-        big_endian (string): Byte order:
-            - 'optimal' or 'native' = optimal/native byte order (default)
-            - 'little-end' = little endian
-            - 'big-end' = big endian
-        xml (bool): Slicer format features (default: False)
+        crop_3D: crop 3D acquisitions (default: False).
+        lossless: Losslessly scale 16-bit integers to use dynamic range (default: True).
+        big_endian: Byte order:
+            - 'o' = optimal/native byte order (default)
+            - 'n' = little endian
+            - 'y' = big endian
+        xml: Slicer format features (default: False).
+        log: LogFile object for logging.
+        env: Path environment dictionary.
+        dryrun: Perform dryrun (creates the command, but does not execute it).
         
-        Returns:
-            None
+    Returns:
+        BIDSimg data object that contains:
+            - imgs: List of NIFTI image files
+            - jsons: Corresponding list of JSON file(s)
+            - bvals: Corresponding bval file(s)
+            - bvecs: Corresponding bvec file(s)
+
+        * Tuple of four lists of strings that correspond to: *
+            - NIFTI image files
+            - Corresponding JSON file(s)
+            - Corresponding bval file(s)
+            - Corresponding bvec file(s)
+    
+    Raises:
+        ConversionError: Error that arises if no converted (NIFTI) images are created.
     '''
-
-    # Empty list
-    conv_cmd = list()
-
-    # Get OS platform
+    
+    # Get OS platform and construct command line args
     if platform.system().lower() == 'windows':
-        conv_cmd.append("dcm2niix.exe")
+        convert: Command = Command("dcm2niix.exe")
     else:
-        conv_cmd.append("dcm2niix")
+        convert: Command = Command("dcm2niix")
 
     # Boolean True/False options arrays
-    bool_opts = [bids, anon_bids, gzip, comment, adjacent, nrrd, ignore_2D, merge_2D, text, verbose, lossless, progress, xml]
-    bool_vars = ["-b", "-ba", "-z", "-c", "-a", "-e", "-i", "-m", "-t", "-v", "-l", "--progress", "--xml"]
+    bool_opts: List[Union[str,bool]] = [bids, anon_bids, gzip, comment, adjacent, nrrd, ignore_2D, merge_2D, text, verbose, lossless, progress, xml]
+    bool_vars: List[str] = ["-b", "-ba", "-z", "-c", "-a", "-e", "-i", "-m", "-t", "-v", "-l", "--progress", "--xml"]
 
     # Initial option(s)
     if cprss_lvl:
-        conv_cmd.append(f"-{cprss_lvl}")
+        convert.cmd_list.append(f"-{cprss_lvl}")
 
     # Keyword option(s)
     if write_conflicts.lower() == "suffix":
-        conv_cmd.append("-w")
-        conv_cmd.append("2")
+        convert.cmd_list.append("-w")
+        convert.cmd_list.append("2")
     elif write_conflicts.lower() == "overwrite":
-        conv_cmd.append("-w")
-        conv_cmd.append("1")
+        convert.cmd_list.append("-w")
+        convert.cmd_list.append("1")
     elif write_conflicts.lower() == "skip":
-        conv_cmd.append("-w")
-        conv_cmd.append("0")
+        convert.cmd_list.append("-w")
+        convert.cmd_list.append("0")
+    
+    if big_endian.lower() == "o":
+        convert.cmd_list.append("--big_endian")
+        convert.cmd_list.append("o")
+    elif big_endian.lower() == "n":
+        convert.cmd_list.append("--big_endian")
+        convert.cmd_list.append("n")
+    elif big_endian.lower() == "y":
+        convert.cmd_list.append("--big_endian")
+        convert.cmd_list.append("y")
+    
+    for opt in zip(bool_opts,bool_vars):
+        if opt[0]:
+            convert.cmd_list.append(opt[1])
+            convert.cmd_list.append("y")
 
-    # if big_endian.lower() == "optimal" or big_endian.lower() == "native":
-    #     conv_cmd.append("--big_endian")
-    #     conv_cmd.append("o")
-    # elif big_endian.lower() == "little-end":
-    #     conv_cmd.append("--big_endian")
-    #     conv_cmd.append("n")
-    # elif big_endian.lower() == "big-end":
-    #     conv_cmd.append("--big_endian")
-    #     conv_cmd.append("y")
+    # Output filename
+    convert.cmd_list.append("-f")
+    convert.cmd_list.append(f"{basename}")
 
+    # Create TmpDir object
+    with TmpDir(tmp_dir=out_dir,use_cwd=False) as tmp_dir:
+        # Create temporary output directory
+        tmp_dir.mk_tmp_dir()
+        
+        # Output directory
+        out_dir: str = os.path.abspath(out_dir)
 
-    for idx,var in enumerate(bool_opts):
-        if var:
-            conv_cmd.append(bool_vars[idx])
-            conv_cmd.append("y")
+        convert.cmd_list.append("-o")
+        convert.cmd_list.append(f"{tmp_dir.tmp_dir}")
 
-    # Required arguments
-    # Filename
-    conv_cmd.append("-f")
-    conv_cmd.append(f"{basename}")
+        # Image file   
+        convert.cmd_list.append(f"{file}")
+        
+        # Execute command
+        convert.run(log=log,env=env,dryrun=dryrun)
+        
+        # Copy files to output directory
+        img_data = BIDSimg(work_dir=tmp_dir.tmp_dir)
+        [imgs, jsons, bvals, bvecs] = img_data.copy_img_data(target_dir=out_dir)
+        
+        # Clean-up
+        tmp_dir.rm_tmp_dir(rm_parent=False)
+    
+    # Image file check
+    if len(imgs) == 0:
+        raise ConversionError("Image conversion error. No output images were found.")
 
-    # Output directory
-    conv_cmd.append("-o")
-    conv_cmd.append(f"{out_dir}")
+    # return imgs, jsons, bvals, bvecs
+    return img_data
 
-    # Image file   
-    conv_cmd.append(f"{file}")
+# def cp_file(file: str,
+#             work_dir: Optional[str] = None,
+#             work_name: Optional[str] = None
+#             ) -> str:
+#     '''Copies a file. Primarily intended for copying single file image data.
+    
+#     Arguments:
+#         file (string): File path to source (image) file
+#         work_dir (string): Absolute path to working directory (must exist at runtime prior to invoakation of this function). If left empty, then the directory of the source file is used.
+#         work_name (string): Output name for (image) file. If left empty, the output name is the same as the source file.
+        
+#     Returns:
+#         out_file (string): Absolute path to output file.
+#     '''
+    
+#     [file: File = File(file)
+#     [ path, filename, ext ] = file.file_parts()
+    
+#     if work_dir == "":
+#         work_dir = path
+#     else:
+#         work_dir = os.path.abspath(work_dir)
+        
+#     if work_name == "":
+#         work_name = filename
+        
+#     out_file = os.path.join(work_dir,work_name + ext)
+    
+#     shutil.copy(file,out_file)
+    
+#     return out_file
 
-    # System Call to dcm2niix (assumes dcm2niix is added to system path variable)
-    subprocess.call(conv_cmd)
-
-    return None
-
-def cp_file(file,work_dir="",work_name=""):
-    '''
-    Copies a file. Primarily intended for copying single file image data.
+def get_recon_mat(json_file: str) -> Union[float,str]:
+    '''Reads ReconMatrixPE (reconstruction matrix phase encode) value from the JSON sidecar.
     
     Arguments:
-        file (string): File path to source (image) file
-        work_dir (string): Absolute path to working directory (must exist at runtime prior to invoakation of this function). If left empty, then the directory of the source file is used.
-        work_name (string): Output name for (image) file. If left empty, the output name is the same as the source file.
+        json_file: BIDS JSON file.
         
     Returns:
-        out_file (string): Absolute path to output file.
+        Recon Matrix PE value (as a float if it exists in the file, or as a string if not in the file).
     '''
-    
-    [path, filename, ext] = file_parts(file)
-    
-    if work_dir == "":
-        work_dir = path
-    else:
-        work_dir = os.path.abspath(work_dir)
-        
-    if work_name == "":
-        work_name = filename
-        
-    out_file = os.path.join(work_dir,work_name + ext)
-    
-    shutil.copy(file,out_file)
-    
-    return out_file
 
-def get_recon_mat(json_file):
-    '''
-    Reads ReconMatrixPE (reconstruction matrix phase encode) value from the JSON sidecar.
-    
-    Arguments:
-        json_file (string): Absolute filepath to JSON file
-        
-    Returns:
-        recon_mat (float or string): Recon Matrix PE value
-    '''
+    json_file: str = os.path.abspath(json_file)
     
     # Read JSON file
-    # Try-Except statement has empty exception as JSONDecodeError is not a valid exception to pass, 
-    # thus throwing a name error
     try:
         with open(json_file, "r") as read_file:
             data = json.load(read_file)
-            recon_mat = data["ReconMatrixPE"]
-    except:
-        recon_mat = 'unknown'
-        pass
-    
-    return recon_mat
+            return data["ReconMatrixPE"]
+    except JSONDecodeError:
+        pass 
+        return 'unknown'
 
-def get_pix_band(json_file):
-    '''
-    Reads pixel bandwidth value from the JSON sidecar.
+def get_pix_band(json_file: str) -> Union[float,str]:
+    '''Reads pixel bandwidth value from the JSON sidecar.
     
     Arguments:
-        json_file (string): Absolute filepath to JSON file
+        json_file (string): BIDS JSON file.
         
     Returns:
-        pix_band (float or string): Pixel bandwidth value
+        Pixel bandwidth value (as a float if it exists in the file, or as a string if not in the file).
     '''
     
+    json_file: str = os.path.abspath(json_file)
+
     # Read JSON file
-    # Try-Except statement has empty exception as JSONDecodeError is not a valid exception to pass, 
-    # thus throwing a name error
     try:
         with open(json_file, "r") as read_file:
             data = json.load(read_file)
-            pix_band = data["PixelBandwidth"]
-    except:
-        pix_band = 'unknown'
-        pass
-    
-    return pix_band
+            return data["PixelBandwidth"]
+    except JSONDecodeError:
+        pass 
+        return'unknown'
 
-def calc_read_time(file, json_file=""):
+def calc_read_time(file: str, 
+                   json_file: Optional[str] = None
+                   ) -> Tuple[float,float]:
     '''
+    PENDING: newer versions of dcm2niix calcuate this value.
+
     Calculates the effective echo spacing and total readout time provided several combinations of parameters.
     Several approaches and methods to calculating the effective echo spacing and total readout within this function
     differ and are dependent on the parameters found within the provided JSON sidecar. Currently, there a four 
