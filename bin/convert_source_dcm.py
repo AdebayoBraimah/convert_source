@@ -174,18 +174,20 @@ def get_red_fact(dcm_file: str) -> float:
 
     return red_fact
 
-def get_mb(dcm_file):
-    '''
-    Extracts multi-band acceleration factor from file description in the DICOM header for philips MR scanners.
+def get_mb(dcm_file: str) -> int:
+    '''Extracts multi-band acceleration factor from file description in the DICOM header for (philips MR scanners).
+    If this information cannont be inferred from the DICOM header file description - then it is assumed to be 1.
     
     N.B.: This is done via a regEx search as no DICOM tag stores this information explicitly.
     
     Arguments:
-        dcm_file (string): Absolute filepath to DICOM file
+        dcm_file: DICOM file.
         
     Returns:
-        mb (int): multi-band acceleration factor
+        Multi-band acceleration factor.
     '''
+
+    dcm_file: str = os.path.abspath(dcm_file)
 
     # Initialize mb to 1
     mb = 1
@@ -199,7 +201,6 @@ def get_mb(dcm_file):
     if match:
         mb = match.group(1)
         mb = int(mb)
-
     return mb
 
 def get_dcm_scan_tech(bids_out_dir, sub, dcm_file, search_dict, meta_dict={}, ses=1, keep_unknown=True, verbose=False):
