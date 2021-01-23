@@ -20,15 +20,14 @@ class DICOMerror(Exception):
 
 # Define functions
 
-def get_scan_time(dcm_file):
-    '''
-    Reads the scan time from the DICOM header.
+def get_scan_time(dcm_file: str) -> Union[float,str]:
+    '''Reads the scan time from the DICOM header.
 
     Arguments:
-        dcm_file (string): Absolute path to DICOM file
+        dcm_file: DICOM file.
 
     Returns:
-        scan_time (float or string): Returns acquisition duration (scan time) as a float if it exists, otherwise the string 'unknown' is returned
+        Acquisition duration (scan time, in sec.) as a float if it exists, otherwise the string 'unknown' is returned.
     '''
 
     # Load data
@@ -36,15 +35,15 @@ def get_scan_time(dcm_file):
 
     # Gets scan time
     try:
-        scan_time = ds.AcquisitionDuration
+        return ds.AcquisitionDuration
     except AttributeError:
         pass
-        scan_time = 'unknown'
-
-    return scan_time
+        return 'unknown'
 
 def get_dcm_files(dcm_dir):
     '''
+    DEPRECATED
+
     Creates a file list consisting of the first DICOM file in a parent DICOM directory. 
     A file list is then returned.
 
@@ -76,49 +75,55 @@ def get_dcm_files(dcm_dir):
 
     return dcm_files
 
-def is_valid_dcm(dcm_file, verbose=False):
-    '''
-    Checks for a valid DICOM file by inspecting the conversion type label in the DICOM file header.
+def is_valid_dcm(dcm_file: str,
+                 raise_exc: Optional[bool] = False, 
+                 verbose: Optional[bool] = False
+                 ) -> bool:
+    '''Checks for a valid DICOM file by inspecting the conversion type label in the DICOM file header.
     This field should be blank. If this label is populated, then it is likely a secondary capture image 
     and thus is not likely to contain meaningful image information.
     
     Arguments:
-        dcm_file (string): DICOM filename with absolute filepath
-        verbose (boolean): Enable verbosity
+        dcm_file: DICOM file.
+        raise_error: Raises exception in the case that execution needs to be halted.
+        verbose: Enable verbosity.
     
     Returns: 
-        is_valid (boolean): True if DICOM file is not a secondary capture (or does not have text in the conversion type label field)
+        True if DICOM file is not a secondary capture (or does not have text in the conversion type label field), and False otherwise.
     '''
+
+    dcm_file: str = os.path.abspath(dcm_file)
     
     # Read DICOM file header
     ds = pydicom.dcmread(dcm_file)
     
     # Invalid files include secondary image captures, and are not suitable for 
-    # nifti conversion as they are often not converted and cause problems.
-    # This string should be empty. If it is populated, then its likely a secondary capture.
+    # NIFTI conversion as they are often not converted and cause problems.
+    # This string should be empty. If it is populated, then it is likely a secondary capture.
     conv_type = ds.ConversionType
     
     if conv_type in '':
-        is_valid = True
+        return True
     else:
-        is_valid = False
         if verbose:
             print(f"Please check Conversion Type (0008, 0064) in dicom header. The presented DICOM file is not a valid file: {dcm_file}.")
-    
-    return is_valid
+        if raise_exc:
+            raise DICOMerror(f"Invalid DICOM series/file. Please check {dcm_file}")
+        return False
 
-def get_bwpppe(dcm_file):
-    '''
-    Reads the Bandwidth Per Pixel PhaseEncode value from a DICOM header. 
+def get_bwpppe(dcm_file: str) -> Union[float,str]:
+    '''Reads the Bandwidth Per Pixel PhaseEncode value from a DICOM header. 
     
-    Note: This DICOM field is usually left blank on Philips DICOM headers.
+    NOTE: This DICOM field is usually left blank on Philips DICOM headers.
     
     Arguments:
-        dcm_file (string): Absolute filepath to DICOM file
+        dcm_file: DICOM file.
         
     Returns:
-        bwpppe (float or string): Bandwidth Per Pixel PhaseEncode value
+        Bandwidth Per Pixel PhaseEncode value as a float, or string if unknown.
     '''
+
+    dcm_file: str = os.path.abspath(dcm_file)
     
     # Load data
     ds = pydicom.dcmread(dcm_file)
@@ -128,25 +133,24 @@ def get_bwpppe(dcm_file):
         val_str = str(ds[0x0019, 0x1028])
         val_list = val_str.split(" ")
         bwpppe = val_list[-1]
-        bwpppe = float(bwpppe)
+        return float(bwpppe)
     except (AttributeError,KeyError):
-        bwpppe = 'unknown'
         pass
-    
-    return bwpppe
+        return 'unknown'
 
-def get_red_fact(dcm_file):
-    '''
-    Extracts parallel reduction factor in-plane value (GRAPPA/SENSE) from file description in the DICOM 
+def get_red_fact(dcm_file: str) -> float:
+    '''Extracts parallel reduction factor in-plane value (GRAPPA/SENSE) from file description in the DICOM 
     header for Philips MR scanners. This reduction factor is assumed to be 1 if a value cannot be found 
     from witin the DICOM header.
     
     Arguments:
-        dcm_file (string): Absolute filepath to DICOM file
+        dcm_file: DICOM file.
         
     Returns:
-        red_fact (float): parallel reduction factor in-plane value (e.g. SENSE factor)
+        Parallel reduction factor in-plane value (e.g. SENSE factor), or 1.0 if not specified.
     '''
+
+    dcm_file: str = os.path.abspath(dcm_file)
 
     # Load dicom data
     ds = pydicom.dcmread(dcm_file)
