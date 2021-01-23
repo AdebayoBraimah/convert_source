@@ -13,6 +13,11 @@ import glob
 import utils
 import convert_source_nii as csn
 
+# Define class(es)
+
+class DICOMerror(Exception):
+    pass
+
 # Define functions
 
 def get_scan_time(dcm_file):
