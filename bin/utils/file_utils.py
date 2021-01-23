@@ -686,7 +686,7 @@ def convert_image_data(file: str,
         convert.run(log=log,env=env,dryrun=dryrun)
         
         # Copy files to output directory
-        img_data = BIDSimg(work_dir=tmp_dir.tmp_dir)
+        img_data: BIDSimg = BIDSimg(work_dir=tmp_dir.tmp_dir)
         [imgs, jsons, bvals, bvecs] = img_data.copy_img_data(target_dir=out_dir)
         
         # Clean-up
@@ -746,7 +746,7 @@ def get_recon_mat(json_file: str) -> Union[float,str]:
     # Read JSON file
     try:
         with open(json_file, "r") as read_file:
-            data = json.load(read_file)
+            data: Dict = json.load(read_file)
             return data["ReconMatrixPE"]
     except JSONDecodeError:
         pass 
@@ -767,7 +767,7 @@ def get_pix_band(json_file: str) -> Union[float,str]:
     # Read JSON file
     try:
         with open(json_file, "r") as read_file:
-            data = json.load(read_file)
+            data: Dict = json.load(read_file)
             return data["PixelBandwidth"]
     except JSONDecodeError:
         pass 
