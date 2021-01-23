@@ -335,7 +335,7 @@ def get_metadata(dictionary: Optional[Dict] = None,
         
     Returns:
         Tuple of dictionaries that contain:
-            - Common metadata dictionary
+            - Common metadata dictionary.
             - Modality specific metadata dictionaries.
     '''
 
@@ -382,8 +382,8 @@ def list_in_substr(in_list: List[str],
         False
     
     Arguments:
-        in_list (string): list containing strings used for matching.
-        in_str (string): Larger string to be searched for matches within substring.
+        in_list: List containing strings used for matching.
+        in_str: Larger string to be searched for matches within substring.
     
     Returns: 
         boolean True or False.
