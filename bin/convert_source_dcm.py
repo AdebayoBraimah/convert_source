@@ -27,7 +27,7 @@ def get_scan_time(dcm_file: str) -> Union[float,str]:
         dcm_file: DICOM file.
 
     Returns:
-        Acquisition duration (scan time, in sec.) as a float if it exists, otherwise the string 'unknown' is returned.
+        Acquisition duration (scan time, in s) as a float if it exists, otherwise the string 'unknown' is returned.
     '''
 
     # Load data

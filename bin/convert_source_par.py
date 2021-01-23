@@ -4,6 +4,7 @@ PAR REC specific functions for convert_source. Primarily intended for converting
 '''
 
 # Import packages and modules
+import os
 import re
 
 # Import third party packages and modules
@@ -12,128 +13,123 @@ import convert_source_nii as csn
 
 # Define functions
 
-def get_etl(par_file):
-    '''
-    Gets EPI factor (Echo Train Length) from Philips' PAR Header.
+def get_etl(par_file: str) -> float:
+    '''Gets EPI factor (Echo Train Length) from Philips' PAR Header.
     
     N.B.: This is done via a regEx search as the PAR header is not assumed to change significantly between scanners.
     
     Arguments:
-        par_file (string): Absolute filepath to PAR header file
+        par_file: PAR header file.
         
     Returns:
-        etl (float): Echo Train Length
+        Echo Train Length as float.
     '''
-    regexp = re.compile(r'.    EPI factor        <0,1=no EPI>     :   .*?([0-9.-]+)')  # Search string for RegEx
+    par_file: str = os.path.abspath(par_file)
+    regexp: re = re.compile(r'.    EPI factor        <0,1=no EPI>     :   .*?([0-9.-]+)')  # Search string for RegEx
     with open(par_file) as f:
         for line in f:
             match = regexp.match(line)
             if match:
                 etl = match.group(1)
-                etl = int(etl)
+                etl: int = int(etl)
     return etl
 
-def get_wfs(par_file):
-    '''
-    Gets Water Fat Shift from Philips' PAR Header.
+def get_wfs(par_file: str) -> float:
+    '''Gets Water Fat Shift from Philips' PAR Header.
     
     N.B.: This is done via a regEx search as the PAR header is not assumed to change significantly between scanners.
     
     Arguments:
-        par_file (string): Absolute filepath to PAR header file
+        par_file: PAR header file.
         
     Returns:
-        wfs (float): Water Fat Shift
+        Water Fat Shift as a float.
     '''
-    regexp = re.compile(
+    par_file: str = os.path.abspath(par_file)
+    regexp: re = re.compile(
         r'.    Water Fat shift \[pixels\]           :   .*?([0-9.-]+)')  # Search string for RegEx, escape the []
     with open(par_file) as f:
         for line in f:
             match = regexp.match(line)
             if match:
                 wfs = match.group(1)
-                wfs = float(wfs)
+                wfs: float = float(wfs)
     return wfs
 
-def get_red_fact(par_file):
-    '''
-    Extracts parallel reduction factor in-plane value (SENSE factor) from the file description in the PAR REC header 
+def get_red_fact(par_file: str) -> float:
+    '''Extracts parallel reduction factor in-plane value (SENSE factor) from the file description in the PAR REC header 
     for Philips MR scanners. This reduction factor is assumed to be 1 if a value cannot be found from witin
     the PAR REC header.
     
     N.B.: This is done via a regEx search as the PAR header is not assumed to change significantly between scanners.
     
     Arguments:
-        par_file (string): Absolute filepath to PAR header file
+        par_file: PAR header file.
         
     Returns:
-        red_fact (float): parallel reduction factor in-plane value (e.g. SENSE factor)
+        Parallel reduction factor in-plane value (e.g. SENSE factor, as a float).
     '''
     
     # Read file
-    red_fact = ""
-    regexp = re.compile(r' SENSE *?([0-9.-]+)')
+    par_file: str = os.path.abspath(par_file)
+    red_fact: str = ""
+    regexp: re = re.compile(r' SENSE *?([0-9.-]+)')
     with open(par_file) as f:
         for line in f:
             match = regexp.search(line)
             if match:
                 red_fact = match.group(1)
-                red_fact = float(red_fact)
+                red_fact: float = float(red_fact)
             else:
-                red_fact = float(1)
-
+                red_fact: float = float(1)
     return red_fact
 
-def get_mb(par_file):
-    '''
-    Extracts multi-band acceleration factor from from Philips' PAR Header.
+def get_mb(par_file: str) -> int:
+    '''Extracts multi-band acceleration factor from from Philips' PAR Header.
     
     N.B.: This is done via a regEx search as the PAR header does not normally store this value.
     
     Arguments:
-        par_file (string): Absolute filepath to PAR header file
+        par_file: Absolute filepath to PAR header file
         
     Returns:
-        mb (int): multi-band acceleration factor
+        Multi-band acceleration factor (as an int).
     '''
+    par_file: str = os.path.abspath(par_file)
 
     # Initialize mb to 1
-    mb = 1
+    mb: int = 1
     
-    regexp = re.compile(r' MB *?([0-9.-]+)')
+    regexp: re = re.compile(r' MB *?([0-9.-]+)')
     with open(par_file) as f:
         for line in f:
             match = regexp.search(line)
             if match:
                 mb = match.group(1)
-                mb = int(mb)
-
+                mb: int = int(mb)
     return mb
 
-def get_scan_time(par_file):
-    '''
-    Gets the acquisition duration (scan time, in s) from the PAR header.
+def get_scan_time(par_file: str) -> Union[float,str]:
+    '''Gets the acquisition duration (scan time, in s) from the PAR header.
     
     N.B.: This is done via a regEx search as the PAR header is not assumed to change significantly between scanners.
     
     Arguments:
-        par_file (string): Absolute filepath to PAR header file
+        par_file: PAR header file.
         
     Returns:
-        scan_time (float or string): Acquisition duration (scan time, in s). If not in header, return is a string 'unknown'
+        Acquisition duration (scan time, in s). If not in header, return is a string 'unknown'
     '''
-    
-    scan_time = 'unknown'
-    
-    regexp = re.compile(
+    par_file: str = os.path.abspath(par_file)
+    scan_time: str = 'unknown'
+    regexp: re = re.compile(
         r'.    Scan Duration \[sec\]                :   .*?([0-9.-]+)')  # Search string for RegEx, escape the []
     with open(par_file) as f:
         for line in f:
             match = regexp.match(line)
             if match:
                 scan_time = match.group(1)
-                scan_time = float(scan_time)
-
+                scan_time: float = float(scan_time)
     return scan_time
 
 def get_par_scan_tech(bids_out_dir, sub, par_file, search_dict, meta_dict={}, ses=1, keep_unknown=True, verbose=False):
