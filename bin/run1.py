@@ -4,6 +4,7 @@
 
 '''
 TODO:
+    - Add option to use dcm2nii to image conversion function.
     - Add (hidden) log file directory and .gitignore file
     - Add simpler example configurations file
     - Add file handling capabilities of task csv/tsv files
