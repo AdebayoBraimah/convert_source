@@ -32,4 +32,5 @@ def batch_convert():
     #   - [X] The categorization should be prefereably stored as a dictionary,
     #       pickled, or as an object
     # Write/re-configure wrapper function(s) to convert image data
+    #   - Re-configure directory layout and function handling.
 
