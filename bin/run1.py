@@ -28,7 +28,8 @@ def batch_convert():
     #   - [X] Use TmpDir context manager to create tmp dir to glob files
     #       for the function return
     #   - [X] Files are returned as tuple of lists (maybe should be object)?
-    # Search, find, and categorize image data for each subject and each session
-    #   - The categorization should be prefereably stored as a dictionary,
+    # [X] Search, find, and categorize image data for each subject and each session
+    #   - [X] The categorization should be prefereably stored as a dictionary,
     #       pickled, or as an object
+    # Write/re-configure wrapper function(s) to convert image data
 
