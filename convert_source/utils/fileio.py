@@ -6,13 +6,6 @@
     * Wrapper class for UNIX command line executables.
 
 Todo:
-    * [X] Add context manager methods to each class
-    * Add gzipping/gunzipping functions to File class
-        * See these links:
-            * https://stackoverflow.com/questions/8156707/gzip-a-file-in-python
-            * https://github.com/AdebayoBraimah/convert_source/blob/36382a97aca380c69b44083abefe6efba74699da/convert_source/utils.py#L114
-        * Add option to use native gzipping if available
-    * Type all initial apprearances of arguments/variables
     * Update/refactor logging class to logging decorator
     * Add List, and Dict to type hints for classes/functions
 """
@@ -25,14 +18,14 @@ import random
 import shutil
 import platform
 from typing import(
-    List, 
     Dict, 
+    List, 
     Optional, 
-    Union, 
-    Tuple
+    Tuple,
+    Union
 )
 
-# Define classes
+# Define class(es)
 class DependencyError(Exception):
     pass
 
@@ -462,7 +455,7 @@ class Command(object):
     '''
 
     def __init__(self,
-                 command: str) -> List:
+                 command: str) -> List[str]:
         '''Init doc-string for Command class. Initializes a command to be used on UNIX command line.
         The input argument is a command (string), and a mutable list is returned (, that can later
         be appended to).
@@ -517,7 +510,7 @@ class Command(object):
                 print(f"\n \t {err_msg} \n")
             else:
                 print(f"\n \t The required dependency {self.command} is not installed or in the system path. \n")
-            raise DependencyError("Command executable not found in system path.")
+            raise DependencyError(f"Command executable not found in system path: {self.command}.")
         else:
             return True
         

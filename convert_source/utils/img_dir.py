@@ -1,29 +1,27 @@
 # -*- coding: utf-8 -*-
 
-'''
-Determines file paths of child directories that contain medical images, and their corresponding image types from some parent directory. 
-Output files consists of lists written to text files with '.dir_list.txt' and '.type_list.txt' appended to them.
+'''Determines file paths of child directories that contain medical images, and their corresponding image types from some parent directory.
+Currently supports use with: DICOM, PAR REC, and NIFTI files.
 '''
 
-# Import packages & modules
 import os
 import glob
-from typing import List, Dict, Optional, Union, Tuple
+from typing import(
+    List, 
+    Tuple
+)
 
-# Import packages/modules for argument parsing
-import argparse
-
-# Define functions
+# Define function(s)
 def id_img_file(dir_names: List[str],
                 verbose: bool = False
                 ) -> List[str]:
     '''Creates list of file-types that either contain the label: DCM (DICOM), NII (NifTi), PAR (PAR REC), or Unknown.
     
     Arguments:
-        dir_names (list): Input directory names list
-        verbose (boolean): Enable verbose output
+        dir_names: Input directory names list.
+        verbose: Enable verbose output.
     Returns:
-        file_types (list): List of file-types that corresponds to input directory names list
+        List of file-types that corresponds to input directory names list.
     '''
     
     # Init empty list
@@ -61,6 +59,9 @@ def img_dir_list(directory: str,
     is a sorted list consisting of unique file paths for each image file parent directory. The corresponding file-
     types list consists of labels that are: DCM (DICOM), NII (NifTi), PAR (PAR REC), or Unknown - depending on the
     file-types in the image file parent directories.
+
+    Usage example:
+        >>> img_list, type_list = img_dir_list(img_dir)
     
     Arguments:
         directory: Parent directory that contains subject image data directories
@@ -110,10 +111,10 @@ def list_to_file(in_list: List[str],
     '''Writes some input list to some file.
     
     Arguments:
-        in_list (list): List of subjects.
-        out_file (file): Output filename.
+        in_list: List of subjects.
+        out_file: Output filename.
     Returns:
-        out_file (file): Output file.
+        Output file with list written to file.
     '''
 
     # Write list to file
@@ -134,14 +135,15 @@ def generate_img_list(directory: str,
     file types. The written files will contain '.dir_list.txt' and '.type_list.txt' appended to them.
     
     Arguments:
-        directory (directory): Input parent directory of that contain medical images somewhere in its directory structure
-        out_prefix (str): Output file prefix for written files.
-        verbose (bool): Enable verbosity.
+        directory: Input parent directory of that contain medical images somewhere in its directory structure.
+        out_prefix: Output file prefix for written files.
+        verbose: Enable verbosity.
+
     Returns:
-        dir_names (list): Child directories that contain medical images.
-        file_types (list): Corresponding file types to 'dir_names' list
-        out_file_dir (file): Output file that contains the contents of 'dir_names'
-        out_file_type (file): Output file that contains the contents of 'file_types'
+        dir_names: Child directories that contain medical images.
+        file_types: Corresponding file types to 'dir_names' list.
+        out_file_dir: Output file that contains the contents of 'dir_names'.
+        out_file_type: Output file that contains the contents of 'file_types'.
     '''
     
     # Generate directories list and child directories' file types
@@ -152,46 +154,3 @@ def generate_img_list(directory: str,
     out_file_type = list_to_file(in_list=file_types,out_file=out_prefix + ".type_list.txt")
     
     return dir_names,file_types,out_file_dir,out_file_type
-
-if __name__ == "__main__":
-
-     # Argument parser
-    parser = argparse.ArgumentParser(description="Determines file paths of child directories that contain medical images, and their corresponding image types from some parent directory. \
-                                    Output files consists of lists written to text files with '.dir_list.txt' and '.type_list.txt' appended to them.")
-
-    # Parse Arguments
-    # Required Arguments
-    reqoptions = parser.add_argument_group('Required arguments')
-    reqoptions.add_argument('-i', '--image-dir',
-                            type=str,
-                            dest="img_dir",
-                            metavar="DIR",
-                            required=True,
-                            help="Parent image directory.")
-    reqoptions.add_argument('-o', '--output',
-                            type=str,
-                            dest="out_file",
-                            metavar="STR",
-                            required=True,
-                            help="Output files' prefix.")
-
-    # Optional Arguments
-    optoptions = parser.add_argument_group('Optional arguments')
-    optoptions.add_argument('-v','--verbose',
-                            dest="verbose",
-                            required=False,
-                            action="store_true",
-                            help="Enables verbose output to screen.")
-
-    args = parser.parse_args() 
-
-    # Print help message in the case
-    # of no arguments
-    try:
-        args = parser.parse_args()
-    except SystemExit as err:
-        if err.code == 2:
-            parser.print_help()
-
-    # Run 
-    args.out_file = generate_img_list(directory=args.img_dir,out_prefix=args.out_file,verbose=args.verbose)
