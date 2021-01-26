@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-NIFTI specific functions for convert_source. Primarily intended for renaming NIFTI to be BIDS compliant.
+"""NIFTI specific functions for convert_source. Primarily intended for renaming NIFTI to be BIDS compliant.
 """
 
 # Import packages and modules

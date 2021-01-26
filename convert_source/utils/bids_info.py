@@ -128,7 +128,8 @@ def construct_bids_dict(meta_dict: Optional[Dict[str,str]] = None,
             ordered_list.append(word)
     
     # Create BIDS dictionary
-    bids_dict: Dict = dict_multi_update(**bids_info,
+    bids_dict: Dict = dict_multi_update(dictionary=None,
+                                        **bids_info,
                                         **meta_dict,
                                         **json_dict)
     
