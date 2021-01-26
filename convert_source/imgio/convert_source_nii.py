@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-'''
-NIFTI specific functions for convert_source. Primarily intended for renaming NifTi to be BIDS compliant.
-'''
+"""
+NIFTI specific functions for convert_source. Primarily intended for renaming NIFTI to be BIDS compliant.
+"""
 
 # Import packages and modules
 import os
@@ -16,13 +16,12 @@ from typing import (
     Tuple
 )
 
-# Import third party packages and modules
-import convert_source_dcm as cdm
-import convert_source_par as csp
-from utils import file_utils as utils
+# # Import third party packages and modules
+# import convert_source_dcm as cdm
+# import convert_source_par as csp
+# from utils import file_utils as utils
 
-# define functions
-
+# Define function(s)
 def get_nii_tr(nii_file: str) -> Union[float,str]:
     '''Reads the NIFTI file header and returns the repetition time (TR, sec) as a value if it is not zero, otherwise this 
     function returns the string 'unknown'.

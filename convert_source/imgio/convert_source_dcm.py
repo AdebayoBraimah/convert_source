@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-'''
-DICOM specific functions for convert_source. Primarily intended for converting and renaming DICOM files to BIDS NifTi.
-'''
+"""DICOM specific functions for convert_source. Primarily intended for converting and renaming DICOM files to BIDS NIFTI.
+"""
 
 # Import packages and modules
 import pydicom
@@ -16,17 +15,23 @@ from typing import (
     Tuple
 )
 
-# Import third party packages and modules
-import utils
-import convert_source_nii as csn
+from convert_source.utils.utils import (
+    dict_multi_update,
+    SubInfoError,
+    SubDataInfo,
+    zeropad
+)
+
+# # Import third party packages and modules
+# import utils
+# import convert_source_nii as csn
 
 # Define class(es)
 
 class DICOMerror(Exception):
     pass
 
-# Define functions
-
+# Define function(s)
 def get_scan_time(dcm_file: str) -> Union[float,str]:
     '''Reads the scan time from the DICOM header.
 
@@ -34,7 +39,7 @@ def get_scan_time(dcm_file: str) -> Union[float,str]:
         dcm_file: DICOM file.
 
     Returns:
-        Acquisition duration (scan time, in s) as a float if it exists, otherwise the string 'unknown' is returned.
+        Acquisition duration (scan time, in s) as a float if it exists, or an empty string otherwise.
     '''
 
     # Load data
@@ -45,42 +50,42 @@ def get_scan_time(dcm_file: str) -> Union[float,str]:
         return ds.AcquisitionDuration
     except AttributeError:
         pass
-        return 'unknown'
+        return ""
 
-def get_dcm_files(dcm_dir):
-    '''
-    DEPRECATED
+# def get_dcm_files(dcm_dir):
+#     '''
+#     DEPRECATED
 
-    Creates a file list consisting of the first DICOM file in a parent DICOM directory. 
-    A file list is then returned.
+#     Creates a file list consisting of the first DICOM file in a parent DICOM directory. 
+#     A file list is then returned.
 
-    Arguments:
-        dcm_dir (string): Absolute path to parent DICOM data directory
+#     Arguments:
+#         dcm_dir (string): Absolute path to parent DICOM data directory
 
-    Returns: 
-        dcm_files (list): List of DICOM filenames, complete with their absolute paths.
-    '''
+#     Returns: 
+#         dcm_files (list): List of DICOM filenames, complete with their absolute paths.
+#     '''
 
-    # Create directory list
-    dcm_dir = os.path.abspath(dcm_dir)
-    parent_dcm_dir = os.path.join(dcm_dir,'*')
-    dcm_dir_list = glob.glob(parent_dcm_dir, recursive=True)
+#     # Create directory list
+#     dcm_dir = os.path.abspath(dcm_dir)
+#     parent_dcm_dir = os.path.join(dcm_dir,'*')
+#     dcm_dir_list = glob.glob(parent_dcm_dir, recursive=True)
 
-    # Initilized dcm_file list
-    dcm_files = list()
+#     # Initilized dcm_file list
+#     dcm_files = list()
 
-    # Iterate through files in the dicom directory list
-    for dir_ in dcm_dir_list:
-    # print(dir_)
-        for root, dirs, files in os.walk(dir_):
-            tmp_dcm_file = files[0] # only need the first dicom file
-            tmp_dcm_dir = root
-            tmp_file = os.path.join(tmp_dcm_dir, tmp_dcm_file)
+#     # Iterate through files in the dicom directory list
+#     for dir_ in dcm_dir_list:
+#     # print(dir_)
+#         for root, dirs, files in os.walk(dir_):
+#             tmp_dcm_file = files[0] # only need the first dicom file
+#             tmp_dcm_dir = root
+#             tmp_file = os.path.join(tmp_dcm_dir, tmp_dcm_file)
 
-            dcm_files.append(tmp_file)
-            break
+#             dcm_files.append(tmp_file)
+#             break
 
-    return dcm_files
+#     return dcm_files
 
 def is_valid_dcm(dcm_file: str,
                  raise_exc: Optional[bool] = False, 
@@ -92,11 +97,14 @@ def is_valid_dcm(dcm_file: str,
     
     Arguments:
         dcm_file: DICOM file.
-        raise_error: Raises exception in the case that execution needs to be halted.
+        raise_exc: Raises exception in the case that execution needs to be halted.
         verbose: Enable verbosity.
     
     Returns: 
         True if DICOM file is not a secondary capture (or does not have text in the conversion type label field), and False otherwise.
+    
+    Raises:
+        DICOMerror: Error that arises if the DICOM in question is not a valid DICOM, and the 'raise_exc' option is set to True.
     '''
 
     dcm_file: str = os.path.abspath(dcm_file)
@@ -127,7 +135,7 @@ def get_bwpppe(dcm_file: str) -> Union[float,str]:
         dcm_file: DICOM file.
         
     Returns:
-        Bandwidth Per Pixel PhaseEncode value as a float, or string if unknown.
+        Bandwidth Per Pixel PhaseEncode value as a float, or empty string otherwise.
     '''
 
     dcm_file: str = os.path.abspath(dcm_file)
@@ -143,7 +151,7 @@ def get_bwpppe(dcm_file: str) -> Union[float,str]:
         return float(bwpppe)
     except (AttributeError,KeyError):
         pass
-        return 'unknown'
+        return ""
 
 def get_red_fact(dcm_file: str) -> float:
     '''Extracts parallel reduction factor in-plane value (GRAPPA/SENSE) from file description in the DICOM 
@@ -178,7 +186,6 @@ def get_red_fact(dcm_file: str) -> float:
             red_fact = float(red_fact)
         else:
             red_fact = float(1)
-
     return red_fact
 
 def get_mb(dcm_file: str) -> int:

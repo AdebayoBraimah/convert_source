@@ -910,8 +910,6 @@ def collect_info(parent_dir: str,
     # Get image directory information
     [dir_list, id_list] = img_dir_list(directory=parent_dir,
                                         verbose=False)
-    # [dir_list, id_list] = idir.img_dir_list(directory=parent_dir,
-    #                                         verbose=False)
 
     # Iterate through each subject image directory
     for img_dir in dir_list:
