@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 """Determines file paths of child directories that contain medical images, and their corresponding image types from some parent directory.
 Currently supports use with: DICOM, PAR REC, and NIFTI files.
 """

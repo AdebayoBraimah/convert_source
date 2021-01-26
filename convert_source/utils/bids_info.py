@@ -11,7 +11,7 @@ from typing import (
     Union
 )
 
-from utils import (
+from convert_source.utils.utils import (
     dict_multi_update,
     SubInfoError,
     SubDataInfo,

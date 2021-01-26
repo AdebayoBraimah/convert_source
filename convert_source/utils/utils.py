@@ -12,7 +12,6 @@ import numpy as np
 
 from json import JSONDecodeError
 from shutil import copy
-from img_dir import img_dir_list
 
 from typing import (
     List, 
@@ -23,7 +22,8 @@ from typing import (
     Union
 )
 
-from fileio import ( 
+from convert_source.utils.img_dir import img_dir_list
+from convert_source.utils.fileio import ( 
     Command, 
     DependencyError, 
     ConversionError, 
