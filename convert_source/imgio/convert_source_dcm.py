@@ -49,43 +49,7 @@ def get_scan_time(dcm_file: str) -> Union[float,str]:
     try:
         return ds.AcquisitionDuration
     except AttributeError:
-        pass
         return ""
-
-# def get_dcm_files(dcm_dir):
-#     '''
-#     DEPRECATED
-
-#     Creates a file list consisting of the first DICOM file in a parent DICOM directory. 
-#     A file list is then returned.
-
-#     Arguments:
-#         dcm_dir (string): Absolute path to parent DICOM data directory
-
-#     Returns: 
-#         dcm_files (list): List of DICOM filenames, complete with their absolute paths.
-#     '''
-
-#     # Create directory list
-#     dcm_dir = os.path.abspath(dcm_dir)
-#     parent_dcm_dir = os.path.join(dcm_dir,'*')
-#     dcm_dir_list = glob.glob(parent_dcm_dir, recursive=True)
-
-#     # Initilized dcm_file list
-#     dcm_files = list()
-
-#     # Iterate through files in the dicom directory list
-#     for dir_ in dcm_dir_list:
-#     # print(dir_)
-#         for root, dirs, files in os.walk(dir_):
-#             tmp_dcm_file = files[0] # only need the first dicom file
-#             tmp_dcm_dir = root
-#             tmp_file = os.path.join(tmp_dcm_dir, tmp_dcm_file)
-
-#             dcm_files.append(tmp_file)
-#             break
-
-#     return dcm_files
 
 def is_valid_dcm(dcm_file: str,
                  raise_exc: Optional[bool] = False, 
@@ -150,7 +114,6 @@ def get_bwpppe(dcm_file: str) -> Union[float,str]:
         bwpppe = val_list[-1]
         return float(bwpppe)
     except (AttributeError,KeyError):
-        pass
         return ""
 
 def get_red_fact(dcm_file: str) -> float:
@@ -162,7 +125,7 @@ def get_red_fact(dcm_file: str) -> float:
         dcm_file: DICOM file.
         
     Returns:
-        Parallel reduction factor in-plane value (e.g. SENSE factor), or 1.0 if not specified.
+        Parallel reduction factor in-plane value (e.g. SENSE/GRAPPA factor), or 1.0 if not specified.
     '''
 
     dcm_file: str = os.path.abspath(dcm_file)

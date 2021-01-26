@@ -24,13 +24,13 @@ from typing import (
 # Define function(s)
 def get_nii_tr(nii_file: str) -> Union[float,str]:
     '''Reads the NIFTI file header and returns the repetition time (TR, sec) as a value if it is not zero, otherwise this 
-    function returns the string 'unknown'.
+    function returns an string.
     
     Arguments:
         nii_file: NIFTI image filename with absolute filepath
         
     Returns: 
-        tr: Repetition time (TR, sec), if not zero, otherwise 'unknown' is returned.
+        tr: Repetition time (TR, sec), if not zero, or an empty string otherwise.
     '''
     
     # Load nifti file
@@ -40,12 +40,10 @@ def get_nii_tr(nii_file: str) -> Union[float,str]:
     tr = float(img.header['pixdim'][4])
     
     # Check if TR is likely
-    if tr != 0:
-        pass
+    if tr == 0:
+        return ""
     else:
-        tr = "unknown"
-    
-    return tr
+        return tr
 
 def get_num_frames(nii_file: str) -> int:
     '''Determines the number of frames/volumes/TRs in a NIFTI-2 file.
@@ -54,18 +52,15 @@ def get_num_frames(nii_file: str) -> int:
         nii_file: Absolute filepath to NIFTI image file
 
     Returns:
-        num_frames: Number of temporal frames or volumes in NIFTI file.
+        Number of temporal frames or volumes in NIFTI file.
     '''
     
     try:
         img = nib.load(nii_file)
         dims = img.header.get_data_shape()
-        num_frames = dims[3]
+        return dims[3]
     except IndexError:
-        num_frames = 1
-        pass
-    
-    return num_frames
+        return  1
 
 def get_data_params(file: str,
                     json_file: Optional[str] = None, 

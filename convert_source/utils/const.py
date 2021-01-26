@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 """Constants needed for several utility modules in convert_source.
+The constant variables contained here include:
+    * BIDS_INFO: BIDS metadata dictionary of BIDS related fields.
+    * BIDS_ORD_ARR: Ordered array of BIDS metadata fields.
+    * BIDS_PARAM: BIDS related parameters used for naming NIFTI, and their corresponding JSON files.
 """
 
 from typing import (
@@ -7,6 +11,7 @@ from typing import (
     List
 )
 
+# Empty BIDS metadata dictionary
 BIDS_INFO: Dict[str,str] = {
     # Common metadata
     ## Scanner Hardware
@@ -79,6 +84,7 @@ BIDS_INFO: Dict[str,str] = {
     "SourceDataFormat":""
 }
 
+# Ordered array of BIDS metadata fields
 BIDS_ORD_ARR: List[str] = [
     "Manufacturer",
     "ManufacturersModelName",
@@ -138,6 +144,7 @@ BIDS_ORD_ARR: List[str] = [
     "SourceDataFormat"
 ]
 
+# Empty BIDS parameter dictionary for naming files
 BIDS_PARAM: Dict[str,str] = {
     "info":{
         "sub":"",

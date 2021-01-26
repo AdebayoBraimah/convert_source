@@ -13,12 +13,18 @@ from typing import (
     Tuple
 )
 
-# Import third party packages and modules
-import utils
-import convert_source_nii as csn
+from convert_source.utils.utils import (
+    dict_multi_update,
+    SubInfoError,
+    SubDataInfo,
+    zeropad
+)
 
-# Define functions
+# # Import third party packages and modules
+# import utils
+# import convert_source_nii as csn
 
+# Define function(s)
 def get_etl(par_file: str) -> float:
     '''Gets EPI factor (Echo Train Length) from Philips' PAR Header.
     
@@ -124,10 +130,10 @@ def get_scan_time(par_file: str) -> Union[float,str]:
         par_file: PAR header file.
         
     Returns:
-        Acquisition duration (scan time, in s). If not in header, return is a string 'unknown'
+        Acquisition duration (scan time, in s). If not in header, an empty string is returned.
     '''
     par_file: str = os.path.abspath(par_file)
-    scan_time: str = 'unknown'
+    scan_time: str = ''
     regexp: re = re.compile(
         r'.    Scan Duration \[sec\]                :   .*?([0-9.-]+)')  # Search string for RegEx, escape the []
     with open(par_file) as f:
