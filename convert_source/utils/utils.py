@@ -738,9 +738,6 @@ def convert_image_data(file: str,
     convert.cmd_list.append("-f")
     convert.cmd_list.append(f"{basename}")
 
-    # Image file   
-    convert.cmd_list.append(f"{file}")
-
     # Create TmpDir object
     with TmpDir(tmp_dir=out_dir,use_cwd=False) as tmp_dir:
         # Create temporary output directory
@@ -751,6 +748,9 @@ def convert_image_data(file: str,
         
         convert.cmd_list.append("-o")
         convert.cmd_list.append(f"{tmp_dir.tmp_dir}")
+
+        # Image file   
+        convert.cmd_list.append(f"{file}")
         
         # Execute command (assumes dcm2niix is added to system path variable)
         convert.run(log=log,env=env,dryrun=dryrun)

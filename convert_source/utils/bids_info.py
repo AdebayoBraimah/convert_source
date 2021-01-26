@@ -403,6 +403,8 @@ def construct_bids_name(sub_data: SubDataInfo,
         bids_param["anat"]["run"] = run
         bids_param["anat"]["modality_label"] = modality_label
     elif modality_type.lower() == 'func':
+        if not modality_label:
+            raise BIDSNameError("Contrast/modality label required for functional data (e.g. 'bold').")
         if not task:
             raise BIDSNameError("Task label required for functional data.")
         bids_param["func"]["task"] = task
@@ -414,6 +416,8 @@ def construct_bids_name(sub_data: SubDataInfo,
         bids_param["func"]["echo"] = echo
         bids_param["func"]["modality_label"] = modality_label
     elif modality_type.lower() == 'dwi':
+        if not modality_label:
+            modality_label = "dwi"
         bids_param["dwi"]["acq"] = acq
         bids_param["dwi"]["dir"] = acq_dir
         bids_param["dwi"]["run"] = run
