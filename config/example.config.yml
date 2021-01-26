@@ -1,0 +1,42 @@
+# Example configuration file.
+
+# Heurestic search terms for each modality
+search:
+  # Anatomical scans
+  anat:
+    T1w: 
+      - T1
+
+  # Functional scans
+  func:
+    bold: 
+      rest: 
+        - rest
+      nback: 
+        - nback
+
+  # Diffusion Weighted Scans
+  dwi:
+    dwi: 
+      - diffusion
+
+# Exclusion List (these filenames are not converted)
+exclude: 
+  - SURVEY
+  - Reg
+  - ScreenCapture
+  - PD
+
+# Metadata Settings
+metadata:
+  common:
+    Manufacturer: Philips
+    ManufacturersModelName: Ingenia
+    MagneticFieldStrength: 3
+    InstitutionName: Cincinnati Children's Hospital Medical Center
+  func:
+    rest:
+      TaskName: Resting State
+    nback:
+      TaskName: N-back
+
