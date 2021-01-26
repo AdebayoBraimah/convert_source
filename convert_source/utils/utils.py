@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""File utility functions for convert_source.
+"""File utility functions for convert_source, which encapsulate file reading/writing for JSON files,
+in addition to subject and session information data collection methods.
 """
 
 import os
@@ -8,10 +9,11 @@ import gzip
 import json
 import platform
 import numpy as np
-import img_dir as idir
+# import img_dir as idir
 
 from json import JSONDecodeError
 from shutil import copy
+from img_dir import img_dir_list
 
 from typing import (
     List, 
@@ -69,6 +71,9 @@ class SubDataInfo():
             sub: Subject ID.
             data: Path to image data directory.
             ses: Session ID.
+        
+        Raises:
+            SubInfoError: Error that arises from either not specifying the subject ID or the path to the image file.
         '''
         if sub:
             self.sub: str = str(sub)
@@ -244,6 +249,37 @@ def file_to_screen(file: str) -> str:
         file_contents = f.read()
         f.close()
     return file_contents
+
+def zeropad(num: Union[str,int],
+            num_zeros: int = 2
+            ) -> str:
+    '''Zeropads a number, should that number be an int or str.
+    
+    Usage example:
+        >>> zeropad(5,2)
+        '05'
+        >>> zeropad('5',2)
+        '05'
+
+    Arguments:
+        num: Input number (as str or int) to zeropad.
+        num_zeros: Number of zeroes to pad with.
+
+    Returns:
+        Zeropadded string of the number, or the original string if the input string could not
+            be represented as an integer.
+
+    Raises:
+        TypeError: Error that arises if floats are passed as an argument.
+    '''
+    if type(num) is float:
+        raise TypeError("Only integers and strings can be used with the zeropad function.")
+    try:
+        num: str = str(num)
+        num: str = num.zfill(num_zeros)
+        return num
+    except ValueError:
+        return num
 
 def get_echo(json_file: str) -> float:
     '''Reads the echo time (TE) from the NIFTI JSON sidecar and returns it.
@@ -908,8 +944,10 @@ def collect_info(parent_dir: str,
         path_sep = "/"
     
     # Get image directory information
-    [dir_list, id_list] = idir.img_dir_list(directory=parent_dir,
-                                            verbose=False)
+    [dir_list, id_list] = img_dir_list(directory=parent_dir,
+                                        verbose=False)
+    # [dir_list, id_list] = idir.img_dir_list(directory=parent_dir,
+    #                                         verbose=False)
 
     # Iterate through each subject image directory
     for img_dir in dir_list:

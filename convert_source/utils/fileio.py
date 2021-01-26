@@ -5,7 +5,7 @@
     * Logging
     * Wrapper class for UNIX command line executables.
 
-Todo:
+TODO:
     * Update/refactor logging class to logging decorator
     * Add List, and Dict to type hints for classes/functions
 """
