@@ -14,8 +14,6 @@ TODO:
     - Add option for creating sessions TSV file(s)
 '''
 
-from utils.command_utils import Command, DependencyError
-
 def batch_convert():
 
     # [X] Read configurations file, and define search terms
@@ -35,3 +33,4 @@ def batch_convert():
     # Write/re-configure wrapper function(s) to convert image data
     #   - Re-configure directory layout and function handling.
 
+    return None
