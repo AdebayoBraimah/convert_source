@@ -57,7 +57,7 @@ def is_camel_case(s: str,
     else:
         return s != s.lower() and s != s.upper() and "_" not in s
 
-def construct_bids_json(meta_dict: Optional[Dict] = None,
+def construct_bids_dict(meta_dict: Optional[Dict] = None,
                         json_dict: Optional[Dict] = None
                         ) -> Dict:
     '''Constructs dictionary of relevant BIDS related information that includes subject and session IDs, in addition
