@@ -81,6 +81,9 @@ def construct_bids_dict(meta_dict: Optional[Dict[str,str]] = None,
 
     Returns:
         Dictionary containing BIDS related metadata.
+    
+    Raises:
+        IndexError: Error that arises if constant variables `BIDS_INFO`'s keys and BIDS_ORD_ARR are of different lengths.
     '''
     # BIDS informatino dictionary
     bids_info: Dict = BIDS_INFO
@@ -88,7 +91,11 @@ def construct_bids_dict(meta_dict: Optional[Dict[str,str]] = None,
     # OrderedDict array/list
     ordered_array: List[str] = BIDS_ORD_ARR
 
-    # TODO: Need to add parameter check to make sure dict and list are of same lennth
+    # Check that length of constant variables' indices are of the same length
+    if len(list(bids_info.keys())) == len(ordered_array):
+        pass
+    else:
+        raise IndexError("Input dictionary keys do not match ordered array. Check constant variables.")
 
     bids_dict: Dict = {}
 
