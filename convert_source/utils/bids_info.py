@@ -328,6 +328,7 @@ def construct_bids_name(sub_data: SubDataInfo,
     Raises:
         BIDSNameError: Error raised if:
             * 'anat' is the speicified modality_type, but no modality_label is specified.
+            * 'func' is the speicified modality_type, but no modality_label is specified.
             * 'func' is the speicified modality_type, but no task is specified.
             * 'fmap' is the speicified modality_type, but no fieldmap 'case' is specified.
     '''
