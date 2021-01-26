@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""working doc-string
+"""BIDS (Brain Imaging Data Structure) related exceptions, and functions for ascertaining metadata and filenames.
 """
 import os
 import glob

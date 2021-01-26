@@ -20,6 +20,7 @@ def id_img_file(dir_names: List[str],
     Arguments:
         dir_names: Input directory names list.
         verbose: Enable verbose output.
+    
     Returns:
         List of file-types that corresponds to input directory names list.
     '''
@@ -113,6 +114,7 @@ def list_to_file(in_list: List[str],
     Arguments:
         in_list: List of subjects.
         out_file: Output filename.
+    
     Returns:
         Output file with list written to file.
     '''

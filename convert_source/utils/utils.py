@@ -9,7 +9,6 @@ import gzip
 import json
 import platform
 import numpy as np
-# import img_dir as idir
 
 from json import JSONDecodeError
 from shutil import copy
@@ -33,10 +32,6 @@ from fileio import (
     File, 
     NiiFile
 )
-
-# Import third party packages and modules
-# import convert_source_dcm as cdm
-# import convert_source_par as csp
 
 # Define exceptions
 class SubInfoError(Exception):
@@ -298,37 +293,6 @@ def get_echo(json_file: str) -> float:
         data = json.load(read_file)
     echo = data.get("EchoTime")
     return echo
-
-# def get_num_runs(out_dir,scan,ses="",task="",acq="",ce="",dirs="",rec="",echo=""):
-#     '''
-
-#     * This should use a dictionary - update function later *
-
-#     Determines run number of a scan (e.g. T1w, T2w, bold, dwi etc.) in an output directory by globbing the 
-#     directory for the number of NifTis of the same scan.
-
-#     Arguments (required):
-#         out_dir (string): Absolute path to output directory
-#         scan (string): Modality (e.g. T1w, T2w, bold, dwi, etc.)
-
-#     Arguments (optional):
-#         ses (string): Session ID
-#         task (string): Task ID
-#         acq (string): Acquisition ID
-#         ce (string): Contrast Enhanced ID
-#         dirs (string): Directions ID string
-#         rec (string): Reconstruction algorithm string
-#         echo (int or string): Echo number from multi-echo functional scan
-
-#     Returns:
-#         run_num (int): Returns the run number for the specific scan
-#     '''
-
-#     runs = os.path.join(out_dir, f"*{ses}*{task}*{acq}*{ce}*{dirs}*{rec}*{echo}*{scan}*.nii*")
-#     run_num = len(glob.glob(runs))
-#     run_num = run_num + 1
-
-#     return run_num
 
 def gzip_file(file: str,
               native: bool = True
@@ -981,38 +945,6 @@ def collect_info(parent_dir: str,
         del sub, ses
     
     return data
-
-# def cp_file(file: str,
-#             work_dir: Optional[str] = None,
-#             work_name: Optional[str] = None
-#             ) -> str:
-#     '''Copies a file. Primarily intended for copying single file image data.
-    
-#     Arguments:
-#         file (string): File path to source (image) file
-#         work_dir (string): Absolute path to working directory (must exist at runtime prior to invoakation of this function). If left empty, then the directory of the source file is used.
-#         work_name (string): Output name for (image) file. If left empty, the output name is the same as the source file.
-        
-#     Returns:
-#         out_file (string): Absolute path to output file.
-#     '''
-    
-#     [file: File = File(file)
-#     [ path, filename, ext ] = file.file_parts()
-    
-#     if work_dir == "":
-#         work_dir = path
-#     else:
-#         work_dir = os.path.abspath(work_dir)
-        
-#     if work_name == "":
-#         work_name = filename
-        
-#     out_file = os.path.join(work_dir,work_name + ext)
-    
-#     shutil.copy(file,out_file)
-    
-#     return out_file
 
 def get_recon_mat(json_file: str) -> Union[float,str]:
     '''Reads ReconMatrixPE (reconstruction matrix phase encode) value from the JSON sidecar.
