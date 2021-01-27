@@ -416,6 +416,7 @@ def write_josn(json_file: str,
     Usage example:
         >>> json_file = write_josn("file.json",
         ...                        example_dict)
+        ...
 
     Arguments:
         json_file: Input JSON file.
@@ -483,9 +484,10 @@ def dict_multi_update(dictionary: Optional[Dict] = None,
         ...                              ManufacturersModelName="Ingenia",
         ...                              MagneticFieldStrength=3,
         ...                              InstitutionName="CCHMC")
+        ... 
     
     Arguments:
-        dictionary: Dictionary of key mapped items to write to JSON file.
+        dictionary: Dictionary of key mapped items to be updated.
         **kwargs: Key-value (key=value) pairs.
         
     Returns: 
@@ -501,7 +503,6 @@ def dict_multi_update(dictionary: Optional[Dict] = None,
     for key,item in kwargs.items():
         tmp_dict: Dict = {key:item}
         new_dict.update(tmp_dict)
-    
     return new_dict
 
 def get_bvals(bval_file: str) -> List[float]:
