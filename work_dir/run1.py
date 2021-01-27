@@ -4,6 +4,7 @@
 
 '''
 TODO:
+    - Remove all .DS_STORE files and add it to .gitignore.
     - NEED to make sure that session ID is either included or excluded, but cannot be inconsistent.
     - Add option to use dcm2nii to image conversion function.
     - Add (hidden) log file directory and .bidsignore file

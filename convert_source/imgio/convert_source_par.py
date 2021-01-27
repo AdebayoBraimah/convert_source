@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 """PAR REC specific functions for convert_source. Primarily intended for converting and renaming PAR REC files to BIDS NIFTI.
+
+TODO:
+    * Figure out a way to get EchoTimes from PAR header file(s).
+        * Perhaps return as list if multi-echo
+        * Return as list if multiple unique values exist.
+        * Update csn function that updates dictionary.
 """
 
 # Import packages and modules

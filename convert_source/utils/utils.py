@@ -520,20 +520,20 @@ def get_bvals(bval_file: str) -> List[float]:
     return list(np.unique(vals_nonzero))
 
 def get_metadata(dictionary: Optional[Dict] = None,
-                 scan_type: Optional [str] = None,
+                 modality_type: Optional [str] = None,
                  task: Optional[str] = None
-                 ) -> Tuple[Dict,Dict]:
+                 ) -> Tuple[Dict[str,str],Dict[str,Union[int,str]]]:
     '''Reads the metadata dictionary and looks for keywords to indicate what metadata should be written to which
     dictionary. For example, the keyword 'common' is used to indicate the common information for the imaging
     protocol and may contain information such as: field strength, phase encoding direction, institution name, etc.
     Additional keywords that are BIDS sub-directories names (e.g. anat, func, dwi) will return an additional
-    dictionary which contains metadata specific for those modalities. Func also has additional keywords based on
+    dictionary which contains metadata specific for those modalities. 'Func' also has additional keywords based on
     the task specified. If an empty dictionary is passed as an argument, then this function returns empty dictionaries
     as a result.
     
     Arguments:
         dictionary: Nested dictionary of key mapped items from the 'read_config' function.
-        scan_type: BIDS scan type (e.g. anat, func, dwi, etc.).
+        modality_type: BIDS modality type (e.g. anat, func, dwi, etc.).
         task: Task name to search in the key mapped dictionary.
         
     Returns:
@@ -552,14 +552,14 @@ def get_metadata(dictionary: Optional[Dict] = None,
     scan_param_dict: Dict = {}
     scan_task_dict: Dict = {}
     
-    # Iterate through, looking for key words (e.g. common and scan_type)
+    # Iterate through, looking for key words (e.g. common and modality_type)
     for key,item in dictionary.items():
         # BIDS common metadata fields (normally shared by all modalities)
         if key.lower() in 'common':
             com_param_dict = dictionary[key]
 
         # BIDS modality specific metadata fields
-        if key.lower() in scan_type:
+        if key.lower() in modality_type:
             scan_param_dict = dictionary[key]
             if task.lower() in scan_param_dict:
                 for dict_key,dict_item in scan_param_dict.items():
@@ -952,7 +952,7 @@ def get_recon_mat(json_file: str) -> Union[float,str]:
         json_file: BIDS JSON file.
         
     Returns:
-        Recon Matrix PE value (as a float if it exists in the file, or as a string if not in the file).
+        Recon Matrix PE value (as a float if it exists in the file, or as an empty string if not in the file).
     '''
 
     json_file: str = os.path.abspath(json_file)
@@ -963,7 +963,7 @@ def get_recon_mat(json_file: str) -> Union[float,str]:
             data: Dict = json.load(read_file)
             return data["ReconMatrixPE"]
     except JSONDecodeError:
-        return 'unknown'
+        return ''
 
 def get_pix_band(json_file: str) -> Union[float,str]:
     '''Reads pixel bandwidth value from the JSON sidecar.
@@ -972,7 +972,7 @@ def get_pix_band(json_file: str) -> Union[float,str]:
         json_file (string): BIDS JSON file.
         
     Returns:
-        Pixel bandwidth value (as a float if it exists in the file, or as a string if not in the file).
+        Pixel bandwidth value (as a float if it exists in the file, or as an empty string if not in the file).
     '''
     
     json_file: str = os.path.abspath(json_file)
@@ -983,139 +983,141 @@ def get_pix_band(json_file: str) -> Union[float,str]:
             data: Dict = json.load(read_file)
             return data["PixelBandwidth"]
     except JSONDecodeError:
-        return'unknown'
+        return''
 
-# def calc_read_time(file: str, 
-#                    json_file: Optional[str] = None
-#                    ) -> Tuple[float,float]:
-#     '''
-#     PENDING: newer versions of dcm2niix calcuate this value.
+def calc_read_time(file: str, 
+                   json_file: Optional[str] = None
+                   ) -> Tuple[float,float]:
+    '''
+    TODO:
+        * Remove 'unknown' str from this function, and replace with empty str.
 
-#     Calculates the effective echo spacing and total readout time provided several combinations of parameters.
-#     Several approaches and methods to calculating the effective echo spacing and total readout within this function
-#     differ and are dependent on the parameters found within the provided JSON sidecar. Currently, there a four 
-#     approaches for calculating the effective echo space (all with differing values) and two ways of calculating 
-#     the total readout time. It should also be noted that several of these approaches are vendor specific (e.g. at 
-#     the time of writing, 16 Jan 2019, the necessary information for approach 1 is only found in Siemens DICOM 
-#     headers - the necessary information for approach 2 is only possible if the data is stored in PAR REC format as the
-#     WaterFatShift is a private tag in the Philips DICOM header - approaches 3 and 4 are intended for Philips/GE DICOMs 
-#     as those values are anticipated to exist in their DICOM headers).
+    Calculates the effective echo spacing and total readout time provided several combinations of parameters.
+    Several approaches and methods to calculating the effective echo spacing and total readout within this function
+    differ and are dependent on the parameters found within the provided JSON sidecar. Currently, there a four 
+    approaches for calculating the effective echo space (all with differing values) and two ways of calculating 
+    the total readout time. It should also be noted that several of these approaches are vendor specific (e.g. at 
+    the time of writing, 16 Jan 2019, the necessary information for approach 1 is only found in Siemens DICOM 
+    headers - the necessary information for approach 2 is only possible if the data is stored in PAR REC format as the
+    WaterFatShift is a private tag in the Philips DICOM header - approaches 3 and 4 are intended for Philips/GE DICOMs 
+    as those values are anticipated to exist in their DICOM headers).
+
+    NOTE: This functions calculation of the Effective Echo Spacing and the Total Readout Time ASSUME that the magnetic field strength is 3T.
     
-#     The approaches are listed below:
+    The approaches are listed below:
     
-#     Approach 1 (BIDS method, Siemens):
-#         BWPPPE = BandwidthPerPixelPhaseEncode
-#         EffectiveEchoSpacing = 1/[BWPPPE * ReconMatrixPE]
-#         TotalReadoutTime = EffectiveEchoSpacing * (ReconMatrixPE - 1)
+    Approach 1 (BIDS method, Siemens):
+        BWPPPE = BandwidthPerPixelPhaseEncode
+        EffectiveEchoSpacing = 1/[BWPPPE * ReconMatrixPE]
+        TotalReadoutTime = EffectiveEchoSpacing * (ReconMatrixPE - 1)
         
-#     Approach 2 (Philips method - PAR REC):
-#         EffectiveEchoSpacing = (((1000 * WaterFatShift)/(434.215 * (EchoTrainLength + 1)))/ParallelReductionFactorInPlane)
-#         TotalReadoutTime = 0.001 * EffectiveEchoSpacing * EchoTrainLength
+    Approach 2 (Philips method - PAR REC):
+        EffectiveEchoSpacing = (((1000 * WaterFatShift)/(434.215 * (EchoTrainLength + 1)))/ParallelReductionFactorInPlane)
+        TotalReadoutTime = 0.001 * EffectiveEchoSpacing * EchoTrainLength
     
-#     Approach 3 (Philips/GE method - DICOM):
-#         EffectiveEchoSpacing = ((1/(PixelBandwidth * EchoTrainLength)) * (EchoTrainLength - 1)) * 1.3
-#         TotalReadoutTime = EffectiveEchoSpacing * (EchoTrainLength - 1)
+    Approach 3 (Philips/GE method - DICOM):
+        EffectiveEchoSpacing = ((1/(PixelBandwidth * EchoTrainLength)) * (EchoTrainLength - 1)) * 1.3
+        TotalReadoutTime = EffectiveEchoSpacing * (EchoTrainLength - 1)
         
-#     Approach 4 (Philips/GE method - DICOM):
-#         EffectiveEchoSpacing = ((1/(PixelBandwidth * ReconMatrixPE)) * (ReconMatrixPE - 1)) * 1.3
-#         tot_read_time = EffectiveEchoSpacing * (ReconMatrixPE - 1)
+    Approach 4 (Philips/GE method - DICOM):
+        EffectiveEchoSpacing = ((1/(PixelBandwidth * ReconMatrixPE)) * (ReconMatrixPE - 1)) * 1.3
+        tot_read_time = EffectiveEchoSpacing * (ReconMatrixPE - 1)
         
-#         Note: EchoTrainLength is assumed to be equal to ReconMatrixPE for approaches 3 and 4, as these values are generally close.
-#         Note: Approaches 3 and 4 appear to have about a 30% decrease in Siemens data when this was tested. The solution was to implement a fudge factor that accounted for the 30% decrease.
+        Note: EchoTrainLength is assumed to be equal to ReconMatrixPE for approaches 3 and 4, as these values are generally close.
+        Note: Approaches 3 and 4 appear to have about a 30% decrease in Siemens data when this was tested. The solution was to implement a fudge factor that accounted for the 30% decrease.
     
-#     Arguments:
-#         file (string): Absolute filepath to raw image data file (DICOM or PAR REC)
-#         json_file (string, optional): Absolute filepath to JSON sidecare
-        
-#     Returns:
-#         eff_echo_sp (float): Effective Echo Spacing
-#         tot_read_time (float): Total Readout Time
-        
-#     References:
-#     Approach 1: https://github.com/bids-standard/bids-specification/blob/master/src/04-modality-specific-files/01-magnetic-resonance-imaging-data.md
-#     Approach 2: https://osf.io/hks7x/ - page 7; 
-#     https://support.brainvoyager.com/brainvoyager/functional-analysis-preparation/29-pre-processing/78-epi-distortion-correction-echo-spacing-and-bandwidth
+    References:
+        Approach 1: https://github.com/bids-standard/bids-specification/blob/master/src/04-modality-specific-files/01-magnetic-resonance-imaging-data.md
+        Approach 2: https://osf.io/hks7x/ - page 7; 
+            https://support.brainvoyager.com/brainvoyager/functional-analysis-preparation/29-pre-processing/78-epi-distortion-correction-echo-spacing-and-bandwidth
     
-#     Forum that raised this specific issue with Philips: https://neurostars.org/t/consolidating-epi-echo-spacing-and-readout-time-for-philips-scanner/4406
+        Forum that raised this specific issue with Philips: https://neurostars.org/t/consolidating-epi-echo-spacing-and-readout-time-for-philips-scanner/4406
     
-#     Approaches 3 and 4 were found thorugh trial and error and yielded similar, but not the same values as approaches 1 and 2.
-#     '''
+        Approaches 3 and 4 were found thorugh trial and error and yielded similar, but not the same values as approaches 1 and 2.
     
-#     # check file extension
-#     if 'dcm' in file:
-#         calc_method = 'dcm'
-#     elif 'PAR' in file:
-#         calc_method = 'par'
+    Arguments:
+        file: Filepath to raw image data file (DICOM or PAR REC)
+        json_file (string, optional): Filepath to corresponding JSON sidecar.
         
-#     # Create empty string variables
-#     bwpppe = ''
-#     recon_mat = ''
-#     pix_band = ''
-#     wfs = ''
-#     etl = ''
-#     red_fact = ''
-        
-#     if calc_method.lower() == 'dcm':
-#         bwpppe = cdm.get_bwpppe(file)
-#         if json_file:
-#             recon_mat = get_recon_mat(json_file)
-#             pix_band = get_pix_band(json_file)
-#             # set bandwidth per pixel to empty if unknown
-#             try:
-#                 if bwpppe.lower() == 'unknown':
-#                     bwpppe = ''
-#             except AttributeError:
-#                 pass
-#             # set pixel bandwidth to empty if unknown
-#             try:
-#                 if pix_band.lower() == 'unknown':
-#                     pix_band = ''
-#             except AttributeError:
-#                 pass
-#             etl = recon_mat
-#     elif calc_method.lower() == 'par':
-#         wfs = csp.get_wfs(file)
-#         etl = csp.get_etl(file)
-#         red_fact = csp.get_red_fact(file)
-#         # set water fat shift to empty if unknown
-#         try:
-#             if wfs.lower() == 'unknown':
-#                 wfs = ''
-#         except AttributeError:
-#             pass
-#         # set echo train length to empty if unknown
-#         try:
-#             if etl.lower() == 'unknown':
-#                 etl = ''
-#         except AttributeError:
-#             pass
-#          # set parallel reduction factor to empty if unknown
-#         try:
-#             if red_fact.lower() == 'unknown':
-#                 red_fact = ''
-#         except AttributeError:
-#             pass
+    Returns:
+        Tuple of floats that correspond to the Effective Echo Spacing and the Total Readout Time.
+    '''
     
-#     # Calculate effective echo spacing and total readout time
-#     if bwpppe and recon_mat:
-#         eff_echo_sp = 1/(bwpppe * recon_mat)
-#         tot_read_time = eff_echo_sp * (recon_mat - 1)
-#     elif wfs and etl:
-#         if not red_fact:
-#             red_fact = 1
-#         eff_echo_sp = (((1000 * wfs)/(434.215 * (etl + 1)))/red_fact)
-#         tot_read_time = 0.001 * eff_echo_sp * etl
-#     elif pix_band and etl:
-#         eff_echo_sp = ((1/(pix_band * etl)) * (etl - 1)) * 1.3
-#         tot_read_time = eff_echo_sp * (etl - 1)
-#     elif pix_band and recon_mat:
-#         eff_echo_sp = ((1/(pix_band * recon_mat)) * (recon_mat - 1)) * 1.3
-#         tot_read_time = eff_echo_sp * (recon_mat - 1)
-#     else:
-#         eff_echo_sp = "unknown"
-#         tot_read_time = "unknown"
+    # check file extension
+    if 'dcm' in file:
+        calc_method = 'dcm'
+    elif 'PAR' in file:
+        calc_method = 'par'
         
-#     return eff_echo_sp,tot_read_time
+    # Create empty string variables
+    bwpppe = ''
+    recon_mat = ''
+    pix_band = ''
+    wfs = ''
+    etl = ''
+    red_fact = ''
+        
+    if calc_method.lower() == 'dcm':
+        bwpppe = cdm.get_bwpppe(file)
+        if json_file:
+            recon_mat = get_recon_mat(json_file)
+            pix_band = get_pix_band(json_file)
+            # set bandwidth per pixel to empty if unknown
+            try:
+                if bwpppe.lower() == 'unknown':
+                    bwpppe = ''
+            except AttributeError:
+                pass
+            # set pixel bandwidth to empty if unknown
+            try:
+                if pix_band.lower() == 'unknown':
+                    pix_band = ''
+            except AttributeError:
+                pass
+            etl = recon_mat
+    elif calc_method.lower() == 'par':
+        wfs = csp.get_wfs(file)
+        etl = csp.get_etl(file)
+        red_fact = csp.get_red_fact(file)
+        # set water fat shift to empty if unknown
+        try:
+            if wfs.lower() == 'unknown':
+                wfs = ''
+        except AttributeError:
+            pass
+        # set echo train length to empty if unknown
+        try:
+            if etl.lower() == 'unknown':
+                etl = ''
+        except AttributeError:
+            pass
+         # set parallel reduction factor to empty if unknown
+        try:
+            if red_fact.lower() == 'unknown':
+                red_fact = ''
+        except AttributeError:
+            pass
+    
+    # Calculate effective echo spacing and total readout time
+    if bwpppe and recon_mat:
+        eff_echo_sp = 1/(bwpppe * recon_mat)
+        tot_read_time = eff_echo_sp * (recon_mat - 1)
+    elif wfs and etl:
+        if not red_fact:
+            red_fact = 1
+        eff_echo_sp = (((1000 * wfs)/(434.215 * (etl + 1)))/red_fact)
+        tot_read_time = 0.001 * eff_echo_sp * etl
+    elif pix_band and etl:
+        eff_echo_sp = ((1/(pix_band * etl)) * (etl - 1)) * 1.3
+        tot_read_time = eff_echo_sp * (etl - 1)
+    elif pix_band and recon_mat:
+        eff_echo_sp = ((1/(pix_band * recon_mat)) * (recon_mat - 1)) * 1.3
+        tot_read_time = eff_echo_sp * (recon_mat - 1)
+    else:
+        eff_echo_sp = "unknown"
+        tot_read_time = "unknown"
+        
+    return eff_echo_sp,tot_read_time
 
 # def convert_anat(file,work_dir,work_name):
 #     '''

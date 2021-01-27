@@ -65,7 +65,12 @@ def get_data_params(file: str,
                     json_file: Optional[str] = None, 
                     bval_file: Optional[str] = None
                     ) -> Dict:
-    '''Creates a dictionary of key mapped parameter items that are often not written to the BIDS JSON sidecar
+    '''
+    TODO:
+        * Remove bvals from this function.
+            * Add bval function call exclusively to dwi related function calls.
+            
+    Creates a dictionary of key mapped parameter items that are often not written to the BIDS JSON sidecar
     when converting Philips DICOM and PAR REC files.
     
     Arguments:
