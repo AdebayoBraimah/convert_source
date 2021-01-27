@@ -34,7 +34,7 @@ import convert_source_par as csp
 import convert_source_nii as csn
 import utils.file_utils
 
-# Define functions
+# Define function(s)
 def read_config(config_file: str, 
                 verbose: bool = False
                 ) -> Tuple[Dict,List[str],Dict]:
