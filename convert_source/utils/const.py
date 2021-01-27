@@ -5,11 +5,15 @@ The constant variables contained here include:
     * BIDS_ORD_ARR: Ordered array of BIDS metadata fields.
     * BIDS_PARAM: BIDS related parameters used for naming NIFTI, and their corresponding JSON files.
 """
-
+import os
+import pathlib
 from typing import (
     Dict,
     List
 )
+
+# Default configuration file
+DEFAULT_CONFIG = os.path.join(str(pathlib.Path(os.path.abspath(__file__)).parents[2]),"config","config.default.yml")
 
 # Empty BIDS metadata dictionary
 BIDS_INFO: Dict[str,str] = {
