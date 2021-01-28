@@ -16,7 +16,7 @@ from typing import (
 DEFAULT_CONFIG = os.path.join(str(pathlib.Path(os.path.abspath(__file__)).parents[2]),"config","config.default.yml")
 
 # Empty BIDS metadata dictionary
-BIDS_INFO: Dict[str,str] = {
+BIDS_INFO: Dict = {
     # Common metadata
     ## Scanner Hardware
     "Manufacturer":"",
