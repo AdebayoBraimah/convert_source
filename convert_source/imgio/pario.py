@@ -184,7 +184,7 @@ def get_echo_time(par_file: str,
     # use tmp_dir here
     with TmpDir(tmp_dir=tmp_dir,use_cwd=False) as tmp:
         tmp.mk_tmp_dir()
-        with TmpDir.TmpFile(tmp_file="file.tmp.txt",tmp_dir=tmp.tmp_dir) as f:
+        with TmpDir.TmpFile(tmp_dir=tmp.tmp_dir,ext="txt") as f:
             df.to_csv(f.file,sep=",",header=False,index=False)
             mat = np.loadtxt(f.file,delimiter=",")
         tmp.rm_tmp_dir(rm_parent=False)

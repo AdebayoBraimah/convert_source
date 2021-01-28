@@ -300,9 +300,12 @@ class TmpDir(object):
             
             Usage example:
                 >>> tmp_directory = TmpDir("/path/to/temporary_directory")
-                >>> temp_file = TmpDir.TmpFile(tmp_directory.tmp_dir)
+                >>>
+                >>> temp_file = TmpDir.TmpFile(tmp_directory.tmp_dir,
+                ...                             ext="txt")
+                ...
                 >>> temp_file
-                "/path/to/temporary_directory/temporary_file"
+                "/path/to/temporary_directory/temporary_file.txt"
             
             Args:
                 tmp_dir: Temporary directory name.
