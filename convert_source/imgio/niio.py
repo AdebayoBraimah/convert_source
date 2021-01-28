@@ -15,10 +15,17 @@ from typing import (
     Tuple
 )
 
-# # Import third party packages and modules
-# import convert_source_dcm as cdm
-# import convert_source_par as csp
-# from utils import file_utils as utils
+from convert_source.utils.utils import (
+    dict_multi_update,
+    SubInfoError,
+    SubDataInfo,
+    zeropad
+)
+
+from convert_source.imgio import(
+    dcmio,
+    pario
+)
 
 # Define function(s)
 def get_nii_tr(nii_file: str) -> Union[float,str]:
@@ -65,30 +72,19 @@ def get_data_params(file: str,
                     json_file: Optional[str] = None, 
                     bval_file: Optional[str] = None
                     ) -> Dict:
-    '''
-    TODO:
-        * Remove bvals from this function.
-            * Add bval function call exclusively to dwi related function calls.
-            
-    Creates a dictionary of key mapped parameter items that are often not written to the BIDS JSON sidecar
+    '''Creates a dictionary of key mapped parameter items that are often not written to the BIDS JSON sidecar
     when converting Philips DICOM and PAR REC files.
     
     Arguments:
-        file: Absolute filepath to raw image data file (DICOM or PAR REC)
-        json_file: Corresponding JSON sidecare file
-        bval_file: Corresponding bval file for DWI acquisitions
+        file: Absolute filepath to raw image data file (DICOM or PAR REC).
+        json_file: Corresponding JSON sidecare file.
     
     Returns:
-        info: Dictionary of key mapped items/values
+        Dictionary of BIDS related key mapped items/values.
     '''
     
     # Create empty dictionary
     tmp_dict = dict()
-    
-    # Check and write bvalue(s) to file
-    if bval_file:
-        bval_list = utils.get_bvals(bval_file)
-        tmp_dict.update({"bval":bval_list})
     
     # Check file type
     if '.dcm' in file.lower():

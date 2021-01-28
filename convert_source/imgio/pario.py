@@ -32,9 +32,7 @@ from convert_source.utils.fileio import (
     TmpDir
 )
 
-# # Import third party packages and modules
-# import utils
-# import convert_source_nii as csn
+from convert_source.imgio import niio
 
 # Define exception(s)
 class PARfileReadError(Exception):
