@@ -290,26 +290,39 @@ class TmpDir(object):
         tmp_dir: str = ""
 
         def __init__(self,
-                    tmp_file: File,
-                    tmp_dir: str = "") -> None:
+                     tmp_dir: str,
+                     tmp_file: Optional[str] = "",
+                     ext: Optional[str] = "",
+                    ) -> None:
             '''Init doc-string for TmpFile class. Allows for creation of 
             a temporary file in parent class' temporary directory location.
             TmpFile also inherits methods from the File class.
             
             Usage example:
                 >>> tmp_directory = TmpDir("/path/to/temporary_directory")
-                >>> temp_file = TmpDir.TmpFile("temporary_file", tmp_directory.tmp_dir)
+                >>> temp_file = TmpDir.TmpFile(tmp_directory.tmp_dir)
                 >>> temp_file
                 "/path/to/temporary_directory/temporary_file"
             
             Args:
-                tmp_file: Temporary file name.
                 tmp_dir: Temporary directory name.
+                tmp_file: Temporary file name.
+                ext: Temporary directory file extension.
             '''
-            self.tmp_file: str = tmp_file
-            self.tmp_dir = tmp_dir
+            self.tmp_dir: str = tmp_dir
+            
+            if tmp_file:
+                self.tmp_file: str = tmp_file
+            else:
+                _n: int = 10000 # maximum N for random number generator
+                self.tmp_file: str = "tmp_file_" + str(random.randint(0,_n))
+            
+            if ext:
+                self.tmp_file: str = self.tmp_file + f".{ext}"
+
             self.tmp_file = os.path.join(self.tmp_dir,self.tmp_file)
             File.__init__(self,self.tmp_file)
+            print(self.tmp_dir)
         
 class NiiFile(File):
     '''NIFTI file class object for handling NIFTI files. Inherits methods and 
