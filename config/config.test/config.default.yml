@@ -32,8 +32,30 @@
 #     <modality_label>:
 #       
 
+# Use old dictionary schema, but include BIDs name dict or something
+
 search:
   anat:
+    - T1w: 
+      - T1
+      - TSE
+      - TFE
+      - acq:
+        - PreContrast
+      - ce:
+        - Contrast_Enhanced
+        - ContrastEnhanced
+      - rec:
+        - Recon3D
+  func:
+    - bold:
+      - rest:
+        - rsfMR
+        - rest
+        - FFE
+        - FEEPI
+      - acq:
+        - PostTask
     
 # Heurestic search terms for each modality
 # search:
