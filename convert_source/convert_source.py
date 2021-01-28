@@ -25,15 +25,15 @@ from typing import (
     Tuple
 )
 
-from utils.const import DEFAULT_CONFIG
+from convert_source.utils.const import DEFAULT_CONFIG
 
-from imgio import(
+from convert_source.imgio import(
     dcmio,
     niio,
     pario
 )
 
-from utils.utils import (
+from convert_source.utils.utils import (
     dict_multi_update,
     SubInfoError,
     SubDataInfo,
