@@ -23,6 +23,12 @@ from typing import (
 )
 
 from convert_source.utils.img_dir import img_dir_list
+
+from convert_source.imgio import(
+    dcmio,
+    pario
+)
+
 from convert_source.utils.fileio import ( 
     Command, 
     DependencyError, 
@@ -986,13 +992,9 @@ def get_pix_band(json_file: str) -> Union[float,str]:
         return''
 
 def calc_read_time(file: str, 
-                   json_file: Optional[str] = None
-                   ) -> Tuple[float,float]:
-    '''
-    TODO:
-        * Remove 'unknown' str from this function, and replace with empty str.
-
-    Calculates the effective echo spacing and total readout time provided several combinations of parameters.
+                   json_file: Optional[str] = ""
+                   ) -> Union[Tuple[float,float],Tuple[str,str]]:
+    '''Calculates the effective echo spacing and total readout time provided several combinations of parameters.
     Several approaches and methods to calculating the effective echo spacing and total readout within this function
     differ and are dependent on the parameters found within the provided JSON sidecar. Currently, there a four 
     approaches for calculating the effective echo space (all with differing values) and two ways of calculating 
@@ -1037,12 +1039,18 @@ def calc_read_time(file: str,
     
     Arguments:
         file: Filepath to raw image data file (DICOM or PAR REC)
-        json_file (string, optional): Filepath to corresponding JSON sidecar.
+        json_file: Filepath to corresponding JSON sidecar.
         
     Returns:
-        Tuple of floats that correspond to the Effective Echo Spacing and the Total Readout Time.
+        Tuple of floats that correspond to the Effective Echo Spacing and the Total Readout Time,
+            OR
+        Empty strings if the values cannot be calculated.
     '''
-    
+    file: str = os.path.abspath(file)
+
+    if json_file:
+        json_file: str = os.path.abspath(json_file)
+
     # check file extension
     if 'dcm' in file:
         calc_method = 'dcm'
@@ -1058,45 +1066,15 @@ def calc_read_time(file: str,
     red_fact = ''
         
     if calc_method.lower() == 'dcm':
-        bwpppe = cdm.get_bwpppe(file)
+        bwpppe = dcmio.get_bwpppe(file)
         if json_file:
             recon_mat = get_recon_mat(json_file)
             pix_band = get_pix_band(json_file)
-            # set bandwidth per pixel to empty if unknown
-            try:
-                if bwpppe.lower() == 'unknown':
-                    bwpppe = ''
-            except AttributeError:
-                pass
-            # set pixel bandwidth to empty if unknown
-            try:
-                if pix_band.lower() == 'unknown':
-                    pix_band = ''
-            except AttributeError:
-                pass
             etl = recon_mat
     elif calc_method.lower() == 'par':
-        wfs = csp.get_wfs(file)
-        etl = csp.get_etl(file)
-        red_fact = csp.get_red_fact(file)
-        # set water fat shift to empty if unknown
-        try:
-            if wfs.lower() == 'unknown':
-                wfs = ''
-        except AttributeError:
-            pass
-        # set echo train length to empty if unknown
-        try:
-            if etl.lower() == 'unknown':
-                etl = ''
-        except AttributeError:
-            pass
-         # set parallel reduction factor to empty if unknown
-        try:
-            if red_fact.lower() == 'unknown':
-                red_fact = ''
-        except AttributeError:
-            pass
+        wfs = pario.get_wfs(file)
+        etl = pario.get_etl(file)
+        red_fact = pario.get_red_fact(file)
     
     # Calculate effective echo spacing and total readout time
     if bwpppe and recon_mat:
@@ -1114,8 +1092,8 @@ def calc_read_time(file: str,
         eff_echo_sp = ((1/(pix_band * recon_mat)) * (recon_mat - 1)) * 1.3
         tot_read_time = eff_echo_sp * (recon_mat - 1)
     else:
-        eff_echo_sp = "unknown"
-        tot_read_time = "unknown"
+        eff_echo_sp = ""
+        tot_read_time = ""
         
     return eff_echo_sp,tot_read_time
 
