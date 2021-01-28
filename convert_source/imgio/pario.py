@@ -21,18 +21,9 @@ from typing import (
     Tuple
 )
 
-from convert_source.utils.utils import (
-    dict_multi_update,
-    SubInfoError,
-    SubDataInfo,
-    zeropad
-)
+from convert_source.utils.fileio import TmpDir
 
-from convert_source.utils.fileio import (
-    TmpDir
-)
-
-from convert_source.imgio import niio
+# from convert_source.imgio import niio
 
 # Define exception(s)
 class PARfileReadError(Exception):

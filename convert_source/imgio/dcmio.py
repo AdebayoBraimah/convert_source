@@ -15,17 +15,6 @@ from typing import (
     Tuple
 )
 
-from convert_source.utils.utils import (
-    dict_multi_update,
-    get_metadata,
-    list_in_substr,
-    SubInfoError,
-    SubDataInfo,
-    zeropad
-)
-
-from convert_source.imgio import niio
-
 # Define class(es)
 
 class DICOMerror(Exception):

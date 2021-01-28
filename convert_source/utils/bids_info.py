@@ -77,7 +77,7 @@ def construct_bids_dict(meta_dict: Optional[Dict[str,str]] = None,
 
     Arguments:
         meta_dict: Metadata dictionary that contains the relevant BIDS metadata.
-        json_dict: Dictionary constructed from the BIDS JSON file.
+        json_dict: Dictionary constructed from the BIDS JSON file, or some secondary dictionary.
 
     Returns:
         Dictionary containing BIDS related metadata.

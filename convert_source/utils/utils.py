@@ -24,11 +24,6 @@ from typing import (
 
 from convert_source.utils.img_dir import img_dir_list
 
-from convert_source.imgio import(
-    dcmio,
-    pario
-)
-
 from convert_source.utils.fileio import ( 
     Command, 
     DependencyError, 
@@ -37,6 +32,14 @@ from convert_source.utils.fileio import (
     LogFile, 
     File, 
     NiiFile
+)
+
+from convert_source.imgio.dcmio import get_bwpppe
+
+from convert_source.imgio.pario import(
+    get_etl,
+    get_red_fact,
+    get_wfs
 )
 
 # Define exceptions
@@ -1066,15 +1069,15 @@ def calc_read_time(file: str,
     red_fact = ''
         
     if calc_method.lower() == 'dcm':
-        bwpppe = dcmio.get_bwpppe(file)
+        bwpppe = get_bwpppe(file)
         if json_file:
             recon_mat = get_recon_mat(json_file)
             pix_band = get_pix_band(json_file)
             etl = recon_mat
     elif calc_method.lower() == 'par':
-        wfs = pario.get_wfs(file)
-        etl = pario.get_etl(file)
-        red_fact = pario.get_red_fact(file)
+        wfs = get_wfs(file)
+        etl = get_etl(file)
+        red_fact = get_red_fact(file)
     
     # Calculate effective echo spacing and total readout time
     if bwpppe and recon_mat:

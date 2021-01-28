@@ -15,18 +15,21 @@ from typing import (
     Tuple
 )
 
-from convert_source.utils.utils import (
-    calc_read_time,
-    dict_multi_update,
-    SubInfoError,
-    SubDataInfo,
-    zeropad
+from convert_source.imgio.dcmio import(
+    get_red_fact as dcm_red_fact,
+    get_mb as dcm_mb,
+    get_scan_time as dcm_scan_time
 )
 
-from convert_source.imgio import(
-    dcmio,
-    pario
+from convert_source.imgio.pario import(
+    get_wfs,
+    get_mb as par_mb,
+    get_red_fact as par_red_fact,
+    get_scan_time as par_scan_time,
+    get_etl
 )
+
+from convert_source.utils.utils import calc_read_time
 
 # Define function(s)
 def get_nii_tr(nii_file: str) -> Union[float,str]:
@@ -94,9 +97,9 @@ def get_data_params(file: str,
     
     # Check file type
     if '.dcm' in file.lower():
-        red_fact: float = dcmio.get_red_fact(file)
-        mb: int = dcmio.get_mb(file)
-        scan_time: Union[float,str] = dcmio.get_scan_time(file)
+        red_fact: float = dcm_red_fact(file)
+        mb: int = dcm_mb(file)
+        scan_time: Union[float,str] = dcm_scan_time(file)
         [eff_echo_sp, tot_read_time]  = calc_read_time(file,json_file)
         source_format: str = "DICOM"
         tmp_dict.update({"ParallelReductionFactorInPlane": red_fact,
@@ -106,11 +109,11 @@ def get_data_params(file: str,
                          "AcquisitionDuration": scan_time,
                          "SourceDataFormat": source_format})
     elif 'par' in file.lower():
-        wfs: float = pario.get_wfs(file)
-        red_fact: float = pario.get_red_fact(file)
-        mb: int = pario.get_mb(file)
-        scan_time: Union[float,str] = pario.get_scan_time(file)
-        etl: int = pario.get_etl(file)
+        wfs: float = get_wfs(file)
+        red_fact: float = par_red_fact(file)
+        mb: int = par_mb(file)
+        scan_time: Union[float,str] = par_scan_time(file)
+        etl: int = get_etl(file)
         [eff_echo_sp, tot_read_time]  = calc_read_time(file,json_file)
         source_format: str = "PAR REC"
         tmp_dict.update({"WaterFatShift": wfs,
