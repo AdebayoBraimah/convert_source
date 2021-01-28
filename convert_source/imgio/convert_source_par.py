@@ -36,6 +36,10 @@ from convert_source.utils.fileio import (
 # import utils
 # import convert_source_nii as csn
 
+# Define exception(s)
+class PARfileReadError(Exception):
+    pass
+
 # Define function(s)
 def get_etl(par_file: str) -> float:
     '''Gets EPI factor (Echo Train Length) from Philips' PAR Header.
@@ -155,6 +159,96 @@ def get_scan_time(par_file: str) -> Union[float,str]:
                 scan_time = match.group(1)
                 scan_time: float = float(scan_time)
     return scan_time
+
+def get_echo_time(par_file: str,
+                 tmp_dir: Optional[str] = None
+                 ) -> float:
+    '''Reads the echo time (TE, in ms) from a PAR header file.
+    
+    Usage example:
+        >>> get_echo_time(par_file="File.PAR")
+        88.0
+        
+    Arguments:
+        par_file: PAR header file.
+        tmp_dir: Path to temporary directory.
+        
+    Returns:
+        Echo time as a float.
+    '''
+    
+    # NOTE: Echo time is obtained from the PAR file header by reading in the PAR header file as a
+    #   pandas dataframe, followed by saving the resulting dataframe as a M x N | N = 35. The echo times
+    #   are stored in the resulting matrix (constructed from numpy as a numpy multi-dimensional array) in 
+    #   row 16 (count starts at 0).
+    
+    if tmp_dir:
+        pass
+    else:
+        tmp_dir: str = os.getcwd()
+    
+    par_file: str = os.path.abspath(par_file)
+        
+    df: pd.DataFrame = pd.read_csv(par_file,sep="\s+",skiprows=98)
+    df: pd.DataFrame = df.dropna(axis=0)
+    
+    # use tmp_dir here
+    with TmpDir(tmp_dir=tmp_dir,use_cwd=False) as tmp:
+        tmp.mk_tmp_dir()
+        with TmpDir.TmpFile(tmp_file="file.tmp.txt",tmp_dir=tmp.tmp_dir) as f:
+            df.to_csv(f.file,sep=",",header=False,index=False)
+            mat = np.loadtxt(f.file,delimiter=",")
+        tmp.rm_tmp_dir(rm_parent=False)
+    
+    if len(list(np.unique(mat[0:,16]))) > 1:
+        raise PARfileReadError(f"Two or more unique echo times were found in {par_file}. Please check.")
+    else:
+        return float(np.unique(mat[0:,16]))
+
+def get_flip_angle(par_file: str,
+                   tmp_dir: Optional[str] = None
+                  ) -> float:
+    '''Reads the flip angle (in degrees) from a PAR header file.
+    
+    Usage example:
+        >>> get_flip_angle(par_file="File.PAR")
+        90.0
+        
+    Arguments:
+        par_file: PAR header file.
+        tmp_dir: Path to temporary directory.
+        
+    Returns:
+        Flip angle as a float.
+    '''
+    
+    # NOTE: Flip angle is obtained from the PAR file header by reading in the PAR header file as a
+    #   pandas dataframe, followed by saving the resulting dataframe as a M x N | N = 35. The flip angles
+    #   are stored in the resulting matrix (constructed from numpy as a numpy multi-dimensional array) in 
+    #   row 21 (count starts at 0).
+    
+    if tmp_dir:
+        pass
+    else:
+        tmp_dir: str = os.getcwd()
+    
+    par_file: str = os.path.abspath(par_file)
+        
+    df: pd.DataFrame = pd.read_csv(par_file,sep="\s+",skiprows=98)
+    df: pd.DataFrame = df.dropna(axis=0)
+    
+    # use tmp_dir here
+    with TmpDir(tmp_dir=tmp_dir,use_cwd=False) as tmp:
+        tmp.mk_tmp_dir()
+        with TmpDir.TmpFile(tmp_file="file.tmp.txt",tmp_dir=tmp.tmp_dir) as f:
+            df.to_csv(f.file,sep=",",header=False,index=False)
+            mat = np.loadtxt(f.file,delimiter=",")
+        tmp.rm_tmp_dir(rm_parent=False)
+    
+    if len(list(np.unique(mat[0:,21]))) > 1:
+        raise PARfileReadError(f"Two or more unique flip angles were found in {par_file}. Please check.")
+    else:
+        return float(np.unique(mat[0:,21]))
 
 def get_par_scan_tech(bids_out_dir, sub, par_file, search_dict, meta_dict={}, ses=1, keep_unknown=True, verbose=False):
     '''
