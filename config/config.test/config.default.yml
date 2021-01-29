@@ -99,8 +99,9 @@ bids_map:
                 acq:
                     - SingleBand
                 ce:
+                    - NewContrast
                 dir:
-                rec:
+                # rec:
 
 # Metadata Settings
 metadata:
