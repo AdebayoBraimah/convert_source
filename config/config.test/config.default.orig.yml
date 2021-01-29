@@ -44,63 +44,87 @@ modality_search:
             - T2
             - T2w
             - TSE
+        flair: 
+            - flair
 
     # Functional scans
     func:
-        bold:
-            rest:
+        bold: 
+            rest: 
                 - rsfMR
                 - rest
                 - FFE
                 - FEEPI
+            visualstrobe: 
+                - vis
+                - visual
 
-bids_search:
-    # Anatomical scans
-    anat:
-        T1w:
-            acq:
-                - Axial
-            rec:
-                - MoCo
-        T2w:
-            acq:
-                - Axial
-            rec:
-                - MoCo
+    # Arterial Spin Labeling
+    asl:
+      asl: 
+        - casl
+        - pcas
 
-    # Functional scans
-    func:
-        bold:
-            rest:
-                acq:
-                    - single
-                ce:
-                dir:
-                rec:
+    # Field maps 
+    fmap:
+        fmap: 
+            - map
+
+    # Susceptiblity Weighted Images
+    swi:
+        swi: 
+            - swi 
+
+    # Diffusion Weighted Scans
+    dwi:
+        dwi: 
+            - diffusion
+            - DTI
+            - DWI
+            - 6_DIR
 
 bids_map:
     # Anatomical scans
     anat:
         T1w:
-            acq:
-                - 2D
-            rec:
-                - MotionCorrected
         T2w:
-            acq:
-                - 2D
-            rec:
-                - MotionCorrected
+        flair:
 
     # Functional scans
     func:
-        bold:
-            rest:
-                acq:
-                    - SingleBand
-                ce:
-                dir:
-                rec:
+        bold: 
+            rest: 
+            visualstrobe: 
+
+    # Arterial Spin Labeling
+    asl:
+      asl:
+
+    # Field maps 
+    fmap:
+        fmap: 
+
+    # Susceptiblity Weighted Images
+    swi:
+        swi: 
+
+    # Diffusion Weighted Scans
+    dwi:
+        dwi:
+
+# Exclusion List (these filenames are not converted)
+exclude: 
+    - SURVEY
+    - Reg
+    - SHORT
+    - LONG
+    - MRS
+    - PRESS
+    - DEFAULT
+    - ScreenCapture
+    - PD
+    - ALL
+    - SPECTRO
 
 # Metadata Settings
 metadata:
@@ -117,19 +141,12 @@ metadata:
             TaskName: Resting State
             dir: PA
             NumberOfVolumesDiscardedByScanner: 4
-
-# Exclusion List (these filenames are not converted)
-exclude: 
-    - SURVEY
-    - Reg
-    - SHORT
-    - LONG
-    - MRS
-    - PRESS
-    - DEFAULT
-    - ScreenCapture
-    - PD
-    - ALL
-    - SPECTRO
-
-
+        visualstrobe:
+            PhaseEncodingDirection: "j"
+            TaskName: Visual (Strobe) Task
+            NumberOfVolumesDiscardedByScanner: 4
+    dwi:
+        PhaseEncodingDirection: 'j'
+        dir: PA
+    fmap:
+        Units: 'Hz'
