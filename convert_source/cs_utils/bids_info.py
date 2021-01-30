@@ -11,14 +11,14 @@ from typing import (
     Union
 )
 
-from convert_source.utils.utils import (
+from convert_source.cs_utils.utils import (
     dict_multi_update,
     SubInfoError,
     SubDataInfo,
     zeropad
 )
 
-from convert_source.utils.const import (
+from convert_source.cs_utils.const import (
     BIDS_INFO,
     BIDS_ORD_ARR,
     BIDS_PARAM

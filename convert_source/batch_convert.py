@@ -25,7 +25,7 @@ from typing import (
     Tuple
 )
 
-from convert_source.utils.const import DEFAULT_CONFIG
+from convert_source.cs_utils.const import DEFAULT_CONFIG
 
 from convert_source.imgio import(
     dcmio,
@@ -33,7 +33,7 @@ from convert_source.imgio import(
     pario
 )
 
-from convert_source.utils.utils import (
+from convert_source.cs_utils.utils import (
     dict_multi_update,
     SubInfoError,
     SubDataInfo,

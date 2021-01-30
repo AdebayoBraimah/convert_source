@@ -29,7 +29,7 @@ from convert_source.imgio.pario import(
     get_etl
 )
 
-from convert_source.utils.utils import calc_read_time
+from convert_source.cs_utils.utils import calc_read_time
 
 # Define function(s)
 def get_nii_tr(nii_file: str) -> Union[float,str]:
