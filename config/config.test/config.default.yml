@@ -75,6 +75,7 @@ bids_search:
                 acq:
                     - single
                 ce:
+                    - New_Contrast
                 dir:
                 rec:
 
@@ -101,7 +102,7 @@ bids_map:
                 ce:
                     - NewContrast
                 dir:
-                # rec:
+                rec:
 
 # Metadata Settings
 metadata:
