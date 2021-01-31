@@ -27,51 +27,59 @@ from typing import (
 
 from convert_source.cs_utils.const import DEFAULT_CONFIG
 
-from convert_source.imgio import(
-    dcmio,
-    niio,
-    pario
-)
+# from convert_source.imgio import(
+#     dcmio,
+#     niio,
+#     pario
+# )
 
 from convert_source.cs_utils.utils import (
-    dict_multi_update,
-    SubInfoError,
-    SubDataInfo,
-    zeropad
+    list_dict,
+    depth,
+    list_in_substr
+)
+
+from convert_source.cs_utils.bids_info import (
+    search_bids
 )
 
 # Define function(s)
 def read_config(config_file: Optional[str] = "", 
                 verbose: Optional[bool] = False
-                ) -> Tuple[Dict[str,str],List[str],Dict[str,Union[str,int]]]:
+                ) -> Tuple[Dict[str,str],Dict,Dict,Dict,List[str]]:
     '''Reads configuration file and creates a dictionary of search terms for 
-    certain modalities provided that BIDS modalities are used as keys. If
-    exclusions are provided (via the key 'exclude') then an exclusion list is 
-    created. Otherwise, 'exclusion_list' is returned as an empty list. If 
-    additional settings are specified, they should be done so via the key
-    'metadata' to enable writing of additional metadata. Otherwise, an 
-    empty dictionary is returned.
+    each modality provided that each BIDS modality is used as a key via the 
+    keyword 'modality_search'. Should BIDS related parameter descriptions need 
+    to be used when renaming files, the related search and mapping terms can included 
+    via the keywords 'bids_search' and 'bids_map', respectively. If these keywords 
+    are not specified, then empty dictionaries are returned. Should exclusions be provided 
+    (via the key 'exclude') then an exclusion list is created. Should this not be provided, 
+    then an empty list is returned.
 
     BIDS modalities:
         - anat:
             - T1w, T2w, FLAIR, etc.
         - func:
-            - task:
-                - resting state, <task-name>
+            - bold
+                - task:
+                    - resting state, <task-name>
         - dwi
         - fmap
 
     Usage example:
-        >>> [search_dict, exclusion_list, meta_dict] = read_config(config_file)
+        >>> [search_dict, bids_search, bids_map, meta_dict, exclusion_list] = read_config(config_file)
     
     Arguments:
         config_file: File path to yaml configuration file. If no file is used, then the default configuration file is used.
         verbose: Prints additional information to screen.
     
     Returns: 
-        search_dict: Nested dictionary of search terms for BIDS modalities.
-        exclusion_list: List of exclusion terms.
-        meta_dict: Nested dictionary of metadata terms to write to JSON file(s).
+        Tuple of dictionaries and a list that consists of:
+            * search_dict: Nested dictionary of heuristic modality search terms for BIDS modalities.
+            * bids_search: Nested dictionary of heuristic BIDS search terms.
+            * bids_map: Corresponding nested dictionary of BIDS mapping terms to rename files to.
+            * meta_dict: Nested dictionary of metadata terms to write to JSON file(s).
+            * exclusion_list: List of exclusion terms.
     
     Raises:
         ConfigFileReadError: Error that arises if no heuristic search terms are provided.
@@ -89,27 +97,38 @@ def read_config(config_file: Optional[str] = "",
         if verbose:
             print("Initialized parameters from configuration file")
     
-    # Required search terms
-    if any("search" in data_map for element in data_map):
+    # Required modality search terms
+    if any("modality_search" in data_map for element in data_map):
         if verbose:
             print("Categorizing search terms")
-        search_dict: Dict[str,str] = data_map["search"]
-        del data_map["search"]
+        search_dict: Dict[str,str] = data_map["modality_search"]
+        del data_map["modality_search"]
     else:
         if verbose:
             print("Heuristic search terms required. Exiting...")
         raise ConfigFileReadError("Heuristic search terms required. Exiting...")
-
-    # Exclusion terms  
-    if any("exclude" in data_map for element in data_map):
+    
+    # BIDS search terms
+    if any("bids_search" in data_map for element in data_map):
         if verbose:
-            print("Exclusion option implemented")
-        exclusion_list: List[str] = data_map["exclude"]
-        del data_map["exclude"]
+            print("Including BIDS related search term settings")
+        bids_search: Dict[str,str] = data_map["bids_search"]
+        del data_map["bids_search"]
     else:
         if verbose:
-            print("Exclusion option not implemented")
-        exclusion_list: List = list()
+            print("No BIDS related search term settings")
+        meta_dict: Dict = dict()
+    
+    # BIDS mapping terms
+    if any("bids_map" in data_map for element in data_map):
+        if verbose:
+            print("Corresponding BIDS mapping settings")
+        bids_map: Dict[str,str] = data_map["bids_map"]
+        del data_map["bids_map"]
+    else:
+        if verbose:
+            print("No BIDS mapping settings")
+        meta_dict: Dict = dict()
     
     # Metadata terms
     if any("metadata" in data_map for element in data_map):
@@ -121,8 +140,73 @@ def read_config(config_file: Optional[str] = "",
         if verbose:
             print("No metadata settings")
         meta_dict: Dict = dict()
+    
+    # Exclusion terms  
+    if any("exclude" in data_map for element in data_map):
+        if verbose:
+            print("Exclusion option implemented")
+        exclusion_list: List[str] = data_map["exclude"]
+        del data_map["exclude"]
+    else:
+        if verbose:
+            print("Exclusion option not implemented")
+        exclusion_list: List = list()
         
-    return search_dict,exclusion_list,meta_dict
+    return (search_dict,
+            bids_search,
+            bids_map,
+            meta_dict,
+            exclusion_list)
+
+def proc_batch(s:str,
+               search_dict: Dict,
+               bids_search: Optional[Dict] = None,
+               bids_map: Optional[Dict] = None
+              ):
+    '''
+    TODO: 
+        * Use this function to search through image files
+        * This function should return lists of image data files
+            OR
+        * List of subject data (as a bids_name_dict) and the image files.
+    '''
+    # use this function to iterate through image data files and subjects
+    search_arr: List[str] = list_dict(d=search_dict)
+    
+    for i in search_arr:
+        for k,v in i.items():
+            if depth(i) == 3:
+                for k2,v2 in v.items():
+                    modality_type = k
+                    modality_label = k2
+                    mod_search = v2
+                    print(f"{modality_type} - {modality_label} - {mod_search}")
+                    # Do stuff here
+                    # Search str with mod_search list of substrings
+                    print(list_in_substr(in_list=mod_search,in_str=s))
+                    if list_in_substr(in_list=mod_search,in_str=s):
+                        bids_name_dict = search_bids(s=s,
+                                                     bids_search=bids_search,
+                                                     bids_map=bids_map,
+                                                     modality_type=modality_type,
+                                                     modality_label=modality_label)
+            elif depth(i) == 4:
+                for k2,v2 in v.items():
+                    for k3,v3 in v2.items():
+                        modality_type = k
+                        modality_label = k2
+                        task = k3
+                        mod_search = v3
+                        print(f"{modality_type} - {modality_label} - {task} - {mod_search}")
+                        # Do stuff here
+                        if list_in_substr(in_list=mod_search,in_str=s):
+                            bids_name_dict = search_bids(s=s,
+                                                         bids_search=bids_search,
+                                                         bids_map=bids_map,
+                                                         modality_type=modality_type,
+                                                         modality_label=modality_label,
+                                                         task=task)
+    # return bids_name_dict
 
 # def create_file_list(data_dir, file_ext="", order="size"):
 #     '''

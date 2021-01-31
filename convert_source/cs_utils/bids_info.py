@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 """BIDS (Brain Imaging Data Structure) related exceptions, and functions for ascertaining metadata and filenames.
+
+TODO:
+    * Perform deepcopy of all constant varibles
 """
 import os
 import glob
 from collections import OrderedDict
+from copy import deepcopy
+
 from typing import (
     Dict,
     List, 
@@ -15,7 +20,9 @@ from convert_source.cs_utils.utils import (
     dict_multi_update,
     SubInfoError,
     SubDataInfo,
-    zeropad
+    zeropad,
+    depth,
+    list_in_substr
 )
 
 from convert_source.cs_utils.const import (
@@ -74,6 +81,7 @@ def construct_bids_dict(meta_dict: Optional[Dict] = None,
     Usage example:
         >>> bids_dict = construct_bids_dict(meta_dict,
         ...                                 json_dict)
+        ...
 
     Arguments:
         meta_dict: Metadata dictionary that contains the relevant BIDS metadata.
@@ -86,10 +94,10 @@ def construct_bids_dict(meta_dict: Optional[Dict] = None,
         IndexError: Error that arises if constant variables `BIDS_INFO`'s keys and BIDS_ORD_ARR are of different lengths.
     '''
     # BIDS informatino dictionary
-    bids_info: Dict = BIDS_INFO
+    bids_info: Dict = deepcopy(BIDS_INFO)
 
     # OrderedDict array/list
-    ordered_array: List[str] = BIDS_ORD_ARR
+    ordered_array: List[str] = deepcopy(BIDS_ORD_ARR)
 
     # Check that length of constant variables' indices are of the same length
     if len(list(bids_info.keys())) == len(ordered_array):
@@ -168,6 +176,7 @@ def construct_bids_name(sub_data: SubDataInfo,
         ...                                  modality_label='bold',
         ...                                  task='rest',
         ...                                  run='01')
+        ...
 
     Arguments:
         sub_data: SubDataInfo object that contains subject and session ID.
@@ -222,7 +231,7 @@ def construct_bids_name(sub_data: SubDataInfo,
             * 'fmap' is the speicified modality_type, but no fieldmap 'case' is specified.
     '''
     # BIDS parameter dictionary
-    bids_param: Dict = BIDS_PARAM
+    bids_param: Dict = deepcopy(BIDS_PARAM)
 
     # Update subject and session ID in BIDS parameter dictionary
     bids_param["info"].update({"sub":sub_data.sub,
@@ -404,3 +413,85 @@ def num_runs(directory: Optional[str] = "",
         return zeropad(num=num,num_zeros=zero_pad)
     else:
         return num
+
+def search_bids(s: str,
+                bids_search: Optional[Dict] = None,
+                bids_map: Optional[Dict] = None,
+                modality_type: Optional[str] = "",
+                modality_label: Optional[str] = "",
+                task: Optional[str] = ""):
+    '''
+    TODO:
+        * add functionality for searching file headers
+        
+    Performs search of BIDS (or related terms) provided there are bids_search, and bids_map dictionaries, and some input
+    string (or file, represented as a string).
+    
+    Usage example:
+        >>> bids_name_dict = search_bids("image_file_0001.dcm",
+        ...                              bids_search=bids_search_dict,
+        ...                              bids_map=bids_map_dict,
+        ...                              modality_type="func",
+        ...                              modality_label="bold",
+        ...                              task="rest")
+        ...
+        
+    Arguments:
+        s: Input string (or file, represented as a string).
+        bids_search: Heurestic BIDS related search terms.
+        bids_map: Descriptive BIDS terms to be mapped to.
+        modality_type: Modality type (e.g. 'anat', 'func', 'dwi' etc).
+        modality_label: Modality label (e.g. 'T1w','bold','dwi' etc).
+        task: Task label to ...
+        
+    Returns:
+        Nested dictionary of BIDS descriptive naming related terms.
+    '''
+    # search string with BIDS search term
+    # if term is present, add BIDS mapped name to BIDS name dictionary (global, constant)
+    
+    # iterate through
+
+    bids_name_dict: Dict = deepcopy(BIDS_PARAM)
+    
+    # Set return dictionary for this condition
+    if modality_type and modality_label and bids_search and bids_map:
+        pass
+    elif modality_type and modality_label:
+        if task:
+            bids_name_dict[modality_type]['modality_label'] = modality_label
+            bids_name_dict[modality_type]['task'] = task
+        else:
+            bids_name_dict[modality_type]['modality_label'] = modality_label
+        return bids_name_dict
+    
+    if depth(bids_search[modality_type]) == 3:
+        for (k1,v1),(k2,v2) in zip(bids_search[modality_type][modality_label].items(),bids_map[modality_type][modality_label].items()):
+            try:
+                for va,vb in zip(v1,v2):
+                    # print(f"{k1} - {va} - {vb}")
+                    # print(list_in_substr(in_list=[va],in_str=s))
+                    if list_in_substr(in_list=[va],in_str=s):
+                        bids_name_dict[modality_type]['modality_label'] = modality_label
+                        bids_name_dict[modality_type][k1] = vb
+                    else:
+                        bids_name_dict[modality_type]['modality_label'] = modality_label
+            except TypeError:
+                pass
+    elif depth(bids_search[modality_type]) == 4:
+        for (k1,v1),(k2,v2) in zip(bids_search[modality_type][modality_label][task].items(),bids_map[modality_type][modality_label][task].items()):
+            try:
+                for (va,vb) in zip(v1,v2):
+                    # print(f"{k1} - {va} - {vb}")
+                    # print(list_in_substr(in_list=[va],in_str=s))
+                    if list_in_substr(in_list=[va],in_str=s):
+                        bids_name_dict[modality_type]['modality_label'] = modality_label
+                        bids_name_dict[modality_type]['task'] = task
+                        bids_name_dict[modality_type][k1] = vb
+                    else:
+                        bids_name_dict[modality_type]['modality_label'] = modality_label
+                        bids_name_dict[modality_type]['task'] = task
+            except TypeError:
+                pass
+    
+    return bids_name_dict

@@ -10,6 +10,7 @@ import json
 import platform
 import numpy as np
 
+from collections import deque
 from json import JSONDecodeError
 from shutil import copy
 
@@ -1099,6 +1100,103 @@ def calc_read_time(file: str,
         tot_read_time = ""
         
     return eff_echo_sp,tot_read_time
+
+def comp_dict(d1: Dict, 
+              d2: Dict, 
+              path: Optional[str] = "", 
+              verbose: bool = False
+             ) -> Union[bool,None]:
+    '''Compares 2 dictionaries to see if they have matching keys, and that each key maps
+    to a value (that is NOT of type None). This is performed recursively.
+    
+    Usage example:
+        >>> comp_dict(d1, d2)
+        True
+        
+    Arguments:
+        d1: Input dictionary.
+        d2: Input dictionary.
+        path: Visualized path that has been traversed.
+        verbose: Print verbose output.
+        
+    Returns:
+        Boolean 'True', raises exceptions otherwise.
+        
+    Raises:
+        KeyError: Error that arises if input dictionaries do not have matching keys.
+        ValueError: Error that arises if one or more of the keys in either dictionary map
+            NoneType values.
+    '''
+    for k in d1:
+        if (k not in d2):
+            if verbose:
+                print (path, ":")
+                print (k + " as key not in d2", "\n")
+            raise KeyError("Input dictionaries do not have matching keys")
+        else:
+            if type(d1[k]) is dict:
+                if path == "":
+                    path = k
+                else:
+                    if verbose:
+                        path = path + "->" + k
+                    pass
+                comp_dict(d1[k],d2[k], path, verbose)
+            else:
+                if d1[k] != d2[k] and (d1[k] is None or d2[k] is None):
+                    if verbose:
+                        print (path, ":")
+                        print (" - ", k," : ", d1[k])
+                        print (" + ", k," : ", d2[k])
+                    raise ValueError("One or both input BIDS dictionaries map to NoneType values.")
+    return True
+
+def depth(d: Dict) -> int:
+    '''Uses breadth-first search approach to find the depth of a dictionary.
+    
+    Usage example:
+        >>> depth(d)
+        3
+    
+    Arguments:
+        d: Input dictionary.
+        
+    Returns:
+        Number of levels in dictionary
+    '''
+    queue = deque([(id(d), d, 1)])
+    memo = set()
+    while queue:
+        id_, o, level = queue.popleft()
+        if id_ in memo:
+            continue
+        memo.add(id_)
+        if isinstance(o, dict):
+            queue += ((id(v), v, level + 1) for v in o.values())
+    return level
+
+def list_dict(d: Dict[str,str]
+             ) -> List[Dict[str,str]]:
+    '''Creates a list of dictionaries provided a nested dictionary using the
+    top-most level of the dictionaries as list (array) indices. 
+    
+    Usage example:
+        >>> list_dict(d)
+        [d1, d2, ..., dn]
+    
+    Arguments:
+        d: Input (nested) dictionary.
+        
+    Returns:
+        List of dictionaries.
+    '''
+    arr: List = []
+    for k,v in d.items():
+        tmp: Dict = {k:v}
+        arr.append(tmp)
+    return arr
+
+
 
 # def convert_anat(file,work_dir,work_name):
 #     '''
