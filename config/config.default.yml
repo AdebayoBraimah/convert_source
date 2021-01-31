@@ -27,95 +27,209 @@
 # line endings: https://forum.sublimetext.com/t/is-there-any-way-to-convert-files-line-ending-on-saving/25456/5
 
 # Heurestic search terms for each modality
-search:
-  # Anatomical scans
-  anat:
-    T1w: 
-      - T1
-      - T1w
-      - TFE
-    T2w: 
-      - T2
-      - T2w
-      - TSE
-    # flair: 
-    #   - flair
+modality_search:
+    # Anatomical scans
+    anat:
+        T1w: 
+            - T1
+            - T1w
+            - TFE
+        T2w: 
+            - T2
+            - T2w
+            - TSE
+        flair: 
+          - flair
 
-  # Functional scans
-  func:
-    bold: 
-      rest: 
-        - rsfMR
-        - rest
-        - FFE
-        - FEEPI
-      visualstrobe: 
-        - vis
-        - visual
+    # Functional scans
+    func:
+        # BOLD contrast
+        bold: 
+            rest: 
+                - rsfMR
+                - rest
+                - FFE
+                - FEEPI
+            visualstrobe: 
+                - vis
+                - visual
 
-  # # Arterial Spin Labeling
-  # asl:
-  #   asl: 
-  #     - casl
-  #     - pcas
+        # ASL (arterial spin labeling) contrast
+        cbv:
+            rest:
+                - casl
+                - pcas
 
-  # Field maps 
-  fmap:
-    fmap: 
-      - map
+    # Field maps 
+    fmap:
+        fmap: 
+            - map
 
-  # Susceptiblity Weighted Images
-  swi:
-    swi: 
-      - swi 
+    # Susceptiblity Weighted Images
+    swi:
+        swi: 
+            - swi 
 
-  # Diffusion Weighted Scans
-  dwi:
-    dwi: 
-      - diffusion
-      - DTI
-      - DWI
-      - 6_DIR
+    # Diffusion Weighted Scans
+    dwi:
+        dwi: 
+            - diffusion
+            - DTI
+            - DWI
+            - 6_DIR
 
+# Heurestic search terms for BIDS descriptive naming conventions
+bids_search:
+    # Anatomical scans
+    anat:
+        T1w:
+            acq:
+            ce:
+            rec:
+        T2w:
+            acq:
+            ce:
+            rec: 
+        flair:
+            acq:
+            ce:
+            rec: 
 
-# Exclusion List (these filenames are not converted)
-exclude: 
-  - SURVEY
-  - Reg
-  - SHORT
-  - LONG
-  - MRS
-  - PRESS
-  - DEFAULT
-  - ScreenCapture
-  - PD
-  - ALL
-  - SPECTRO
+    # Functional scans
+    func:
+        # BOLD contrast
+        bold: 
+            rest:
+                acq:
+                ce:
+                dir:
+                rec:
+            visualstrobe:
+                acq:
+                ce:
+                dir:
+                rec:
+        # ASL (arterial spin labeling) contrast
+        cbv:
+            rest:
+                acq:
+                ce:
+                dir:
+                rec:
+
+    # Field maps 
+    fmap:
+        fmap: 
+            acq:
+            # BIDS case 4: Multiple phase encoded directions ("pepolar")
+            ce:
+            dir:
+
+    # Susceptiblity Weighted Images
+    swi:
+        swi: 
+
+    # Diffusion Weighted Scans
+    dwi:
+        dwi: 
+            acq:
+            dir:
+
+# BIDS terms to map to
+bids_map:
+    # Anatomical scans
+    anat:
+        T1w:
+            acq:
+            ce:
+            rec:
+        T2w:
+            acq:
+            ce:
+            rec: 
+        flair:
+            acq:
+            ce:
+            rec: 
+
+    # Functional scans
+    func:
+        # BOLD contrast
+        bold: 
+            rest:
+                acq:
+                ce:
+                dir:
+                rec:
+            visualstrobe:
+                acq:
+                ce:
+                dir:
+                rec:
+        # ASL (arterial spin labeling) contrast
+        cbv:
+            rest:
+                acq:
+                ce:
+                dir:
+                rec:
+
+    # Field maps 
+    fmap:
+        fmap: 
+            acq:
+            # BIDS case 4: Multiple phase encoded directions ("pepolar")
+            ce:
+            dir:
+
+    # Susceptiblity Weighted Images
+    swi:
+        swi: 
+
+    # Diffusion Weighted Scans
+    dwi:
+        dwi: 
+            acq:
+            dir:
+
 
 # Metadata Settings
 metadata:
-  common:
-    Manufacturer: Philips
-    ManufacturersModelName: Ingenia
-    MagneticFieldStrength: 3
-    InstitutionName: Cincinnati Children's Hospital Medical Center
-  func:
-    rest:
-      ParallelAcquisitionTechnique: SENSE # GRAPPA, for the general term
-      PhaseEncodingDirection: 'j'
-      MultibandAccelerationFactor: 6
-      TaskName: Resting State
-      dir: PA
-      NumberOfVolumesDiscardedByScanner: 4
-    visualstrobe:
-      PhaseEncodingDirection: "j"
-      TaskName: Visual (Strobe) Task
-      NumberOfVolumesDiscardedByScanner: 4
-  dwi:
-    PhaseEncodingDirection: 'j'
-    dir: PA
-  fmap:
-    Units: 'Hz'
+    common:
+        Manufacturer: Philips
+        ManufacturersModelName: Ingenia
+        MagneticFieldStrength: 3
+        InstitutionName: Cincinnati Children's Hospital Medical Center
+    func:
+        rest:
+            ParallelAcquisitionTechnique: SENSE # GRAPPA, for the general term
+            PhaseEncodingDirection: 'j'
+            MultibandAccelerationFactor: 6
+            TaskName: Resting State
+            dir: PA
+            NumberOfVolumesDiscardedByScanner: 4
+        visualstrobe:
+            PhaseEncodingDirection: "j"
+            TaskName: Visual (Strobe) Task
+            NumberOfVolumesDiscardedByScanner: 4
+    dwi:
+        PhaseEncodingDirection: 'j'
+        dir: PA
+    fmap:
+        Units: 'Hz'
 
-# add option to create participant tsv
-# read and convert physio data(?)
+# Exclusion List (these filenames are not converted)
+exclude: 
+    - SURVEY
+    - Reg
+    - SHORT
+    - LONG
+    - MRS
+    - PRESS
+    - DEFAULT
+    - ScreenCapture
+    - PD
+    - ALL
+    - SPECTRO
+
+
