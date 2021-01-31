@@ -1,42 +1,51 @@
-# Example configuration file.
+# Example configuration file
 
 # Heurestic search terms for each modality
-search:
-  # Anatomical scans
-  anat:
-    T1w: 
-      - T1
+modality_search:
+    # Anatomical scans
+    anat:
+        T1w: 
+            - T1
+            - T1w
+        T2w: 
+            - T2
+            - T2w
 
-  # Functional scans
-  func:
-    bold: 
-      rest: 
-        - rest
-      nback: 
-        - nback
+    # Functional scans
+    func:
+        # BOLD contrast
+        bold: 
+            rest: 
+                - rsfMR
+                - rest
 
-  # Diffusion Weighted Scans
-  dwi:
-    dwi: 
-      - diffusion
+    # Diffusion Weighted Scans
+    dwi:
+        dwi: 
+            - diffusion
 
-# Exclusion List (these filenames are not converted)
-exclude: 
-  - SURVEY
-  - Reg
-  - ScreenCapture
-  - PD
 
 # Metadata Settings
 metadata:
-  common:
-    Manufacturer: Philips
-    ManufacturersModelName: Ingenia
-    MagneticFieldStrength: 3
-    InstitutionName: Cincinnati Children's Hospital Medical Center
-  func:
-    rest:
-      TaskName: Resting State
-    nback:
-      TaskName: N-back
+    common:
+        Manufacturer: Philips
+        ManufacturersModelName: Ingenia
+        MagneticFieldStrength: 3
+        InstitutionName: Cincinnati Children's Hospital Medical Center
+    func:
+        rest:
+            ParallelAcquisitionTechnique: SENSE # GRAPPA, for the general term
+            PhaseEncodingDirection: 'j'
+            MultibandAccelerationFactor: 6
+            TaskName: Resting State
+            dir: PA
+            NumberOfVolumesDiscardedByScanner: 4
+
+# Exclusion List (these filenames are not converted)
+exclude: 
+    - SURVEY
+    - Reg
+    - DEFAULT
+    - ScreenCapture
+
 

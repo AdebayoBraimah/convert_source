@@ -1008,7 +1008,7 @@ def calc_read_time(file: str,
     WaterFatShift is a private tag in the Philips DICOM header - approaches 3 and 4 are intended for Philips/GE DICOMs 
     as those values are anticipated to exist in their DICOM headers).
 
-    NOTE: This functions calculation of the Effective Echo Spacing and the Total Readout Time ASSUME that the magnetic field strength is 3T.
+    NOTE: This function's calculation of the Effective Echo Spacing and the Total Readout Time ASSUME that the magnetic field strength is 3T.
     
     The approaches are listed below:
     
