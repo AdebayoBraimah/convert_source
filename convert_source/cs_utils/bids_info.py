@@ -419,7 +419,9 @@ def search_bids(s: str,
                 bids_map: Optional[Dict] = None,
                 modality_type: Optional[str] = "",
                 modality_label: Optional[str] = "",
-                task: Optional[str] = ""):
+                task: Optional[str] = "",
+                bids_name_dict: Optional[Dict] = {}
+                ):
     '''
     TODO:
         * add functionality for searching file headers
@@ -442,7 +444,8 @@ def search_bids(s: str,
         bids_map: Descriptive BIDS terms to be mapped to.
         modality_type: Modality type (e.g. 'anat', 'func', 'dwi' etc).
         modality_label: Modality label (e.g. 'T1w','bold','dwi' etc).
-        task: Task label to ...
+        task: Task label.
+        bids_name_dict: Existing BIDS name dictionary.
         
     Returns:
         Nested dictionary of BIDS descriptive naming related terms.
@@ -451,8 +454,10 @@ def search_bids(s: str,
     # if term is present, add BIDS mapped name to BIDS name dictionary (global, constant)
     
     # iterate through
-
-    bids_name_dict: Dict = deepcopy(BIDS_PARAM)
+    if bids_name_dict:
+        pass
+    else:
+        bids_name_dict: Dict = deepcopy(BIDS_PARAM)
     
     # Set return dictionary for this condition
     if modality_type and modality_label and bids_search and bids_map:
@@ -469,8 +474,6 @@ def search_bids(s: str,
         for (k1,v1),(k2,v2) in zip(bids_search[modality_type][modality_label].items(),bids_map[modality_type][modality_label].items()):
             try:
                 for va,vb in zip(v1,v2):
-                    # print(f"{k1} - {va} - {vb}")
-                    # print(list_in_substr(in_list=[va],in_str=s))
                     if list_in_substr(in_list=[va],in_str=s):
                         bids_name_dict[modality_type]['modality_label'] = modality_label
                         bids_name_dict[modality_type][k1] = vb
@@ -482,8 +485,6 @@ def search_bids(s: str,
         for (k1,v1),(k2,v2) in zip(bids_search[modality_type][modality_label][task].items(),bids_map[modality_type][modality_label][task].items()):
             try:
                 for (va,vb) in zip(v1,v2):
-                    # print(f"{k1} - {va} - {vb}")
-                    # print(list_in_substr(in_list=[va],in_str=s))
                     if list_in_substr(in_list=[va],in_str=s):
                         bids_name_dict[modality_type]['modality_label'] = modality_label
                         bids_name_dict[modality_type]['task'] = task

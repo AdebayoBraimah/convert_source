@@ -53,6 +53,8 @@ modality_search:
                 - rest
                 - FFE
                 - FEEPI
+                - rs-func
+                - func
 
 bids_search:
     # Anatomical scans

@@ -174,7 +174,12 @@ class BIDSimg():
     def copy_img_data(self,
                       target_dir: str
                      ) -> Tuple[List[str],List[str],List[str],List[str]]:
-        '''Copies image data and their associated files to some target directory.
+        '''
+        TODO:
+            * allow option for basename while copying
+                * use File object class
+                
+        Copies image data and their associated files to some target directory.
 
         NOTE: This function resets the class attributes of the class instance with the
             returns of this function.
@@ -605,8 +610,7 @@ def list_in_substr(in_list: List[str],
     for word in in_list:
         if any(word.lower() in in_str.lower() for element in in_str.lower()):
             return True
-        else:
-            return False
+    return False
 
 def convert_image_data(file: str,
                        basename: str,
