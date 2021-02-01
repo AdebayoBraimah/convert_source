@@ -282,8 +282,8 @@ def construct_bids_name(sub_data: SubDataInfo,
             bids_param["fmap"]["case3"]["magnitude"] = "magnitude"
             bids_param["fmap"]["case3"]["fieldmap"] = "fieldmap"
         elif case_4:
-            bids_param["func"]["ce"] = ce
-            bids_param["func"]["dir"] = acq_dir
+            bids_param["fmap"]["ce"] = ce
+            bids_param["fmap"]["dir"] = acq_dir
         else:
             raise BIDSNameError("Fieldmap data was specified, however, no BIDS fieldmap case was specified.")
     elif modality_type:
@@ -455,7 +455,7 @@ def search_bids(s: str,
     
     # iterate through
     if bids_name_dict:
-        pass
+        bids_name_dict: Dict = deepcopy(bids_name_dict)
     else:
         bids_name_dict: Dict = deepcopy(BIDS_PARAM)
     
