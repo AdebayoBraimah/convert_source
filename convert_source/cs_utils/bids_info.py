@@ -158,11 +158,11 @@ def construct_bids_name(sub_data: SubDataInfo,
                         rec: Optional[str] = "",
                         run: Optional[Union[int,str]] = "",
                         echo: Optional[Union[int,str]]  = "",
-                        case_1: bool = False,
+                        case1: bool = False,
                         mag2: bool = False,
-                        case_2: bool = False,
-                        case_3: bool = False,
-                        case_4: bool = False,
+                        case2: bool = False,
+                        case3: bool = False,
+                        case4: bool = False,
                         out_dir: Optional[str] = "",
                         zero_pad: Optional[int] = 0
                         ) -> Dict:
@@ -197,24 +197,24 @@ def construct_bids_name(sub_data: SubDataInfo,
         rec: Image reconstruction description.
         run: Run number of the associated image data.
         echo: Echo number of the associated image data (, in the case of multi-echo data).
-        case_1: BIDS fieldmap case 1, set to True if the following files are present:
+        case1: BIDS fieldmap case 1, set to True if the following files are present:
             * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phasediff.nii[.gz]
             * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phasediff.json
             * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude1.nii[.gz]
             * [ sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude2.nii[.gz] ]
         mag2: Should be set to True, if case 1 contains a second magnitude image.
-        case_2: BIDS fieldmap case 2, set to True if the following files are present:
+        case2: BIDS fieldmap case 2, set to True if the following files are present:
             * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phase1.nii[.gz]
             * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phase1.json
             * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phase2.nii[.gz]
             * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phase2.json
             * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude1.nii[.gz]
             * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude2.nii[.gz]
-        case_3: BIDS fieldmap case 3, set to True if the following files are present:
+        case3: BIDS fieldmap case 3, set to True if the following files are present:
             * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude.nii[.gz]
             * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_fieldmap.nii[.gz]
             * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_fieldmap.json
-        case_4: BIDS fieldmap case 4, set to True if the following files are present:
+        case4: BIDS fieldmap case 4, set to True if the following files are present:
             * sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>]_dir-<label>[_run-<index>]_epi.nii[.gz]
             * sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>]_dir-<label>[_run-<index>]_epi.json
         out_dir: Target output directory for a subject's BIDS files.
@@ -268,20 +268,20 @@ def construct_bids_name(sub_data: SubDataInfo,
     elif modality_type.lower() == 'fmap':
         bids_param["fmap"]["acq"] = acq
         bids_param["fmap"]["run"] = run
-        if case_1:
+        if case1:
             bids_param["fmap"]["case1"]["phasediff"] = "phasediff"
             bids_param["fmap"]["case1"]["magnitude1"] = "magnitude1"
             if mag2:
                 bids_param["fmap"]["case1"]["magnitude2"] = "magnitude2"
-        elif case_2:
+        elif case2:
             bids_param["fmap"]["case2"]["phase1"] = "phase1"
             bids_param["fmap"]["case2"]["phase2"] = "phase2"
             bids_param["fmap"]["case2"]["magnitude1"] = "magnitude1"
             bids_param["fmap"]["case2"]["magnitude2"] = "magnitude2"
-        elif case_3:
+        elif case3:
             bids_param["fmap"]["case3"]["magnitude"] = "magnitude"
             bids_param["fmap"]["case3"]["fieldmap"] = "fieldmap"
-        elif case_4:
+        elif case4:
             bids_param["fmap"]["ce"] = ce
             bids_param["fmap"]["dir"] = acq_dir
         else:
@@ -325,11 +325,11 @@ def construct_bids_name(sub_data: SubDataInfo,
                                         rec=rec,
                                         run=run,
                                         echo=echo,
-                                        case_1=case_1,
+                                        case1=case1,
                                         mag2=mag2,
-                                        case_2=case_2,
-                                        case_3=case_3,
-                                        case_4=case_4)
+                                        case2=case2,
+                                        case3=case3,
+                                        case4=case4)
 
     return bids_param
 

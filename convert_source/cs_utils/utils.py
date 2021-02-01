@@ -12,6 +12,7 @@ import numpy as np
 
 from collections import deque
 from json import JSONDecodeError
+from copy import deepcopy
 from shutil import copy
 
 from typing import (
@@ -511,7 +512,7 @@ def dict_multi_update(dictionary: Optional[Dict] = None,
     
     # Create new dictionary
     if dictionary:
-        new_dict: Dict = dictionary.copy()
+        new_dict: Dict = deepcopy(dictionary)
     else:
         new_dict: Dict = {}
     
@@ -520,19 +521,25 @@ def dict_multi_update(dictionary: Optional[Dict] = None,
         new_dict.update(tmp_dict)
     return new_dict
 
-def get_bvals(bval_file: str) -> List[float]:
-    '''Reads the bvals from the (FSL-style) bvalue file and returns a list of unique non-zero bvalues
+def get_bvals(bval_file: Optional[str] = ""
+              ) -> List[int]:
+    '''Reads the bvals from the (FSL-style) bvalue file and returns a list of unique non-zero bvalues.
+    If the bval file does not exist or is not provided, then zero is returned in a list.
     
     Arguments:
         bval_file: Bval (.bval) file.
         
     Returns: 
-        List of unique, non-zero bvalues (as floats).
+        List of unique, non-zero bvalues (as ints), or zero in a list.
     '''
-    bval_file: str = os.path.abspath(bval_file)
-    vals = np.loadtxt(bval_file)
-    vals_nonzero = vals[vals.astype(bool)]
-    return list(np.unique(vals_nonzero))
+    if bval_file and os.path.exists(bval_file):
+        bval_file: str = os.path.abspath(bval_file)
+        vals = np.loadtxt(bval_file)
+        vals_nonzero = vals[vals.astype(bool)]
+        bvals = list(np.unique(vals_nonzero))
+        return [ int(i) for i in bvals ]
+    else:
+        return [0]
 
 def get_metadata(dictionary: Optional[Dict] = None,
                  modality_type: Optional [str] = None,

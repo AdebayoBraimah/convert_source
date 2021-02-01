@@ -26,7 +26,9 @@ from convert_source.imgio.pario import(
     get_mb as par_mb,
     get_red_fact as par_red_fact,
     get_scan_time as par_scan_time,
-    get_etl
+    get_etl,
+    get_echo_time as par_echo,
+    get_flip_angle as par_flip_angle
 )
 
 from convert_source.cs_utils.utils import calc_read_time
@@ -115,6 +117,8 @@ def get_data_params(file: str,
         scan_time: Union[float,str] = par_scan_time(file)
         etl: int = get_etl(file)
         [eff_echo_sp, tot_read_time]  = calc_read_time(file,json_file)
+        echo_time = par_echo(file)
+        flip_angle = par_flip_angle(file)
         source_format: str = "PAR REC"
         tmp_dict.update({"WaterFatShift": wfs,
                          "ParallelAcquisitionTechnique": 'SENSE',
@@ -124,6 +128,8 @@ def get_data_params(file: str,
                          "TotalReadoutTime": tot_read_time,
                          "AcquisitionDuration": scan_time,
                          "EchoTrainLength": etl,
+                         "EchoTime": echo_time,
+                         "FlipAngle": flip_angle,
                          "SourceDataFormat": source_format})
     elif 'nii' in file.lower():
         tr: Union[float,str] = get_nii_tr(file)
