@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Constants needed for several utility modules in convert_source.
+"""
+TODO:
+    * Add BIDSVersion to dictionary
+    * Have function that prints BIDS version to screen
+    * Store version number in file
+
+Constants needed for several utility modules in convert_source.
 The constant variables contained here include:
     * BIDS_INFO: BIDS metadata dictionary of BIDS related fields.
     * BIDS_ORD_ARR: Ordered array of BIDS metadata fields.
@@ -85,7 +91,8 @@ BIDS_INFO: Dict = {
     "Units":"",
     "IntendedFor":"",
     # Custom BIDS fields
-    "SourceDataFormat":""
+    "SourceDataFormat":"",
+    "BIDSVersion":""
 }
 
 # Ordered array of BIDS metadata fields
@@ -145,7 +152,8 @@ BIDS_ORD_ARR: List[str] = [
     "CogPOID",
     "Units",
     "IntendedFor",
-    "SourceDataFormat"
+    "SourceDataFormat",
+    "BIDSVersion"
 ]
 
 # Empty BIDS parameter dictionary for naming files

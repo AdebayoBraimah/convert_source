@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 """BIDS (Brain Imaging Data Structure) related exceptions, and functions for ascertaining metadata and filenames.
-
-TODO:
-    * Perform deepcopy of all constant varibles
 """
 import os
 import glob
@@ -421,12 +418,8 @@ def search_bids(s: str,
                 modality_label: Optional[str] = "",
                 task: Optional[str] = "",
                 bids_name_dict: Optional[Dict] = {}
-                ):
-    '''
-    TODO:
-        * add functionality for searching file headers
-        
-    Performs search of BIDS (or related terms) provided there are bids_search, and bids_map dictionaries, and some input
+                ) -> Dict:
+    '''Performs search of BIDS (or related terms) provided there are bids_search, and bids_map dictionaries, and some input
     string (or file, represented as a string).
     
     Usage example:
@@ -449,6 +442,9 @@ def search_bids(s: str,
         
     Returns:
         Nested dictionary of BIDS descriptive naming related terms.
+
+    TODO:
+        * Add functionality for searching file headers.
     '''
     # search string with BIDS search term
     # if term is present, add BIDS mapped name to BIDS name dictionary (global, constant)

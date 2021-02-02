@@ -27,12 +27,6 @@ from typing import (
 
 from convert_source.cs_utils.const import DEFAULT_CONFIG
 
-# from convert_source.imgio import(
-#     dcmio,
-#     niio,
-#     pario
-# )
-
 from convert_source.cs_utils.utils import (
     list_dict,
     depth,

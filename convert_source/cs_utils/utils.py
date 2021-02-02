@@ -2,12 +2,13 @@
 """File utility functions for convert_source, which encapsulate file reading/writing for JSON files,
 in addition to subject and session information data collection methods.
 """
-
 import os
 import glob
 import gzip
 import json
 import platform
+import re
+import pydicom
 import numpy as np
 
 from collections import deque
@@ -175,12 +176,7 @@ class BIDSimg():
     def copy_img_data(self,
                       target_dir: str
                      ) -> Tuple[List[str],List[str],List[str],List[str]]:
-        '''
-        TODO:
-            * allow option for basename while copying
-                * use File object class
-                
-        Copies image data and their associated files to some target directory.
+        '''Copies image data and their associated files to some target directory.
 
         NOTE: This function resets the class attributes of the class instance with the
             returns of this function.
@@ -1207,109 +1203,234 @@ def list_dict(d: Dict[str,str]
         arr.append(tmp)
     return arr
 
+def get_par_scan_tech(par_file: str,
+                      search_dict: Dict
+                      ) -> Tuple[str,str,str]:
+    '''Searches PAR file header for scan technique/MR modality used in accordance with the search terms provided by the
+    nested heursitic search dictionary. A regular expression (regEx) search string is defined and is searched in the 
+    PAR header file.
+    
+    Usage example:
+        >>> [modality_type, modality_label, task] = get_par_scan_tech(par_file,
+        ...                                                           search_dict)
+        ...
 
+    Arguments:
+        par_file: PAR filename.
+        search_dict: Nested heursitic search dictionary (from the `read_config` function).
+    
+    Returns: 
+        Tuple of strings that consist of:
+            * modality_type: Modality type (e.g. 'anat', 'func', etc.)
+            * modality_label: Modality label (e.g. 'T1w','bold', etc.)
+            * task: Task name.
+    '''
+    par_file: str = os.path.abspath(par_file)
 
-# def convert_anat(file,work_dir,work_name):
-#     '''
-#     Converts raw anatomical (and functional) MR images to NifTi file format, with a BIDS JSON sidecar.
-#     Returns a NifTi file and a JSON sidecar (file) by globbing an isolated directory.
-    
-#     Arguments:
-#         file (string): Absolute filepath to raw image data
-#         work_dir (string): Working directory
-#         work_name (string): Output file name
-        
-#     Returns:
-#         nii_file (string): Absolute file path to NifTi image
-#         json_file (string): Absolute file path to JSON sidecar
-#     '''
-    
-#     # Convert (anatomical) iamge data
-#     convert_image_data(file, work_name, work_dir)
-    
-#     # Get files
-#     dir_path = os.path.join(work_dir, work_name)
-#     nii_file = glob.glob(dir_path + '*.nii*')
-#     json_file = glob.glob(dir_path + '*.json')
-    
-#     # Convert lists to strings
-#     nii_file = ''.join(nii_file)
-#     json_file = ''.join(json_file)
-    
-#     return nii_file, json_file
+    search_arr: List[str] = list_dict(d=search_dict)
 
-# def convert_dwi(file,work_dir,work_name):
-#     '''
-#     Converts raw diffusion weigthed MR images to NifTi file format, with a BIDS JSON sidecar.
-#     Returns a NifTi file, JSON sidecar (file), and (FSL-style) bval and bvec files by globbing 
-#     an isolated directory.
-    
-#     Arguments:
-#         file (string): Absolute filepath to raw image data
-#         work_dir (string): Working directory
-#         work_name (string): Output file name
-        
-#     Returns:
-#         nii_file (string): Absolute file path to NifTi image
-#         json_file (string): Absolute file path to JSON sidecar
-#         bval (string): Absolute file path to bval file
-#         bvec (string): Absolute file path to bvec file
-#     '''
-    
-#     # Convert diffusion iamge data
-#     convert_image_data(file, work_name, work_dir)
-    
-#     # Get files
-#     dir_path = os.path.join(work_dir, work_name)
-#     nii_file = glob.glob(dir_path + '*.nii*')
-#     json_file = glob.glob(dir_path + '*.json')
-#     bval = glob.glob(dir_path + '*.bval*')
-#     bvec = glob.glob(dir_path + '*.bvec*')
-    
-#     # Convert lists to strings
-#     nii_file = ''.join(nii_file)
-#     json_file = ''.join(json_file)
-#     bval = ''.join(bval)
-#     bvec = ''.join(bvec)
-    
-#     return nii_file, json_file, bval, bvec
+    mod_found: bool = False
 
-# def convert_fmap(file,work_dir,work_name):
-#     '''
-#     Converts raw precomputed fieldmap MR images to NifTi file format, with a BIDS JSON sidecar.
-#     Returns two NifTi files, and their corresponding JSON sidecars (files), by globbing an isolated directory.
+    # Define regEx search string
+    regexp: re = re.compile(r'.    Technique                          :  .*', re.M | re.I)
     
-#     N.B.: This function is mainly designed to handle fieldmap data case 3 from bids-specifications document. Furhter support for 
-#     the additional cases requires test/validation data. 
-#     BIDS-specifications document located here: 
-#     https://github.com/bids-standard/bids-specification/blob/master/src/04-modality-specific-files/01-magnetic-resonance-imaging-data.md
-    
-#     Arguments:
-#         file (string): Absolute filepath to raw image data
-#         work_dir (string): Working directory
-#         work_name (string): Output file name
-        
-#     Returns:
-#         nii_fmap (string): Absolute file path to NifTi image fieldmap
-#         json_fmap (string): Absolute file path to corresponding JSON sidecar
-#         nii_mag (string): Absolute file path to NifTi magnitude image
-#         json_mag (string): Absolute file path to corresponding JSON sidecar
-#     '''
-    
-#     # Convert diffusion iamge data
-#     convert_image_data(file, work_name, work_dir)
-    
-#     # Get files
-#     dir_path = os.path.join(work_dir, work_name)
-#     nii_fmap = glob.glob(dir_path + '*real*.nii*')
-#     json_fmap = glob.glob(dir_path + '*real*.json')
-#     nii_mag = glob.glob(dir_path + '.nii*')
-#     json_mag = glob.glob(dir_path + '.json')
-    
-#     # Convert lists to strings
-#     nii_fmap = ''.join(nii_fmap)
-#     json_fmap = ''.join(json_fmap)
-#     nii_mag = ''.join(nii_mag)
-#     json_mag = ''.join(json_mag)
+    # Open and search PAR header file
+    with open(par_file) as f:
+        for line in f:
+            match_ = regexp.match(line)
+            if match_:
+                par_scan_tech_str: str = match_.group()
 
-#     return nii_fmap, json_fmap, nii_mag, json_mag
+    if par_scan_tech_str:
+        pass
+    else:
+        return "","",""
+    
+    # Set returns to empty strings
+    modality_type: str = ""
+    modality_label: str = ""
+    task: str = ""
+
+    # Use matching string in search dictionary
+    for i in search_arr:
+        if mod_found:
+            break
+        for k,v in i.items():
+            if depth(i) == 3:
+                for k2,v2 in v.items():
+                    mod_type: str = k
+                    mod_label: str = k2
+                    mod_task: str = ""
+                    mod_search: List[str] = v2
+                    if list_in_substr(in_list=mod_search,in_str=par_scan_tech_str):
+                        mod_found: bool = True
+                        modality_type: str = mod_type
+                        modality_label: str = mod_label
+                        task: str = mod_task
+            elif depth(i) == 4:
+                for k2,v2 in v.items():
+                    for k3,v3 in v2.items():
+                        mod_type: str = k
+                        mod_label: str = k2
+                        mod_task: str = k3
+                        mod_search: List[str] = v3
+                        if list_in_substr(in_list=mod_search,in_str=par_scan_tech_str):
+                            mod_found: bool = True
+                            modality_type: str = mod_type
+                            modality_label: str = mod_label
+                            task: str = mod_task
+
+    return (modality_type, 
+            modality_label, 
+            task)
+
+def get_dcm_scan_tech(dcm_file: str,
+                      search_dict: Dict
+                      ) -> Tuple[str,str,str]:
+    '''Searches DICOM file header for scan technique/MR modality used in accordance with the search terms provided by the
+    nested heursitic search dictionary. The DICOM header field searched is a Philips DICOM private tag (2001,1020) [Scanning 
+    Technique Description MR]. In the case that matches are found in that field, is empty, or does not exist - then common 
+    DICOM tags are searched which include: 
+        * Series Description
+        * Protocol Name
+        * Image Type.
+    
+    Usage example:
+        >>> [modality_type, modality_label, task] = get_dcm_scan_tech(dcm_file,
+        ...                                                           search_dict)
+        ...
+    
+    Arguments:
+        dcm_file: DICOM filename.
+        search_dict: Nested heursitic search dictionary (from the `read_config` function).
+    
+    Returns: 
+        Tuple of strings that consist of:
+            * modality_type: Modality type (e.g. 'anat', 'func', etc.)
+            * modality_label: Modality label (e.g. 'T1w','bold', etc.)
+            * task: Task name.
+    '''
+    dcm_file: str = os.path.abspath(dcm_file)
+
+    search_arr: List[str] = list_dict(d=search_dict)
+
+    mod_found: bool = False
+
+    # Set returns to empty strings
+    modality_type: str = ""
+    modality_label: str = ""
+    task: str = ""
+
+    ds = pydicom.dcmread(dcm_file)
+
+    # Search DICOM header for Scan Technique
+    dcm_scan_tech_str = str(ds[0x2001,0x1020])
+
+    # Use dictionary to search in string
+    for i in search_arr:
+        if mod_found:
+            break
+        for k,v in i.items():
+            if depth(i) == 3:
+                for k2,v2 in v.items():
+                    mod_type: str = k
+                    mod_label: str = k2
+                    mod_task: str = ""
+                    mod_search: List[str] = v2
+                    if list_in_substr(in_list=mod_search,in_str=dcm_scan_tech_str):
+                        mod_found: bool = True
+                        modality_type: str = mod_type
+                        modality_label: str = mod_label
+                        task: str = mod_task
+            elif depth(i) == 4:
+                for k2,v2 in v.items():
+                    for k3,v3 in v2.items():
+                        mod_type: str = k
+                        mod_label: str = k2
+                        mod_task: str = k3
+                        mod_search: List[str] = v3
+                        if list_in_substr(in_list=mod_search,in_str=dcm_scan_tech_str):
+                            mod_found: bool = True
+                            modality_type: str = mod_type
+                            modality_label: str = mod_label
+                            task: str = mod_task
+
+    if mod_found:
+        return (modality_type, 
+                modality_label, 
+                task)
+
+    # Secondary searches in the case that the Private Tag/Field (2001, 1020) [Scanning Technique Description MR] search is unsucessful
+
+    # Define list of DICOM header fields to search
+    dcm_fields = ['SeriesDescription', 'ImageType', 'ProtocolName']
+
+    for dcm_field in dcm_fields:
+            dcm_scan_tech_str = str(eval(f"ds.{dcm_field}")) # This makes me dangerously uncomfortable
+
+            # Use dictionary to search in string
+            for i in search_arr:
+                if mod_found:
+                    break
+                for k,v in i.items():
+                    if depth(i) == 3:
+                        for k2,v2 in v.items():
+                            mod_type: str = k
+                            mod_label: str = k2
+                            mod_task: str = ""
+                            mod_search: List[str] = v2
+                            if list_in_substr(in_list=mod_search,in_str=dcm_scan_tech_str):
+                                mod_found: bool = True
+                                modality_type: str = mod_type
+                                modality_label: str = mod_label
+                                task: str = mod_task
+                    elif depth(i) == 4:
+                        for k2,v2 in v.items():
+                            for k3,v3 in v2.items():
+                                mod_type: str = k
+                                mod_label: str = k2
+                                mod_task: str = k3
+                                mod_search: List[str] = v3
+                                if list_in_substr(in_list=mod_search,in_str=dcm_scan_tech_str):
+                                    mod_found: bool = True
+                                    modality_type: str = mod_type
+                                    modality_label: str = mod_label
+                                    task: str = mod_task
+
+    return (modality_type, 
+            modality_label, 
+            task)
+
+def header_search(img_file: str, 
+                  search_dict: Dict
+                  ) -> Tuple[str,str,str]:
+    '''Searches a DICOM or PAR file header for relevant scan technique/parameter information provided a nested heursitic search dictionary
+    of search terms to map scan acquisitions of interest. Any other image file passed as an argument will return a tuple of empty strings.
+
+    Usage example:
+    Arguments:
+        img_file: Input image data file path.
+        search_dict: Nested heursitic dictionary of (BIDS) related search terms.
+
+    Returns: 
+        Tuple of strings that consist of:
+            * modality_type: Modality type (e.g. 'anat', 'func', etc.)
+            * modality_label: Modality label (e.g. 'T1w','bold', etc.)
+            * task: Task name.
+    '''
+    img_file: str = os.path.abspath(img_file)
+
+    if '.dcm' in img_file.lower():
+        [ modality_type, modality_label, task ] = get_dcm_scan_tech(dcm_file=img_file,
+                                                                    search_dict=search_dict)  
+    elif '.par' in img_file.lower():
+        [ modality_type, modality_label, task ] = get_par_scan_tech(par_file=img_file, 
+                                                                    search_dict=search_dict)
+    elif '.nii' in img_file.lower():
+        return "","",""
+    else:
+        return "","",""
+    
+    return (modality_type, 
+            modality_label, 
+            task)

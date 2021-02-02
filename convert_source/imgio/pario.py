@@ -1,14 +1,6 @@
 # -*- coding: utf-8 -*-
 """PAR REC specific functions for convert_source. Primarily intended for converting and renaming PAR REC files to BIDS NIFTI.
-
-TODO:
-    * Figure out a way to get EchoTimes from PAR header file(s).
-        * Perhaps return as list if multi-echo
-        * Return as list if multiple unique values exist.
-        * Update csn function that updates dictionary.
 """
-
-# Import packages and modules
 import os
 import re
 import numpy as np
@@ -22,8 +14,6 @@ from typing import (
 )
 
 from convert_source.cs_utils.fileio import TmpDir
-
-# from convert_source.imgio import niio
 
 # Define exception(s)
 class PARfileReadError(Exception):
@@ -153,6 +143,11 @@ def get_echo_time(par_file: str,
                  tmp_dir: Optional[str] = None
                  ) -> float:
     '''Reads the echo time (TE, in ms) from a PAR header file.
+
+    NOTE: Echo time is obtained from the PAR file header by reading in the PAR header file as a
+        pandas dataframe, followed by saving the resulting dataframe as a M x N | N = 35. The echo times
+        are stored in the resulting matrix (constructed from numpy as a numpy multi-dimensional array) in 
+        row 16 (count starts at 0).
     
     Usage example:
         >>> get_echo_time(par_file="File.PAR")
@@ -165,12 +160,6 @@ def get_echo_time(par_file: str,
     Returns:
         Echo time as a float.
     '''
-    
-    # NOTE: Echo time is obtained from the PAR file header by reading in the PAR header file as a
-    #   pandas dataframe, followed by saving the resulting dataframe as a M x N | N = 35. The echo times
-    #   are stored in the resulting matrix (constructed from numpy as a numpy multi-dimensional array) in 
-    #   row 16 (count starts at 0).
-    
     if tmp_dir:
         pass
     else:
@@ -198,6 +187,11 @@ def get_flip_angle(par_file: str,
                    tmp_dir: Optional[str] = None
                   ) -> float:
     '''Reads the flip angle (in degrees) from a PAR header file.
+
+    NOTE: Flip angle is obtained from the PAR file header by reading in the PAR header file as a
+        pandas dataframe, followed by saving the resulting dataframe as a M x N | N = 35. The flip angles
+        are stored in the resulting matrix (constructed from numpy as a numpy multi-dimensional array) in 
+        row 21 (count starts at 0).
     
     Usage example:
         >>> get_flip_angle(par_file="File.PAR")
@@ -210,12 +204,6 @@ def get_flip_angle(par_file: str,
     Returns:
         Flip angle as a float.
     '''
-    
-    # NOTE: Flip angle is obtained from the PAR file header by reading in the PAR header file as a
-    #   pandas dataframe, followed by saving the resulting dataframe as a M x N | N = 35. The flip angles
-    #   are stored in the resulting matrix (constructed from numpy as a numpy multi-dimensional array) in 
-    #   row 21 (count starts at 0).
-    
     if tmp_dir:
         pass
     else:
@@ -239,92 +227,3 @@ def get_flip_angle(par_file: str,
     else:
         return float(np.unique(mat[0:,21]))
 
-def get_par_scan_tech(bids_out_dir, sub, par_file, search_dict, meta_dict={}, ses=1, keep_unknown=True, verbose=False):
-    '''
-    Searches PAR file header for scan technique/MR modality used in accordance with the search terms provided by the
-    nested dictionary. A regular expression (regEx) search string is defined and searched for conventional PAR headers.
-    
-    Note: This function is still undergoing active development.
-
-    Arguments:
-        bids_out_dir (string): Output BIDS directory
-        sub (int or string): Subject ID
-        par_file (string): PAR filename with absolute filepath
-        search_dict (dict): Nested dictionary from the 'read_config' function
-        meta_dict (dict): Nested metadata dictionary
-        ses (int or string): Session ID
-        keep_unknown (bool): Convert modalities/scans which cannot be identified (default: True)
-        verbose (bool): Prints the scan_type, modality, and search terms used (e.g. func - bold - rest - ['rest', 'FFE'])
-    
-    Returns: 
-        None
-    '''
-
-    if not meta_dict:
-        meta_dict = dict()
-    
-    mod_found = False
-    
-    # Define regEx search string
-    regexp = re.compile(r'.    Technique                          :  .*', re.M | re.I)
-    
-    # Open and search PAR header file
-    with open(par_file) as f:
-        for line in f:
-            match_ = regexp.match(line)
-            if match_:
-                par_scan_tech_str = match_.group()
-    
-    # Search Scan Technique with search terms
-    for key,item in search_dict.items():
-        for dict_key,dict_item in search_dict[key].items():
-            if isinstance(dict_item,list):
-                if utils.list_in_substr(dict_item,par_scan_tech_str):
-                    mod_found = True
-                    if verbose:
-                        print(f"{key} - {dict_key}: {dict_item}")
-                    scan_type = key
-                    scan = dict_key
-                    [com_param_dict, scan_param_dict] = utils.get_metadata(dictionary=meta_dict,scan_type=scan_type)
-                    if scan_type.lower() == 'dwi':
-                        csn.data_to_bids_dwi(bids_out_dir=bids_out_dir,file=par_file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_dwi=scan_param_dict,ses=ses,scan_type=scan_type)
-                    elif scan_type.lower() == 'fmap':
-                        csn.data_to_bids_fmap(bids_out_dir=bids_out_dir,file=par_file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_fmap=scan_param_dict,ses=ses,scan_type=scan_type)
-                    else:
-                        csn.data_to_bids_anat(bids_out_dir=bids_out_dir,file=par_file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_anat=scan_param_dict,ses=ses,scan_type=scan_type)
-                    if mod_found:
-                        break
-            elif isinstance(dict_item,dict):
-                tmp_dict = search_dict[key]
-                for d_key,d_item in tmp_dict[dict_key].items():
-                    if utils.list_in_substr(d_item,par_scan_tech_str):
-                        mod_found = True
-                        if verbose:
-                            print(f"{key} - {dict_key} - {d_key}: {d_item}")
-                        scan_type = key
-                        scan = dict_key
-                        task = d_key
-                        [com_param_dict, scan_param_dict] = utils.get_metadata(dictionary=meta_dict,scan_type=scan_type,task=task)
-                        if scan_type.lower() == 'func':
-                            csn.data_to_bids_func(bids_out_dir=bids_out_dir,file=par_file,sub=sub,scan=scan,task=task,meta_dict_com=com_param_dict,meta_dict_func=scan_param_dict,ses=ses,scan_type=scan_type)
-                        elif scan_type.lower() == 'dwi':
-                            csn.data_to_bids_dwi(bids_out_dir=bids_out_dir,file=par_file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_dwi=scan_param_dict,ses=ses,scan_type=scan_type)
-                        elif scan_type.lower() == 'fmap':
-                            csn.data_to_bids_fmap(bids_out_dir=bids_out_dir,file=par_file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_fmap=scan_param_dict,ses=ses,scan_type=scan_type)
-                        else:
-                            csn.data_to_bids_anat(bids_out_dir=bids_out_dir,file=par_file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_anat=scan_param_dict,ses=ses,scan_type=scan_type)
-                        if mod_found:
-                            break
-                            
-        if mod_found:
-            break
-            
-    if not mod_found:
-        if verbose:
-            print("unknown modality")
-        if keep_unknown:
-            scan_type = 'unknown_modality'
-            scan = 'unknown'
-            csn.data_to_bids_anat(bids_out_dir=bids_out_dir,file=par_file,sub=sub,scan=scan,meta_dict_com={},meta_dict_anat={},ses=ses,scan_type=scan_type)
-        
-    return None

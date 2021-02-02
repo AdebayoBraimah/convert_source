@@ -8,8 +8,6 @@
 TODO:
     * Update/refactor logging class to logging decorator.
 """
-
-# Import modules/packages
 import subprocess
 import logging
 import os
