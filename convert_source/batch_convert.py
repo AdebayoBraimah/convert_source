@@ -250,11 +250,7 @@ def bids_id(s:str,
             modality_label: Optional[str] = "",
             task: Optional[str] = ""
            ) -> Tuple[Dict[str,str],str,str,str]:
-    '''
-    TODO:
-        * write documentation.
-        
-    Performs identification of descriptive BIDS information relevant for file naming, provided
+    '''Performs identification of descriptive BIDS information relevant for file naming, provided
     a BIDS search dictionary and a BIDS map dictionary. The resulting information is then placed
     in nested dictionary of BIDS related descriptive terms.
     
@@ -415,6 +411,10 @@ def _get_bids_name_args(bids_name_dict: Dict,
     '''Helper function that wraps the helper funciton `_gather_bids_name_args`.
     
     Usage example:
+        >>> param_tuple = _get_bids_name_args(bids_dict,
+        ...                                   'anat')
+        ...
+
     Arguments:
         bids_name_dict: BIDS name description dictionary.
         modality_type: Modality type.
@@ -586,6 +586,7 @@ def data_to_bids(sub_data: SubDataInfo,
             * List of corresponding FSL-style bvec file(s). Empty string is returned if this file does not exist.
     
     TODO: 
+        * handle no gzip/gunzip NIFTI file cases
         * Construct dcm2niix's args as a dict, and pass that as args to this function.
         * Init subject log file here.
         * Write documentation.

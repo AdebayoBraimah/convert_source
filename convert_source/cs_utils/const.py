@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-TODO:
-    * Add BIDSVersion to dictionary
-    * Have function that prints BIDS version to screen
-    * Store version number in file
-
-Constants needed for several utility modules in convert_source.
+"""Constants needed for several utility modules in convert_source.
 The constant variables contained here include:
     * BIDS_INFO: BIDS metadata dictionary of BIDS related fields.
     * BIDS_ORD_ARR: Ordered array of BIDS metadata fields.
@@ -19,7 +13,15 @@ from typing import (
 )
 
 # Default configuration file
-DEFAULT_CONFIG = os.path.join(str(pathlib.Path(os.path.abspath(__file__)).parents[2]),"config","config.default.yml")
+DEFAULT_CONFIG: str = os.path.join(str(pathlib.Path(os.path.abspath(__file__)).parents[2]),"config","config.default.yml")
+
+# Default BIDS version
+_bids_version_file: str = os.path.join(str(pathlib.Path(os.path.abspath(__file__)).parents[2]),"config","bids_version.txt")
+
+with open(_bids_version_file, "r") as f: 
+    _bids_version = f.read().replace('\n','')
+
+DEFAULT_BIDS_VERSION: str = _bids_version
 
 # Empty BIDS metadata dictionary
 BIDS_INFO: Dict = {
@@ -92,7 +94,7 @@ BIDS_INFO: Dict = {
     "IntendedFor":"",
     # Custom BIDS fields
     "SourceDataFormat":"",
-    "BIDSVersion":""
+    "BIDSVersion":DEFAULT_BIDS_VERSION
 }
 
 # Ordered array of BIDS metadata fields
