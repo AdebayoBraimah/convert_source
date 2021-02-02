@@ -1,21 +1,17 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# title           : convert_source.py
-# description     : [description]
-# author          : Adebayo B. Braimah
-# e-mail          : adebayo.braimah@cchmc.org
-# date            : 2020 01 14 15:29:24
-# version         : 0.0.3
-# usage           : convert_source.py [-h,--help]
-# notes           : [notes]
-# python_version  : 3.7.4
-#==============================================================================
+"""Batch conversion wrapper and its associated classes and functions for the `convert_source` package.
 
-# Import packages and modules
+TODO:
+    * Resolve TODO's.
+"""
 import os
 import sys
 import glob
 import yaml
+import platform
+
+from copy import deepcopy
+from shutil import copy
 
 from typing import (
     List, 
@@ -25,17 +21,108 @@ from typing import (
     Tuple
 )
 
-from convert_source.cs_utils.const import DEFAULT_CONFIG
+from convert_source.cs_utils.const import(
+    DEFAULT_CONFIG,
+    BIDS_PARAM
+)
+
+from convert_source.cs_utils.fileio import (
+    ConversionError,
+    NiiFile,
+    LogFile,
+    TmpDir
+)
 
 from convert_source.cs_utils.utils import (
-    list_dict,
     depth,
-    list_in_substr
+    list_dict,
+    read_json,
+    write_josn,
+    get_bvals,
+    zeropad,
+    comp_dict,
+    list_in_substr,
+    header_search,
+    SubDataInfo,
+    collect_info,
+    get_metadata,
+    convert_image_data,
+    dict_multi_update
 )
 
 from convert_source.cs_utils.bids_info import (
+    construct_bids_dict,
+    construct_bids_name,
     search_bids
 )
+
+from convert_source.imgio.niio import(
+    get_data_params,
+    get_num_frames
+)
+
+# Define class(es)
+class BIDSImgData(object):
+    '''Class that creates an object of lists for a set of image data,
+    and its associated (BIDS related) files - allows for grouping of 
+    image data and its associated files.
+
+    Attributes (instance attributes):
+        imgs: List of image files. Emtpy when initialized.
+        jsons: List of corresponding JSON files. Emtpy when initialized.
+        bvals: List of corresponding bval files. Emtpy when initialized.
+        bvecs: List of corresponding bvec files. Emtpy when initialized.
+    '''
+    def __init__(self,
+                 imgs: Optional[str] = "",
+                 jsons: Optional[str] = "",
+                 bvals: Optional[str] = "",
+                 bvecs: Optional[str] = ""
+                ):
+        '''Init doc-string for BIDSImgData class. Allows
+        for grouping of image data and its associated files.
+
+        Usage example:
+            >>> data_obj = BIDSImgData(img,
+            ...                        json)
+            ...
+
+        Arguments:
+            imgs: Input image.
+            jsons: Corresponding input JSON file.
+            bvals: Corresponding input FSL-style bval file.
+            bvecs: Corresponding input FSL-style bvec file.
+        '''
+        if imgs:
+            self.imgs: List = [imgs]
+        else:
+            self.imgs: List = []
+        
+        if jsons:
+            self.jsons: List = [jsons]
+        else:
+            self.jsons: List = []
+        
+        if bvals:
+            self.bvals: List = [bvals]
+        else:
+            self.bvals: List = []
+                
+        if bvecs:
+            self.bvecs: List = [bvecs]
+        else:
+            self.bvecs: List = []
+    
+    def __repr__(self):
+        '''NOTE: Returns Dictionary of key-value mapped lists,
+        represented as a string.
+        '''
+        return (str(
+                {"imgs":self.imgs,
+                "jsons":self.jsons,
+                "bvals":self.bvals,
+                "bvecs":self.bvecs})
+               )
 
 # Define function(s)
 def read_config(config_file: Optional[str] = "", 
@@ -152,440 +239,968 @@ def read_config(config_file: Optional[str] = "",
             meta_dict,
             exclusion_list)
 
-def proc_batch(s:str,
-               search_dict: Dict,
-               bids_search: Optional[Dict] = None,
-               bids_map: Optional[Dict] = None
-              ):
+def bids_id(s:str,
+            search_dict: Dict,
+            bids_search: Optional[Dict] = None,
+            bids_map: Optional[Dict] = None,
+            bids_name_dict: Optional[Dict] = None,
+            parent_dir: Optional[str] = "",
+            modality_type: Optional[str] = "",
+            modality_label: Optional[str] = "",
+            task: Optional[str] = ""
+           ) -> Tuple[Dict[str,str],str,str,str]:
     '''
-    TODO: 
-        * Use this function to search through image files
-        * This function should return lists of image data files
-            OR
-        * List of subject data (as a bids_name_dict) and the image files.
+    TODO:
+        * write documentation.
+        
+    Performs identification of descriptive BIDS information relevant for file naming, provided
+    a BIDS search dictionary and a BIDS map dictionary. The resulting information is then placed
+    in nested dictionary of BIDS related descriptive terms.
+    
+    Usage example:
+        >>> bids_example_dict = bids_id("ImageFile00001.dcm")
+        
+    Arguments:
+        s: Input str/file to be searched.
+        search_dict: Dictionary of modality specific search terms.
+        bids_search: Dictionary of BIDS specific search terms.
+        bids_map: Dictionary of BIDS related terms to be mapped to BIDS search terms.
+        bids_name_dict: Existing BIDS name dictionary. If provided, an updated copy of this dictionary is returned.
+        parent_dir: Parent or study image directory of the image file. This path is removed from the string search
+            to prevent false positives.
+        modality_type: (BIDS) modality type (e.g. 'anat', 'func', etc).
+        modality_label: (BIDS) modality label (e.g. 'T1w', 'bold', etc).
+        task: (BIDS) task label (e.g. 'rest','nback', etc).
+        
+    Returns:
+        Tuple that consists of:
+            * Nested dictionary of BIDS descriptive naming related terms.
+            * Modality type.
+            * Modality label.
+            * Task label.
     '''
-    # use this function to iterate through image data files and subjects
     search_arr: List[str] = list_dict(d=search_dict)
     
+    if os.path.exists(s) and parent_dir:
+        if 'windows' in platform.platform().lower():
+            path_sep: str = "\\"
+        else:
+            path_sep: str = "/"
+        
+        # Store string, then overwrite
+        img_file_path:str = s
+        s: str = s.replace(parent_dir + path_sep,"")
+    else:
+        img_file_path:str = s
+    
+    if bids_name_dict:
+        bids_name_dict: Dict = deepcopy(bids_name_dict)
+    else:
+        bids_name_dict: Dict = deepcopy(BIDS_PARAM)
+    
+    mod_found: bool = False
+    
     for i in search_arr:
+        if mod_found:
+            break
         for k,v in i.items():
             if depth(i) == 3:
                 for k2,v2 in v.items():
-                    modality_type = k
-                    modality_label = k2
-                    mod_search = v2
-                    print(f"{modality_type} - {modality_label} - {mod_search}")
-                    # Do stuff here
-                    # Search str with mod_search list of substrings
-                    print(list_in_substr(in_list=mod_search,in_str=s))
+                    mod_type: str = k
+                    mod_label: str = k2
+                    mod_task: str = ""
+                    mod_search: List[str] = v2
                     if list_in_substr(in_list=mod_search,in_str=s):
-                        bids_name_dict = search_bids(s=s,
-                                                     bids_search=bids_search,
-                                                     bids_map=bids_map,
-                                                     modality_type=modality_type,
-                                                     modality_label=modality_label)
+                        mod_found: bool = True
+                        modality_type: str = mod_type
+                        modality_label: str = mod_label
+                        task: str = mod_task
+                        bids_name_dict: Dict = search_bids(s=s,
+                                                           bids_search=bids_search,
+                                                           bids_map=bids_map,
+                                                           modality_type=modality_type,
+                                                           modality_label=modality_label,
+                                                           bids_name_dict=bids_name_dict)
+                            
             elif depth(i) == 4:
                 for k2,v2 in v.items():
                     for k3,v3 in v2.items():
-                        modality_type = k
-                        modality_label = k2
-                        task = k3
-                        mod_search = v3
-                        print(f"{modality_type} - {modality_label} - {task} - {mod_search}")
-                        # Do stuff here
+                        mod_type: str = k
+                        mod_label: str = k2
+                        mod_task: str = k3
+                        mod_search: List[str] = v3
                         if list_in_substr(in_list=mod_search,in_str=s):
-                            bids_name_dict = search_bids(s=s,
-                                                         bids_search=bids_search,
-                                                         bids_map=bids_map,
-                                                         modality_type=modality_type,
-                                                         modality_label=modality_label,
-                                                         task=task)
-    # return bids_name_dict
+                            mod_found: bool = True
+                            modality_type: str = mod_type
+                            modality_label: str = mod_label
+                            task: str = mod_task
+                            bids_name_dict: Dict = search_bids(s=s,
+                                                               bids_search=bids_search,
+                                                               bids_map=bids_map,
+                                                               modality_type=modality_type,
+                                                               modality_label=modality_label,
+                                                               task=task,
+                                                               bids_name_dict=bids_name_dict)
 
-# def create_file_list(data_dir, file_ext="", order="size"):
-#     '''
-#     Creates a file list by globbing a directory for a specific file
-#     extension and sorting by some determined order. A file list is 
-#     then returned
+    # Contingency search if initially unsuccessful
+    if mod_found:
+        pass
+    else:
+        [modality_type, modality_label, task] = header_search(img_file=img_file_path,
+                                                              search_dict=search_dict)
+        # Back track if modality type and label were found
+        if modality_type and modality_label:
+            [bids_name_dict,
+             modality_type,
+             modality_label,
+             task] = bids_id(s=img_file_path,
+                             search_dict=search_dict,
+                             bids_search=bids_search,
+                             bids_map=bids_map,
+                             bids_name_dict=bids_name_dict,
+                             parent_dir=parent_dir,
+                             modality_type=modality_type,
+                             modality_label=modality_label,
+                             task=task)
     
-#     Arguments:
-#         data_dir (string): Absolute path to data directory (must be a directory dump of image data)
-#         file_ext (string): File extension to glob. Built-in options include:
-#             - 'par' or 'PAR': Searches for PAR headers
-#             - 'dcm' or 'DICOM': Searches for DICOM directories, then searches for one file from each DICOM directory
-#             - 'nii', or 'Nifti': Searches for nifti files (including gzipped nifti files)
-#         order (string): Order to sort the list. Valid options are: 'size' and 'time':
-#             - 'size': sorts by file size in ascending order (default)
-#             - 'time': sorts by file modification time in ascending order
-#             - 'none': no sorting is applied and the list is generated as the system finds the files
-    
-#     Returns: 
-#         file_list (list): List of filenames, complete with their absolute paths.
-#     '''
-    
-#     # Check file extension
-#     if file_ext != "":
-#         if file_ext.upper() == "PAR" or file_ext.upper() == "REC":
-#             file_ext = "PAR"
-#             file_ext = f".{file_ext.upper()}"
-#         elif file_ext.lower() == "dcm" or file_ext.upper() == "DICOM":
-#             file_ext = "dcm"
-#             file_ext = f".{file_ext.lower()}"
-#         elif file_ext.lower() == "nii" or file_ext.lower() == "nifti":
-#             file_ext = "nii"
-#             file_ext = f".{file_ext.lower()}*" # Add wildcard for globbling gzipped files
-#         else:
-#             file_ext = f".{file_ext}"
-    
-#     # Check sort order
-#     if order.lower() == "size":
-#         order_key = os.path.getsize
-#     elif order.lower() == "time":
-#         order_key = os.path.getmtime
-#     elif order.lower() == "none":
-#         order_key=None
-#     else:
-#         order_key = os.path.getsize
-#         print("Unrecognized keyword option. Using default.")
-    
-#     # Create file list
-#     if file_ext == ".dcm":
-#         file_list = sorted(cdm.get_dcm_files(data_dir), key=order_key, reverse=False)
-#     elif file_ext != ".dcm":
-#         file_names = os.path.join(data_dir, f"*{file_ext}")
-#         file_list = sorted(glob.glob(file_names, recursive=True), key=order_key, reverse=False)
-    
-#     return file_list
+    return (bids_name_dict,
+            modality_type,
+            modality_label,
+            task)
 
-# def file_exclude(file_list, data_dir, exclusion_list = [], verbose = False):
-#     '''
-#     Excludes files from the conversion process by removing filenames
-#     that contain words that match those found in the 'exclusion_list'
-#     from the 'read_config' function - should any files need/want to be 
-#     excluded.
+def _gather_bids_name_args(bids_name_dict: Dict,
+                           modality_type: str,
+                           param: str
+                          ) -> str:
+    '''Gathers BIDS naming description arguments for the `construct_bids_name` function.
     
-#     If 'exclusion_list' is empty, then the original 'file_list' is returned.
-    
-#     Arguments:
-#         file_list (list): List of filenames
-#         data_dir (string): Absolute path to parent directory that contains the image data
-#         exclusion_list (list): List of words to be matched. Filenames that contain these words will be excluded.
-#         verbose (bool): Boolean - True or False.
-    
-#     Returns: 
-#         currated_list (list): Currated list of filenames, with unwanted filenames removed.
-#     '''
-            
-#     # Check file extension in file list
-#     if 'dcm' in file_list[0]:
-#         file_ext = "dcm"
-#         file_ext = f".{file_ext.lower()}"
-#     elif 'PAR' in file_list[0]:
-#         file_ext = "PAR"
-#         file_ext = f".{file_ext.upper()}"
-#     elif 'nii' in file_list[0]:
-#         file_ext = "nii"
-#         file_ext = f".{file_ext.lower()}*" # Add wildcard for globbling gzipped files
-#     else:
-#         file_ext = ""
-#         file_ext = f".{file_ext.lower()}"
-    
-#     # create set of lists
-#     file_set = set(file_list)
-    
-#     # create empty sets
-#     currated_set = set()
-#     exclusion_set = set()
-    
-#     if len(exclusion_list) == 0:
-#         currated_set = file_set
-#     else:
-#         for file in exclusion_list:
-#             if file_ext == '.dcm':
-#                 dir_ = os.path.join(data_dir, f"*{file}*",f"*{file_ext}")
-#             else:
-#                 dir_ = os.path.join(data_dir, f"*{file}*{file_ext}")
-#             f_names = glob.glob(dir_, recursive=True)        
-#             f_names_set = set(f_names)
-#             if verbose:
-#                 if len(f_names_set) != 0:
-#                     print(f"Excluded files: {f_names_set} \n")
-#             exclusion_set.update(f_names_set)
-            
-#         currated_set = file_set.difference(exclusion_set)
-
-#     currated_list = list(currated_set)
-    
-#     return currated_list
-
-# def get_scan_tech(bids_out_dir, sub, file, search_dict, meta_dict=dict(), ses=1, keep_unknown=True, verbose=False):
-#     '''
-#     Searches DICOM or PAR file header for scan technique/MR modality used in accordance with the search terms provided
-#     by the nested dictionary.
-    
-#     Arguments:
-#         bids_out_dir (string): Output BIDS directory
-#         sub (int or string): Subject ID
-#         file (string): Source image filename with absolute filepath
-#         search_dict (dict): Nested dictionary from the 'read_config' function
-#         meta_dict (dict): Nested metadata dictionary
-#         ses (int or string): Session ID
-#         keep_unknown (bool): Convert modalities/scans which cannot be identified (default: True)
-#         verbose (bool): Prints the scan_type, modality, and search terms used (e.g. func - bold - rest - ['rest', 'FFE'])
-    
-#     Returns: 
-#         None
-#     '''
-    
-#     if not meta_dict:
-#         meta_dict = dict()
-
-#     converted_files = list()
-    
-#     # Check file extension in file
-#     # Perform Scanning Techniqe Search
-#     if '.dcm' in file.lower():
-#         converted_files = cdm.get_dcm_scan_tech(bids_out_dir=bids_out_dir, sub=sub, dcm_file=file, search_dict=search_dict, meta_dict=meta_dict, ses=1, keep_unknown=keep_unknown, verbose=verbose)
-#     elif '.PAR' in file.upper():
-#         converted_files = csp.get_par_scan_tech(bids_out_dir=bids_out_dir, sub=sub, par_file=file, search_dict=search_dict, meta_dict=meta_dict, ses=1, keep_unknown=keep_unknown, verbose=verbose)
-#     else:
-#         if verbose:
-#             print("unknown modality")
-#         if keep_unknown:
-#             if verbose:
-#                 print("converting unknown_modality")
-#             scan_type = 'unknown_modality'
-#             scan = 'unknown'
-#             [com_param_dict, scan_param_dict] = utils.get_metadata(dictionary=meta_dict,scan_type=scan_type)
-#             converted_files = csn.data_to_bids_anat(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_anat=scan_param_dict,ses=ses,scan_type=scan_type)
+    Usage example:
+        >>> param_name = _gather_bids_name_args(bids_dict,
+        ...                                     "anat",
+        ...                                     "ce")
+        ...
         
-#     return converted_files
+    Arguments:
+        bids_name_dict: BIDS name description dictionary.
+        modality_type: Modality type.
+        param: BIDS parameter description.
+    
+    Returns:
+        string from the BIDS name description dictionary if it exists, or an empty string otherwise.
+    '''
+    try:
+        if modality_type.lower() == 'fmap' and (param == "case1" or param == "mag2" or param == "case2" or param == "case3" or param == "case4"):
+            if param == 'mag2':
+                if bids_name_dict[modality_type][param]['magnitude2']:
+                    return True
+            elif param == 'case4':
+                if bids_name_dict[modality_type]["ce"] or bids_name_dict[modality_type]["dir"]:
+                    return True
+                else:
+                    return False
+            elif bids_name_dict[modality_type][param]:
+                return True
+        else:
+            return bids_name_dict[modality_type][param]
+    except KeyError:
+        if param == "case1" or param == "mag2" or param == "case2" or param == "case3" or param == "case4":
+            return False
+        else:
+            return ""
 
-# def convert_modality(bids_out_dir, sub, file, search_dict, meta_dict=dict(), ses=1, keep_unknown=True, verbose=False):
-#     '''
-#     Converts an image file and extracts information from the filename (such as the modality). 
+def _get_bids_name_args(bids_name_dict: Dict,
+                        modality_type: str
+                        ) -> Tuple[str,bool]:
+    '''Helper function that wraps the helper funciton `_gather_bids_name_args`.
     
-#     Note: This function is still undergoing active development.
-#     Note: Add support for extra dictionaries
-    
-#     Arguments:
-#         bids_out_dir (string): Output BIDS directory
-#         sub (int or string): Subject ID
-#         file (string): Source image filename with absolute filepath
-#         search_dict (dict): Nested dictionary from the 'read_config' function
-#         meta_dict (dict): Nested metadata dictionary
-#         ses (int or string): Session ID
-#         keep_unknown (bool): Convert modalities/scans which cannot be identified (default: True)
-#         verbose (bool): Prints the scan_type, modality, and search terms used (e.g. func - bold - rest - ['rest', 'FFE'])
-    
-    
-#     Returns: 
-#         None
-#     '''
-    
-#     mod_found = False
+    Usage example:
+    Arguments:
+        bids_name_dict: BIDS name description dictionary.
+        modality_type: Modality type.
 
-#     converted_files = list()
+    Returns:
+        Tuple of strings and booleans that represent:
+            * task: str, task name BIDS filename description.
+            * acq: str, acquisition description.
+            * ce: str, contrast enhanced description
+            * acq_dir: str, acquisition direction description.
+            * rec: str, reconstruction methods description.
+            * echo: str, echo number description from multi-echo acquisition.
+            * case1: bool, fieldmap BIDS case 1.
+            * mag2: bool, fieldmap BIDS case 1, that includes 2nd magnitude image.
+            * case2: bool, fieldmap BIDS case 2.
+            * case3: bool, fieldmap BIDS case 3.
+            * case4: bool, fieldmap BIDS case 4.
+    '''
+    task: str = ""
+    acq: str = ""
+    ce: str = ""
+    acq_dir: str = ""
+    rec: str = ""
+    echo: str = ""
+    case1: bool = False
+    mag2: bool = False
+    case2: bool = False
+    case3: bool = False
+    case4: bool = False
+
+    params_var: List[str] = [task, acq, ce, acq_dir, rec, echo, case1, mag2, case2, case3, case4]
+    params_str: List[str] = ["task", "acq", "ce", "acq_dir", "rec", "echo", "case1", "mag2", "case2", "case3", "case4"]
+
+    if len(params_str) == len(params_var):
+        pass
+    else:
+        raise IndexError("Paired arrays of two different lengths are being compared.")
+
+    for i in range(0,len(params_var)):
+        params_var[i] = _gather_bids_name_args(bids_name_dict=bids_name_dict,
+                                               modality_type=modality_type,
+                                               param=params_str[i])
+
+    return tuple(params_var)
+
+def _make_bids_name(bids_name_dict: Dict,
+                    modality_type: str
+                   ) -> Tuple[str,str,str,str]:
+    '''Helper funciton that creates a BIDS compliant filename given a BIDS name description dictionary,
+    and the modality type.
+
+    Usage example:
+        >>> _make_bids_name(bids_name_dict=bids_dict,
+        ...                 modality_type="anat")
+        ...
+        "sub-001_ses-001_run-01_T1w"
+        
+    Arguments:
+        bids_name_dict: BIDS name description dictionary.
+        modality_type: Modality type.
+
+    Returns:
+        BIDS compliant filename string.
+    '''
     
-#     # Check file type
-#     if 'dcm' in file:
-#         if not cdm.is_valid_dcm(file,verbose):
-#             sys.exit(f"Invalid DICOM file. Please check {file}")
+    bids_keys: List[str] = list(bids_name_dict[modality_type].keys())
     
-#     for key,item in search_dict.items():
-#         for dict_key,dict_item in search_dict[key].items():
-#             if isinstance(dict_item,list):
-#                 if utils.list_in_substr(dict_item,file):
-#                     mod_found = True
-#                     if verbose:
-#                         print(f"{key} - {dict_key}: {dict_item}")
-#                     scan_type = key
-#                     scan = dict_key
-#                     [com_param_dict, scan_param_dict] = utils.get_metadata(dictionary=meta_dict,scan_type=scan_type)
-#                     if scan_type.lower() == 'dwi':
-#                         converted_files = csn.data_to_bids_dwi(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_dwi=scan_param_dict,ses=ses,scan_type=scan_type)
-#                     elif scan_type.lower() == 'fmap':
-#                         converted_files = csn.data_to_bids_fmap(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_fmap=scan_param_dict,ses=ses,scan_type=scan_type)
-#                     else:
-#                         converted_files = csn.data_to_bids_anat(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_anat=scan_param_dict,ses=ses,scan_type=scan_type)
-#                     if mod_found:
-#                         break
-#             elif isinstance(dict_item,dict):
-#                 tmp_dict = search_dict[key]
-#                 for d_key,d_item in tmp_dict[dict_key].items():
-#                     if utils.list_in_substr(d_item,file):
-#                         mod_found = True
-#                         if verbose:
-#                             print(f"{key} - {dict_key} - {d_key}: {d_item}")
-#                         scan_type = key
-#                         scan = dict_key
-#                         task = d_key
-#                         [com_param_dict, scan_param_dict] = utils.get_metadata(dictionary=meta_dict,scan_type=scan_type,task=task)
-#                         if scan_type.lower() == 'func':
-#                             converted_files = csn.data_to_bids_func(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,task=task,meta_dict_com=com_param_dict,meta_dict_func=scan_param_dict,ses=ses,scan_type=scan_type)
-#                         elif scan_type.lower() == 'dwi':
-#                             converted_files = csn.data_to_bids_dwi(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_dwi=scan_param_dict,ses=ses,scan_type=scan_type)
-#                         elif scan_type.lower() == 'fmap':
-#                             converted_files = csn.data_to_bids_fmap(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_fmap=scan_param_dict,ses=ses,scan_type=scan_type)
-#                         else:
-#                             converted_files = csn.data_to_bids_anat(bids_out_dir=bids_out_dir,file=file,sub=sub,scan=scan,meta_dict_com=com_param_dict,meta_dict_anat=scan_param_dict,ses=ses,scan_type=scan_type)
-#                         if mod_found:
-#                             break
+    sub: str = bids_name_dict['info']['sub']
+    ses: str = bids_name_dict['info']['ses']
+    run: Union[int,str] = bids_name_dict[modality_type]['run']
+
+    [task, 
+     acq, 
+     ce, 
+     acq_dir, 
+     rec, 
+     echo, 
+     case1, 
+     mag2, 
+     case2, 
+     case3, 
+     case4] = _get_bids_name_args(bids_name_dict=bids_name_dict,
+                                  modality_type=modality_type)
+    
+    f_name: str = ""
+    f_name += f"sub-{sub}"
+    
+    if ses:
+        f_name += f"_ses-{ses}"
+    
+    if task and ('task' in bids_keys):
+        f_name += f"_task-{task}"
+    
+    if acq and ('acq' in bids_keys):
+        f_name += f"_acq-{acq}"
+    
+    if ce and ('ce' in bids_keys):
+        f_name += f"_ce-{ce}"
+    
+    if acq_dir and ('dir' in bids_keys):
+        f_name += f"_dir-{acq_dir}"
+    
+    if rec and ('rec' in bids_keys):
+        f_name += f"_rec-{rec}"
+    
+    f_name += f"_run-{run}"
+    
+    if modality_type.lower() == 'fmap':
+        if case1:
+            f_name1: str = f_name + "_phasediff"
+            f_name2: str = f_name + "_magnitude1"
+            return (f_name1,
+                   f_name2,
+                   "",
+                   "")
+        elif case1 and mag2:
+            f_name1: str = f_name + "_phasediff"
+            f_name2: str = f_name + "_magnitude1"
+            f_name3: str = f_name + "_magnitude2"
+            return (f_name1,
+                   f_name2,
+                   f_name3,
+                   "")
+        elif case2:
+            f_name1: str = f_name + "_phase1"
+            f_name2: str = f_name + "_phase2"
+            f_name3: str = f_name + "_magnitude1"
+            f_name4: str = f_name + "_magnitude2"
+            return (f_name1,
+                   f_name2,
+                   f_name3,
+                   f_name4)
+        elif case3:
+            f_name1: str = f_name + "_magnitude"
+            f_name2: str = f_name + "_fieldmap"
+            return (f_name1,
+                   f_name2,
+                   "",
+                   "")
+    else:
+        modality_label = bids_name_dict[modality_type]['modality_label']
+        f_name += f"_{modality_label}"
+        return f_name,"","",""
+
+def data_to_bids(sub_data: SubDataInfo,
+                 bids_name_dict: Dict,
+                 out_dir: str,
+                 modality_type: Optional[str] = "",
+                 modality_label: Optional[str] = "",
+                 task: Optional[str] = "",
+                 meta_dict: Optional[Dict] = {},
+                 mod_dict: Optional[Dict] = {},
+                 log: Optional[LogFile] = None,
+                 gzip: bool = True,
+                 env: Optional[Dict] = {},
+                 dryrun: bool = False,
+                 append_dwi_info: bool = True,
+                 zero_pad: int = 2
+                 ) -> Tuple[List[str],List[str],List[str],List[str]]:
+    '''Converts source data to BIDS named raw data.
+    
+    Usage example:
+    Arguments:
+    Returns:
+        Tuple of lists that contains:
+            * List of image data file(s). Empty string is returned if this file does not exist.
+            * List of corresponding JSON (sidecar) file(s). Empty string is returned if this file does not exist.
+            * List of corresponding FSL-style bval file(s). Empty string is returned if this file does not exist.
+            * List of corresponding FSL-style bvec file(s). Empty string is returned if this file does not exist.
+    
+    TODO: 
+        * Construct dcm2niix's args as a dict, and pass that as args to this function.
+        * Init subject log file here.
+        * Write documentation.
+        * Write log files for each subject.
+            * BUG: logging class only writes to one file.
+    '''
+    sub: Union[int,str] = sub_data.sub
+    ses: Union[int,str] = sub_data.ses
+    data: str = sub_data.data
+    
+    sub_dir: str = os.path.join(out_dir,"sub-" + sub)
+    sub_tmp: str = sub_dir
+    
+    if ses:
+        sub_dir: str = os.path.join(sub_dir,"ses-" + ses)
+    
+    if sub_dir:
+        sub_dir: str = os.path.abspath(sub_dir)
+    else:
+        os.makedirs(sub_dir)
+        sub_dir: str = os.path.abspath(sub_dir)
+    
+    out_data_dir: str = os.path.join(sub_dir, modality_type)
+    
+    # Gather BIDS name description args
+    [task, 
+     acq, 
+     ce, 
+     acq_dir, 
+     rec, 
+     echo, 
+     case1, 
+     mag2, 
+     case2, 
+     case3, 
+     case4] = _get_bids_name_args(bids_name_dict=bids_name_dict,
+                                  modality_type=modality_type)
+    
+    if ('.par' in data) or ('.dcm' in data) and modality_type and modality_label:
+        # Handle source data cases here
+        with TmpDir(tmp_dir=sub_tmp,use_cwd=False) as tmp:
+            with TmpDir.TmpFile(tmp_dir=tmp.tmp_dir) as f:
+                tmp.mk_tmp_dir()
+                [_path, basename, _ext] = f.file_parts()
+                try:
+                    img_data = convert_image_data(file=data,
+                                                  basename=basename,
+                                                  out_dir=tmp.tmp_dir,
+                                                  log=log,
+                                                  env=env,
+                                                  dryrun=dryrun,
+                                                  return_obj=True)
+
+                    # Update JSON files
+                    for i in range(0,len(img_data.imgs)):
+                        if img_data.jsons[i]:
+                            json_dict: Dict = read_json(json_file=img_data.jsons[i])
+
+                            param_dict: Dict = get_data_params(file=data,
+                                                               json_file=img_data.jsons[i])
+
+                            metadata: Dict = dict_multi_update(dictionary=None,
+                                                               **meta_dict,
+                                                               **param_dict,
+                                                               **mod_dict)
+
+                            bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
+                                                                  json_dict=json_dict)
+
+                            img_data.jsons[i]: str = write_josn(json_file=img_data.jsons[i],
+                                                                dictionary=bids_dict)
+
+                            if (modality_type.lower() == 'dwi' or modality_label.lower() == 'dwi') and append_dwi_info:
+                                bvals: List[int] = get_bvals(img_data.bvals[i])
+                                echo_time: int = bids_dict["EchoTime"] # Not sure if this value will be in sec. or msec.
+                                _label: str = ""
+                                for bval in bvals:
+                                    if bval != 0:
+                                        _label += f"b{bval}"
+                                _label += f"TE{echo_time}"
+                                if acq:
+                                    acq += _label
+                                else:
+                                    acq = _label
+                    
+                    # BIDS 'fmap' cases
+                    case1: bool = False
+                    case2: bool = False
+                    case3: bool = False
+                    case4: bool = False
+                    mag2: bool = False
+                    
+                    if modality_type.lower() == 'fmap':
+                        if len(img_data.imgs) == 4:
+                            case2: bool = True
+                        elif len(img_data.imgs) == 3:
+                            case1: bool = True
+                            mag2: bool = True
+                        elif len(img_data.imgs) == 1:
+                            case4 = True
+                        elif len(img_data.imgs) == 2:
+                            for i in img_data.imgs:
+                                # This needs more review, need to know output of fieldmaps from dcm2niix
+                                if list_in_substr(['mag','map','a'],i):
+                                    case3: bool = True
+                                    break
+                                else:
+                                    case1: bool = True
                         
-#     if not mod_found:
-#         converted_files = get_scan_tech(bids_out_dir=bids_out_dir, sub=sub, file=file, search_dict=search_dict, meta_dict=dict(), ses=ses, keep_unknown=keep_unknown, verbose=verbose)
+                    out_data_dir: str = os.path.join(sub_dir, modality_type)
+                    
+                    if os.path.exists(out_data_dir):
+                        pass
+                    else:
+                        os.makedirs(out_data_dir)
+                    
+                    if modality_type.lower() == 'dwi' or modality_type.lower() == 'func' :
+                        num_frames = get_num_frames(img_data.imgs[0])
+                        if num_frames == 1:
+                            modality_label: str = "sbref"
+                    
+                    # Re-write BIDS name dictionary and update to reflect NIFTI data
+                    bids_name_dict: Dict = construct_bids_name(sub_data=sub_data,
+                                                               modality_type=modality_type,
+                                                               modality_label=modality_label,
+                                                               acq=acq,
+                                                               ce=ce,
+                                                               task=task,
+                                                               acq_dir=acq_dir,
+                                                               rec=rec,
+                                                               echo=echo,
+                                                               case1=case1,
+                                                               mag2=mag2,
+                                                               case2=case2,
+                                                               case3=case3,
+                                                               case4=case4,
+                                                               zero_pad=zero_pad,
+                                                               out_dir=out_data_dir)
+                    
+                    [bids_1, bids_2, bids_3, bids_4] = _make_bids_name(bids_name_dict=bids_name_dict,
+                                                                       modality_type=modality_type)
+
+                    bids_names: List[str] = [bids_1, bids_2, bids_3, bids_4]
+                    
+                    # Image data return lists
+                    imgs: List[str] = []
+                    jsons: List[str] = []
+                    bvals: List[str] = []
+                    bvecs: List[str] = []
+                    
+                    for i in range(0,len(img_data.imgs)):
+                        out_name: str = ""
+                        if gzip:
+                            ext: str = ".nii.gz"
+                        else:
+                            ext: str = ".nii"
+                        
+                        out_name: str = os.path.join(out_data_dir,bids_names[i])
+
+                        out_nii: str = out_name + ext
+                        out_json: str = out_name + ".json"
+                        out_bval: str = out_name + ".bval"
+                        out_bvec: str = out_name + ".bvec"
+
+                        out_nii = copy(img_data.imgs[i],out_nii)
+                        imgs.append(out_nii)
+
+                        if img_data.jsons[i]:
+                            out_json = copy(img_data.jsons[i],out_json)
+                            jsons.append(out_json)
+                        else:
+                            jsons.append("")
+                        
+                        if img_data.bvals[i]:
+                            out_bval = copy(img_data.bvals[i],out_bval)
+                            bvals.append(out_bval)
+                        else:
+                            bvals.append("")
+                        
+                        if img_data.bvecs[i]:
+                            out_bvec = copy(img_data.bvecs[i],out_bvec)
+                            bvecs.append(out_bvec)
+                        else:
+                            bvecs.append("")
+                    # Clean-up
+                    tmp.rm_tmp_dir()
+                    return (imgs,
+                            jsons,
+                            bvals,
+                            bvecs)
+                except ConversionError:
+                    tmp.rm_tmp_dir()
+                    return [""],[""],[""],[""]
+    elif ('.nii' in data) and modality_type and modality_label:
+        # Handle NIFTI cases here
+        out_data_dir: str = os.path.join(sub_dir, modality_type)
+        with NiiFile(data) as n:
+            [path, basename, ext] = n.file_parts()
+            img_files: List[str] = glob.glob(os.path.join(path,basename + "*" + ext))
+            json_file: str = os.path.join(path,basename + "*.json")
+            bval_file: str = ''.join(glob.glob(os.path.join(path,basename + "*.bval*")))
+            bvec_file: str = ''.join(glob.glob(os.path.join(path,basename + "*.bvec*")))
+            if json_file:
+                json_dict: Dict = read_json(json_file=json_file)
+
+                param_dict: Dict = get_data_params(file=data,
+                                                   json_file=json_file)
+
+                metadata: Dict = dict_multi_update(dictionary=None,
+                                                   **meta_dict,
+                                                   **param_dict,
+                                                   **mod_dict)
+
+                bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
+                                                      json_dict=json_dict)
+            else:
+                json_dict: Dict = read_json(json_file="")
+                metadata: Dict = dict_multi_update(dictionary=None,
+                                                   **meta_dict,
+                                                   **mod_dict)
+                
+                bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
+                                                      json_dict=json_dict)
+
+            # BIDS 'fmap' cases
+            case1: bool = False
+            case2: bool = False
+            case3: bool = False
+            case4: bool = False
+            mag2: bool = False
+            
+            if modality_type.lower() == 'fmap':
+                if len(img_files) == 4:
+                    case2: bool = True
+                elif len(img_files) == 3:
+                    case1: bool = True
+                    mag2: bool = True
+                elif len(img_files) == 1:
+                    case4 = True
+                elif len(img_files) == 2:
+                    for i in img_data.imgs:
+                        # This needs more review, need to know output of fieldmaps from dcm2niix
+                        if list_in_substr(['mag','map','a'],i):
+                            case3: bool = True
+                            break
+                        else:
+                            case1: bool = True
+            
+            if modality_type.lower() == 'dwi' or modality_type.lower() == 'func' :
+                num_frames = get_num_frames(img_files[0])
+                if num_frames == 1:
+                    modality_label: str = "sbref"
+
+            if (modality_type.lower() == 'dwi' or modality_label.lower() == 'dwi') and append_dwi_info:
+                bvals: List[int] = get_bvals(bval_file)
+                echo_time: Union[int,str] = bids_dict["EchoTime"] # Not sure if this value will be in sec. or msec.
+                _label: str = ""
+                for bval in bvals:
+                    if bval != 0:
+                        _label += f"b{bval}"
+                if echo_time:
+                    _label += f"TE{echo_time}"
+                if acq:
+                    acq += _label
+                else:
+                    acq = _label
+
+            # Re-write BIDS name dictionary and update to reflect NIFTI data
+            bids_name_dict: Dict = construct_bids_name(sub_data=sub_data,
+                                                        modality_type=modality_type,
+                                                        modality_label=modality_label,
+                                                        acq=acq,
+                                                        ce=ce,
+                                                        task=task,
+                                                        acq_dir=acq_dir,
+                                                        rec=rec,
+                                                        echo=echo,
+                                                        case1=case1,
+                                                        mag2=mag2,
+                                                        case2=case2,
+                                                        case3=case3,
+                                                        case4=case4,
+                                                        zero_pad=zero_pad,
+                                                        out_dir=out_data_dir)
+            
+            [bids_1, bids_2, bids_3, bids_4] = _make_bids_name(bids_name_dict=bids_name_dict,
+                                                               modality_type=modality_type)
+            
+            bids_names: List[str] = [bids_1, bids_2, bids_3, bids_4]
+            
+            # Image data return lists
+            imgs: List[str] = []
+            jsons: List[str] = []
+            bvals: List[str] = []
+            bvecs: List[str] = []
+
+            if os.path.exists(out_data_dir):
+                pass
+            else:
+                os.makedirs(out_data_dir)
+            
+            for i in range(0,len(img_files)):
+                out_name: str = os.path.join(out_data_dir,bids_names[i])
+
+                out_nii: str = out_name + ext
+                out_json: str = out_name + ".json"
+                out_bval: str = out_name + ".bval"
+                out_bvec: str = out_name + ".bvec"
+
+                out_nii = copy(img_files[i],out_nii)
+                out_json = write_josn(json_file=out_json,
+                                      dictionary=bids_dict)
+                
+                imgs.append(out_nii)
+                jsons.append(out_json)
+                
+                if bval_file and bvec_file:
+                    out_bval = copy(bval_file,out_bval)
+                    out_bvec = copy(bvec_file,out_bvec)
+                    bvals.append(out_bval)
+                    bvecs.append(out_bvec)
+                else:
+                    out_bval: str = ""
+                    out_bvec: str = ""
+                    bvals.append("")
+                    bvecs.append("")
+        
+            return (imgs,
+                    jsons,
+                    bvals,
+                    bvecs)
+    elif ('.par' in data) or ('.dcm' in data):
+        # Handle source data cases here
+        with TmpDir(tmp_dir=sub_tmp,use_cwd=False) as tmp:
+            with TmpDir.TmpFile(tmp_dir=tmp.tmp_dir) as f:
+                tmp.mk_tmp_dir()
+                [_path, basename, _ext] = f.file_parts()
+                try:
+                    img_data = convert_image_data(file=data,
+                                                  basename=basename,
+                                                  out_dir=tmp.tmp_dir,
+                                                  log=log,
+                                                  env=env,
+                                                  dryrun=dryrun,
+                                                  return_obj=True)
+
+                    # Update JSON files
+                    for i in range(0,len(img_data.imgs)):
+                        if img_data.jsons[i]:
+                            json_dict: Dict = read_json(json_file=img_data.jsons[i])
+
+                            param_dict: Dict = get_data_params(file=data,
+                                                               json_file=img_data.jsons[i])
+
+                            metadata: Dict = dict_multi_update(dictionary=None,
+                                                               **meta_dict,
+                                                               **param_dict,
+                                                               **mod_dict)
+
+                            bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
+                                                                  json_dict=json_dict)
+
+                            img_data.jsons[i]: str = write_josn(json_file=img_data.jsons[i],
+                                                                dictionary=bids_dict)
+                    
+                    out_data_dir: str = os.path.join(out_dir, "unknown")
+                    
+                    # Re-write BIDS name dictionary and update to reflect NIFTI data
+                    bids_name_dict: Dict = construct_bids_name(sub_data=sub_data,
+                                                               modality_type=modality_type,
+                                                               modality_label=modality_label,
+                                                               acq=acq,
+                                                               ce=ce,
+                                                               task=task,
+                                                               acq_dir=acq_dir,
+                                                               rec=rec,
+                                                               echo=echo,
+                                                               case1=case1,
+                                                               mag2=mag2,
+                                                               case2=case2,
+                                                               case3=case3,
+                                                               case4=case4,
+                                                               zero_pad=zero_pad,
+                                                               out_dir=out_data_dir)
+                    
+                    # Ensure that DWI and Fieldmap files are not kept as unknown
+                    # by back-tracking if that is the case.
+                    if img_data.bvals[0] and img_data.bvecs[0]:
+                        modality_type = 'dwi'
+                        modality_label = 'dwi'
+                        sub_data.data = img_data.imgs[0]
+                        [imgs, jsons, bvals, bvecs] = data_to_bids(sub_data=sub_data,
+                                                                   bids_name_dict=bids_name_dict,
+                                                                   out_dir=out_dir,
+                                                                   modality_type=modality_type,
+                                                                   modality_label=modality_label,
+                                                                   meta_dict=meta_dict,
+                                                                   mod_dict=mod_dict)
+                        return (imgs,
+                                jsons,
+                                bvals,
+                                bvecs)
+                    elif len(img_data.imgs) >= 2:
+                        modality_type = 'fmap'
+                        modality_label = 'fmap'
+                        sub_data.data = img_data.imgs[0]
+                        [imgs, jsons, bvals, bvecs] = data_to_bids(sub_data=sub_data,
+                                                                   bids_name_dict=bids_name_dict,
+                                                                   out_dir=out_dir,
+                                                                   modality_type=modality_type,
+                                                                   modality_label=modality_label,
+                                                                   meta_dict=meta_dict,
+                                                                   mod_dict=mod_dict)
+                        return (imgs,
+                                jsons,
+                                bvals,
+                                bvecs)
+                    
+                    if os.path.exists(out_data_dir):
+                        pass
+                    else:
+                        os.makedirs(out_data_dir)
+                    
+                    modality_type: str = "unknown"
+                    [bids_1, bids_2, bids_3, bids_4] = _make_bids_name(bids_name_dict=bids_name_dict,
+                                                                       modality_type=modality_type)
+
+                    bids_names: List[str] = [bids_1, bids_2, bids_3, bids_4]
+                    
+                    # Image data return lists
+                    imgs: List[str] = []
+                    jsons: List[str] = []
+                    bvals: List[str] = []
+                    bvecs: List[str] = []
+                    
+                    for i in range(0,len(img_data.imgs)):
+                        out_name: str = ""
+                        if gzip:
+                            ext: str = ".nii.gz"
+                        else:
+                            ext: str = ".nii"
+                        
+                        out_name: str = os.path.join(out_data_dir,bids_names[i])
+
+                        out_nii: str = out_name + ext
+                        out_json: str = out_name + ".json"
+                        out_bval: str = out_name + ".bval"
+                        out_bvec: str = out_name + ".bvec"
+
+                        out_nii = copy(img_data.imgs[i],out_nii)
+                        imgs.append(out_nii)
+
+                        if img_data.jsons[i]:
+                            out_json = copy(img_data.jsons[i],out_json)
+                            jsons.append(out_json)
+                        else:
+                            jsons.append("")
+                        
+                        if img_data.bvals[i]:
+                            out_bval = copy(img_data.bvals[i],out_bval)
+                            bvals.append(out_bval)
+                        else:
+                            bvals.append("")
+                        
+                        if img_data.bvecs[i]:
+                            out_bvec = copy(img_data.bvecs[i],out_bvec)
+                            bvecs.append(out_bvec)
+                        else:
+                            bvecs.append("")
+                    # Clean-up
+                    tmp.rm_tmp_dir()
+                    return (imgs,
+                            jsons,
+                            bvals,
+                            bvecs)
+                except ConversionError:
+                    tmp.rm_tmp_dir()
+                    return [""],[""],[""],[""]
+    elif ('.nii' in data):
+        # Handle NIFTI cases here
+        out_data_dir: str = os.path.join(out_dir, "unknown")
+        with NiiFile(data) as n:
+            [path, basename, ext] = n.file_parts()
+            img_files: List[str] = glob.glob(os.path.join(path,basename + "*" + ext))
+            json_file: str = os.path.join(path,basename + "*.json")
+            bval_file: str = ""
+            bvec_file: str = ""
+            
+            if json_file:
+                json_dict: Dict = read_json(json_file=json_file)
+
+                param_dict: Dict = get_data_params(file=data,
+                                                    json_file=json_file)
+
+                metadata: Dict = dict_multi_update(dictionary=None,
+                                                    **meta_dict,
+                                                    **param_dict,
+                                                    **mod_dict)
+
+                bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
+                                                        json_dict=json_dict)
+            else:
+                json_dict: Dict = read_json(json_file="")
+                metadata: Dict = dict_multi_update(dictionary=None,
+                                                    **meta_dict,
+                                                    **mod_dict)
+                
+                bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
+                                                        json_dict=json_dict)
+
+
+            # Re-write BIDS name dictionary and update to reflect NIFTI data
+            bids_name_dict: Dict = construct_bids_name(sub_data=sub_data,
+                                                        modality_type=modality_type,
+                                                        modality_label=modality_label,
+                                                        acq=acq,
+                                                        ce=ce,
+                                                        task=task,
+                                                        acq_dir=acq_dir,
+                                                        rec=rec,
+                                                        echo=echo,
+                                                        case1=case1,
+                                                        mag2=mag2,
+                                                        case2=case2,
+                                                        case3=case3,
+                                                        case4=case4,
+                                                        zero_pad=zero_pad,
+                                                        out_dir=out_data_dir)
+            
+            modality_type: str = "unknown"
+            [bids_1, bids_2, bids_3, bids_4] = _make_bids_name(bids_name_dict=bids_name_dict,
+                                                                modality_type=modality_type)
+
+            if os.path.exists(out_data_dir):
+                pass
+            else:
+                os.makedirs(out_data_dir)
+            
+            out_name: str = os.path.join(out_data_dir,bids_1)
+            
+            out_nii: str = out_name + ext
+            out_json: str = out_name + ".json"
+
+            out_nii = copy(img_files[0],out_nii)
+            out_json = write_josn(json_file=out_json,
+                                    dictionary=bids_dict)
+            if bval_file and bvec_file:
+                out_bval = copy(bval_file,out_bval)
+                out_bvec = copy(bvec_file,out_bvec)
+            else:
+                out_bval: str = ""
+                out_bvec: str = ""
+        
+            return ([out_nii],
+                    [out_json],
+                    [out_bval],
+                    [out_bvec])
+    else:
+        return [""],[""],[""],[""]
+
+def batch_proc(config_file: str,
+              study_img_dir: str,
+              out_dir: str,
+              verbose: bool = False
+              ) -> List[BIDSImgData]:
+    '''working doc-string'''
+    [search_dict,
+     bids_search,
+     bids_map,
+     meta_dict,
+     exclusion_list] = read_config(config_file=config_file,
+                                   verbose=verbose)
     
-#     return converted_files
-
-# def batch_convert(bids_out_dir,sub,file_list, search_dict, meta_dict=dict(), ses=1, keep_unknown=True,verbose=False):
-#     '''
-#     Batch conversion function for image files.
+    # Check BIDS searcn and map dictionaries
+    if comp_dict(d1=bids_search,d2=bids_map):
+        pass
     
-#     Note: This function is still undergoing active development.
-
-#     Arguments:
-#         bids_out_dir (string): Output BIDS directory
-#         sub (int or string): Subject ID
-#         file_list (list): List of image files with absolute paths
-#         search_dict (dict): Nested dictionary from the 'read_config' function
-#         meta_dict (dict): Nested metadata dictionary
-#         ses (int or string): Session ID
-#         keep_unknown (bool): Convert modalities/scans which cannot be identified (default: True)
-#         verbose (bool): Prints the scan_type, modality, and search terms used (e.g. func - bold - rest - ['rest', 'FFE'])
-
-#     Returns: 
-#         None
-#     '''
-
-#     converted_files = list()
+    subs_data: List[SubDataInfo] = collect_info(parent_dir=study_img_dir,
+                                                exclusion_list=exclusion_list)
     
-#     for file in file_list:
-#         try:
-#             converted_files = convert_modality(bids_out_dir=bids_out_dir, sub=sub, file=file, search_dict=search_dict, meta_dict=meta_dict, ses=ses, keep_unknown=keep_unknown, verbose=verbose)
-#         except SystemExit:
-#             pass
-    
-#     return converted_files
-
-# if __name__ == "__main__":
-
-#     # Info
-#     v_txt = os.path.join(os.path.dirname(__file__),'..','version.txt')
-#     version = utils.file_to_screen(v_txt)
-
-#     # Argument Parser
-#     parser = argparse.ArgumentParser(
-#         description=f'Performs conversion of source DICOM, PAR REC, and Nifti data to BIDS directory layout.\t\n\n convert_source v{version}\n\n')
-
-#     # Parse Arguments
-#     # Required Arguments
-#     reqoptions = parser.add_argument_group('Required arguments')
-#     reqoptions.add_argument('-s', '-sub', '--sub',
-#                             type=str,
-#                             dest="sub",
-#                             metavar="subject_ID",
-#                             required=True,
-#                             help="Unique subject identifier given to each participant. This indentifier CAN contain letters and numbers. This identifier CANNOT contain: underscores, hyphens, colons, semi-colons, spaces, or any other special characters.")
-#     reqoptions.add_argument('-o', '-out', '--out',
-#                             type=str,
-#                             dest="out_bids",
-#                             metavar="Output_BIDS_Directory",
-#                             required=True,
-#                             help="BIDS output directory. This directory does not need to exist at runtime. The resulting directory will be populated with BIDS named and structured data.")
-#     reqoptions.add_argument('-d', '-data', '--data',
-#                             type=str,
-#                             dest="data_dir",
-#                             metavar="data_directory",
-#                             required=True,
-#                             help="Parent directory that contains that subuject's unconverted source data. This directory can contain either all the PAR REC files, or all the directories of the DICOM files. NOTE: filepaths with spaces either need to replaced with underscores or placed in quotes. NOTE: The PAR REC directory is rename PAR_REC automaticaly.")
-#     reqoptions.add_argument('-c', '-config', '--config',
-#                             type=str,
-#                             dest="conf",
-#                             metavar="config.yml",
-#                             required=True,
-#                             help="YAML configuruation file that contains modality search, parameters, metadata, and exclusion list.")
-#     reqoptions.add_argument('-f', '-file', '--file-type',
-#                             type=str,
-#                             dest="conv",
-#                             metavar="file_type",
-#                             required=True,
-#                             help="File type that is to be used with the converter. Acceptable choices include: DCM, PAR, or, NII.")
-
-#     # Optional Arguments
-#     optoptions = parser.add_argument_group('Optional arguments')
-#     optoptions.add_argument('-ses', '--ses',
-#                             type=str,
-#                             dest="ses",
-#                             metavar="session",
-#                             required=False,
-#                             default=1,
-#                             help="Session label for the acquired source data. [default: 1]")
-#     optoptions.add_argument('-k', '-keep', '--keep-unknown',
-#                             dest="keep_unknown",
-#                             required=False,
-#                             default=True,
-#                             action="store_true",
-#                             help="Keep or remove unknown modalities [default: True].")
-#     optoptions.add_argument('-v', '-verbose', '--verbose',
-#                             dest="verbose",
-#                             required=False,
-#                             default=False,
-#                             action="store_true",
-#                             help="Prints additional information to screen. [default: False]")
-#     optoptions.add_argument('-version', '--version',
-#                             dest="vers",
-#                             required=False,
-#                             default=False,
-#                             action="store_true",
-#                             help=f"Prints version to screen and exits. convert_source v{version}")
-
-#     args = parser.parse_args()
-
-#     # Print help message in the case
-#     # of no arguments
-#     try:
-#         args = parser.parse_args()
-#     except SystemExit as err:
-#         if err.code == 2:
-#             parser.print_help()
-
-#     # version flag
-#     if args.vers:
-#         print("")
-#         print(f"convert_source v{version}")
-#         print("")
-#         sys.exit()
-
-#     # Verbose flag
-#     if args.verbose:
-#         args.verbose = True
-
-#     # Convert Source Data Files
-#     if args.conv.upper() == 'PAR':
-#         file_ext = "PAR"
-#     elif args.conv.upper() == 'DCM':
-#         file_ext = "dcm"
-#     elif args.conv.upper() == 'NII':
-#         file_ext = "nii"
-#     else:
-#         print(
-#             "Option not recognized. Please use the \'--fileType\' option with either \'PAR\' or \'DCM\' as specified.")
-
-#     # Read config file
-#     [search_dict, exclude_list, meta_dict] = read_config(config_file=args.conf, verbose=args.verbose)
-
-#     # Create file list
-#     file_list_all = create_file_list(data_dir=args.data_dir,file_ext=file_ext)
-#     file_list = file_exclude(file_list_all, data_dir=args.data_dir, exclusion_list=exclude_list, verbose=args.verbose)
-
-#     # Batch convert files in file list
-#     batch_convert(bids_out_dir=args.out_bids,
-#                   sub=args.sub,
-#                   file_list=file_list,
-#                   search_dict=search_dict,
-#                   meta_dict=meta_dict,
-#                   ses=args.ses,
-#                   keep_unknown=args.keep_unknown,
-#                   verbose=args.verbose)
-
-#     print(f"Completed sub-{args.sub}")
+    subs_bids: List = []
+       
+    for sub_data in subs_data:
+        data: str = sub_data.data
+        bids_name_dict: Dict = deepcopy(BIDS_PARAM)
+        bids_name_dict['info']['sub'] = sub_data.sub
+        if sub_data.ses:
+            bids_name_dict['info']['ses'] = sub_data.ses
+        [bids_name_dict, 
+         modality_type, 
+         modality_label, 
+         task] = bids_id(s=data,
+                         search_dict=search_dict,
+                         bids_search=bids_search,
+                         bids_map=bids_map,
+                         bids_name_dict=bids_name_dict,
+                         parent_dir=study_img_dir)
+        [meta_com_dict, 
+         meta_scan_dict] = get_metadata(dictionary=meta_dict,
+                                        modality_type=modality_type,
+                                        task=task)
+        # Convert source data
+        [imgs,
+         jsons,
+         bvals,
+         bvecs] = data_to_bids(sub_data=sub_data,
+                               bids_name_dict=bids_name_dict,
+                               out_dir=out_dir,
+                               modality_type=modality_type,
+                               modality_label=modality_label,
+                               task=task,
+                               meta_dict=meta_com_dict,
+                               mod_dict=meta_scan_dict)
+        tmp_img_data_obj = BIDSImgData(imgs=imgs,
+                                       jsons=jsons,
+                                       bvals=bvals,
+                                       bvecs=bvecs)
+        subs_bids.append(tmp_img_data_obj)
+    return subs_bids
