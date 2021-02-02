@@ -670,7 +670,7 @@ def convert_image_data(file: str,
         gzip: Gzip compress images (default: True).
         comment: Image comment(s) stored in NifTi header (default: True).
         adjacent: Assumes adjacent DICOMs/Image data (images from same series always in same folder) for faster conversion (default: False).
-        dir_search (int): Directory search depth (default: 5).
+        dir_search: Directory search depth (default: 5).
         nrrd: Export as NRRD instead of NifTi, not recommended (default: False).
         ignore_2D: Ignore derived, localizer and 2D images (default: True).
         merge_2D: Merge 2D slices from same series regardless of echo, exposure, etc. (default: True).
@@ -678,15 +678,15 @@ def convert_image_data(file: str,
         progress: Report progress, slicer format progress information (default: True).
         verbose: Enable verbosity (default: False).
         write_conflicts: Write behavior for name conflicts:
-            - 'suffix' = Add suffix to name conflict (default)
-            - 'overwrite' = Overwrite name conflict
-            - 'skip' = Skip name conflict
+            * 'suffix' = Add suffix to name conflict (default)
+            * 'overwrite' = Overwrite name conflict
+            * 'skip' = Skip name conflict
         crop_3D: crop 3D acquisitions (default: False).
         lossless: Losslessly scale 16-bit integers to use dynamic range (default: True).
         big_endian: Byte order:
-            - 'o' = optimal/native byte order (default)
-            - 'n' = little endian
-            - 'y' = big endian
+            * 'o' = optimal/native byte order (default)
+            * 'n' = little endian
+            * 'y' = big endian
         xml: Slicer format features (default: False).
         log: LogFile object for logging.
         env: Path environment dictionary.
@@ -695,18 +695,18 @@ def convert_image_data(file: str,
         
     Returns:
         BIDSimg data object that contains:
-            - imgs: List of NIFTI image files
-            - jsons: Corresponding list of JSON file(s)
-            - bvals: Corresponding bval file(s)
-            - bvecs: Corresponding bvec file(s)
+            * imgs: List of NIFTI image files
+            * jsons: Corresponding list of JSON file(s)
+            * bvals: Corresponding bval file(s)
+            * bvecs: Corresponding bvec file(s)
 
         OR
 
         Tuple of four lists of strings that correspond to:
-            - NIFTI image files
-            - Corresponding JSON file(s)
-            - Corresponding bval file(s)
-            - Corresponding bvec file(s)
+            * NIFTI image files
+            * Corresponding JSON file(s)
+            * Corresponding bval file(s)
+            * Corresponding bvec file(s)
     
     Raises:
         ConversionError: Error that arises if no converted (NIFTI) images are created.
@@ -1405,7 +1405,7 @@ def header_search(img_file: str,
         >>> [modality_type, modality_label, task] = header_search(img_file,
         ...                                                       search_dict)
         ...
-        
+
     Arguments:
         img_file: Input image data file path.
         search_dict: Nested heursitic dictionary of (BIDS) related search terms.

@@ -565,17 +565,44 @@ def data_to_bids(sub_data: SubDataInfo,
                  task: Optional[str] = "",
                  meta_dict: Optional[Dict] = {},
                  mod_dict: Optional[Dict] = {},
-                 log: Optional[LogFile] = None,
                  gzip: bool = True,
-                 env: Optional[Dict] = {},
-                 dryrun: bool = False,
                  append_dwi_info: bool = True,
-                 zero_pad: int = 2
+                 zero_pad: int = 2,
+                 cprss_lvl: int = 6,
+                 verbose: bool = False,
+                 log: Optional[LogFile] = None,
+                 env: Optional[Dict] = {},
+                 dryrun: bool = False
                  ) -> Tuple[List[str],List[str],List[str],List[str]]:
-    '''Converts source data to BIDS named raw data.
+    '''Converts source data to BIDS compliant data. This functions also
+    renames already existing NIFTI data so that it can be BIDS compliant.
     
     Usage example:
+        >>> [imgs, jsons, bvals, bvecs] = data_to_bids(sub_obj,
+        ...                                            bids_name_dict,
+        ...                                            output_dir,
+        ...                                            'anat',
+        ...                                            'T1w')
+        ...
+
     Arguments:
+        sub_data: Subject data information object.
+        bids_name_dict: BIDS name dictionary.
+        out_dir: Output directory.
+        modality_type: Modality type (BIDS label e.g. 'anat', 'func', etc).
+        modality_label: Modality label (BIDS label  e.g. 'T1w', 'bold', etc).
+        task: Task label (BIDS filename task label, e.g. 'rest', 'nback', etc.)
+        meta_dict: BIDS common metadata dictoinary.
+        mod_dict: Modality specific metadata dictionary.
+        gzip: Gzip output NIFTI files.
+        append_dwi_info: Appends DWI acquisition information (unique non-zero b-values, and TE, in msec.) to BIDS acquisition filename.
+        zero_pad: Number of zeroes to pad the run number up to (zero_pad=2 is '01').
+        cprss_lvl: Compression level [1 - 9] - 1 is fastest, 9 is smallest (dcm2niix option).
+        verbose: Enable verbose output (dcm2niix option).
+        log: LogFile object for logging.
+        env: Path environment dictionary.
+        dryrun: Perform dryrun (creates the command, but does not execute it).
+
     Returns:
         Tuple of lists that contains:
             * List of image data file(s). Empty string is returned if this file does not exist.
@@ -584,9 +611,7 @@ def data_to_bids(sub_data: SubDataInfo,
             * List of corresponding FSL-style bvec file(s). Empty string is returned if this file does not exist.
     
     TODO: 
-        * Construct dcm2niix's args as a dict, and pass that as args to this function.
         * Init subject log file here.
-        * Write documentation.
         * Write log files for each subject.
             * BUG: logging class only writes to one file.
     '''
@@ -632,6 +657,9 @@ def data_to_bids(sub_data: SubDataInfo,
                     img_data = convert_image_data(file=data,
                                                   basename=basename,
                                                   out_dir=tmp.tmp_dir,
+                                                  gzip=gzip,
+                                                  cprss_lvl=cprss_lvl,
+                                                  verbose=verbose,
                                                   log=log,
                                                   env=env,
                                                   dryrun=dryrun,
@@ -934,6 +962,9 @@ def data_to_bids(sub_data: SubDataInfo,
                     img_data = convert_image_data(file=data,
                                                   basename=basename,
                                                   out_dir=tmp.tmp_dir,
+                                                  gzip=gzip,
+                                                  cprss_lvl=cprss_lvl,
+                                                  verbose=verbose,
                                                   log=log,
                                                   env=env,
                                                   dryrun=dryrun,
