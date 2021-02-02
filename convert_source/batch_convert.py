@@ -2,6 +2,7 @@
 """Batch conversion wrapper and its associated classes and functions for the `convert_source` package.
 
 TODO:
+    * Write unit tests.
     * Resolve TODO's.
 """
 import os
