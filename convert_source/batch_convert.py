@@ -6,7 +6,6 @@ TODO:
     * Resolve TODO's.
 """
 import os
-import sys
 import glob
 import yaml
 import platform
