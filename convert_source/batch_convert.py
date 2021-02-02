@@ -41,6 +41,8 @@ from convert_source.cs_utils.utils import (
     get_bvals,
     zeropad,
     comp_dict,
+    gzip_file,
+    gunzip_file,
     list_in_substr,
     header_search,
     SubDataInfo,
@@ -390,10 +392,7 @@ def _gather_bids_name_args(bids_name_dict: Dict,
                 if bids_name_dict[modality_type][param]['magnitude2']:
                     return True
             elif param == 'case4':
-                if bids_name_dict[modality_type]["ce"] or bids_name_dict[modality_type]["dir"]:
-                    return True
-                else:
-                    return False
+                return True
             elif bids_name_dict[modality_type][param]:
                 return True
         else:
@@ -585,7 +584,6 @@ def data_to_bids(sub_data: SubDataInfo,
             * List of corresponding FSL-style bvec file(s). Empty string is returned if this file does not exist.
     
     TODO: 
-        * handle no gzip/gunzip NIFTI file cases
         * Construct dcm2niix's args as a dict, and pass that as args to this function.
         * Init subject log file here.
         * Write documentation.
@@ -899,6 +897,15 @@ def data_to_bids(sub_data: SubDataInfo,
                 out_json = write_josn(json_file=out_json,
                                       dictionary=bids_dict)
                 
+                if gzip and ('.nii.gz' in out_nii):
+                    pass
+                elif (not gzip) and ('.nii.gz' in out_nii):
+                    out_nii = gunzip_file(file=out_nii,
+                                          native=True)
+                elif gzip and ('.nii' in out_nii):
+                    out_nii = gzip_file(file=out_nii,
+                                        native=True)
+                
                 imgs.append(out_nii)
                 jsons.append(out_json)
                 
@@ -1132,6 +1139,16 @@ def data_to_bids(sub_data: SubDataInfo,
             out_nii = copy(img_files[0],out_nii)
             out_json = write_josn(json_file=out_json,
                                     dictionary=bids_dict)
+
+            if gzip and ('.nii.gz' in out_nii):
+                pass
+            elif (not gzip) and ('.nii.gz' in out_nii):
+                out_nii = gunzip_file(file=out_nii,
+                                        native=True)
+            elif gzip and ('.nii' in out_nii):
+                out_nii = gzip_file(file=out_nii,
+                                    native=True)
+
             if bval_file and bvec_file:
                 out_bval = copy(bval_file,out_bval)
                 out_bvec = copy(bvec_file,out_bvec)

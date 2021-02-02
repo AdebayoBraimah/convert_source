@@ -869,19 +869,13 @@ def img_exclude(img_list: List[str],
     Returns:
         List of image files that do not contain words in the exclusion list.
     '''
-    if exclusion_list is None or len(exclusion_list) == 0:
+    if (exclusion_list is None) or (len(exclusion_list) == 0):
         return img_list
     else:
-        # Init set of images
         img_set: Set = set(img_list)
-
-        # Init empty set
         exclusion_set: Set = set()
-        
-        # Temporary list
         tmp_list: List[str] = []
-        
-        # Iterate through exclusion and image lists and remove images in the exclusion list
+
         for file in exclusion_list:
             for img in img_list:
                 if file.lower() in img.lower():
@@ -950,7 +944,7 @@ def collect_info(parent_dir: str,
         
         # Exclude files
         img_list = img_exclude(img_list=img_list,
-                              exclusion_list=exclusion_list)
+                               exclusion_list=exclusion_list)
         
         for img in img_list:
             # Collect and organize each subjects' session and data
@@ -1363,7 +1357,7 @@ def get_dcm_scan_tech(dcm_file: str,
     # Secondary searches in the case that the Private Tag/Field (2001, 1020) [Scanning Technique Description MR] search is unsucessful
 
     # Define list of DICOM header fields to search
-    dcm_fields = ['SeriesDescription', 'ImageType', 'ProtocolName']
+    dcm_fields: List[str] = ['SeriesDescription', 'ImageType', 'ProtocolName']
 
     for dcm_field in dcm_fields:
             dcm_scan_tech_str = str(eval(f"ds.{dcm_field}")) # This makes me dangerously uncomfortable
@@ -1408,6 +1402,10 @@ def header_search(img_file: str,
     of search terms to map scan acquisitions of interest. Any other image file passed as an argument will return a tuple of empty strings.
 
     Usage example:
+        >>> [modality_type, modality_label, task] = header_search(img_file,
+        ...                                                       search_dict)
+        ...
+        
     Arguments:
         img_file: Input image data file path.
         search_dict: Nested heursitic dictionary of (BIDS) related search terms.

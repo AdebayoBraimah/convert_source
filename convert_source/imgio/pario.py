@@ -170,7 +170,6 @@ def get_echo_time(par_file: str,
     df: pd.DataFrame = pd.read_csv(par_file,sep="\s+",skiprows=98)
     df: pd.DataFrame = df.dropna(axis=0)
     
-    # use tmp_dir here
     with TmpDir(tmp_dir=tmp_dir,use_cwd=False) as tmp:
         tmp.mk_tmp_dir()
         with TmpDir.TmpFile(tmp_dir=tmp.tmp_dir,ext="txt") as f:
@@ -214,7 +213,6 @@ def get_flip_angle(par_file: str,
     df: pd.DataFrame = pd.read_csv(par_file,sep="\s+",skiprows=98)
     df: pd.DataFrame = df.dropna(axis=0)
     
-    # use tmp_dir here
     with TmpDir(tmp_dir=tmp_dir,use_cwd=False) as tmp:
         tmp.mk_tmp_dir()
         with TmpDir.TmpFile(tmp_file="file.tmp.txt",tmp_dir=tmp.tmp_dir) as f:

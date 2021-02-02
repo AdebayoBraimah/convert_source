@@ -73,7 +73,8 @@ def construct_bids_dict(meta_dict: Optional[Dict] = None,
     '''Constructs dictionary of relevant BIDS related information that includes subject and session IDs, in addition
     to various metadata. Custom BIDS fields can also be added through the metadata dictionary.
 
-    More information can be obtained from: https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html.
+    More information can be obtained from: 
+        https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html.
 
     Usage example:
         >>> bids_dict = construct_bids_dict(meta_dict,
@@ -165,7 +166,8 @@ def construct_bids_name(sub_data: SubDataInfo,
                         ) -> Dict:
     '''Constructs BIDS filenames from input paraemter descriptions.
 
-    More information can be obtained from: https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html.
+    More information can be obtained from: 
+        https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html.
 
     Usage example:
         >>> bids_param = construct_bids_name(sub_data=sub_data,
@@ -306,29 +308,29 @@ def construct_bids_name(sub_data: SubDataInfo,
     if run is None or run == "":
         if out_dir:
             run = num_runs(directory=out_dir,
-                        modality_type=modality_type,
-                        modality_label=modality_label,
-                        bids_dict=bids_param,
-                        zero_pad=zero_pad)
+                           modality_type=modality_type,
+                           modality_label=modality_label,
+                           bids_dict=bids_param,
+                           zero_pad=zero_pad)
         else:
             run = zeropad(num=1,num_zeros=zero_pad)
         
         # Back track to fill in run number
         bids_param = construct_bids_name(sub_data=sub_data,
-                                        modality_type=modality_type,
-                                        modality_label=modality_label,
-                                        acq=acq,
-                                        ce=ce,
-                                        task=task,
-                                        acq_dir=acq_dir,
-                                        rec=rec,
-                                        run=run,
-                                        echo=echo,
-                                        case1=case1,
-                                        mag2=mag2,
-                                        case2=case2,
-                                        case3=case3,
-                                        case4=case4)
+                                         modality_type=modality_type,
+                                         modality_label=modality_label,
+                                         acq=acq,
+                                         ce=ce,
+                                         task=task,
+                                         acq_dir=acq_dir,
+                                         rec=rec,
+                                         run=run,
+                                         echo=echo,
+                                         case1=case1,
+                                         mag2=mag2,
+                                         case2=case2,
+                                         case3=case3,
+                                         case4=case4)
 
     return bids_param
 
@@ -445,16 +447,11 @@ def search_bids(s: str,
     Returns:
         Nested dictionary of BIDS descriptive naming related terms.
     '''
-    # search string with BIDS search term
-    # if term is present, add BIDS mapped name to BIDS name dictionary (global, constant)
-    
-    # iterate through
     if bids_name_dict:
         bids_name_dict: Dict = deepcopy(bids_name_dict)
     else:
         bids_name_dict: Dict = deepcopy(BIDS_PARAM)
     
-    # Set return dictionary for this condition
     if modality_type and modality_label and bids_search and bids_map:
         pass
     elif modality_type and modality_label:
