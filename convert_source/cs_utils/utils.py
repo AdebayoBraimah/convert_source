@@ -103,7 +103,7 @@ class SubDataInfo():
 
 class BIDSimg():
     '''File collection and organization object intended for handling 
-    Brain Imaging Data Structure (BIDS) data in the processing of being converted from source data to 
+    Brain Imaging Data Structure (BIDS) data in the process of being converted from source data to 
     NIFTI.
     
     Attributes:

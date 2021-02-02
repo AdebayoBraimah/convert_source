@@ -291,6 +291,8 @@ def construct_bids_name(sub_data: SubDataInfo,
                                            "run":run,
                                            "echo":echo}})
     elif modality_type == "":
+        if not modality_label:
+            modality_label = "unknown"
         bids_param.update({"unknown":{"task":task,
                                       "acq":acq,
                                       "ce":ce,
@@ -442,9 +444,6 @@ def search_bids(s: str,
         
     Returns:
         Nested dictionary of BIDS descriptive naming related terms.
-
-    TODO:
-        * Add functionality for searching file headers.
     '''
     # search string with BIDS search term
     # if term is present, add BIDS mapped name to BIDS name dictionary (global, constant)

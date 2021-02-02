@@ -8,6 +8,7 @@ convert_source/*.ipynb
 tests/img.test.dir/*
 
 # Command to file al .DS_STOREs files:
-# find . -name ".DS_Store" 
-# find . -name "__pycache__" 
-# find . -name ".ipynb_checkpoints" 
+# find . -name ".DS_Store"
+# find . -name "__pycache__"
+# find . -name ".ipynb_checkpoints"
+# rm -rf $(find . -name ".DS_Store") $(find . -name "__pycache__") $(find . -name ".ipynb_checkpoints")
