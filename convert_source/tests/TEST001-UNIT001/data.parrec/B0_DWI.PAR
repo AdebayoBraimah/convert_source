@@ -3,15 +3,15 @@
 # CAUTION - Investigational device.
 # Limited by Federal Law to investigational use.
 #
-# Dataset name: e:\dicom\\IRC317H-2_WIP_6_DIR_B0_A_TE88_SENSE_NO_MB_NO_6_1
+# Dataset name: e:\dicom\\TestData_B0
 #
 # CLINICAL TRYOUT             Research image export tool     V4.2
 #
 # === GENERAL INFORMATION ========================================================
 #
-.    Patient name                       :   IRC317H-2
-.    Examination name                   :   IRC317H
-.    Protocol name                      :   WIP 6 DIR B0 A TE88 SENSE NO MB NO
+.    Patient name                       :   TestData
+.    Examination name                   :   Protocol
+.    Protocol name                      :   B0
 .    Examination date/time              :   2018.04.19 / 09:38:14
 .    Series Type                        :   Image   MRSERIES
 .    Acquisition nr                     :   6

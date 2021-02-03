@@ -3,14 +3,14 @@
 # CAUTION - Investigational device.
 # Limited by Federal Law to investigational use.
 #
-# Dataset name: e:\dicom\\IRC317H-2_AXIAL_3_3
+# Dataset name: e:\dicom\\TestData_AXIAL
 #
 # CLINICAL TRYOUT             Research image export tool     V4.2
 #
 # === GENERAL INFORMATION ========================================================
 #
-.    Patient name                       :   IRC317H-2
-.    Examination name                   :   IRC317H
+.    Patient name                       :   TestData
+.    Examination name                   :   Protocol
 .    Protocol name                      :   AXIAL
 .    Examination date/time              :   2018.04.19 / 09:38:14
 .    Series Type                        :   Image   MRSERIES
