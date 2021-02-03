@@ -304,7 +304,7 @@ def get_echo(json_file: str) -> float:
     with open(json_file, "r") as read_file:
         data = json.load(read_file)
     echo = data.get("EchoTime")
-    return echo
+    return float(echo)
 
 def gzip_file(file: str,
               native: bool = True
@@ -330,18 +330,18 @@ def gzip_file(file: str,
     
     if native:
         # Native implementation
-        file: File = File(file)
-        [ path, filename, ext ] = file.file_parts()
+        tmp_file: str = file
+        tmp_file: File = File(tmp_file)
+        [path, filename, ext] = tmp_file.file_parts()
         out_file: str = os.path.join(path,filename + ext + '.gz')
         gzip_cmd: Command = Command("gzip")
-        gzip_cmd.cmd_list.append(file.file)
-        gzip_cmd.cmd_list.append(out_file)
+        gzip_cmd.cmd_list.append(file)
         gzip_cmd.run()
         return out_file
     else:
         # Define tempory file for I/O buffer stream
         tmp_file: File = File(file)
-        [ path, filename, ext ] = tmp_file.file_parts()
+        [path, filename, ext] = tmp_file.file_parts()
         out_file: str = os.path.join(path,filename + ext + '.gz')
         
         # Pythonic gzip
@@ -377,18 +377,18 @@ def gunzip_file(file: str,
     
     if native:
         # Native implementation
-        file: File = File(file)
-        [ path, filename, ext ] = file.file_parts()
+        tmp_file: str = file
+        tmp_file: File = File(tmp_file)
+        [path, filename, ext] = tmp_file.file_parts()
         out_file: str = os.path.join(path,filename + ext[:-3])
         gunzip_cmd: Command = Command("gunzip")
-        gunzip_cmd.cmd_list.append(file.file)
-        gunzip_cmd.cmd_list.append(out_file)
+        gunzip_cmd.cmd_list.append(file)
         gunzip_cmd.run()
         return out_file
     else:
         # Define tempory file for I/O buffer stream
         tmp_file: File = File(file)
-        [ path, filename, ext ] = tmp_file.file_parts()
+        [path, filename, ext] = tmp_file.file_parts()
         out_file: str = os.path.join(path,filename + ext[:-3])
         
         # Pythonic gunzip
@@ -420,13 +420,13 @@ def read_json(json_file: str) -> Dict:
     else:
         return dict()
 
-def write_josn(json_file: str,
+def write_json(json_file: str,
                dictionary: Dict
                ) -> str:
     '''Writes python dictionary to a JavaScript Object Notation (JSON) file. The speicifed JSON file need not exist.
     
     Usage example:
-        >>> json_file = write_josn("file.json",
+        >>> json_file = write_json("file.json",
         ...                        example_dict)
         ...
 
@@ -556,8 +556,8 @@ def get_metadata(dictionary: Optional[Dict] = None,
         
     Returns:
         Tuple of dictionaries that contain:
-            - Common metadata dictionary.
-            - Modality specific metadata dictionaries.
+            * Common metadata dictionary.
+            * Modality specific metadata dictionaries.
     '''
 
     if dictionary:

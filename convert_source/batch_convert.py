@@ -37,7 +37,7 @@ from convert_source.cs_utils.utils import (
     depth,
     list_dict,
     read_json,
-    write_josn,
+    write_json,
     get_bvals,
     zeropad,
     comp_dict,
@@ -681,7 +681,7 @@ def data_to_bids(sub_data: SubDataInfo,
                             bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
                                                                   json_dict=json_dict)
 
-                            img_data.jsons[i]: str = write_josn(json_file=img_data.jsons[i],
+                            img_data.jsons[i]: str = write_json(json_file=img_data.jsons[i],
                                                                 dictionary=bids_dict)
 
                             if (modality_type.lower() == 'dwi' or modality_label.lower() == 'dwi') and append_dwi_info:
@@ -922,7 +922,7 @@ def data_to_bids(sub_data: SubDataInfo,
                 out_bvec: str = out_name + ".bvec"
 
                 out_nii = copy(img_files[i],out_nii)
-                out_json = write_josn(json_file=out_json,
+                out_json = write_json(json_file=out_json,
                                       dictionary=bids_dict)
                 
                 if gzip and ('.nii.gz' in out_nii):
@@ -986,7 +986,7 @@ def data_to_bids(sub_data: SubDataInfo,
                             bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
                                                                   json_dict=json_dict)
 
-                            img_data.jsons[i]: str = write_josn(json_file=img_data.jsons[i],
+                            img_data.jsons[i]: str = write_json(json_file=img_data.jsons[i],
                                                                 dictionary=bids_dict)
                     
                     out_data_dir: str = os.path.join(out_dir, "unknown")
@@ -1168,7 +1168,7 @@ def data_to_bids(sub_data: SubDataInfo,
             out_json: str = out_name + ".json"
 
             out_nii = copy(img_files[0],out_nii)
-            out_json = write_josn(json_file=out_json,
+            out_json = write_json(json_file=out_json,
                                     dictionary=bids_dict)
 
             if gzip and ('.nii.gz' in out_nii):
