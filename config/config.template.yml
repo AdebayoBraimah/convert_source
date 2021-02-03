@@ -1,0 +1,221 @@
+# Template configuration file
+
+# Keywords:
+#   * modality_search
+#   * bids_search
+#   * bids_map
+#   * metadata
+#   * exclude
+
+# Congfiguration modality_search layout
+# 
+# modality_search:
+#   <modality_type>:
+#       [<task>]:
+#           <modality_label>:
+#               - <search term 1>
+#               - <search term 2>
+
+
+# Congfiguration bids_search layout
+# 
+# bids_search:
+#   <modality_type>:
+#       [<task>]:
+#           <BIDS_descriptive_term>:
+#               - <search term 1>
+#               - <search term 2>
+
+# Congfiguration bids_map layout
+# 
+# bids_map:
+#   <modality_type>:
+#       [<task>]:
+#           <BIDS_descriptive_term>:
+#               - <Mapping term>
+
+# Congfiguration meta layout
+# 
+# metadata:
+#   common:
+#       <BIDS common metadata>:
+#           <MetaDataTerm>: value
+#   <modality_type>:
+#       [<task>]:
+#           <BIDS modality specific metadata>:
+#               <MetaDataTerm>: value
+
+# Heurestic search terms for each modality
+modality_search:
+    # Anatomical scans
+    anat:
+        T1w: 
+            - T1
+            - T1w
+        T2w: 
+            - T2
+            - T2w
+        flair: 
+          - flair
+
+    # Functional scans
+    func:
+        # BOLD contrast
+        bold: 
+            rest: 
+                - rsfMR
+                - rest
+
+        # ASL (arterial spin labeling) contrast
+        cbv:
+            rest:
+                - casl
+                - pcas
+
+    # Field maps 
+    fmap:
+        fmap: 
+            - map
+
+    # Susceptiblity Weighted Images
+    swi:
+        swi: 
+            - swi 
+
+    # Diffusion Weighted Scans
+    dwi:
+        dwi: 
+            - diffusion
+
+# Heurestic search terms for BIDS descriptive naming conventions
+bids_search:
+    # Anatomical scans
+    anat:
+        T1w:
+            acq:
+            ce:
+            rec:
+        T2w:
+            acq:
+            ce:
+            rec: 
+        flair:
+            acq:
+            ce:
+            rec: 
+
+    # Functional scans
+    func:
+        # BOLD contrast
+        bold: 
+            rest:
+                acq:
+                ce:
+                dir:
+                rec:
+        # ASL (arterial spin labeling) contrast
+        cbv:
+            rest:
+                acq:
+                ce:
+                dir:
+                rec:
+
+    # Field maps 
+    fmap:
+        fmap: 
+            acq:
+            # BIDS case 4: Multiple phase encoded directions ("pepolar")
+            ce:
+            dir:
+
+    # Susceptiblity Weighted Images
+    swi:
+        swi: 
+
+    # Diffusion Weighted Scans
+    dwi:
+        dwi: 
+            acq:
+            dir:
+
+# BIDS terms to map to
+bids_map:
+    # Anatomical scans
+    anat:
+        T1w:
+            acq:
+            ce:
+            rec:
+        T2w:
+            acq:
+            ce:
+            rec: 
+        flair:
+            acq:
+            ce:
+            rec: 
+
+    # Functional scans
+    func:
+        # BOLD contrast
+        bold: 
+            rest:
+                acq:
+                ce:
+                dir:
+                rec:
+        # ASL (arterial spin labeling) contrast
+        cbv:
+            rest:
+                acq:
+                ce:
+                dir:
+                rec:
+
+    # Field maps 
+    fmap:
+        fmap: 
+            acq:
+            # BIDS case 4: Multiple phase encoded directions ("pepolar")
+            ce:
+            dir:
+
+    # Susceptiblity Weighted Images
+    swi:
+        swi: 
+
+    # Diffusion Weighted Scans
+    dwi:
+        dwi: 
+            acq:
+            dir:
+
+
+# Metadata Settings
+metadata:
+    common:
+        Manufacturer: 
+        ManufacturersModelName: 
+        MagneticFieldStrength: 
+        InstitutionName: 
+    func:
+        rest:
+            TaskName: Resting State
+            dir: PA
+
+# Exclusion List (these filenames are not converted)
+exclude: 
+    - SURVEY
+    - Reg
+    - SHORT
+    - LONG
+    - MRS
+    - PRESS
+    - DEFAULT
+    - ScreenCapture
+    - PD
+    - ALL
+    - SPECTRO
+
+

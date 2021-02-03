@@ -1,0 +1,92 @@
+{
+  "files": [
+    {
+      "links": {
+        "self": "https://zenodo.org/api/files/03deb9b8-e9a8-4727-a560-beff99b843db/DICOM.zip"
+      }, 
+      "checksum": "md5:e5cbd0bca91f1787d057b0eac2572bde", 
+      "bucket": "03deb9b8-e9a8-4727-a560-beff99b843db", 
+      "key": "DICOM.zip", 
+      "type": "zip", 
+      "size": 4811333
+    }
+  ], 
+  "owners": [
+    12029
+  ], 
+  "doi": "10.5281/zenodo.16956", 
+  "stats": {
+    "version_unique_downloads": 1901.0, 
+    "unique_views": 4835.0, 
+    "views": 5104.0, 
+    "version_views": 5102.0, 
+    "unique_downloads": 1901.0, 
+    "version_unique_views": 4833.0, 
+    "volume": 10945782575.0, 
+    "version_downloads": 2275.0, 
+    "downloads": 2275.0, 
+    "version_volume": 10945782575.0
+  }, 
+  "links": {
+    "doi": "https://doi.org/10.5281/zenodo.16956", 
+    "latest_html": "https://zenodo.org/record/16956", 
+    "bucket": "https://zenodo.org/api/files/03deb9b8-e9a8-4727-a560-beff99b843db", 
+    "badge": "https://zenodo.org/badge/doi/10.5281/zenodo.16956.svg", 
+    "html": "https://zenodo.org/record/16956", 
+    "latest": "https://zenodo.org/api/records/16956"
+  }, 
+  "created": "2015-04-24T15:21:33+00:00", 
+  "updated": "2020-01-24T19:25:44.861300+00:00", 
+  "conceptrecid": "609363", 
+  "revision": 11, 
+  "id": 16956, 
+  "metadata": {
+    "access_right_category": "success", 
+    "doi": "10.5281/zenodo.16956", 
+    "description": "<p>This zip file contains a DICOM data set of magnetic resonance images&nbsp; a normal male mathematics professor aged 52. The experimental subject is the author. The MRI scans are T2 weighted&nbsp; turbo-spin-echo (T2W TSE) and T1 weighted Fast Field Echo (T1W FFE).</p>\n\n<p>The subject suffers from a small vertical strabismus (hypertropia), a misalignment of the eyes, which is visible in this data set.</p>\n\n<p>The author would like to thank the Radiology Department at the Macclesfield General Hospital for performing the scan.</p>\n\n<p>&nbsp;</p>", 
+    "license": {
+      "id": "CC-BY-SA-4.0"
+    }, 
+    "title": "An MRI DICOM data set of the head of a  normal male human aged 52", 
+    "relations": {
+      "version": [
+        {
+          "count": 1, 
+          "index": 0, 
+          "parent": {
+            "pid_type": "recid", 
+            "pid_value": "609363"
+          }, 
+          "is_last": true, 
+          "last_child": {
+            "pid_type": "recid", 
+            "pid_value": "16956"
+          }
+        }
+      ]
+    }, 
+    "communities": [
+      {
+        "id": "ipuom"
+      }, 
+      {
+        "id": "zenodo"
+      }
+    ], 
+    "keywords": [
+      "MRI, head, brain, DICOM, T2W TSE, T1W FFE, normal male, human"
+    ], 
+    "publication_date": "2015-04-20", 
+    "creators": [
+      {
+        "affiliation": "University of Manchester", 
+        "name": "Lionheart, William R.B."
+      }
+    ], 
+    "access_right": "open", 
+    "resource_type": {
+      "type": "dataset", 
+      "title": "Dataset"
+    }
+  }
+}
