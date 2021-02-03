@@ -33,23 +33,21 @@ from convert_source.cs_utils.fileio import (
     File
 )
 
-from convert_source.cs_utils.utils import (
-    SubDataInfo,
-    zeropad,
-    get_echo,
-    gzip_file,
-    gunzip_file,
-    read_json,
-    write_json,
-    update_json,
-    dict_multi_update,
-    get_bvals,
-    list_in_substr,
-    collect_info,
-    comp_dict,
-    depth,
-    list_dict
-)
+# from convert_source.cs_utils.utils import (
+#     # imports
+# )
+# 
+# from convert_source.imgio.dcmio import (
+#     # imports
+# )
+
+# Windows commands
+# 
+# Unzip on windows command line (windows 10): tar -xf <file.zip>
+# 
+# Recursively remove directories (and files, PowerShell): Remove-Item <directory> -Recurse
+# Recursively remove directories (and files, cmd): del /s /q /f <directory>
+# Recursively remove directories (and files, cmd): rmdir /s /q /f <directory>
 
 # Test variables
 scripts_dir: str = os.path.join(os.getcwd(),'TEST001-UNIT001','data.dicom')
