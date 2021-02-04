@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for the imgio's dcmio module's main functions.
+"""Tests for the imgio's dcmio module's functions.
 
 NOTE: 
     * The test DICOM data used here is publicly available in the referenced citation(s):

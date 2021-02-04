@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for the cs_utils utils module main functions.
+"""Tests for the cs_utils' utils module's functions.
 
 NOTE: 
     * get_metadata is tested elsewhere.
