@@ -881,7 +881,9 @@ def img_exclude(img_list: List[str],
                 if file.lower() in img.lower():
                     tmp_list.append(img)
             exclusion_set.update(set(tmp_list))
-        return list(img_set.difference(exclusion_set))
+        new_list: List[str] = list(img_set.difference(exclusion_set))
+        new_list.sort(reverse=False)
+        return new_list
 
 def collect_info(parent_dir: str,
                 exclusion_list: Optional[List[str]] = None
