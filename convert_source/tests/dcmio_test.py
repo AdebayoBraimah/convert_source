@@ -48,6 +48,8 @@ from convert_source.cs_utils.fileio import (
 # Recursively remove directories (and files, PowerShell): Remove-Item <directory> -Recurse
 # Recursively remove directories (and files, cmd): del /s /q /f <directory>
 # Recursively remove directories (and files, cmd): rmdir /s /q /f <directory>
+# 
+# Uncompress *.tar.gz file: tar -zxvf <file.tar.gz>
 
 # Test variables
 scripts_dir: str = os.path.join(os.getcwd(),'TEST001-UNIT001','data.dicom')
