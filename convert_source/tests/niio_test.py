@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 """Tests for the imgio's niio module's functions.
+
+TODO:
+    * BUG FIX: Edit NIFTI header such that the correct values are written to file.
 """
 import pytest
 
@@ -31,12 +34,18 @@ from convert_source.cs_utils.fileio import (
 from convert_source.cs_utils.utils import (
     SubDataInfo,
     collect_info,
+    list_in_substr,
     write_json
 )
 
+from convert_source.imgio.niio import (
+    get_num_frames,
+    get_nii_tr
+)
+
 # Test variables
-data_dir: str = os.path.join(os.getcwd(),'test.study_dir','TEST001-UNIT001')
-nii_test_data: str = os.path.join(data_dir,'data.nifti')
+data_dir: str = os.path.join(os.getcwd(),'test.study_dir')
+nii_test_data: str = os.path.join(data_dir,'TEST001-UNIT001','data.nifti')
 
 # Code to create empty test NIFTI-2 files
 nii_list: List[str] = ['T1_AXIAL','T2_InPlane','DWI_68_DIR','rs_fMRI','rsfMRI','DWI_B0','FLAIR']
@@ -103,8 +112,8 @@ def create_test_files(test_gzip: bool = False):
             tr: float = 1.2
             task: str = ""
         elif 'rsfMRI' in nii.lower():
-            num_frames: int = 68
-            tr: float = 2.00
+            num_frames: int = 500
+            tr: float = 1.00
             task: str = "Resting State"
         else:
             num_frames: int = 1
@@ -136,6 +145,22 @@ if os.path.exists(os.path.join(nii_test_data,nii_list[0]+'.nii')) or os.path.exi
     pass
 else:
     create_test_files(test_gzip=False)
+
+# Begin tests
+def test_collect_data():
+    subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+                                                exclusion_list=[".dcm",".PAR"])
+
+    sub: str = subs_data[0].sub
+    ses: str = subs_data[0].ses
+
+    assert len(subs_data) == 7
+    assert sub == 'TEST001'
+    assert ses == 'UNIT001'
+
+def test_get_nii_tr():
+    subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+                                                exclusion_list=[".dcm",".PAR"])
 
 # CLI
 # mod_path: str = os.path.join(str(pathlib.Path(os.path.abspath(os.getcwd())).parents[1]))
