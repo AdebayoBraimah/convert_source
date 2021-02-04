@@ -55,8 +55,8 @@ from convert_source.imgio.dcmio import (
 # Recursively remove directories (and files, cmd): rmdir /s /q /f <directory>
 
 # Test variables
-data_dir: str = os.path.join(os.getcwd(),'test.study_dir','TEST001-UNIT001')
-dcm_test_data: str = os.path.join(data_dir,'data.dicom','ST000000')
+data_dir: str = os.path.join(os.getcwd(),'test.study_dir')
+dcm_test_data: str = os.path.join(data_dir,'TEST001-UNIT001','data.dicom','ST000000')
 
 def test_extract_data():
     dcm_data: str = os.path.join(data_dir,'data.dicom','data.tar.gz')
@@ -87,6 +87,8 @@ def test_is_valid_dcm():
     ses: str = subs_data[0].ses
     data: str = subs_data[0].data
     assert is_valid_dcm(data) == True
+    assert sub == 'TEST001'
+    assert ses == 'UNIT001'
 
 def test_get_scan_time():
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
