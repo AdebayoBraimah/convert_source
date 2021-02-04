@@ -100,8 +100,8 @@ def test_get_echo_time():
     data2: str = subs_data[3].data
 
     # NOTE: This is in msec, and may be updated soon.
-    assert get_echo_time(data1) == 3.41
-    assert get_echo_time(data2) == 93.0
+    assert get_echo_time(data1) == 0.0034
+    assert get_echo_time(data2) == 0.0930
 
 def test_get_flip_angle():
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,

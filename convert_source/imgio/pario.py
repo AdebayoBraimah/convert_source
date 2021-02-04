@@ -5,6 +5,7 @@ import os
 import re
 import numpy as np
 import pandas as pd
+from decimal import Decimal
 from typing import (
     List, 
     Dict, 
@@ -142,7 +143,7 @@ def get_scan_time(par_file: str) -> Union[float,str]:
 def get_echo_time(par_file: str,
                  tmp_dir: Optional[str] = None
                  ) -> float:
-    '''Reads the echo time (TE, in ms) from a PAR header file.
+    '''Reads the echo time (TE, in sec.) from a PAR header file.
 
     NOTE: Echo time is obtained from the PAR file header by reading in the PAR header file as a
         pandas dataframe, followed by saving the resulting dataframe as a M x N | N = 35. The echo times
@@ -180,7 +181,7 @@ def get_echo_time(par_file: str,
     if len(list(np.unique(mat[0:,16]))) > 1:
         raise PARfileReadError(f"Two or more unique echo times were found in {par_file}. Please check.")
     else:
-        return float(np.unique(mat[0:,16]))
+        return float(round(Decimal(float(np.unique(mat[0:,16]))/1000),4))
 
 def get_flip_angle(par_file: str,
                    tmp_dir: Optional[str] = None
