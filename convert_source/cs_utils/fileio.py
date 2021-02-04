@@ -149,8 +149,8 @@ class File(object):
 
     def file_parts(self,
                   ext: str = "") -> Tuple[str,str,str]:
-        '''Splits a file and its path into its constituent 
-        parts:
+        '''Similar to MATLAB's `fileparts`, this function splits a file and its path 
+        into its constituent parts:
             * file path
             * filename
             * extension

@@ -57,9 +57,6 @@ from convert_source.imgio.dcmio import (
 # Test variables
 data_dir: str = os.path.join(os.getcwd(),'test.study_dir','TEST001-UNIT001')
 dcm_test_data: str = os.path.join(data_dir,'data.dicom','ST000000')
-tmp_out: str = os.path.join(os.getcwd(),'tmp.subs.dir')
-scripts_dir: str = os.path.join(os.getcwd(),'helper.scripts')
-tmp_json: str = os.path.join(scripts_dir,'test.orig.json')
 
 def test_extract_data():
     dcm_data: str = os.path.join(data_dir,'data.dicom','data.tar.gz')
