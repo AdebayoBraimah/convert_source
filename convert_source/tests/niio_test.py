@@ -47,6 +47,22 @@ from convert_source.imgio.niio import (
 data_dir: str = os.path.join(os.getcwd(),'test.study_dir')
 nii_test_data: str = os.path.join(data_dir,'TEST001-UNIT001','data.nifti')
 
+# # Begin tests
+# def test_collect_data():
+#     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+#                                                 exclusion_list=[".dcm",".PAR"])
+
+#     sub: str = subs_data[0].sub
+#     ses: str = subs_data[0].ses
+
+#     assert len(subs_data) == 7
+#     assert sub == 'TEST001'
+#     assert ses == 'UNIT001'
+
+# def test_get_nii_tr():
+#     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+#                                                 exclusion_list=[".dcm",".PAR"])
+
 # Code to create empty test NIFTI-2 files
 nii_list: List[str] = ['T1_AXIAL','T2_InPlane','DWI_68_DIR','rs_fMRI','rsfMRI','DWI_B0','FLAIR']
 
@@ -145,22 +161,6 @@ if os.path.exists(os.path.join(nii_test_data,nii_list[0]+'.nii')) or os.path.exi
     pass
 else:
     create_test_files(test_gzip=False)
-
-# Begin tests
-def test_collect_data():
-    subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
-                                                exclusion_list=[".dcm",".PAR"])
-
-    sub: str = subs_data[0].sub
-    ses: str = subs_data[0].ses
-
-    assert len(subs_data) == 7
-    assert sub == 'TEST001'
-    assert ses == 'UNIT001'
-
-def test_get_nii_tr():
-    subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
-                                                exclusion_list=[".dcm",".PAR"])
 
 # CLI
 # mod_path: str = os.path.join(str(pathlib.Path(os.path.abspath(os.getcwd())).parents[1]))
