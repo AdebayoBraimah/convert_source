@@ -7,7 +7,6 @@ NOTE:
     * header_search is tested elsewhere.
         * This function wraps `get_dcm_scan_tech` and `get_par_scan_tech`.
 """
-
 import pytest
 
 import os
@@ -23,10 +22,6 @@ from typing import (
 # Add package/module to PYTHONPATH
 mod_path: str = os.path.join(str(pathlib.Path(os.path.abspath(__file__)).parents[2]))
 sys.path.append(mod_path)
-
-# # CLI
-# mod_path: str = os.path.join(str(pathlib.Path(os.path.abspath(os.getcwd())).parents[1]))
-# sys.path.append(mod_path)
 
 from convert_source.cs_utils.fileio import (
     Command,
@@ -248,3 +243,7 @@ def test_cleanup_tmp_dir():
         rm_test_dir.cmd_list.append(tmp_out)
         rm_test_dir.run()
         assert os.path.exists(tmp_out) == False
+
+# CLI
+# mod_path: str = os.path.join(str(pathlib.Path(os.path.abspath(os.getcwd())).parents[1]))
+# sys.path.append(mod_path)
