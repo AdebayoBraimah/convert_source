@@ -2,13 +2,10 @@
 """Tests for the imgio's dcmio module's main functions.
 
 NOTE: 
-    * get_metadata is tested elsewhere.
-    * convert_image_data is tested elsewhere.
-    * header_search is tested elsewhere.
-        * This function wraps `get_dcm_scan_tech` and `get_par_scan_tech`.
+    * The test DICOM data used here is publicly available in the referenced citation(s):
+        * convert_source/convert_source/tests/test.study_dir/TEST001-UNIT001/data.dicom/citation.[bib][json]
+    * Some parameter data is missing, likely due to the anonymization process.
 """
-
-from convert_source.cs_utils.utils import SubDataInfo
 import pytest
 
 import os
@@ -25,10 +22,6 @@ from typing import (
 mod_path: str = os.path.join(str(pathlib.Path(os.path.abspath(__file__)).parents[2]))
 sys.path.append(mod_path)
 
-# # CLI
-# mod_path: str = os.path.join(str(pathlib.Path(os.path.abspath(os.getcwd())).parents[1]))
-# sys.path.append(mod_path)
-
 from convert_source.cs_utils.fileio import (
     Command,
     DependencyError
@@ -39,12 +32,19 @@ from convert_source.cs_utils.utils import (
     collect_info
 )
 
-# from convert_source.imgio.dcmio import (
-#     # imports
-# )
+from convert_source.imgio.dcmio import (
+    is_valid_dcm,
+    get_scan_time,
+    get_red_fact,
+    get_bwpppe,
+    get_mb
+)
 
 # Maximally compress data:
 # GZIP=-9 tar -cvzf <file.tar.gz> <directory>
+
+# Uncompress tar.gz files:
+# tar -zxvf <file.tar.gz>
 
 # Windows commands
 # 
@@ -53,8 +53,6 @@ from convert_source.cs_utils.utils import (
 # Recursively remove directories (and files, PowerShell): Remove-Item <directory> -Recurse
 # Recursively remove directories (and files, cmd): del /s /q /f <directory>
 # Recursively remove directories (and files, cmd): rmdir /s /q /f <directory>
-# 
-# Uncompress *.tar.gz file: tar -zxvf <file.tar.gz>
 
 # Test variables
 data_dir: str = os.path.join(os.getcwd(),'test.study_dir','TEST001-UNIT001')
@@ -80,55 +78,97 @@ def get_subject_data():
                                                 exclusion_list=[".PAR", ".nii"])
     assert len(subs_data) == 3
 
-# Intermediary test variables
-subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
-                                            exclusion_list=[".PAR", ".nii"])
+# NOTE: subs_data list of SubDataInfo objects is placed in each test function
+#   as pytest does not allow test functions to execute without first initializing
+#   all global variables.
 
-sub: str = subs_data[0].sub
-ses: str = subs_data[0].ses
-data: str = subs_data[0].data
+def test_is_valid_dcm():
+    subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+                                                exclusion_list=[".PAR", ".nii"])
+
+    sub: str = subs_data[0].sub
+    ses: str = subs_data[0].ses
+    data: str = subs_data[0].data
+    assert is_valid_dcm(data) == True
 
 def test_get_scan_time():
+    subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+                                                exclusion_list=[".PAR", ".nii"])
 
-# def test_cleanup():
-#     del_method: bool = False
-#     rm_method: bool = False
-#     rm_item_method: bool = False
+    sub: str = subs_data[0].sub
+    ses: str = subs_data[0].ses
+    data: str = subs_data[0].data
+    assert get_scan_time(data) == ''
 
-#     if platform.system().lower() != 'windows':
-#         rm_test_dir: Command = Command("rm")
-#         rm_test_dir.cmd_list.append("-rf")
-#         rm_test_dir.cmd_list.append(dcm_test_data)
-#         rm_test_dir.run()
-#         assert os.path.exists(dcm_test_data) == False
-#     else:
-#         try:
-#             rm_test_dir: Command = Command("del")
-#             rm_test_dir.check_dependency()
-#             del_method: bool = True
-#         except DependencyError:
-#             rm_test_dir: Command = Command("rmdir")
-#             rm_test_dir.check_dependency()
-#             rm_method: bool = True
-#         except DependencyError:
-#             rm_test_dir: Command = Command("Remove-Item")
-#             rm_test_dir.check_dependency()
-#             rm_item_method: bool = True
-#         except DependencyError:
-#             import shutil
-#             shutil.rmtree(dcm_test_data)
-#             assert os.path.exists(dcm_test_data) == False
+def test_get_bwpppe():
+    subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+                                                exclusion_list=[".PAR", ".nii"])
+
+    sub: str = subs_data[0].sub
+    ses: str = subs_data[0].ses
+    data: str = subs_data[0].data
+    assert get_bwpppe(data) == ''
+
+def test_get_red_fact():
+    subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+                                                exclusion_list=[".PAR", ".nii"])
+
+    sub: str = subs_data[0].sub
+    ses: str = subs_data[0].ses
+    data: str = subs_data[0].data
+    assert get_red_fact(data) == 1.0
+
+def test_get_mb():
+    subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+                                                exclusion_list=[".PAR", ".nii"])
+
+    sub: str = subs_data[0].sub
+    ses: str = subs_data[0].ses
+    data: str = subs_data[0].data
+    assert get_mb(data) == 1 
+
+def test_cleanup():
+    del_method: bool = False
+    rm_method: bool = False
+    rm_item_method: bool = False
+
+    if platform.system().lower() != 'windows':
+        rm_test_dir: Command = Command("rm")
+        rm_test_dir.cmd_list.append("-rf")
+        rm_test_dir.cmd_list.append(dcm_test_data)
+        rm_test_dir.run()
+        assert os.path.exists(dcm_test_data) == False
+    else:
+        try:
+            rm_test_dir: Command = Command("del")
+            rm_test_dir.check_dependency()
+            del_method: bool = True
+        except DependencyError:
+            rm_test_dir: Command = Command("rmdir")
+            rm_test_dir.check_dependency()
+            rm_method: bool = True
+        except DependencyError:
+            rm_test_dir: Command = Command("Remove-Item")
+            rm_test_dir.check_dependency()
+            rm_item_method: bool = True
+        except DependencyError:
+            import shutil
+            shutil.rmtree(dcm_test_data)
+            assert os.path.exists(dcm_test_data) == False
         
-#         if rm_method or del_method:
-#             rm_test_dir.cmd_list.append("/s")
-#             rm_test_dir.cmd_list.append("/q")
-#             rm_test_dir.cmd_list.append("/f")
-#             rm_test_dir.cmd_list.append(dcm_test_data)
-#             rm_test_dir.run()
-#             assert os.path.exists(dcm_test_data) == False
-#         elif rm_item_method:
-#             rm_test_dir.cmd_list.append(dcm_test_data)
-#             rm_test_dir.cmd_list.append("-Recurse")
-#             rm_test_dir.run()
-#             assert os.path.exists(dcm_test_data) == False
+        if rm_method or del_method:
+            rm_test_dir.cmd_list.append("/s")
+            rm_test_dir.cmd_list.append("/q")
+            rm_test_dir.cmd_list.append("/f")
+            rm_test_dir.cmd_list.append(dcm_test_data)
+            rm_test_dir.run()
+            assert os.path.exists(dcm_test_data) == False
+        elif rm_item_method:
+            rm_test_dir.cmd_list.append(dcm_test_data)
+            rm_test_dir.cmd_list.append("-Recurse")
+            rm_test_dir.run()
+            assert os.path.exists(dcm_test_data) == False
 
+# CLI
+# mod_path: str = os.path.join(str(pathlib.Path(os.path.abspath(os.getcwd())).parents[1]))
+# sys.path.append(mod_path)
