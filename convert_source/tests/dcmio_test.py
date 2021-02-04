@@ -61,7 +61,7 @@ data_dir: str = os.path.join(os.getcwd(),'test.study_dir')
 dcm_test_data: str = os.path.join(data_dir,'TEST001-UNIT001','data.dicom','ST000000')
 
 def test_extract_data():
-    dcm_data: str = os.path.join(data_dir,'data.dicom','data.tar.gz')
+    dcm_data: str = os.path.join(data_dir,'TEST001-UNIT001','data.dicom','data.tar.gz')
     extract: Command = Command("tar")
     extract.cmd_list.append("-zxvf")
     extract.cmd_list.append(dcm_data)
