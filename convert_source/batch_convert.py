@@ -39,7 +39,6 @@ from convert_source.cs_utils.utils import (
     read_json,
     write_json,
     get_bvals,
-    zeropad,
     comp_dict,
     gzip_file,
     gunzip_file,
@@ -686,7 +685,7 @@ def data_to_bids(sub_data: SubDataInfo,
 
                             if (modality_type.lower() == 'dwi' or modality_label.lower() == 'dwi') and append_dwi_info:
                                 bvals: List[int] = get_bvals(img_data.bvals[i])
-                                echo_time: int = bids_dict["EchoTime"] # Not sure if this value will be in sec. or msec.
+                                echo_time: int = bids_dict["EchoTime"] * 1000
                                 _label: str = ""
                                 for bval in bvals:
                                     if bval != 0:
@@ -867,7 +866,7 @@ def data_to_bids(sub_data: SubDataInfo,
 
             if (modality_type.lower() == 'dwi' or modality_label.lower() == 'dwi') and append_dwi_info:
                 bvals: List[int] = get_bvals(bval_file)
-                echo_time: Union[int,str] = bids_dict["EchoTime"] # Not sure if this value will be in sec. or msec.
+                echo_time: Union[int,str] = bids_dict["EchoTime"] * 1000
                 _label: str = ""
                 for bval in bvals:
                     if bval != 0:
