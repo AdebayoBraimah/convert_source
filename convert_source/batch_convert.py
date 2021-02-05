@@ -26,7 +26,7 @@ from typing import (
     Tuple
 )
 
-from convert_source.cs_utils.const import(
+from convert_source.cs_utils.const import (
     DEFAULT_CONFIG,
     BIDS_PARAM
 )
@@ -62,7 +62,7 @@ from convert_source.cs_utils.bids_info import (
     search_bids
 )
 
-from convert_source.imgio.niio import(
+from convert_source.imgio.niio import (
     get_data_params,
     get_num_frames
 )
