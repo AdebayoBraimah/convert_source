@@ -6,6 +6,7 @@ TODO:
         * Either collect and pass args with dicrtionary.
             OR
         * Use a yaml file to pass the args.
+    * Use dict.get method safe retrival of dict items.
     * Write unit tests.
     * Resolve TODO's.
 """
