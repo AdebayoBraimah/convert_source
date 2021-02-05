@@ -2,6 +2,10 @@
 """Batch conversion wrapper and its associated classes and functions for the `convert_source` package.
 
 TODO:
+    * Update dcm2niix wrapper function to include all args.
+        * Either collect and pass args with dicrtionary.
+            OR
+        * Use a yaml file to pass the args.
     * Write unit tests.
     * Resolve TODO's.
 """
@@ -34,6 +38,7 @@ from convert_source.cs_utils.fileio import (
 )
 
 from convert_source.cs_utils.utils import (
+    SubDataInfo,
     depth,
     list_dict,
     read_json,
@@ -44,7 +49,6 @@ from convert_source.cs_utils.utils import (
     gunzip_file,
     list_in_substr,
     header_search,
-    SubDataInfo,
     collect_info,
     get_metadata,
     convert_image_data,
@@ -1198,7 +1202,31 @@ def batch_proc(config_file: str,
               out_dir: str,
               verbose: bool = False
               ) -> List[BIDSImgData]:
-    '''working doc-string'''
+    '''Batch processes a study's source image data provided a configuration, the parent directory of the study's imaging data,
+    and an output directory to place the BIDS NIFTI data.
+
+    Usage example:
+        >>> subs_bids_data = batch_proc(config_file,
+        ...                             study_img_dir,
+        ...                             out_dir)
+        ...
+
+    Arguments:
+        config_file: Configuration file.
+        study_img_dir: Path to study image parent directory that contains all the subjects' source image data.
+        out_dir: Output directory.
+        verbose: Verbose output.
+
+    Returns:
+        List of BIDSImgData objects. The BIDSImgData object that contains:
+            * List of NIFTI images.
+            * Corresponding list of JSON sidecars.
+            * Corresponding list of bval files.
+            * Corresponding list of bvec files.
+    
+    TODO: 
+        * Create option to return a set of lists (as opposed to current implementation to return a collection object).
+    '''
     [search_dict,
      bids_search,
      bids_map,
