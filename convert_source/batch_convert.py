@@ -2,11 +2,13 @@
 """Batch conversion wrapper and its associated classes and functions for the `convert_source` package.
 
 TODO:
+    * Remove underscore from helper functions, those functions are more versatile
+    * Use dict.get method safe retrival of dict items.
+    * Abstract DICOM/PAR and NIFTI BIDS conversion functions into seperate objects.
     * Update dcm2niix wrapper function to include all args.
         * Either collect and pass args with dicrtionary.
             OR
         * Use a yaml file to pass the args.
-    * Use dict.get method safe retrival of dict items.
     * Write unit tests.
     * Resolve TODO's.
 """
