@@ -2,8 +2,6 @@
 """Batch conversion wrapper and its associated classes and functions for the `convert_source` package.
 
 TODO:
-    * Remove underscore from helper functions, those functions are more versatile
-    * Use dict.get method safe retrival of dict items.
     * Abstract DICOM/PAR and NIFTI BIDS conversion functions into seperate objects.
     * Update dcm2niix wrapper function to include all args.
         * Either collect and pass args with dicrtionary.
@@ -533,23 +531,26 @@ def make_bids_name(bids_name_dict: Dict,
     if rec and ('rec' in bids_keys):
         f_name += f"_rec-{rec}"
     
+    if echo and ('echo' in bids_keys):
+        f_name += f"_echo-{echo}"
+
     f_name += f"_run-{run}"
     
     if modality_type.lower() == 'fmap':
-        if case1:
-            f_name1: str = f_name + "_phasediff"
-            f_name2: str = f_name + "_magnitude1"
-            return (f_name1,
-                   f_name2,
-                   "",
-                   "")
-        elif case1 and mag2:
+        if case1 and mag2:
             f_name1: str = f_name + "_phasediff"
             f_name2: str = f_name + "_magnitude1"
             f_name3: str = f_name + "_magnitude2"
             return (f_name1,
                    f_name2,
                    f_name3,
+                   "")
+        elif case1:
+            f_name1: str = f_name + "_phasediff"
+            f_name2: str = f_name + "_magnitude1"
+            return (f_name1,
+                   f_name2,
+                   "",
                    "")
         elif case2:
             f_name1: str = f_name + "_phase1"
@@ -567,6 +568,10 @@ def make_bids_name(bids_name_dict: Dict,
                    f_name2,
                    "",
                    "")
+        elif case4:
+            modality_label = bids_name_dict[modality_type]['modality_label']
+            f_name += f"_{modality_label}"
+            return f_name,"","",""
     else:
         modality_label = bids_name_dict[modality_type]['modality_label']
         f_name += f"_{modality_label}"
