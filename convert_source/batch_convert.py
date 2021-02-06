@@ -12,7 +12,6 @@ TODO:
 import os
 import glob
 import yaml
-import platform
 
 from copy import deepcopy
 from shutil import copy
@@ -278,13 +277,9 @@ def bids_id(s:str,
     search_arr: List[str] = list_dict(d=search_dict)
     
     if os.path.exists(s) and parent_dir:
-        if 'windows' in platform.platform().lower():
-            path_sep: str = "\\"
-        else:
-            path_sep: str = "/"
-        
         # Store string, then overwrite
         img_file_path:str = s
+        path_sep: str = os.path.sep
         s: str = s.replace(parent_dir + path_sep,"")
     else:
         img_file_path:str = s

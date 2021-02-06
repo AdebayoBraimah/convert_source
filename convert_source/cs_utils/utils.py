@@ -922,10 +922,7 @@ def collect_info(parent_dir: str,
     parent_dir: str = os.path.abspath(parent_dir)
     data: List[SubDataInfo] = []
 
-    if 'windows' in platform.platform().lower():
-        path_sep = "\\"
-    else:
-        path_sep = "/"
+    path_sep: str = os.path.sep
     
     # Get image directory information
     [dir_list, id_list] = img_dir_list(directory=parent_dir,
