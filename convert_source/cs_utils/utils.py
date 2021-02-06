@@ -641,7 +641,11 @@ def convert_image_data(file: str,
                        dryrun: bool = False,
                        return_obj: bool = False
                        ) -> Union[BIDSimg,Tuple[List[str],List[str],List[str],List[str]]]:
-    '''Converts medical image data (DICOM, PAR REC, or Bruker) to NifTi (or NRRD) using dcm2niix.
+    '''
+    TODO:
+        * Add option to allow for specifying the path to dcm2niix
+        * Perform dependency check
+    Converts medical image data (DICOM, PAR REC, or Bruker) to NifTi (or NRRD) using dcm2niix.
     This is a wrapper function for dcm2niix (v1.0.20190902+).
 
     Usage example:
@@ -1059,9 +1063,9 @@ def calc_read_time(file: str,
         json_file: str = os.path.abspath(json_file)
 
     # check file extension
-    if 'dcm' in file:
+    if '.dcm' in file:
         calc_method = 'dcm'
-    elif 'PAR' in file:
+    elif '.PAR' in file:
         calc_method = 'par'
         
     # Create empty string variables
