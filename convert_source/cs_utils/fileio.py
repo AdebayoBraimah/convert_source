@@ -498,7 +498,9 @@ class Command(object):
         return ' '.join(self.cmd_list)
         
     def check_dependency(self,
-                         err_msg: Optional[str] = None) -> Union[bool,None]:
+                         err_msg: Optional[str] = None,
+                         path_envs: Optional[List[str]] = []
+                         ) -> Union[bool,None]:
         '''Checks dependency of some command line executable. Should the 
         dependency not be met, then an exception is raised. Check the 
         system path should problems arise and ensure that the executable
@@ -510,6 +512,7 @@ class Command(object):
         
         Args:
             err_msg: Error message to print to screen.
+            path_envs: List of directory paths to append to the system's 'PATH' variable.
 
         Returns:
             Returns True if dependency is met.
@@ -518,6 +521,14 @@ class Command(object):
             DependencyError: Dependency error exception is raised if the dependency
                 is not met.
         '''
+        # Append to PATH environmental variable
+        mod_path_env: str = os.environ['PATH']
+        if path_envs:
+            for path in path_envs:
+                mod_path_env += os.pathsep + path
+
+        os.environ['PATH'] = mod_path_env
+        
         if not shutil.which(self.command):
             if err_msg:
                 print(f"\n \t {err_msg} \n")
@@ -531,7 +542,7 @@ class Command(object):
             log: Optional[LogFile] = None,
             debug: bool = False,
             dryrun: bool = False,
-            path_env: List[str] = [],
+            path_envs: List[str] = [],
             env: Dict = {},
             stdout: File = "",
             shell: bool = False
@@ -539,7 +550,10 @@ class Command(object):
         '''Uses python's built-in subprocess class to execute (run) a command from an input command list.
         The standard output and error can optionally be written to file.
         
-        NOTE: The contents of the 'stdout' output file will be empty if 'shell' is set to True.
+        NOTE: 
+            * The contents of the 'stdout' output file will be empty if 'shell' is set to True.
+            * IF `check_dependency` was used with the `path_envs` argument, then the default system
+                PATH variable has been updated to include the list of specified paths.
         
         Usage example:
             >>> # Create command and cmd_list
@@ -555,7 +569,7 @@ class Command(object):
             log: LogFile object
             debug: Sets logging function verbosity to DEBUG level
             dryrun: Dry run -- does not run task. Command is recorded to log file.
-            path_env: List of directory paths to append to the system's 'PATH' variable.
+            path_envs: List of directory paths to append to the system's 'PATH' variable.
             env: Dictionary of environment variables to add to subshell.
             stdout: Output file to write standard output to.
             shell: Use shell to execute command.
@@ -580,20 +594,20 @@ class Command(object):
                 log.info("Performing command as dryrun")
                 return (0,'','')
         
-        # Append to PATH environmental variables
+        # Append to PATH environmental variable
         mod_path_env: str = os.environ['PATH']
-        if path_env:
-            for path in path_env:
+        if path_envs:
+            for path in path_envs:
                 mod_path_env += os.pathsep + path
 
         # Define environment variables
         merged_env: Dict = os.environ
-        if env and path_env:
+        if env and path_envs:
             merged_env.update(env)
             merged_env['PATH'] = mod_path_env
         elif env:
             merged_env.update(env)
-        elif path_env:
+        elif path_envs:
             merged_env['PATH'] = mod_path_env
         
         # Execute/run command
