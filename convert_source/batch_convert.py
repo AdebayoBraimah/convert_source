@@ -370,12 +370,9 @@ def bids_id(s:str,
 def _gather_bids_name_args(bids_name_dict: Dict,
                            modality_type: str,
                            param: str
-                          ) -> str:
-    '''
-    TODO:
-        * Use dict.get() method here
-
-    Helper function that gathers BIDS naming description arguments for the `construct_bids_name` function.
+                          ) -> Union[str,bool]:
+    '''Helper function that gathers BIDS naming description arguments for the `construct_bids_name` function. In the case that 'fmap' is passed as the 
+    'modality_type' argument, then the 'param' argument must be either: 'mag2', 'case1', 'case2', 'case3', or 'case4'.
     
     Usage example:
         >>> param_name = _gather_bids_name_args(bids_dict,
@@ -389,24 +386,37 @@ def _gather_bids_name_args(bids_name_dict: Dict,
         param: BIDS parameter description.
     
     Returns:
-        string from the BIDS name description dictionary if it exists, or an empty string otherwise.
+        String from the BIDS name description dictionary if it exists, or an empty string otherwise. In the case of 'fmap', then a boolean value is returned.
     '''
-    try:
-        if modality_type.lower() == 'fmap' and (param == "case1" or param == "mag2" or param == "case2" or param == "case3" or param == "case4"):
-            if param == 'mag2':
-                if bids_name_dict[modality_type][param]['magnitude2']:
-                    return True
-            elif param == 'case4':
+    if modality_type.lower() == 'fmap' and (param == "case1" or param == "mag2" or param == "case2" or param == "case3" or param == "case4"):
+        if param == 'mag2':
+            param = 'case1'
+            if bids_name_dict[modality_type][param].get('magnitude2',''):
                 return True
-            elif bids_name_dict[modality_type][param]:
+            else:
+                return False
+        elif param == 'case1':
+            if bids_name_dict[modality_type][param].get('phasediff',''):
                 return True
-        else:
-            return bids_name_dict[modality_type][param]
-    except KeyError:
-        if param == "case1" or param == "mag2" or param == "case2" or param == "case3" or param == "case4":
-            return False
-        else:
-            return ""
+            else:
+                False
+        elif param == 'case2':
+            if bids_name_dict[modality_type][param].get('phase1',''):
+                return True
+            else:
+                return False
+        elif param == 'case3':
+            if bids_name_dict[modality_type][param].get('fieldmap',''):
+                return True
+            else:
+                return False
+        elif param == 'case4':
+            if bids_name_dict[modality_type][param].get('modality_label',''):
+                return True
+            else:
+                return False
+    else:
+        return bids_name_dict[modality_type].get(param,'')
 
 def _get_bids_name_args(bids_name_dict: Dict,
                         modality_type: str
