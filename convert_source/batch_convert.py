@@ -604,8 +604,6 @@ def source_to_bids(sub_data: SubDataInfo,
     
     if ses:
         sub_dir: str = os.path.join(sub_dir,"ses-" + ses)
-    
-    out_data_dir: str = os.path.join(sub_dir, modality_type)
 
     # Gather BIDS name description args
     [task, 
@@ -739,6 +737,11 @@ def source_to_bids(sub_data: SubDataInfo,
                     pass
                 else:
                     os.makedirs(out_data_dir)
+
+                if modality_type:
+                    pass
+                else:
+                    modality_type: str = "unknown"
                 
                 [bids_1, bids_2, bids_3, bids_4] = make_bids_name(bids_name_dict=bids_name_dict,
                                                                    modality_type=modality_type)
