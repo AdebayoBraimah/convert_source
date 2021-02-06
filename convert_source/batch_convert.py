@@ -376,7 +376,11 @@ def _gather_bids_name_args(bids_name_dict: Dict,
                            modality_type: str,
                            param: str
                           ) -> str:
-    '''Gathers BIDS naming description arguments for the `construct_bids_name` function.
+    '''
+    TODO:
+        * Use dict.get() method here
+
+    Helper function that gathers BIDS naming description arguments for the `construct_bids_name` function.
     
     Usage example:
         >>> param_name = _gather_bids_name_args(bids_dict,
@@ -412,7 +416,7 @@ def _gather_bids_name_args(bids_name_dict: Dict,
 def _get_bids_name_args(bids_name_dict: Dict,
                         modality_type: str
                         ) -> Tuple[str,bool]:
-    '''Helper function that wraps the helper funciton `_gather_bids_name_args`.
+    '''Helper function that wraps the funciton `_gather_bids_name_args`.
     
     Usage example:
         >>> param_tuple = _get_bids_name_args(bids_dict,
@@ -631,7 +635,7 @@ def data_to_bids(sub_data: SubDataInfo,
     if ses:
         sub_dir: str = os.path.join(sub_dir,"ses-" + ses)
     
-    if sub_dir:
+    if sub_dir: # BUG: should be checking if it exists, not if variable is not None/empty str
         sub_dir: str = os.path.abspath(sub_dir)
     else:
         os.makedirs(sub_dir)
