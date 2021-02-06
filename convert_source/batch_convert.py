@@ -2,7 +2,6 @@
 """Batch conversion wrapper and its associated classes and functions for the `convert_source` package.
 
 TODO:
-    * Abstract DICOM/PAR and NIFTI BIDS conversion functions into seperate objects.
     * Update dcm2niix wrapper function to include all args.
         * Either collect and pass args with dicrtionary.
             OR
@@ -848,8 +847,6 @@ def nifti_to_bids(sub_data: SubDataInfo,
      case3, 
      case4] = _get_bids_name_args(bids_name_dict=bids_name_dict,
                                   modality_type=modality_type)
-
-    # out_data_dir: str = os.path.join(sub_dir, modality_type)
 
     # Use NiiFile context manager
     with NiiFile(data) as n:
