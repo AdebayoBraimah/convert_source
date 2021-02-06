@@ -473,14 +473,14 @@ def _get_bids_name_args(bids_name_dict: Dict,
 
     return tuple(params_var)
 
-def _make_bids_name(bids_name_dict: Dict,
+def make_bids_name(bids_name_dict: Dict,
                     modality_type: str
                    ) -> Tuple[str,str,str,str]:
     '''Helper funciton that creates a BIDS compliant filename given a BIDS name description dictionary,
     and the modality type.
 
     Usage example:
-        >>> _make_bids_name(bids_name_dict=bids_dict,
+        >>> make_bids_name(bids_name_dict=bids_dict,
         ...                 modality_type="anat")
         ...
         "sub-001_ses-001_run-01_T1w"
@@ -766,7 +766,7 @@ def data_to_bids(sub_data: SubDataInfo,
                                                                zero_pad=zero_pad,
                                                                out_dir=out_data_dir)
                     
-                    [bids_1, bids_2, bids_3, bids_4] = _make_bids_name(bids_name_dict=bids_name_dict,
+                    [bids_1, bids_2, bids_3, bids_4] = make_bids_name(bids_name_dict=bids_name_dict,
                                                                        modality_type=modality_type)
 
                     bids_names: List[str] = [bids_1, bids_2, bids_3, bids_4]
@@ -912,7 +912,7 @@ def data_to_bids(sub_data: SubDataInfo,
                                                         zero_pad=zero_pad,
                                                         out_dir=out_data_dir)
             
-            [bids_1, bids_2, bids_3, bids_4] = _make_bids_name(bids_name_dict=bids_name_dict,
+            [bids_1, bids_2, bids_3, bids_4] = make_bids_name(bids_name_dict=bids_name_dict,
                                                                modality_type=modality_type)
             
             bids_names: List[str] = [bids_1, bids_2, bids_3, bids_4]
@@ -1063,7 +1063,7 @@ def data_to_bids(sub_data: SubDataInfo,
                         os.makedirs(out_data_dir)
                     
                     modality_type: str = "unknown"
-                    [bids_1, bids_2, bids_3, bids_4] = _make_bids_name(bids_name_dict=bids_name_dict,
+                    [bids_1, bids_2, bids_3, bids_4] = make_bids_name(bids_name_dict=bids_name_dict,
                                                                        modality_type=modality_type)
 
                     bids_names: List[str] = [bids_1, bids_2, bids_3, bids_4]
@@ -1169,7 +1169,7 @@ def data_to_bids(sub_data: SubDataInfo,
                                                         out_dir=out_data_dir)
             
             modality_type: str = "unknown"
-            [bids_1, bids_2, bids_3, bids_4] = _make_bids_name(bids_name_dict=bids_name_dict,
+            [bids_1, bids_2, bids_3, bids_4] = make_bids_name(bids_name_dict=bids_name_dict,
                                                                 modality_type=modality_type)
 
             if os.path.exists(out_data_dir):
