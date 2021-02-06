@@ -531,16 +531,12 @@ class Command(object):
             log: Optional[LogFile] = None,
             debug: bool = False,
             dryrun: bool = False,
+            path_env: List[str] = [],
             env: Dict = {},
             stdout: File = "",
             shell: bool = False
            ) -> Tuple[int,File,File]:
-        '''
-        TODO:
-            * Fix BUG when using env variable, PATH is not updated.
-                * See this link: https://stackoverflow.com/questions/2231227/python-subprocess-popen-with-a-modified-environment
-
-        Uses python's built-in subprocess class to execute (run) a command from an input command list.
+        '''Uses python's built-in subprocess class to execute (run) a command from an input command list.
         The standard output and error can optionally be written to file.
         
         NOTE: The contents of the 'stdout' output file will be empty if 'shell' is set to True.
@@ -559,6 +555,7 @@ class Command(object):
             log: LogFile object
             debug: Sets logging function verbosity to DEBUG level
             dryrun: Dry run -- does not run task. Command is recorded to log file.
+            path_env: List of directory paths to append to the system's 'PATH' variable.
             env: Dictionary of environment variables to add to subshell.
             stdout: Output file to write standard output to.
             shell: Use shell to execute command.
@@ -583,10 +580,21 @@ class Command(object):
                 log.info("Performing command as dryrun")
                 return (0,'','')
         
+        # Append to PATH environmental variables
+        mod_path_env: str = os.environ['PATH']
+        if path_env:
+            for path in path_env:
+                mod_path_env += os.pathsep + path
+
         # Define environment variables
         merged_env: Dict = os.environ
-        if env:
+        if env and path_env:
             merged_env.update(env)
+            merged_env['PATH'] = mod_path_env
+        elif env:
+            merged_env.update(env)
+        elif path_env:
+            merged_env['PATH'] = mod_path_env
         
         # Execute/run command
         p = subprocess.Popen(self.cmd_list,
