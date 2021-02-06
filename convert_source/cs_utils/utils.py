@@ -644,7 +644,9 @@ def convert_image_data(file: str,
     '''
     TODO:
         * Add option to allow for specifying the path to dcm2niix
+            * See TODO `Command` class's `run` function.
         * Perform dependency check
+
     Converts medical image data (DICOM, PAR REC, or Bruker) to NifTi (or NRRD) using dcm2niix.
     This is a wrapper function for dcm2niix (v1.0.20190902+).
 

@@ -535,7 +535,12 @@ class Command(object):
             stdout: File = "",
             shell: bool = False
            ) -> Tuple[int,File,File]:
-        '''Uses python's built-in subprocess class to execute (run) a command from an input command list.
+        '''
+        TODO:
+            * Fix BUG when using env variable, PATH is not updated.
+                * See this link: https://stackoverflow.com/questions/2231227/python-subprocess-popen-with-a-modified-environment
+
+        Uses python's built-in subprocess class to execute (run) a command from an input command list.
         The standard output and error can optionally be written to file.
         
         NOTE: The contents of the 'stdout' output file will be empty if 'shell' is set to True.
