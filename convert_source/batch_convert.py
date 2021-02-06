@@ -529,11 +529,11 @@ def make_bids_name(bids_name_dict: Dict,
     
     if rec and ('rec' in bids_keys):
         f_name += f"_rec-{rec}"
-    
-    if echo and ('echo' in bids_keys):
-        f_name += f"_echo-{echo}"
 
     f_name += f"_run-{run}"
+
+    if echo and ('echo' in bids_keys):
+        f_name += f"_echo-{echo}"
     
     if modality_type.lower() == 'fmap':
         if case1 and mag2:
