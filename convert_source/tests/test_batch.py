@@ -31,7 +31,7 @@ from convert_source.batch_convert import (
     bids_id,
     _gather_bids_name_args,
     _get_bids_name_args,
-    _make_bids_name,
+    make_bids_name,
     data_to_bids,
     batch_proc
 )
