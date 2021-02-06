@@ -230,8 +230,8 @@ def read_config(config_file: Optional[str] = "",
             print("No metadata settings")
         meta_dict: Dict = dict()
     
-    # Exclusion terms  
-    if any("exclude" in data_map for element in data_map):
+    # Exclusion terms/terms to ignore
+    if any("exclude" in data_map for element in data_map) or any("ignore" in data_map for element in data_map):
         if verbose:
             print("Exclusion option implemented")
         exclusion_list: List[str] = data_map["exclude"]
