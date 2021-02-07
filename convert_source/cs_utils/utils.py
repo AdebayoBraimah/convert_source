@@ -632,7 +632,7 @@ def convert_image_data(file: str,
                        progress: bool = True,
                        verbose: bool = False,
                        write_conflicts: str = "suffix",
-                       crop_3D: bool = False,
+                       crop_3D: str = 'n',
                        lossless: bool = False,
                        big_endian: str = "o",
                        xml: bool = False,
@@ -641,14 +641,19 @@ def convert_image_data(file: str,
                        dryrun: bool = False,
                        return_obj: bool = False
                        ) -> Union[BIDSimg,Tuple[List[str],List[str],List[str],List[str]]]:
-    '''
-    TODO:
-        * Add option to allow for specifying the path to dcm2niix
-            * See TODO `Command` class's `run` function.
-        * Perform dependency check
+    '''Converts medical image data (DICOM, PAR REC, or Bruker) to NifTi (or NRRD) using dcm2niix.
+    This is a wrapper function for dcm2niix (v1.0.20201102+).
 
-    Converts medical image data (DICOM, PAR REC, or Bruker) to NifTi (or NRRD) using dcm2niix.
-    This is a wrapper function for dcm2niix (v1.0.20190902+).
+    NOTE: IF `dcm2niix` is not in system path, then its parent's directory path can be appended to 
+        the system's PATH variable by doing:
+        
+            >>> from convert_source.cs_utils.fileio import Command
+            >>> dcm2niix_command = Command("dcm2niix")
+            >>> dcm2niix_command.check_dependency(path_envs=['<path/to/dcm2niix/dir>'])
+
+        One should note that argument passed for the `path_envs` argument is a list.
+        Additionally, the last statement above should return `True` if the executable is found, or raise 
+        a DependencyError otherwise.
 
     Usage example:
         >>> data = convert_image_data("IM00001.dcm",
@@ -687,7 +692,7 @@ def convert_image_data(file: str,
             * 'suffix' = Add suffix to name conflict (default)
             * 'overwrite' = Overwrite name conflict
             * 'skip' = Skip name conflict
-        crop_3D: crop 3D acquisitions (default: False).
+        crop_3D: Crop 3D acquisitions (y/n/i, default n, use 'i'gnore to neither crop nor rotate 3D acquistions).
         lossless: Losslessly scale 16-bit integers to use dynamic range (default: True).
         big_endian: Byte order:
             * 'o' = optimal/native byte order (default)
@@ -731,6 +736,19 @@ def convert_image_data(file: str,
     # Initial option(s)
     if cprss_lvl:
         convert.cmd_list.append(f"-{cprss_lvl}")
+    
+    if dir_search:
+        convert.cmd_list.append("-d")
+        convert.cmd_list.append(dir_search)
+    
+    if crop_3D:
+        if (crop_3D.lower() == 'y') or (crop_3D.lower() == 'n') or (crop_3D.lower() == 'i'):
+            convert.cmd_list.append("-x")
+            convert.cmd_list.append(crop_3D)
+        else:
+            crop_3D = 'n'
+            convert.cmd_list.append("-x")
+            convert.cmd_list.append(crop_3D)
 
     # Keyword option(s)
     if write_conflicts.lower() == "suffix":
