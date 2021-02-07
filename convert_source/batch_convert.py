@@ -405,7 +405,8 @@ def bids_id(s:str,
             parent_dir: Optional[str] = "",
             modality_type: Optional[str] = "",
             modality_label: Optional[str] = "",
-            task: Optional[str] = ""
+            task: Optional[str] = "",
+            mod_found: bool = False
            ) -> Tuple[Dict[str,str],str,str,str]:
     '''Performs identification of descriptive BIDS information relevant for file naming, provided
     a BIDS search dictionary and a BIDS map dictionary. The resulting information is then placed
@@ -425,7 +426,8 @@ def bids_id(s:str,
         modality_type: (BIDS) modality type (e.g. 'anat', 'func', etc).
         modality_label: (BIDS) modality label (e.g. 'T1w', 'bold', etc).
         task: (BIDS) task label (e.g. 'rest','nback', etc).
-        
+        mod_found: Boolean value that indicates if the (BIDS) modality or matching modality has been identified/found.
+
     Returns:
         Tuple that consists of:
             * Nested dictionary of BIDS descriptive naming related terms.
@@ -448,37 +450,27 @@ def bids_id(s:str,
     else:
         bids_name_dict: Dict = deepcopy(BIDS_PARAM)
     
-    mod_found: bool = False
-    
-    for i in search_arr:
-        if mod_found:
-            break
-        for k,v in i.items():
-            if depth(i) == 3:
-                for k2,v2 in v.items():
-                    mod_type: str = k
-                    mod_label: str = k2
-                    mod_task: str = ""
-                    mod_search: List[str] = v2
-                    if list_in_substr(in_list=mod_search,in_str=s):
-                        mod_found: bool = True
-                        modality_type: str = mod_type
-                        modality_label: str = mod_label
-                        task: str = mod_task
-                        bids_name_dict: Dict = search_bids(s=s,
-                                                           bids_search=bids_search,
-                                                           bids_map=bids_map,
-                                                           modality_type=modality_type,
-                                                           modality_label=modality_label,
-                                                           bids_name_dict=bids_name_dict)
-                            
-            elif depth(i) == 4:
-                for k2,v2 in v.items():
-                    for k3,v3 in v2.items():
+    if mod_found and modality_type:
+        modality_type: str = modality_type
+        modality_label: str = modality_label
+        task: str = task
+        bids_name_dict: Dict = search_bids(s=s,
+                                           bids_search=bids_search,
+                                           bids_map=bids_map,
+                                           modality_type=modality_type,
+                                           modality_label=modality_label,
+                                           bids_name_dict=bids_name_dict)
+    else:
+        for i in search_arr:
+            if mod_found:
+                break
+            for k,v in i.items():
+                if depth(i) == 3:
+                    for k2,v2 in v.items():
                         mod_type: str = k
                         mod_label: str = k2
-                        mod_task: str = k3
-                        mod_search: List[str] = v3
+                        mod_task: str = ""
+                        mod_search: List[str] = v2
                         if list_in_substr(in_list=mod_search,in_str=s):
                             mod_found: bool = True
                             modality_type: str = mod_type
@@ -489,8 +481,27 @@ def bids_id(s:str,
                                                                bids_map=bids_map,
                                                                modality_type=modality_type,
                                                                modality_label=modality_label,
-                                                               task=task,
                                                                bids_name_dict=bids_name_dict)
+                                
+                elif depth(i) == 4:
+                    for k2,v2 in v.items():
+                        for k3,v3 in v2.items():
+                            mod_type: str = k
+                            mod_label: str = k2
+                            mod_task: str = k3
+                            mod_search: List[str] = v3
+                            if list_in_substr(in_list=mod_search,in_str=s):
+                                mod_found: bool = True
+                                modality_type: str = mod_type
+                                modality_label: str = mod_label
+                                task: str = mod_task
+                                bids_name_dict: Dict = search_bids(s=s,
+                                                                   bids_search=bids_search,
+                                                                   bids_map=bids_map,
+                                                                   modality_type=modality_type,
+                                                                   modality_label=modality_label,
+                                                                   task=task,
+                                                                   bids_name_dict=bids_name_dict)
 
     # Contingency search if initially unsuccessful
     if mod_found:
@@ -511,7 +522,9 @@ def bids_id(s:str,
                              parent_dir=parent_dir,
                              modality_type=modality_type,
                              modality_label=modality_label,
-                             task=task)
+                             task=task,
+                             mod_found=True)
+        # return modality_type,modality_label,task
     
     return (bids_name_dict,
             modality_type,
