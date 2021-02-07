@@ -646,7 +646,7 @@ def convert_image_data(file: str,
 
     NOTE: IF `dcm2niix` is not in system path, then its parent's directory path can be appended to 
         the system's PATH variable by doing:
-        
+
             >>> from convert_source.cs_utils.fileio import Command
             >>> dcm2niix_command = Command("dcm2niix")
             >>> dcm2niix_command.check_dependency(path_envs=['<path/to/dcm2niix/dir>'])
@@ -739,7 +739,7 @@ def convert_image_data(file: str,
     
     if dir_search:
         convert.cmd_list.append("-d")
-        convert.cmd_list.append(dir_search)
+        convert.cmd_list.append(f"{dir_search}")
     
     if crop_3D:
         if (crop_3D.lower() == 'y') or (crop_3D.lower() == 'n') or (crop_3D.lower() == 'i'):
