@@ -5,6 +5,7 @@ import os
 import shutil
 import random
 import nibabel as nib
+from decimal import Decimal
 from typing import (
     List, 
     Dict, 
@@ -48,7 +49,7 @@ def get_nii_tr(nii_file: str) -> Union[float,str]:
     img = nib.load(nii_file)
     
     # Store nifti image TR
-    tr = float(img.header['pixdim'][4])
+    tr = float(round(Decimal(float(img.header['pixdim'][4])),3))
     
     # Check if TR is likely
     if tr == 0:
