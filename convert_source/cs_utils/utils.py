@@ -284,6 +284,41 @@ def zeropad(num: Union[str,int],
     except ValueError:
         return num
 
+def add_to_zeropadded(num1: Union[int,str],
+                      num2: int
+                      ) -> str:
+    '''Adds some specified integer to another zeropadded integer.
+
+    Usage example:
+        >>> add_to_zeropadded('005',2)
+        '007'
+        
+    Arguments:
+        num1: Input integer, or zeropadded integer represented as a string.
+        num2: Integer to add to num1.
+
+    Returns:
+        Sum of the two perceived integer values, represented as a string.
+
+    Raises:
+        ValueError: Error that arises if non-integer string representations are passed as an argument for num1.
+        TypeError: Error that arise if non-integer arguments are passed for num2, OR if floats are passed for either num1 or num2.
+    '''
+    try:
+        int(num1)
+    except ValueError:
+        raise ValueError(f"Input value {num1} is not an integer represented as a string.")
+
+    if isinstance(num2,int) and (isinstance(num1,int) or isinstance(num1,str)):
+        if isinstance(num1,int):
+            pad_len: int = 0
+        else:
+            pad_len: int = len(num1)
+        new_num: int = int(num1) + num2
+        return zeropad(num=new_num,num_zeros=pad_len)
+    else:
+        raise TypeError(f"Input {num1} is not a string or integer OR {num2} is not an integer. Please check.")
+
 def get_echo(json_file: str) -> float:
     '''Reads the echo time (TE) from the NIFTI JSON sidecar and returns it.
 
