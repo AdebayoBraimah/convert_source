@@ -6,9 +6,6 @@ NOTE:
     * convert_image_data is tested elsewhere.
     * header_search is tested elsewhere.
         * This function wraps `get_dcm_scan_tech` and `get_par_scan_tech`.
-
-TODO: 
-    * Raise warning for components/functions that are not tested.
 """
 import pytest
 
