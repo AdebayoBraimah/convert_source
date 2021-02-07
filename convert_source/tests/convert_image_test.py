@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for the imgio's dcmio module's functions.
+"""Tests for the `convert_image_data` function.
 
 NOTE: 
     * The test DICOM data used here is publicly available:
@@ -17,10 +17,7 @@ import platform
 import urllib.request
 import shutil
 
-from typing import (
-    Dict,
-    List
-)
+from typing import List
 
 # Add package/module to PYTHONPATH
 mod_path: str = os.path.join(str(pathlib.Path(os.path.abspath(__file__)).parents[2]))
@@ -36,14 +33,6 @@ from convert_source.cs_utils.utils import (
     SubDataInfo,
     collect_info,
     convert_image_data
-)
-
-from convert_source.imgio.dcmio import (
-    is_valid_dcm,
-    get_scan_time,
-    get_red_fact,
-    get_bwpppe,
-    get_mb
 )
 
 # Maximally compress data:
@@ -178,4 +167,3 @@ def test_cleanup():
     
     os.remove("dcm2niix")
     assert os.path.exists("dcm2niix") == False
-
