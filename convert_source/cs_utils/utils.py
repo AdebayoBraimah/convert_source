@@ -238,12 +238,7 @@ class BIDSimg():
 
 # Define function(s)
 def file_to_screen(file: str) -> str:
-    '''
-    TODO:
-        * Re-factor and re-name function
-        * use exec perhaps
-
-    Reads the contents of a file and prints it to screen.
+    '''Reads the contents of a file and prints it to screen.
 
     Arguments:
         file: Path to file.
@@ -253,7 +248,8 @@ def file_to_screen(file: str) -> str:
     '''
 
     with open(file,"r") as f:
-        file_contents = f.read()
+        file_contents: str = f.read()
+        file_contents: str = file_contents.strip("\n")
         f.close()
     return file_contents
 
