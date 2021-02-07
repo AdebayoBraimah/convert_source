@@ -843,8 +843,8 @@ def source_to_bids(sub_data: SubDataInfo,
                                                            json_file=img_data.jsons[i])
 
                         metadata: Dict = dict_multi_update(dictionary=None, **meta_dict)
-                        metadata: Dict = dict_multi_update(dictionary=None, **param_dict)
-                        metadata: Dict = dict_multi_update(dictionary=None, **mod_dict)
+                        metadata: Dict = dict_multi_update(dictionary=metadata, **param_dict)
+                        metadata: Dict = dict_multi_update(dictionary=metadata, **mod_dict)
 
                         bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
                                                               json_dict=json_dict)
@@ -958,7 +958,10 @@ def source_to_bids(sub_data: SubDataInfo,
                     else:
                         ext: str = ".nii"
                     
-                    out_name: str = os.path.join(out_data_dir,bids_names[i])
+                    if bids_names[i]:
+                        out_name: str = os.path.join(out_data_dir,bids_names[i])
+                    else:
+                       out_name: str = os.path.join(out_data_dir,bids_names[0]) 
 
                     out_nii: str = out_name + ext
                     out_json: str = out_name + ".json"
@@ -1075,8 +1078,8 @@ def nifti_to_bids(sub_data: SubDataInfo,
                                                json_file=json_file)
 
             metadata: Dict = dict_multi_update(dictionary=None, **meta_dict)
-            metadata: Dict = dict_multi_update(dictionary=None, **param_dict)
-            metadata: Dict = dict_multi_update(dictionary=None, **mod_dict)
+            metadata: Dict = dict_multi_update(dictionary=metadata, **param_dict)
+            metadata: Dict = dict_multi_update(dictionary=metadata, **mod_dict)
 
             bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
                                                   json_dict=json_dict)
@@ -1084,7 +1087,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
             json_dict: Dict = read_json(json_file="")
 
             metadata: Dict = dict_multi_update(dictionary=None, **meta_dict)
-            metadata: Dict = dict_multi_update(dictionary=None, **mod_dict)
+            metadata: Dict = dict_multi_update(dictionary=metadata, **mod_dict)
             
             bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
                                                   json_dict=json_dict)
@@ -1294,6 +1297,10 @@ def data_to_bids(sub_data: SubDataInfo,
                                  log=log,
                                  env=env,
                                  dryrun=dryrun)
+        return (imgs,
+                jsons,
+                bvals,
+                bvecs)
     elif '.nii' in sub_data.data.lower():
         [imgs,
          jsons,
@@ -1309,6 +1316,10 @@ def data_to_bids(sub_data: SubDataInfo,
                                 gzip=gzip,
                                 append_dwi_info=append_dwi_info,
                                 zero_pad=zero_pad)
+        return (imgs,
+                jsons,
+                bvals,
+                bvecs)
     else:
         return [""],[""],[""],[""]
 

@@ -134,10 +134,9 @@ def construct_bids_dict(meta_dict: Optional[Dict] = None,
             ordered_list.append(word)
     
     # Create BIDS dictionary
-    bids_dict: Dict = dict_multi_update(dictionary=None,
-                                        **bids_info,
-                                        **meta_dict,
-                                        **json_dict)
+    bids_dict: Dict = dict_multi_update(dictionary=None, **bids_info)
+    bids_dict: Dict = dict_multi_update(dictionary=bids_dict, **meta_dict)
+    bids_dict: Dict = dict_multi_update(dictionary=bids_dict, **json_dict)
     
     # Create ordered BIDS dictionary
     ordered_bids_dict: OrderedDict = OrderedDict()
