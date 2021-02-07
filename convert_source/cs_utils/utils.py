@@ -625,7 +625,7 @@ def convert_image_data(file: str,
                        ignore_2D: bool = True,
                        merge_2D: bool = True,
                        text: bool = False,
-                       progress: bool = True,
+                       progress: bool = False,
                        verbose: bool = False,
                        write_conflicts: str = "suffix",
                        crop_3D: str = 'n',
@@ -682,7 +682,7 @@ def convert_image_data(file: str,
         ignore_2D: Ignore derived, localizer and 2D images (default: True).
         merge_2D: Merge 2D slices from same series regardless of echo, exposure, etc. (default: True).
         text: Text notes includes private patient details in separate text file (default: False).
-        progress: Report progress, slicer format progress information (default: True).
+        progress: Report progress, slicer format progress information (default: False).
         verbose: Enable verbosity (default: False).
         write_conflicts: Write behavior for name conflicts:
             * 'suffix' = Add suffix to name conflict (default)
@@ -717,6 +717,7 @@ def convert_image_data(file: str,
     
     Raises:
         ConversionError: Error that arises if no converted (NIFTI) images are created.
+        IndexError: Error that arises if the specified options arrays/lists are of different lengths.
     '''
     
     # Get OS platform and construct command line args
@@ -726,8 +727,8 @@ def convert_image_data(file: str,
         convert: Command = Command("dcm2niix")
 
     # Boolean True/False options arrays
-    bool_opts: List[Union[str,bool]] = [bids, anon_bids, gzip, comment, adjacent, nrrd, ignore_2D, merge_2D, text, verbose, lossless, progress, xml]
-    bool_vars: List[str] = ["-b", "-ba", "-z", "-c", "-a", "-e", "-i", "-m", "-t", "-v", "-l", "--progress", "--xml"]
+    bool_opts: List[Union[str,bool]] = [bids, anon_bids, gzip, comment, adjacent, nrrd, ignore_2D, merge_2D, text, verbose, lossless]
+    bool_vars: List[str] = ["-b", "-ba", "-z", "-c", "-a", "-e", "-i", "-m", "-t", "-v", "-l"]
 
     # Initial option(s)
     if cprss_lvl:
@@ -767,10 +768,20 @@ def convert_image_data(file: str,
         convert.cmd_list.append("--big_endian")
         convert.cmd_list.append("y")
     
-    for opt in zip(bool_opts,bool_vars):
-        if opt[0]:
-            convert.cmd_list.append(opt[1])
-            convert.cmd_list.append("y")
+    # Boolean option(s)
+    if progress:
+        convert.cmd_list.append("--progress")
+    
+    if xml:
+        convert.cmd_list.append("--xml")
+    
+    if len(bool_opts) == len(bool_vars):
+        for opt in zip(bool_opts,bool_vars):
+            if opt[0]:
+                convert.cmd_list.append(opt[1])
+                convert.cmd_list.append("y")
+    else:
+        raise IndexError("Comparing arrays of two different lengths.")
 
     # Output filename
     convert.cmd_list.append("-f")
