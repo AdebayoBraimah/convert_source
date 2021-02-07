@@ -128,6 +128,60 @@ class BIDSImgData(object):
                 "bvecs":self.bvecs})
                )
 
+    def add(self,
+            imgs: Optional[Union[List[str],str]] = "",
+            jsons: Optional[Union[List[str],str]] = "",
+            bvals: Optional[Union[List[str],str]] = "",
+            bvecs: Optional[Union[List[str],str]] = ""
+            ) -> Tuple[List[str],List[str],List[str],List[str]]:
+        '''Extends or appends to a list depending on if a list or string is passed as an argument.
+
+        Usage example:
+            >>> data_obj = BIDSImgData(img,
+            ...                        json)
+            ...
+            >>> data_obj.add(imgs=[img1,img2],
+            ...              jsons=[json1,''])
+            ...
+
+        Arguments:
+            imgs: Input NIFTI image OR list of NIFTI image files.
+            jsons: Corresponding JSON file OR list of corresponding JSON files.
+            bvals: Corresponding bval file OR list of corresponding bval files.
+            bvecs: Corresponding bvec file OR list of corresponding bvec files.
+
+        Returns:
+            Tuple of four lists that consists of:
+                * Image files
+                * Corresponding JSON files
+                * Corresponding bval files
+                * Corresponding bvec files
+        '''
+        if imgs:
+            self.imgs.extend(imgs)
+        else:
+            self.imgs.append("")
+        
+        if jsons:
+            self.jsons.extend(jsons)
+        else:
+            self.jsons.append("")
+        
+        if bvals:
+            self.bvals.extend(bvals)
+        else:
+            self.bvals.append("")
+        
+        if bvecs:
+            self.bvecs.extend(bvecs)
+        else:
+            self.bvecs.append("")
+        
+        return (self.imgs,
+                self.jsons,
+                self.bvals,
+                self.bvecs)
+
 # Define function(s)
 def read_config(config_file: Optional[str] = "", 
                 verbose: Optional[bool] = False
@@ -1116,7 +1170,7 @@ def batch_proc(config_file: str,
     subs_data: List[SubDataInfo] = collect_info(parent_dir=study_img_dir,
                                                 exclusion_list=exclusion_list)
     
-    subs_bids: List = []
+    subs_bids: BIDSImgData = BIDSImgData()
        
     for sub_data in subs_data:
         data: str = sub_data.data
@@ -1149,11 +1203,12 @@ def batch_proc(config_file: str,
                                task=task,
                                meta_dict=meta_com_dict,
                                mod_dict=meta_scan_dict)
-        tmp_img_data_obj = BIDSImgData(imgs=imgs,
-                                       jsons=jsons,
-                                       bvals=bvals,
-                                       bvecs=bvecs)
-        subs_bids.append(tmp_img_data_obj)
+
+        # Collect data using BIDSImgData object
+        subs_bids.add(imgs=imgs,
+                      jsons=jsons,
+                      bvals=bvals,
+                      bvecs=bvecs)
 
     if return_obj:
         return subs_bids
