@@ -901,7 +901,10 @@ def img_exclude(img_list: List[str],
         List of image files that do not contain words in the exclusion list.
     '''
     if (exclusion_list is None) or (len(exclusion_list) == 0):
-        return img_list
+        img_set: Set = set(img_list)
+        new_list: List[str] = list(img_set)
+        new_list.sort(reverse=False)
+        return new_list
     else:
         img_set: Set = set(img_list)
         exclusion_set: Set = set()
