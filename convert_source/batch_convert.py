@@ -1068,8 +1068,9 @@ def data_to_bids(sub_data: SubDataInfo,
 def batch_proc(config_file: str,
               study_img_dir: str,
               out_dir: str,
-              verbose: bool = False
-              ) -> List[BIDSImgData]:
+              verbose: bool = False,
+              return_obj: bool = False
+              ) -> Union[List[BIDSImgData],Tuple[List[str]]]:
     '''Batch processes a study's source image data provided a configuration, the parent directory of the study's imaging data,
     and an output directory to place the BIDS NIFTI data.
 
@@ -1084,16 +1085,22 @@ def batch_proc(config_file: str,
         study_img_dir: Path to study image parent directory that contains all the subjects' source image data.
         out_dir: Output directory.
         verbose: Verbose output.
+        return_obj: Return a single object that is collection of lists, rather than a tuple of lists.
 
     Returns:
+        Tuple of lists that consists of: 
+            * List of NIFTI images.
+            * Corresponding list of JSON sidecars.
+            * Corresponding list of bval files.
+            * Corresponding list of bvec files.
+
+            OR 
+
         List of BIDSImgData objects. The BIDSImgData object that contains:
             * List of NIFTI images.
             * Corresponding list of JSON sidecars.
             * Corresponding list of bval files.
             * Corresponding list of bvec files.
-    
-    TODO: 
-        * Create option to return a set of lists (as opposed to current implementation to return a collection object).
     '''
     [search_dict,
      bids_search,
@@ -1147,4 +1154,15 @@ def batch_proc(config_file: str,
                                        bvals=bvals,
                                        bvecs=bvecs)
         subs_bids.append(tmp_img_data_obj)
-    return subs_bids
+
+    if return_obj:
+        return subs_bids
+    else:
+        imgs: List[str] = subs_bids.imgs
+        jsons: List[str] = subs_bids.jsons
+        bvals: List[str] = subs_bids.bvals
+        bvecs: List[str] = subs_bids.bvecs
+        return (imgs,
+                jsons,
+                bvals,
+                bvecs)
