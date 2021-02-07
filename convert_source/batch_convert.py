@@ -30,7 +30,7 @@ from convert_source.cs_utils.const import (
 )
 
 from convert_source.cs_utils.fileio import (
-    ConversionError,
+    Command, ConversionError,
     NiiFile,
     LogFile,
     TmpDir
@@ -183,6 +183,114 @@ class BIDSImgData(object):
                 self.bvecs)
 
 # Define function(s)
+def batch_proc(config_file: str,
+               study_img_dir: str,
+               out_dir: str,
+               path_envs: List[str] = [],
+               verbose: bool = False,
+               return_obj: bool = False
+               ) -> Union[Tuple[List[str]],List[BIDSImgData]]:
+    '''Batch processes a study's source image data provided a configuration, the parent directory of the study's imaging data,
+    and an output directory to place the BIDS NIFTI data.
+
+    Usage example:
+        >>> subs_bids_data = batch_proc(config_file,
+        ...                             study_img_dir,
+        ...                             out_dir)
+        ...
+
+    Arguments:
+        config_file: Configuration file.
+        study_img_dir: Path to study image parent directory that contains all the subjects' source image data.
+        out_dir: Output directory.
+        verbose: Verbose output.
+        return_obj: Return a single object that is collection of lists, rather than a tuple of lists.
+
+    Returns:
+        Tuple of lists that consists of: 
+            * List of NIFTI images.
+            * Corresponding list of JSON sidecars.
+            * Corresponding list of bval files.
+            * Corresponding list of bvec files.
+
+            OR 
+
+        List of BIDSImgData objects. The BIDSImgData object that contains:
+            * List of NIFTI images.
+            * Corresponding list of JSON sidecars.
+            * Corresponding list of bval files.
+            * Corresponding list of bvec files.
+    '''
+    # Check dependencies
+    dcm2niix_cmd: Command = Command("dcm2niix")
+    dcm2niix_cmd.check_dependency(path_envs=path_envs)
+
+    [search_dict,
+     bids_search,
+     bids_map,
+     meta_dict,
+     exclusion_list] = read_config(config_file=config_file,
+                                   verbose=verbose)
+    
+    # Check BIDS search and map dictionaries
+    if comp_dict(d1=bids_search,d2=bids_map):
+        pass
+    
+    subs_data: List[SubDataInfo] = collect_info(parent_dir=study_img_dir,
+                                                exclusion_list=exclusion_list)
+    
+    subs_bids: BIDSImgData = BIDSImgData()
+       
+    for sub_data in subs_data:
+        data: str = sub_data.data
+        bids_name_dict: Dict = deepcopy(BIDS_PARAM)
+        bids_name_dict['info']['sub'] = sub_data.sub
+        if sub_data.ses:
+            bids_name_dict['info']['ses'] = sub_data.ses
+        [bids_name_dict, 
+         modality_type, 
+         modality_label, 
+         task] = bids_id(s=data,
+                         search_dict=search_dict,
+                         bids_search=bids_search,
+                         bids_map=bids_map,
+                         bids_name_dict=bids_name_dict,
+                         parent_dir=study_img_dir)
+        [meta_com_dict, 
+         meta_scan_dict] = get_metadata(dictionary=meta_dict,
+                                        modality_type=modality_type,
+                                        task=task)
+        # Convert source data
+        [imgs,
+         jsons,
+         bvals,
+         bvecs] = data_to_bids(sub_data=sub_data,
+                               bids_name_dict=bids_name_dict,
+                               out_dir=out_dir,
+                               modality_type=modality_type,
+                               modality_label=modality_label,
+                               task=task,
+                               meta_dict=meta_com_dict,
+                               mod_dict=meta_scan_dict)
+
+        # Collect data using BIDSImgData object
+        subs_bids.add(imgs=imgs,
+                      jsons=jsons,
+                      bvals=bvals,
+                      bvecs=bvecs)
+
+    if return_obj:
+        return subs_bids
+    else:
+        imgs: List[str] = subs_bids.imgs
+        jsons: List[str] = subs_bids.jsons
+        bvals: List[str] = subs_bids.bvals
+        bvecs: List[str] = subs_bids.bvecs
+        return (imgs,
+                jsons,
+                bvals,
+                bvecs)
+
 def read_config(config_file: Optional[str] = "", 
                 verbose: Optional[bool] = False
                 ) -> Tuple[Dict[str,str],Dict,Dict,Dict,List[str]]:
@@ -926,7 +1034,6 @@ def nifti_to_bids(sub_data: SubDataInfo,
     data: str = sub_data.data
     
     sub_dir: str = os.path.join(out_dir,"sub-" + sub)
-    sub_tmp: str = sub_dir
     
     if ses:
         sub_dir: str = os.path.join(sub_dir,"ses-" + ses)
@@ -1161,111 +1268,40 @@ def data_to_bids(sub_data: SubDataInfo,
             * BUG: logging class only writes to one file.
     '''
     if ('.dcm' in sub_data.data.lower()) or ('.par' in sub_data.data.lower()):
-        source_to_bids() # Add args later
-    elif '.nii' in sub_data.data.lower():
-        nifti_to_bids() # Add args later
-    else:
-        return [""],[""],[""],[""]
-
-def batch_proc(config_file: str,
-              study_img_dir: str,
-              out_dir: str,
-              verbose: bool = False,
-              return_obj: bool = False
-              ) -> Union[List[BIDSImgData],Tuple[List[str]]]:
-    '''Batch processes a study's source image data provided a configuration, the parent directory of the study's imaging data,
-    and an output directory to place the BIDS NIFTI data.
-
-    Usage example:
-        >>> subs_bids_data = batch_proc(config_file,
-        ...                             study_img_dir,
-        ...                             out_dir)
-        ...
-
-    Arguments:
-        config_file: Configuration file.
-        study_img_dir: Path to study image parent directory that contains all the subjects' source image data.
-        out_dir: Output directory.
-        verbose: Verbose output.
-        return_obj: Return a single object that is collection of lists, rather than a tuple of lists.
-
-    Returns:
-        Tuple of lists that consists of: 
-            * List of NIFTI images.
-            * Corresponding list of JSON sidecars.
-            * Corresponding list of bval files.
-            * Corresponding list of bvec files.
-
-            OR 
-
-        List of BIDSImgData objects. The BIDSImgData object that contains:
-            * List of NIFTI images.
-            * Corresponding list of JSON sidecars.
-            * Corresponding list of bval files.
-            * Corresponding list of bvec files.
-    '''
-    [search_dict,
-     bids_search,
-     bids_map,
-     meta_dict,
-     exclusion_list] = read_config(config_file=config_file,
-                                   verbose=verbose)
-    
-    # Check BIDS searcn and map dictionaries
-    if comp_dict(d1=bids_search,d2=bids_map):
-        pass
-    
-    subs_data: List[SubDataInfo] = collect_info(parent_dir=study_img_dir,
-                                                exclusion_list=exclusion_list)
-    
-    subs_bids: BIDSImgData = BIDSImgData()
-       
-    for sub_data in subs_data:
-        data: str = sub_data.data
-        bids_name_dict: Dict = deepcopy(BIDS_PARAM)
-        bids_name_dict['info']['sub'] = sub_data.sub
-        if sub_data.ses:
-            bids_name_dict['info']['ses'] = sub_data.ses
-        [bids_name_dict, 
-         modality_type, 
-         modality_label, 
-         task] = bids_id(s=data,
-                         search_dict=search_dict,
-                         bids_search=bids_search,
-                         bids_map=bids_map,
-                         bids_name_dict=bids_name_dict,
-                         parent_dir=study_img_dir)
-        [meta_com_dict, 
-         meta_scan_dict] = get_metadata(dictionary=meta_dict,
-                                        modality_type=modality_type,
-                                        task=task)
-        # Convert source data
         [imgs,
          jsons,
          bvals,
-         bvecs] = data_to_bids(sub_data=sub_data,
-                               bids_name_dict=bids_name_dict,
-                               out_dir=out_dir,
-                               modality_type=modality_type,
-                               modality_label=modality_label,
-                               task=task,
-                               meta_dict=meta_com_dict,
-                               mod_dict=meta_scan_dict)
-
-        # Collect data using BIDSImgData object
-        subs_bids.add(imgs=imgs,
-                      jsons=jsons,
-                      bvals=bvals,
-                      bvecs=bvecs)
-
-    if return_obj:
-        return subs_bids
+         bvecs] = source_to_bids(sub_data=sub_data,
+                                 bids_name_dict=bids_name_dict,
+                                 out_dir=out_dir,
+                                 modality_type=modality_type,
+                                 modality_label=modality_label,
+                                 task=task,
+                                 meta_dict=meta_dict,
+                                 mod_dict=mod_dict,
+                                 gzip=gzip,
+                                 append_dwi_info=append_dwi_info,
+                                 zero_pad=zero_pad,
+                                 cprss_lvl=cprss_lvl,
+                                 verbose=verbose,
+                                 log=log,
+                                 env=env,
+                                 dryrun=dryrun)
+    elif '.nii' in sub_data.data.lower():
+        [imgs,
+         jsons,
+         bvals,
+         bvecs] = nifti_to_bids(sub_data=sub_data,
+                                bids_name_dict=bids_name_dict,
+                                out_dir=out_dir,
+                                modality_type=modality_type,
+                                modality_label=modality_label,
+                                task=task,
+                                meta_dict=meta_dict,
+                                mod_dict=mod_dict,
+                                gzip=gzip,
+                                append_dwi_info=append_dwi_info,
+                                zero_pad=zero_pad)
     else:
-        imgs: List[str] = subs_bids.imgs
-        jsons: List[str] = subs_bids.jsons
-        bvals: List[str] = subs_bids.bvals
-        bvecs: List[str] = subs_bids.bvecs
-        return (imgs,
-                jsons,
-                bvals,
-                bvecs)
+        return [""],[""],[""],[""]
+
