@@ -639,7 +639,13 @@ def _get_bids_name_args(bids_name_dict: Dict,
 def make_bids_name(bids_name_dict: Dict,
                     modality_type: str
                    ) -> Tuple[str,str,str,str]:
-    '''Creates a BIDS compliant filename given a BIDS name description dictionary, and the modality type.
+    '''
+    TODO:
+        * For singleton return strings, increase run number by 1
+            in contingency/edge-cases in which there happens to be 
+            more than one expected nifti image.
+             
+    Creates a BIDS compliant filename given a BIDS name description dictionary, and the modality type.
 
     Usage example:
         >>> make_bids_name(bids_name_dict=bids_dict,
