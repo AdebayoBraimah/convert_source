@@ -524,7 +524,6 @@ def bids_id(s:str,
                              modality_label=modality_label,
                              task=task,
                              mod_found=True)
-        # return modality_type,modality_label,task
     
     return (bids_name_dict,
             modality_type,
@@ -843,10 +842,9 @@ def source_to_bids(sub_data: SubDataInfo,
                         param_dict: Dict = get_data_params(file=data,
                                                            json_file=img_data.jsons[i])
 
-                        metadata: Dict = dict_multi_update(dictionary=None,
-                                                           **meta_dict,
-                                                           **param_dict,
-                                                           **mod_dict)
+                        metadata: Dict = dict_multi_update(dictionary=None, **meta_dict)
+                        metadata: Dict = dict_multi_update(dictionary=None, **param_dict)
+                        metadata: Dict = dict_multi_update(dictionary=None, **mod_dict)
 
                         bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
                                                               json_dict=json_dict)
@@ -1076,18 +1074,17 @@ def nifti_to_bids(sub_data: SubDataInfo,
             param_dict: Dict = get_data_params(file=data,
                                                json_file=json_file)
 
-            metadata: Dict = dict_multi_update(dictionary=None,
-                                               **meta_dict,
-                                               **param_dict,
-                                               **mod_dict)
+            metadata: Dict = dict_multi_update(dictionary=None, **meta_dict)
+            metadata: Dict = dict_multi_update(dictionary=None, **param_dict)
+            metadata: Dict = dict_multi_update(dictionary=None, **mod_dict)
 
             bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
                                                   json_dict=json_dict)
         else:
             json_dict: Dict = read_json(json_file="")
-            metadata: Dict = dict_multi_update(dictionary=None,
-                                               **meta_dict,
-                                               **mod_dict)
+
+            metadata: Dict = dict_multi_update(dictionary=None, **meta_dict)
+            metadata: Dict = dict_multi_update(dictionary=None, **mod_dict)
             
             bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
                                                   json_dict=json_dict)

@@ -1005,7 +1005,7 @@ def get_recon_mat(json_file: str) -> Union[float,str]:
     try:
         with open(json_file, "r") as read_file:
             data: Dict = json.load(read_file)
-            return data["ReconMatrixPE"]
+            return data.get("ReconMatrixPE","")
     except JSONDecodeError:
         return ''
 
@@ -1025,7 +1025,7 @@ def get_pix_band(json_file: str) -> Union[float,str]:
     try:
         with open(json_file, "r") as read_file:
             data: Dict = json.load(read_file)
-            return data["PixelBandwidth"]
+            return data.get("PixelBandwidth","")
     except JSONDecodeError:
         return''
 

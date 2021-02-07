@@ -10,6 +10,7 @@ import platform
 import urllib.request
 import shutil
 
+from copy import deepcopy
 from typing import (
     Dict,
     List
@@ -19,12 +20,20 @@ from typing import (
 mod_path: str = os.path.join(str(pathlib.Path(os.path.abspath(__file__)).parents[2]))
 sys.path.append(mod_path)
 
-from convert_source.cs_utils.fileio import Command
+from convert_source.cs_utils.fileio import (
+    Command,
+    DependencyError
+)
+
+from convert_source.cs_utils.const import BIDS_PARAM
 
 from convert_source.cs_utils.utils import (
+    SubDataInfo,
+    collect_info,
     list_dict,
     comp_dict,
-    depth
+    depth,
+    get_metadata
 )
 
 from convert_source.batch_convert import (
@@ -58,6 +67,53 @@ test_config: str = os.path.join(scripts_dir,'test.config.yml')
 
 data_dir: str = os.path.join(os.getcwd(),'test.study_dir')
 dcm_test_data: str = os.path.join(data_dir,'TEST001-UNIT001','data.dicom','ST000000')
+
+## Additional test variables
+meta_dict_1: Dict = {
+    'Manufacturer': 'Vendor',
+    'ManufacturersModelName': 'Scanner model',
+    'MagneticFieldStrength': 3,
+    'InstitutionName': 'Institution Name'
+}
+
+meta_dict_2: Dict = {}
+
+def test_download_prog():
+    class PlatformInferError(Exception):
+        pass
+
+    if platform.system().lower() == 'darwin':
+        url: str = "https://github.com/rordenlab/dcm2niix/releases/download/v1.0.20201102/dcm2niix_mac.zip"
+        file_name: str = "dcm2niix_mac.zip"
+    elif platform.system().lower() == 'windows':
+        url: str = "https://github.com/rordenlab/dcm2niix/releases/download/v1.0.20201102/dcm2niix_win.zip"
+        file_name: str = "dcm2niix_win.zip"
+    elif platform.system().lower() == 'linux':
+        url: str = "https://github.com/rordenlab/dcm2niix/releases/download/v1.0.20201102/dcm2niix_lnx.zip"
+        file_name: str = "dcm2niix_lin.zip"
+    else:
+        raise PlatformInferError("Unable to infer this platform's operating system.")
+
+    with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
+        shutil.copyfileobj(response, out_file)
+    
+    assert os.path.exists(file_name) == True
+    
+    extract: Command = Command("tar")
+    extract.cmd_list.append("-zxvf")
+    extract.cmd_list.append(file_name)
+    extract.run()
+
+    os.remove(file_name)
+    assert os.path.exists(file_name) == False
+
+def test_dependency():
+    dcm2niix_cmd: Command = Command("dcm2niix")
+
+    with pytest.raises(DependencyError):
+        assert dcm2niix_cmd.check_dependency(path_envs=[]) == False
+    
+    assert dcm2niix_cmd.check_dependency(path_envs=[os.getcwd()]) == True
 
 def test_extract_data():
     dcm_data: str = os.path.join(data_dir,'TEST001-UNIT001','data.dicom','data.tar.gz')
@@ -97,5 +153,131 @@ def test_read_config():
     with pytest.raises(KeyError):
         assert comp_dict(search_dict,meta_dict) == False
 
+def get_subject_data():
+    subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+                                                exclusion_list=[])
+    assert len(subs_data) == 14
 
+def test_bids_id():
+    verbose: bool = True
+    [search_dict,
+    bids_search,
+    bids_map,
+    meta_dict,
+    exclusion_list] = read_config(config_file=test_config,
+                                  verbose=verbose)
+
+    subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir, 
+                                                exclusion_list=[])
+
+    # DICOM file 1 (incomplete acquisition)
+    bids_name_dict: Dict = deepcopy(BIDS_PARAM)
+    bids_name_dict['info']['sub'] = subs_data[0].sub
+    if subs_data[0].ses:
+        bids_name_dict['info']['ses'] = subs_data[0].ses
+    [bids_name_dict, 
+    modality_type, 
+    modality_label, 
+    task] = bids_id(s=subs_data[0].data,
+                    search_dict=search_dict,
+                    bids_search=bids_search,
+                    bids_map=bids_map,
+                    bids_name_dict=bids_name_dict,
+                    parent_dir=data_dir)
+    assert modality_type == 'anat'
+    assert modality_label == 'T1w'
+    assert task == ""
+
+    # DICOM file 2 (complete acquisition)
+    bids_name_dict: Dict = deepcopy(BIDS_PARAM)
+    bids_name_dict['info']['sub'] = subs_data[1].sub
+    if subs_data[1].ses:
+        bids_name_dict['info']['ses'] = subs_data[1].ses
+
+    [bids_name_dict, 
+    modality_type, 
+    modality_label, 
+    task] = bids_id(s=subs_data[1].data,
+                    search_dict=search_dict,
+                    bids_search=bids_search,
+                    bids_map=bids_map,
+                    bids_name_dict=bids_name_dict,
+                    parent_dir=data_dir)
+    assert modality_type == 'anat'
+    assert modality_label == 'T2w'
+    assert task == ""
+
+    # NIFTI file
+    bids_name_dict: Dict = deepcopy(BIDS_PARAM)
+    bids_name_dict['info']['sub'] = subs_data[9].sub
+    if subs_data[9].ses:
+        bids_name_dict['info']['ses'] = subs_data[9].ses
+
+    [bids_name_dict, 
+    modality_type, 
+    modality_label, 
+    task] = bids_id(s=subs_data[9].data,
+                    search_dict=search_dict,
+                    bids_search=bids_search,
+                    bids_map=bids_map,
+                    bids_name_dict=bids_name_dict,
+                    parent_dir=data_dir)
+    assert modality_type == 'func'
+    assert modality_label == 'bold'
+    assert task == 'rest'
+
+    # PAR file
+    bids_name_dict: Dict = deepcopy(BIDS_PARAM)
+    bids_name_dict['info']['sub'] = subs_data[11].sub
+    if subs_data[11].ses:
+        bids_name_dict['info']['ses'] = subs_data[11].ses
+
+    [bids_name_dict, 
+    modality_type, 
+    modality_label, 
+    task] = bids_id(s=subs_data[11].data,
+                    search_dict=search_dict,
+                    bids_search=bids_search,
+                    bids_map=bids_map,
+                    bids_name_dict=bids_name_dict,
+                    parent_dir=data_dir)
+    assert modality_type == 'swi'
+    assert modality_label == 'swi'
+    assert task == ""
+
+def test_get_metadata():
+    verbose: bool = True
+    [search_dict,
+    bids_search,
+    bids_map,
+    meta_dict,
+    exclusion_list] = read_config(config_file=test_config,
+                                  verbose=verbose)
+
+    subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir, 
+                                                exclusion_list=[])
+
+    bids_name_dict: Dict = deepcopy(BIDS_PARAM)
+    bids_name_dict['info']['sub'] = subs_data[11].sub
+    if subs_data[11].ses:
+        bids_name_dict['info']['ses'] = subs_data[11].ses
+
+    [bids_name_dict, 
+    modality_type, 
+    modality_label, 
+    task] = bids_id(s=subs_data[11].data,
+                    search_dict=search_dict,
+                    bids_search=bids_search,
+                    bids_map=bids_map,
+                    bids_name_dict=bids_name_dict,
+                    parent_dir=data_dir)
+
+    [meta_com_dict, 
+    meta_scan_dict] = get_metadata(dictionary=meta_dict,
+                                   modality_type=modality_type,
+                                   task=task)
+
+    assert meta_com_dict == meta_dict_1
+    assert meta_scan_dict == meta_dict_2
+    
 
