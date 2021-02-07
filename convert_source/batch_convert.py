@@ -708,10 +708,10 @@ def make_bids_name(bids_name_dict: Dict,
     run3: str = add_to_zeropadded(run,2)
     run4: str = add_to_zeropadded(run,3)
 
-    f_name1: str = f_name + "_run-{run1}"
-    f_name2: str = f_name + "_run-{run2}"
-    f_name3: str = f_name + "_run-{run3}"
-    f_name4: str = f_name + "_run-{run4}"
+    f_name1: str = f_name + f"_run-{run1}"
+    f_name2: str = f_name + f"_run-{run2}"
+    f_name3: str = f_name + f"_run-{run3}"
+    f_name4: str = f_name + f"_run-{run4}"
 
     if echo and ('echo' in bids_keys):
         f_name1 += f"_echo-{echo}"
