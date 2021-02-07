@@ -2,10 +2,6 @@
 """Batch conversion wrapper and its associated classes and functions for the `convert_source` package.
 
 TODO:
-    * Update dcm2niix wrapper function to include all args.
-        * Either collect and pass args with dicrtionary.
-            OR
-        * Use a yaml file to pass the args.
     * Write unit tests.
     * Resolve TODO's.
 """
@@ -30,7 +26,8 @@ from convert_source.cs_utils.const import (
 )
 
 from convert_source.cs_utils.fileio import (
-    Command, ConversionError,
+    Command, 
+    ConversionError,
     NiiFile,
     LogFile,
     TmpDir
