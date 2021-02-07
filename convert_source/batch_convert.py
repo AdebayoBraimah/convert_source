@@ -48,7 +48,8 @@ from convert_source.cs_utils.utils import (
     collect_info,
     get_metadata,
     convert_image_data,
-    dict_multi_update
+    dict_multi_update,
+    add_to_zeropadded
 )
 
 from convert_source.cs_utils.bids_info import (
@@ -701,51 +702,75 @@ def make_bids_name(bids_name_dict: Dict,
     if rec and ('rec' in bids_keys):
         f_name += f"_rec-{rec}"
 
-    f_name += f"_run-{run}"
+    # Set multiple run names
+    run1: str = str(run)
+    run2: str = add_to_zeropadded(run,1)
+    run3: str = add_to_zeropadded(run,2)
+    run4: str = add_to_zeropadded(run,3)
+
+    f_name1: str = f_name + "_run-{run1}"
+    f_name2: str = f_name + "_run-{run2}"
+    f_name3: str = f_name + "_run-{run3}"
+    f_name4: str = f_name + "_run-{run4}"
 
     if echo and ('echo' in bids_keys):
-        f_name += f"_echo-{echo}"
+        f_name1 += f"_echo-{echo}"
+        f_name2 += f"_echo-{echo}"
+        f_name3 += f"_echo-{echo}"
+        f_name4 += f"_echo-{echo}"
     
     if modality_type.lower() == 'fmap':
         if case1 and mag2:
-            f_name1: str = f_name + "_phasediff"
-            f_name2: str = f_name + "_magnitude1"
-            f_name3: str = f_name + "_magnitude2"
+            f_name1: str = f_name1 + "_phasediff"
+            f_name2: str = f_name1 + "_magnitude1"
+            f_name3: str = f_name1 + "_magnitude2"
             return (f_name1,
                    f_name2,
                    f_name3,
                    "")
         elif case1:
-            f_name1: str = f_name + "_phasediff"
-            f_name2: str = f_name + "_magnitude1"
+            f_name1: str = f_name1 + "_phasediff"
+            f_name2: str = f_name1 + "_magnitude1"
             return (f_name1,
                    f_name2,
                    "",
                    "")
         elif case2:
-            f_name1: str = f_name + "_phase1"
-            f_name2: str = f_name + "_phase2"
-            f_name3: str = f_name + "_magnitude1"
-            f_name4: str = f_name + "_magnitude2"
+            f_name1: str = f_name1 + "_phase1"
+            f_name2: str = f_name1 + "_phase2"
+            f_name3: str = f_name1 + "_magnitude1"
+            f_name4: str = f_name1 + "_magnitude2"
             return (f_name1,
                    f_name2,
                    f_name3,
                    f_name4)
         elif case3:
-            f_name1: str = f_name + "_magnitude"
-            f_name2: str = f_name + "_fieldmap"
+            f_name1: str = f_name1 + "_magnitude"
+            f_name2: str = f_name1 + "_fieldmap"
             return (f_name1,
                    f_name2,
                    "",
                    "")
         elif case4:
             modality_label = bids_name_dict[modality_type]['modality_label']
-            f_name += f"_{modality_label}"
-            return f_name,"","",""
+            f_name1 += f"_{modality_label}"
+            f_name2 += f"_{modality_label}"
+            f_name3 += f"_{modality_label}"
+            f_name4 += f"_{modality_label}"
+            return (f_name1,
+                    f_name2,
+                    f_name3,
+                    f_name4)
     else:
         modality_label = bids_name_dict[modality_type]['modality_label']
-        f_name += f"_{modality_label}"
-        return f_name,"","",""
+        f_name1 += f"_{modality_label}"
+        f_name2 += f"_{modality_label}"
+        f_name3 += f"_{modality_label}"
+        f_name4 += f"_{modality_label}"
+        return (f_name1,
+                f_name2,
+                f_name3,
+                f_name4)
 
 def source_to_bids(sub_data: SubDataInfo,
                    bids_name_dict: Dict,
@@ -964,10 +989,7 @@ def source_to_bids(sub_data: SubDataInfo,
                     else:
                         ext: str = ".nii"
                     
-                    if bids_names[i]:
-                        out_name: str = os.path.join(out_data_dir,bids_names[i])
-                    else:
-                       out_name: str = os.path.join(out_data_dir,bids_names[0]) 
+                    out_name: str = os.path.join(out_data_dir,bids_names[i]) 
 
                     out_nii: str = out_name + ext
                     out_json: str = out_name + ".json"
