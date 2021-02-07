@@ -69,49 +69,68 @@ class BIDSImgData(object):
     and its associated (BIDS related) files - allows for grouping of 
     image data and its associated files.
 
-    Attributes (instance attributes):
+    Attributes (class and instance attributes):
         imgs: List of image files. Emtpy when initialized.
         jsons: List of corresponding JSON files. Emtpy when initialized.
         bvals: List of corresponding bval files. Emtpy when initialized.
         bvecs: List of corresponding bvec files. Emtpy when initialized.
     '''
+    # Class attributes
+    imgs: List = []
+    jsons: List = []
+    bvals: List = []
+    bvecs: List = []
+
     def __init__(self,
-                 imgs: Optional[str] = "",
-                 jsons: Optional[str] = "",
-                 bvals: Optional[str] = "",
-                 bvecs: Optional[str] = ""
+                 imgs: Optional[List[str]] = [],
+                 jsons: Optional[List[str]] = [],
+                 bvals: Optional[List[str]] = [],
+                 bvecs: Optional[List[str]] = []
                 ):
-        '''Init doc-string for BIDSImgData class. Allows
+        '''
+        TODO: 
+            * Update documentation.
+
+        Init doc-string for BIDSImgData class. Allows
         for grouping of image data and its associated files.
 
+        NOTE: To ensure all lists correspond (i.e. are of the same length,
+            be sure to pass empty strings as place holders in lists that 
+            do not have that piece of corresponding information (e.g. cases 
+            such as a both a NIFTI and JSON file are present, but no 
+            bval and bvecs files - then just place empty strings in those 
+            corresponding list indices).
+
         Usage example:
-            >>> data_obj = BIDSImgData(img,
-            ...                        json)
+            >>> data_obj = BIDSImgData(img=[ img1 ],
+            ...                        json=[ json1 ],
+            ...                        bval=[ "" ],
+            ...                        bvec=[ "" ])
             ...
 
         Arguments:
-            imgs: Input image.
-            jsons: Corresponding input JSON file.
-            bvals: Corresponding input FSL-style bval file.
-            bvecs: Corresponding input FSL-style bvec file.
+            imgs: List of input images.
+            jsons: Corresponding list of input JSON files.
+            bvals: Corresponding list of input FSL-style bval files.
+            bvecs: Corresponding list of input FSL-style bvec files.
         '''
         if imgs:
-            self.imgs: List = [imgs]
+            self.imgs: List[str] = imgs
         else:
             self.imgs: List = []
         
         if jsons:
-            self.jsons: List = [jsons]
+            self.jsons: List[str] = jsons
         else:
             self.jsons: List = []
         
         if bvals:
-            self.bvals: List = [bvals]
+            self.bvals: List[str] = bvals
         else:
             self.bvals: List = []
-                
+        
         if bvecs:
-            self.bvecs: List = [bvecs]
+            self.bvecs: List[str] = bvecs
         else:
             self.bvecs: List = []
     
@@ -127,19 +146,30 @@ class BIDSImgData(object):
                )
 
     def add(self,
-            imgs: Optional[Union[List[str],str]] = "",
-            jsons: Optional[Union[List[str],str]] = "",
-            bvals: Optional[Union[List[str],str]] = "",
-            bvecs: Optional[Union[List[str],str]] = ""
+            imgs: Optional[Union[List[str],str]] = None,
+            jsons: Optional[Union[List[str],str]] = None,
+            bvals: Optional[Union[List[str],str]] = None,
+            bvecs: Optional[Union[List[str],str]] = None
             ) -> Tuple[List[str],List[str],List[str],List[str]]:
         '''Extends or appends to a list depending on if a list or string is passed as an argument.
 
+        NOTE: To ensure all lists correspond (i.e. are of the same length,
+            be sure to pass empty strings as place holders in lists that 
+            do not have that piece of corresponding information (e.g. cases 
+            such as a both a NIFTI and JSON file are present, but no 
+            bval and bvecs files - then just place empty strings in those 
+            corresponding list indices).
+
         Usage example:
-            >>> data_obj = BIDSImgData(img,
-            ...                        json)
+            >>> data_obj = BIDSImgData(img=[ img1 ],
+            ...                        json=[ json1 ],
+            ...                        bval=[ "" ],
+            ...                        bvec=[ "" ])
             ...
             >>> data_obj.add(imgs=[img1,img2],
-            ...              jsons=[json1,''])
+            ...              jsons=[json1,'']
+            ...              bval=[ "" ],
+            ...              bvec=[ "" ])
             ...
 
         Arguments:
@@ -272,10 +302,16 @@ def batch_proc(config_file: str,
                                mod_dict=meta_scan_dict)
 
         # Collect data using BIDSImgData object
-        subs_bids.add(imgs=imgs,
-                      jsons=jsons,
-                      bvals=bvals,
-                      bvecs=bvecs)
+        if len(subs_bids.imgs) == 0:
+            subs_bids: BIDSImgData = BIDSImgData(imgs=imgs,
+                                                 jsons=jsons,
+                                                 bvals=bvals,
+                                                 bvecs=bvecs)
+        else:
+            subs_bids: BIDSImgData = subs_bids.add(imgs=imgs,
+                                                   jsons=jsons,
+                                                   bvals=bvals,
+                                                   bvecs=bvecs)
 
     if return_obj:
         return subs_bids
