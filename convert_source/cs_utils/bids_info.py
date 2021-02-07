@@ -15,7 +15,6 @@ from typing import (
 
 from convert_source.cs_utils.utils import (
     dict_multi_update,
-    SubInfoError,
     SubDataInfo,
     zeropad,
     depth,
