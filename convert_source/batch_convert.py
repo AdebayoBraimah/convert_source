@@ -641,11 +641,40 @@ def source_to_bids(sub_data: SubDataInfo,
                    env: Optional[Dict] = {},
                    dryrun: bool = False
                    ) -> Tuple[List[str],List[str],List[str],List[str]]:
-    '''
-    TODO:
-        * Write documentation.
+    '''Converts source data to BIDS raw data.
     
-    Converts source data to BIDS raw data.
+    Usage example:
+        >>> [imgs, jsons, bvals, bvecs] = source_to_bids(sub_obj,
+        ...                                              bids_name_dict,
+        ...                                              output_dir,
+        ...                                              'anat',
+        ...                                              'T1w')
+        ...
+
+    Arguments:
+        sub_data: Subject data information object.
+        bids_name_dict: BIDS name dictionary.
+        out_dir: Output directory.
+        modality_type: Modality type (BIDS label e.g. 'anat', 'func', etc).
+        modality_label: Modality label (BIDS label  e.g. 'T1w', 'bold', etc).
+        task: Task label (BIDS filename task label, e.g. 'rest', 'nback', etc.)
+        meta_dict: BIDS common metadata dictoinary.
+        mod_dict: Modality specific metadata dictionary.
+        gzip: Gzip output NIFTI files.
+        append_dwi_info: Appends DWI acquisition information (unique non-zero b-values, and TE, in msec.) to BIDS acquisition filename.
+        zero_pad: Number of zeroes to pad the run number up to (zero_pad=2 is '01').
+        cprss_lvl: Compression level [1 - 9] - 1 is fastest, 9 is smallest (dcm2niix option).
+        verbose: Enable verbose output (dcm2niix option).
+        log: LogFile object for logging.
+        env: Path environment dictionary.
+        dryrun: Perform dryrun (creates the command, but does not execute it).
+
+    Returns:
+        Tuple of lists that contains:
+            * List of image data file(s). Empty string is returned if this file does not exist.
+            * List of corresponding JSON (sidecar) file(s). Empty string is returned if this file does not exist.
+            * List of corresponding FSL-style bval file(s). Empty string is returned if this file does not exist.
+            * List of corresponding FSL-style bvec file(s). Empty string is returned if this file does not exist.
     '''
     sub: Union[int,str] = sub_data.sub
     ses: Union[int,str] = sub_data.ses
@@ -860,18 +889,37 @@ def nifti_to_bids(sub_data: SubDataInfo,
                   mod_dict: Optional[Dict] = {},
                   gzip: bool = True,
                   append_dwi_info: bool = True,
-                  zero_pad: int = 2,
-                  cprss_lvl: int = 6,
-                  verbose: bool = False,
-                  log: Optional[LogFile] = None,
-                  env: Optional[Dict] = {},
-                  dryrun: bool = False
+                  zero_pad: int = 2
                   ) -> Tuple[List[str],List[str],List[str],List[str]]:
-    '''
-    TODO: 
-        * write documentation
+    '''Converts existing NIFTI data to BIDS raw data.
+    
+    Usage example:
+        >>> [imgs, jsons, bvals, bvecs] = nifti_to_bids(sub_obj,
+        ...                                             bids_name_dict,
+        ...                                             output_dir,
+        ...                                             'anat',
+        ...                                             'T1w')
+        ...
 
-    Converts existing NIFTI data to BIDS raw data.
+    Arguments:
+        sub_data: Subject data information object.
+        bids_name_dict: BIDS name dictionary.
+        out_dir: Output directory.
+        modality_type: Modality type (BIDS label e.g. 'anat', 'func', etc).
+        modality_label: Modality label (BIDS label  e.g. 'T1w', 'bold', etc).
+        task: Task label (BIDS filename task label, e.g. 'rest', 'nback', etc.)
+        meta_dict: BIDS common metadata dictoinary.
+        mod_dict: Modality specific metadata dictionary.
+        gzip: Gzip output NIFTI files.
+        append_dwi_info: Appends DWI acquisition information (unique non-zero b-values, and TE, in msec.) to BIDS acquisition filename.
+        zero_pad: Number of zeroes to pad the run number up to (zero_pad=2 is '01').
+
+    Returns:
+        Tuple of lists that contains:
+            * List of image data file(s). Empty string is returned if this file does not exist.
+            * List of corresponding JSON (sidecar) file(s). Empty string is returned if this file does not exist.
+            * List of corresponding FSL-style bval file(s). Empty string is returned if this file does not exist.
+            * List of corresponding FSL-style bvec file(s). Empty string is returned if this file does not exist.
     '''
     sub: Union[int,str] = sub_data.sub
     ses: Union[int,str] = sub_data.ses
