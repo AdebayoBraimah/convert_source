@@ -87,11 +87,7 @@ class BIDSImgData(object):
                  bvals: Optional[List[str]] = [],
                  bvecs: Optional[List[str]] = []
                 ):
-        '''
-        TODO: 
-            * Update documentation.
-
-        Init doc-string for BIDSImgData class. Allows
+        '''Init doc-string for BIDSImgData class. Allows
         for grouping of image data and its associated files.
 
         NOTE: To ensure all lists correspond (i.e. are of the same length,
@@ -266,8 +262,6 @@ def batch_proc(config_file: str,
     
     subs_data: List[SubDataInfo] = collect_info(parent_dir=study_img_dir,
                                                 exclusion_list=exclusion_list)
-    
-    subs_bids: BIDSImgData = BIDSImgData()
 
     bids_imgs: List = []
     bids_jsons: List = []
@@ -311,42 +305,16 @@ def batch_proc(config_file: str,
             jsons = [""]
             bvals = [""]
             bvecs = [""]
-
-        # # Collect data using BIDSImgData object
-        # if len(subs_bids.imgs) == 0:
-        #     subs_bids: BIDSImgData = BIDSImgData(imgs=imgs,
-        #                                          jsons=jsons,
-        #                                          bvals=bvals,
-        #                                          bvecs=bvecs)
-        # else:
-        #     subs_bids: BIDSImgData = subs_bids.add(imgs=imgs,
-        #                                            jsons=jsons,
-        #                                            bvals=bvals,
-        #                                            bvecs=bvecs)
-
+        
         bids_imgs.extend(imgs)
         bids_jsons.extend(jsons)
         bids_bvals.extend(bvals)
-        bids_bvals.extend(bvecs)
+        bids_bvecs.extend(bvecs)
 
-        # subs_bids: BIDSImgData = subs_bids.add(imgs=imgs,
-        #                                        jsons=jsons,
-        #                                        bvals=bvals,
-        #                                        bvecs=bvecs)
-
-
-    # if return_obj:
-    #     return subs_bids
-    # else:
-    #     imgs: List[str] = subs_bids.imgs
-    #     jsons: List[str] = subs_bids.jsons
-    #     bvals: List[str] = subs_bids.bvals
-    #     bvecs: List[str] = subs_bids.bvecs
-    #     return (imgs,
-    #             jsons,
-    #             bvals,
-    #             bvecs)
-    return bids_imgs,bids_jsons,bids_bvals,bids_bvals
+    return (bids_imgs,
+            bids_jsons,
+            bids_bvals,
+            bids_bvecs)
 
 def read_config(config_file: Optional[str] = "", 
                 verbose: Optional[bool] = False
@@ -639,7 +607,10 @@ def _gather_bids_name_args(bids_name_dict: Dict,
             else:
                 return False
     else:
-        return bids_name_dict[modality_type].get(param,'')
+        try:
+            return bids_name_dict[modality_type].get(param,'')
+        except KeyError:
+            return ''
 
 def _get_bids_name_args(bids_name_dict: Dict,
                         modality_type: str

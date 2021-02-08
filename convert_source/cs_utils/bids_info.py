@@ -398,12 +398,15 @@ def num_runs(directory: Optional[str] = "",
     
     # Construct glob string
     tmp_list: List[str] = []
-    for item in list(bids_dict[modality_type].keys()):
-        if bids_dict[modality_type][item] == "":
-            pass
-        else:
-            tmp_list.append(bids_dict[modality_type][item])
-            tmp_list.append("*")
+    try:
+        for item in list(bids_dict[modality_type].keys()):
+            if bids_dict[modality_type][item] == "":
+                pass
+            else:
+                tmp_list.append(bids_dict[modality_type][item])
+                tmp_list.append("*")
+    except KeyError:
+        pass
     glob_str: str = ''.join(tmp_list)
     runs: str = os.path.join(directory,f"*{glob_str}.nii*")
     num: int = len(glob.glob(runs)) + 1
@@ -461,28 +464,28 @@ def search_bids(s: str,
         return bids_name_dict
     
     if depth(bids_search[modality_type]) == 3:
-        for (k1,v1),(k2,v2) in zip(bids_search[modality_type][modality_label].items(),bids_map[modality_type][modality_label].items()):
-            try:
-                for va,vb in zip(v1,v2):
-                    if list_in_substr(in_list=[va],in_str=s):
-                        bids_name_dict[modality_type]['modality_label'] = modality_label
-                        bids_name_dict[modality_type][k1] = vb
-                    else:
-                        bids_name_dict[modality_type]['modality_label'] = modality_label
-            except TypeError:
-                pass
+        try:
+            for (k1,v1),(k2,v2) in zip(bids_search[modality_type][modality_label].items(),bids_map[modality_type][modality_label].items()):
+                    for va,vb in zip(v1,v2):
+                        if list_in_substr(in_list=[va],in_str=s):
+                            bids_name_dict[modality_type]['modality_label'] = modality_label
+                            bids_name_dict[modality_type][k1] = vb
+                        else:
+                            bids_name_dict[modality_type]['modality_label'] = modality_label
+        except (TypeError,KeyError):
+            pass
     elif depth(bids_search[modality_type]) == 4:
-        for (k1,v1),(k2,v2) in zip(bids_search[modality_type][modality_label][task].items(),bids_map[modality_type][modality_label][task].items()):
-            try:
-                for (va,vb) in zip(v1,v2):
-                    if list_in_substr(in_list=[va],in_str=s):
-                        bids_name_dict[modality_type]['modality_label'] = modality_label
-                        bids_name_dict[modality_type]['task'] = task
-                        bids_name_dict[modality_type][k1] = vb
-                    else:
-                        bids_name_dict[modality_type]['modality_label'] = modality_label
-                        bids_name_dict[modality_type]['task'] = task
-            except TypeError:
-                pass
+        try:
+            for (k1,v1),(k2,v2) in zip(bids_search[modality_type][modality_label][task].items(),bids_map[modality_type][modality_label][task].items()):
+                    for (va,vb) in zip(v1,v2):
+                        if list_in_substr(in_list=[va],in_str=s):
+                            bids_name_dict[modality_type]['modality_label'] = modality_label
+                            bids_name_dict[modality_type]['task'] = task
+                            bids_name_dict[modality_type][k1] = vb
+                        else:
+                            bids_name_dict[modality_type]['modality_label'] = modality_label
+                            bids_name_dict[modality_type]['task'] = task
+        except (TypeError,KeyError):
+            pass
     
     return bids_name_dict
