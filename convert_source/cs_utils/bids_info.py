@@ -290,7 +290,8 @@ def construct_bids_name(sub_data: SubDataInfo,
                                            "dir":acq_dir,
                                            "rec":rec,
                                            "run":run,
-                                           "echo":echo}})
+                                           "echo":echo,
+                                           "modality_label": modality_label}})
     elif modality_type == "":
         if not modality_label:
             modality_label = "unknown"
