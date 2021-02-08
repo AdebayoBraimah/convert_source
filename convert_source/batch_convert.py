@@ -878,6 +878,11 @@ def source_to_bids(sub_data: SubDataInfo,
      case4] = _get_bids_name_args(bids_name_dict=bids_name_dict,
                                   modality_type=modality_type)
 
+    if _task == task:
+        pass
+    elif _task:
+        task: str = _task
+
     # Using TmpDir and TmpFile context managers
     with TmpDir(tmp_dir=sub_tmp,use_cwd=False) as tmp:
         with TmpDir.TmpFile(tmp_dir=tmp.tmp_dir) as f:
@@ -1106,9 +1111,9 @@ def nifti_to_bids(sub_data: SubDataInfo,
     
     if ses:
         sub_dir: str = os.path.join(sub_dir,"ses-" + ses)
-
+    
     # Gather BIDS name description args
-    [task, 
+    [_task, 
      acq, 
      ce, 
      acq_dir, 
@@ -1120,12 +1125,17 @@ def nifti_to_bids(sub_data: SubDataInfo,
      case3, 
      case4] = _get_bids_name_args(bids_name_dict=bids_name_dict,
                                   modality_type=modality_type)
+    
+    if _task == task:
+        pass
+    elif _task:
+        task: str = _task
 
     # Use NiiFile context manager
     with NiiFile(data) as n:
         [path, basename, ext] = n.file_parts()
         img_files: List[str] = glob.glob(os.path.join(path,basename + "*" + ext))
-        json_file: str = os.path.join(path,basename + "*.json")
+        json_file: str = ''.join(glob.glob(os.path.join(path,basename + "*.json*")))
         bval_file: str = ''.join(glob.glob(os.path.join(path,basename + "*.bval*")))
         bvec_file: str = ''.join(glob.glob(os.path.join(path,basename + "*.bvec*")))
         
