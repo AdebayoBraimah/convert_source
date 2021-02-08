@@ -302,6 +302,13 @@ def batch_proc(config_file: str,
         bids_bvals.extend(bvals)
         bids_bvecs.extend(bvecs)
 
+    for i in reversed(range(0,len(bids_imgs))):
+        if (bids_imgs[i] == "") and (bids_jsons[i] == "") and (bids_bvals[i] == "") and (bids_bvecs[i] == ""):
+            bids_imgs.pop(i)
+            bids_jsons.pop(i)
+            bids_bvals.pop(i)
+            bids_bvecs.pop(i)
+
     return (bids_imgs,
             bids_jsons,
             bids_bvals,

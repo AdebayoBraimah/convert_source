@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 """Tests for convert_source's batch processing functions.
-
-TODO:
-    * deprecate `BIDSImgData` class.
 """
 import pytest
 
@@ -40,7 +37,6 @@ from convert_source.cs_utils.utils import (
 )
 
 from convert_source.batch_convert import (
-    # BIDSImgData,
     read_config,
     bids_id,
     make_bids_name,
@@ -503,12 +499,21 @@ def test_batch_proc():
     [imgs,
      jsons,
      bvals,
-     bvecs] =batch_proc(config_file=test_config2,
-                        study_img_dir=data_dir,
-                        out_dir=out_dir,
-                        verbose=True)
+     bvecs] = batch_proc(config_file=test_config2,
+                         study_img_dir=data_dir,
+                         out_dir=out_dir,
+                         verbose=True)
 
-    assert len(imgs) == 12
-    assert len(jsons) == 12
-    assert len(bvals) == 12
-    assert len(bvecs) == 12
+    assert len(imgs) == 11
+    assert len(jsons) == 11
+    assert len(bvals) == 11
+    assert len(bvecs) == 11
+
+def test_cleanup():
+    shutil.rmtree(out_dir)
+    assert os.path.exists(out_dir) == False
+
+    shutil.rmtree(dcm_test_data)
+    assert os.path.exists(dcm_test_data) == False
+
+    os.remove("dcm2niix")
