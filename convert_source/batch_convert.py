@@ -3,6 +3,10 @@
 
 TODO:
     * [PENDING] Figure out where tmp directory path is being printed.
+    * Write to log file.
+    * Make sub-directory in output directory for:
+        * log file(s).
+        * 
 """
 import os
 import glob
@@ -10,6 +14,7 @@ import yaml
 
 from copy import deepcopy
 from shutil import copy
+from datetime import datetime
 
 from typing import (
     List, 
@@ -27,6 +32,7 @@ from convert_source.cs_utils.const import (
 from convert_source.cs_utils.fileio import (
     Command, 
     ConversionError,
+    File,
     NiiFile,
     LogFile,
     TmpDir
@@ -96,6 +102,26 @@ def batch_proc(config_file: str,
     dcm2niix_cmd: Command = Command("dcm2niix")
     dcm2niix_cmd.check_dependency(path_envs=path_envs)
 
+    # Write logs
+    misc_dir: str = os.path.join(out_dir,'.misc')
+    if os.path.exists(misc_dir):
+        misc_dir: str = os.path.abspath(misc_dir)
+    else:
+        os.makedirs(misc_dir)
+        misc_dir: str = os.path.abspath(misc_dir)
+    
+    now = datetime.now()
+    dt_string: str = str(now.strftime("%m_%d_%Y_%H_%M%_%S"))
+
+    _log: str = os.path.join(misc_dir,f"convert_source_{dt_string}.log")
+    log: LogFile = log_file(log=_log)
+
+    # Write bidsignore
+    _ = bids_ignore(out_dir=out_dir)
+    log.info("Init .bidsignore file")
+
+    log.info("Reading config file")
+
     [search_dict,
      bids_search,
      bids_map,
@@ -107,6 +133,8 @@ def batch_proc(config_file: str,
     if comp_dict(d1=bids_search,d2=bids_map):
         pass
     
+    log.info("Collecting subject imaging data")
+
     subs_data: List[SubDataInfo] = collect_info(parent_dir=study_img_dir,
                                                 exclusion_list=exclusion_list)
 
@@ -148,7 +176,8 @@ def batch_proc(config_file: str,
                                 modality_label=modality_label,
                                 task=task,
                                 meta_dict=meta_com_dict,
-                                mod_dict=meta_scan_dict)
+                                mod_dict=meta_scan_dict,
+                                log=log)
         except AttributeError:
             imgs = [""]
             jsons = [""]
@@ -1241,3 +1270,57 @@ def data_to_bids(sub_data: SubDataInfo,
     else:
         return [""],[""],[""],[""]
 
+
+def bids_ignore(out_dir: str) -> str:
+    '''Writes '.bidsignore' file. This file functions 
+    similarly to the '.gitignore' file.
+
+    Usage example:
+        >>> ignore = bids_ignore(out_dir)
+        
+    Arguments:
+        out_dir: Output directory to place the file.
+
+    Returns:
+        String of the file path to the '.bidsignore' file.
+    '''
+    if os.path.exists(out_dir):
+        out_dir: str = os.path.abspath(out_dir)
+    else:
+        os.makedirs(out_dir)
+        out_dir: str = os.path.abspath(out_dir)
+    
+    new_file: str = os.path.join(out_dir,'.bidsignore')
+
+    # Write to file using File class context manager
+    with File(new_file) as f:
+        f.write_txt(".misc \n")
+    
+    return new_file
+
+def log_file(log: str) -> LogFile:
+    '''Initializes log file object for logging purposes.
+
+    Usage example:
+        >>> logger = log(log_file)
+        >>>
+        >>> logger.info("Some information")
+        >>> logger.warning("Some warning")
+        
+    Arguments:
+        log: Log file name.
+
+    Returns:
+        LogFile object to be logged to.
+    '''
+    from convert_source import __version__
+
+    log: LogFile = LogFile(log_file=log)
+
+    now = datetime.now()
+    dt_string = now.strftime("%A %B %d, %Y %H:%M%:%S")
+
+    log.info(dt_string)
+    log.info(f"convert_source v{__version__}")
+
+    return log

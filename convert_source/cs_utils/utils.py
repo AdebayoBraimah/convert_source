@@ -798,13 +798,13 @@ def convert_image_data(file: str,
         convert.cmd_list.append("0")
     
     if big_endian.lower() == "o":
-        convert.cmd_list.append("--big_endian")
+        convert.cmd_list.append("--big-endian")
         convert.cmd_list.append("o")
     elif big_endian.lower() == "n":
-        convert.cmd_list.append("--big_endian")
+        convert.cmd_list.append("--big-endian")
         convert.cmd_list.append("n")
     elif big_endian.lower() == "y":
-        convert.cmd_list.append("--big_endian")
+        convert.cmd_list.append("--big-endian")
         convert.cmd_list.append("y")
     
     # Boolean option(s)
