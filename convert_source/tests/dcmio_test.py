@@ -15,10 +15,7 @@ import sys
 import pathlib
 import platform
 
-from typing import (
-    Dict,
-    List
-)
+from typing import List
 
 # Add package/module to PYTHONPATH
 mod_path: str = os.path.join(str(pathlib.Path(os.path.abspath(__file__)).parents[2]))
