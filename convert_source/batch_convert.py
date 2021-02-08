@@ -2,8 +2,8 @@
 """Batch conversion wrapper and its associated classes and functions for the `convert_source` package.
 
 TODO:
-    * Write unit tests.
-    * Resolve TODO's.
+    * [PENDING] Order the test scripts for CI.
+    * [PENDING] Figure out where tmp directory path is being printed.
 """
 import os
 import glob
@@ -118,7 +118,7 @@ def batch_proc(config_file: str,
        
     for sub_data in subs_data:
         if verbose:
-            print(sub_data.data)
+            print(f"Processing: {sub_data.data}")
         data: str = sub_data.data
         bids_name_dict: Dict = deepcopy(BIDS_PARAM)
         bids_name_dict['info']['sub'] = sub_data.sub
@@ -224,56 +224,56 @@ def read_config(config_file: Optional[str] = "",
     with open(config_file) as file:
         data_map: Dict[str,str] = yaml.safe_load(file)
         if verbose:
-            print("Initialized parameters from configuration file")
+            print("\n Initialized parameters from configuration file")
     
     # Required modality search terms
     if any("modality_search" in data_map for element in data_map):
         if verbose:
-            print("Categorizing search terms")
+            print("\n Categorizing search terms")
         search_dict: Dict[str,str] = data_map["modality_search"]
     else:
         if verbose:
-            print("Heuristic search terms required. Exiting...")
+            print("\n Heuristic search terms required. Exiting...")
         raise ConfigFileReadError("Heuristic search terms required. Exiting...")
     
     # BIDS search terms
     if any("bids_search" in data_map for element in data_map):
         if verbose:
-            print("Including BIDS related search term settings")
+            print("\n Including BIDS related search term settings")
         bids_search: Dict[str,str] = data_map["bids_search"]
     else:
         if verbose:
-            print("No BIDS related search term settings")
+            print("\n No BIDS related search term settings")
         meta_dict: Dict = dict()
     
     # BIDS mapping terms
     if any("bids_map" in data_map for element in data_map):
         if verbose:
-            print("Corresponding BIDS mapping settings")
+            print("\n Corresponding BIDS mapping settings")
         bids_map: Dict[str,str] = data_map["bids_map"]
     else:
         if verbose:
-            print("No BIDS mapping settings")
+            print("\n No BIDS mapping settings")
         meta_dict: Dict = dict()
     
     # Metadata terms
     if any("metadata" in data_map for element in data_map):
         if verbose:
-            print("Including additional settings for metadata")
+            print("\n Including additional settings for metadata")
         meta_dict: Dict[str,Union[str,int]] = data_map["metadata"]
     else:
         if verbose:
-            print("No metadata settings")
+            print("\n No metadata settings")
         meta_dict: Dict = dict()
     
     # Exclusion terms/terms to ignore
     if any("exclude" in data_map for element in data_map):
         if verbose:
-            print("Exclusion option implemented")
+            print("\n Exclusion option implemented")
         exclusion_list: List[str] = data_map["exclude"]
     else:
         if verbose:
-            print("Exclusion option not implemented")
+            print("\n Exclusion option not implemented")
         exclusion_list: List = list()
         
     return (search_dict,
@@ -737,7 +737,7 @@ def source_to_bids(sub_data: SubDataInfo,
     # Using TmpDir and TmpFile context managers
     with TmpDir(tmp_dir=sub_tmp,use_cwd=False) as tmp:
         with TmpDir.TmpFile(tmp_dir=tmp.tmp_dir) as f:
-            tmp.mk_tmp_dir()
+            _ = tmp.mk_tmp_dir()
             [_path, basename, _ext] = f.file_parts()
             try:
                 img_data = convert_image_data(file=data,
@@ -776,7 +776,7 @@ def source_to_bids(sub_data: SubDataInfo,
                             for bval in bvals:
                                 if bval != 0:
                                     _label += f"b{bval}"
-                            _label += f"TE{echo_time}"
+                            _label += f"TE{int(echo_time)}"
                             if acq:
                                 acq += _label
                             else:
@@ -1048,7 +1048,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
                 if bval != 0:
                     _label += f"b{bval}"
             if echo_time:
-                _label += f"TE{echo_time}"
+                _label += f"TE{int(echo_time)}"
             if acq:
                 acq += _label
             else:

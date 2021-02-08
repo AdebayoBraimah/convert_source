@@ -829,7 +829,7 @@ def convert_image_data(file: str,
     # Create TmpDir object
     with TmpDir(tmp_dir=out_dir,use_cwd=False) as tmp_dir:
         # Create temporary output directory
-        tmp_dir.mk_tmp_dir()
+        _ = tmp_dir.mk_tmp_dir()
         
         # Output directory
         out_dir: str = os.path.abspath(out_dir)
