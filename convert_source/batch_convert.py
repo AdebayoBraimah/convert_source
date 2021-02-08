@@ -2,7 +2,6 @@
 """Batch conversion wrapper and its associated classes and functions for the `convert_source` package.
 
 TODO:
-    * [PENDING] Order the test scripts for CI.
     * [PENDING] Figure out where tmp directory path is being printed.
 """
 import os
