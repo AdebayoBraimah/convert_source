@@ -3,10 +3,6 @@
 
 TODO:
     * [PENDING] Figure out where tmp directory path is being printed.
-    * Write to log file.
-    * Make sub-directory in output directory for:
-        * log file(s).
-        * 
 """
 import os
 import glob
