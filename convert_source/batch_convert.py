@@ -117,6 +117,8 @@ def batch_proc(config_file: str,
     bids_bvecs: List = []
        
     for sub_data in subs_data:
+        if verbose:
+            print(sub_data.data)
         data: str = sub_data.data
         bids_name_dict: Dict = deepcopy(BIDS_PARAM)
         bids_name_dict['info']['sub'] = sub_data.sub
@@ -987,7 +989,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
         json_file: str = ''.join(glob.glob(os.path.join(path,basename + "*.json*")))
         bval_file: str = ''.join(glob.glob(os.path.join(path,basename + "*.bval*")))
         bvec_file: str = ''.join(glob.glob(os.path.join(path,basename + "*.bvec*")))
-        
+
         if json_file:
             json_dict: Dict = read_json(json_file=json_file)
 

@@ -281,6 +281,7 @@ def construct_bids_name(sub_data: SubDataInfo,
         elif case4:
             bids_param["fmap"]["ce"] = ce
             bids_param["fmap"]["dir"] = acq_dir
+            bids_param["fmap"]["modality_label"] = 'epi'
         else:
             raise BIDSNameError("Fieldmap data was specified, however, no BIDS fieldmap case was specified.")
     elif modality_type:

@@ -442,10 +442,14 @@ def read_json(json_file: str) -> Dict:
     '''
 
     # Get absolute path to file
-    json_file: str = os.path.abspath(json_file)
+    if ('.json' in json_file) and os.path.exists(json_file):
+        pass
+    else:
+        json_file: str = ""
     
     # Read JSON file
     if json_file:
+        json_file: str = os.path.abspath(json_file)
         with open(json_file) as file:
             return json.load(file)
     else:
