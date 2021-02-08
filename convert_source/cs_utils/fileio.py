@@ -245,7 +245,7 @@ class TmpDir(object):
     def __repr__(self):
         return self.tmp_dir
         
-    def mk_tmp_dir(self) -> None:
+    def mk_tmp_dir(self) -> Union[str,None]:
         '''Creates/makes temporary directory.
         
         Usage example:
