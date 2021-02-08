@@ -268,6 +268,11 @@ def batch_proc(config_file: str,
                                                 exclusion_list=exclusion_list)
     
     subs_bids: BIDSImgData = BIDSImgData()
+
+    bids_imgs: List = []
+    bids_jsons: List = []
+    bids_bvals: List = []
+    bids_bvecs: List = []
        
     for sub_data in subs_data:
         data: str = sub_data.data
@@ -289,41 +294,59 @@ def batch_proc(config_file: str,
                                         modality_type=modality_type,
                                         task=task)
         # Convert source data
-        [imgs,
-         jsons,
-         bvals,
-         bvecs] = data_to_bids(sub_data=sub_data,
-                               bids_name_dict=bids_name_dict,
-                               out_dir=out_dir,
-                               modality_type=modality_type,
-                               modality_label=modality_label,
-                               task=task,
-                               meta_dict=meta_com_dict,
-                               mod_dict=meta_scan_dict)
+        try:
+            [imgs,
+            jsons,
+            bvals,
+            bvecs] = data_to_bids(sub_data=sub_data,
+                                bids_name_dict=bids_name_dict,
+                                out_dir=out_dir,
+                                modality_type=modality_type,
+                                modality_label=modality_label,
+                                task=task,
+                                meta_dict=meta_com_dict,
+                                mod_dict=meta_scan_dict)
+        except AttributeError:
+            imgs = [""]
+            jsons = [""]
+            bvals = [""]
+            bvecs = [""]
 
-        # Collect data using BIDSImgData object
-        if len(subs_bids.imgs) == 0:
-            subs_bids: BIDSImgData = BIDSImgData(imgs=imgs,
-                                                 jsons=jsons,
-                                                 bvals=bvals,
-                                                 bvecs=bvecs)
-        else:
-            subs_bids: BIDSImgData = subs_bids.add(imgs=imgs,
-                                                   jsons=jsons,
-                                                   bvals=bvals,
-                                                   bvecs=bvecs)
+        # # Collect data using BIDSImgData object
+        # if len(subs_bids.imgs) == 0:
+        #     subs_bids: BIDSImgData = BIDSImgData(imgs=imgs,
+        #                                          jsons=jsons,
+        #                                          bvals=bvals,
+        #                                          bvecs=bvecs)
+        # else:
+        #     subs_bids: BIDSImgData = subs_bids.add(imgs=imgs,
+        #                                            jsons=jsons,
+        #                                            bvals=bvals,
+        #                                            bvecs=bvecs)
 
-    if return_obj:
-        return subs_bids
-    else:
-        imgs: List[str] = subs_bids.imgs
-        jsons: List[str] = subs_bids.jsons
-        bvals: List[str] = subs_bids.bvals
-        bvecs: List[str] = subs_bids.bvecs
-        return (imgs,
-                jsons,
-                bvals,
-                bvecs)
+        bids_imgs.extend(imgs)
+        bids_jsons.extend(jsons)
+        bids_bvals.extend(bvals)
+        bids_bvals.extend(bvecs)
+
+        # subs_bids: BIDSImgData = subs_bids.add(imgs=imgs,
+        #                                        jsons=jsons,
+        #                                        bvals=bvals,
+        #                                        bvecs=bvecs)
+
+
+    # if return_obj:
+    #     return subs_bids
+    # else:
+    #     imgs: List[str] = subs_bids.imgs
+    #     jsons: List[str] = subs_bids.jsons
+    #     bvals: List[str] = subs_bids.bvals
+    #     bvecs: List[str] = subs_bids.bvecs
+    #     return (imgs,
+    #             jsons,
+    #             bvals,
+    #             bvecs)
+    return bids_imgs,bids_jsons,bids_bvals,bids_bvals
 
 def read_config(config_file: Optional[str] = "", 
                 verbose: Optional[bool] = False
@@ -865,7 +888,7 @@ def source_to_bids(sub_data: SubDataInfo,
         sub_dir: str = os.path.join(sub_dir,"ses-" + ses)
 
     # Gather BIDS name description args
-    [task, 
+    [_task, 
      acq, 
      ce, 
      acq_dir, 

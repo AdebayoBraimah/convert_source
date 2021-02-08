@@ -26,11 +26,11 @@ from convert_source.cs_utils.fileio import (
 )
 
 from convert_source.cs_utils.const import BIDS_PARAM
+from convert_source.cs_utils.bids_info import construct_bids_name
 
 from convert_source.cs_utils.utils import (
     SubDataInfo,
     collect_info,
-    list_dict,
     comp_dict,
     depth,
     get_metadata
@@ -40,8 +40,6 @@ from convert_source.batch_convert import (
     BIDSImgData,
     read_config,
     bids_id,
-    _gather_bids_name_args,
-    _get_bids_name_args,
     make_bids_name,
     data_to_bids,
     batch_proc
@@ -63,10 +61,13 @@ from convert_source.batch_convert import (
 
 # Test variables
 scripts_dir: str = os.path.join(os.getcwd(),'helper.scripts')
-test_config: str = os.path.join(scripts_dir,'test.config.yml')
+test_config1: str = os.path.join(scripts_dir,'test.1.config.yml')
+test_config2: str = os.path.join(scripts_dir,'test.2.config.yml')
 
 data_dir: str = os.path.join(os.getcwd(),'test.study_dir')
 dcm_test_data: str = os.path.join(data_dir,'TEST001-UNIT001','data.dicom','ST000000')
+
+out_dir: str = os.path.join(os.getcwd(),'test.bids')
 
 ## Additional test variables
 meta_dict_1: Dict = {
@@ -133,7 +134,7 @@ def test_read_config():
      bids_search,
      bids_map,
      meta_dict,
-     exclusion_list] = read_config(config_file=test_config,
+     exclusion_list] = read_config(config_file=test_config1,
                                    verbose=verbose)
     # write test statements here.
     assert depth(search_dict) == 4
@@ -164,7 +165,7 @@ def test_bids_id():
     bids_search,
     bids_map,
     meta_dict,
-    exclusion_list] = read_config(config_file=test_config,
+    exclusion_list] = read_config(config_file=test_config1,
                                   verbose=verbose)
 
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir, 
@@ -251,7 +252,7 @@ def test_get_metadata():
     bids_search,
     bids_map,
     meta_dict,
-    exclusion_list] = read_config(config_file=test_config,
+    exclusion_list] = read_config(config_file=test_config1,
                                   verbose=verbose)
 
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir, 
@@ -280,4 +281,204 @@ def test_get_metadata():
     assert meta_com_dict == meta_dict_1
     assert meta_scan_dict == meta_dict_2
     
+def test_data_to_bids():
+    verbose: bool = True
+    [search_dict,
+    bids_search,
+    bids_map,
+    meta_dict,
+    exclusion_list] = read_config(config_file=test_config1,
+                                  verbose=verbose)
 
+    subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir, 
+                                                exclusion_list=[])
+
+    # Test 1
+    bids_name_dict: Dict = deepcopy(BIDS_PARAM)
+    bids_name_dict['info']['sub'] = subs_data[0].sub
+    if subs_data[0].ses:
+        bids_name_dict['info']['ses'] = subs_data[0].ses
+
+    [bids_name_dict, 
+    modality_type, 
+    modality_label, 
+    task] = bids_id(s=subs_data[0].data,
+                    search_dict=search_dict,
+                    bids_search=bids_search,
+                    bids_map=bids_map,
+                    bids_name_dict=bids_name_dict,
+                    parent_dir=data_dir)
+
+    [meta_com_dict, 
+    meta_scan_dict] = get_metadata(dictionary=meta_dict,
+                                   modality_type=modality_type,
+                                   task=task)
+
+    [imgs,
+    jsons,
+    bvals,
+    bvecs] = data_to_bids(sub_data=subs_data[0],
+                        bids_name_dict=bids_name_dict,
+                        out_dir=out_dir,
+                        modality_type=modality_type,
+                        modality_label=modality_label,
+                        task=task,
+                        meta_dict=meta_com_dict,
+                        mod_dict=meta_scan_dict)
+
+    subs_img_data: BIDSImgData = BIDSImgData(imgs=imgs,
+                                             jsons=jsons,
+                                             bvals=bvals,
+                                             bvecs=bvecs)
+    assert len(subs_img_data.imgs) == 1
+    assert len(subs_img_data.jsons) == 1
+    assert len(subs_img_data.bvals) == 1
+    assert len(subs_img_data.bvecs) == 1
+
+    # Test 2
+    bids_name_dict: Dict = deepcopy(BIDS_PARAM)
+    bids_name_dict['info']['sub'] = subs_data[1].sub
+    if subs_data[1].ses:
+        bids_name_dict['info']['ses'] = subs_data[1].ses
+
+    [bids_name_dict, 
+    modality_type, 
+    modality_label, 
+    task] = bids_id(s=subs_data[1].data,
+                    search_dict=search_dict,
+                    bids_search=bids_search,
+                    bids_map=bids_map,
+                    bids_name_dict=bids_name_dict,
+                    parent_dir=data_dir)
+
+    [meta_com_dict, 
+    meta_scan_dict] = get_metadata(dictionary=meta_dict,
+                                   modality_type=modality_type,
+                                   task=task)
+
+    [imgs,
+    jsons,
+    bvals,
+    bvecs] = data_to_bids(sub_data=subs_data[1],
+                        bids_name_dict=bids_name_dict,
+                        out_dir=out_dir,
+                        modality_type=modality_type,
+                        modality_label=modality_label,
+                        task=task,
+                        meta_dict=meta_com_dict,
+                        mod_dict=meta_scan_dict)
+
+    subs_img_data: BIDSImgData = BIDSImgData(imgs=imgs,
+                                             jsons=jsons,
+                                             bvals=bvals,
+                                             bvecs=bvecs)
+    assert len(subs_img_data.imgs) == 2
+    assert len(subs_img_data.jsons) == 2
+    assert len(subs_img_data.bvals) == 2
+    assert len(subs_img_data.bvecs) == 2
+
+    ## These strings should be empty - only DWIs have these
+    assert subs_img_data.bvals[0] == ""
+    assert subs_img_data.bvecs[0] == ""
+
+    # Test 3
+    bids_name_dict: Dict = deepcopy(BIDS_PARAM)
+    bids_name_dict['info']['sub'] = subs_data[9].sub
+    if subs_data[9].ses:
+        bids_name_dict['info']['ses'] = subs_data[9].ses
+
+    [bids_name_dict, 
+    modality_type, 
+    modality_label, 
+    task] = bids_id(s=subs_data[9].data,
+                    search_dict=search_dict,
+                    bids_search=bids_search,
+                    bids_map=bids_map,
+                    bids_name_dict=bids_name_dict,
+                    parent_dir=data_dir)
+
+    [meta_com_dict, 
+    meta_scan_dict] = get_metadata(dictionary=meta_dict,
+                                   modality_type=modality_type,
+                                   task=task)
+
+    [imgs,
+    jsons,
+    bvals,
+    bvecs] = data_to_bids(sub_data=subs_data[9],
+                        bids_name_dict=bids_name_dict,
+                        out_dir=out_dir,
+                        modality_type=modality_type,
+                        modality_label=modality_label,
+                        task=task,
+                        meta_dict=meta_com_dict,
+                        mod_dict=meta_scan_dict)
+
+    subs_img_data: BIDSImgData = BIDSImgData(imgs=imgs,
+                                             jsons=jsons,
+                                             bvals=bvals,
+                                             bvecs=bvecs)
+    assert len(subs_img_data.imgs) == 1
+    assert len(subs_img_data.jsons) == 1
+    assert len(subs_img_data.bvals) == 1
+    assert len(subs_img_data.bvecs) == 1
+
+    ## These strings should be empty - only DWIs have these
+    assert subs_img_data.bvals[0] == ""
+    assert subs_img_data.bvecs[0] == ""
+
+def test_tmp_cleanup():
+    shutil.rmtree(out_dir)
+    assert os.path.exists(out_dir) == False
+
+def test_make_bids_name():
+    verbose: bool = True
+    [search_dict,
+    bids_search,
+    bids_map,
+    meta_dict,
+    exclusion_list] = read_config(config_file=test_config1,
+                                  verbose=verbose)
+
+    subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir, 
+                                                exclusion_list=[])
+
+    bids_name_dict: Dict = deepcopy(BIDS_PARAM)
+    bids_name_dict['info']['sub'] = subs_data[9].sub
+    if subs_data[9].ses:
+        bids_name_dict['info']['ses'] = subs_data[9].ses
+
+    [bids_name_dict, 
+    modality_type, 
+    modality_label, 
+    task] = bids_id(s=subs_data[9].data,
+                    search_dict=search_dict,
+                    bids_search=bids_search,
+                    bids_map=bids_map,
+                    bids_name_dict=bids_name_dict,
+                    parent_dir=data_dir)
+
+    bids_name_dict = construct_bids_name(sub_data=subs_data[9],
+                                         modality_type=modality_type,
+                                         modality_label=modality_label,
+                                         task=task,
+                                         out_dir=out_dir,
+                                         zero_pad=2)
+
+    [bids_1, bids_2, bids_3, bids_4] = make_bids_name(bids_name_dict=bids_name_dict,
+                                                      modality_type=modality_type)
+
+    assert bids_1 == "sub-TEST001_ses-UNIT001_task-rest_run-01_bold"
+    assert bids_2 == "sub-TEST001_ses-UNIT001_task-rest_run-02_bold"
+    assert bids_3 == "sub-TEST001_ses-UNIT001_task-rest_run-03_bold"
+    assert bids_4 == "sub-TEST001_ses-UNIT001_task-rest_run-04_bold"
+
+def test_batch_proc():
+    [imgs,
+     jsons,
+     bvals,
+     bvecs] =batch_proc(config_file=test_config2,
+                        study_img_dir=data_dir,
+                        out_dir=out_dir,
+                        verbose=True,
+                        return_obj=False)
