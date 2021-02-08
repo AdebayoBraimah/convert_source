@@ -40,7 +40,7 @@ from convert_source.cs_utils.utils import (
 )
 
 from convert_source.batch_convert import (
-    BIDSImgData,
+    # BIDSImgData,
     read_config,
     bids_id,
     make_bids_name,
@@ -329,14 +329,20 @@ def test_data_to_bids():
                         meta_dict=meta_com_dict,
                         mod_dict=meta_scan_dict)
 
-    subs_img_data: BIDSImgData = BIDSImgData(imgs=imgs,
-                                             jsons=jsons,
-                                             bvals=bvals,
-                                             bvecs=bvecs)
-    assert len(subs_img_data.imgs) == 1
-    assert len(subs_img_data.jsons) == 1
-    assert len(subs_img_data.bvals) == 1
-    assert len(subs_img_data.bvecs) == 1
+    bids_imgs: List = []
+    bids_jsons: List = []
+    bids_bvals: List = []
+    bids_bvecs: List = []
+
+    bids_imgs.extend(imgs)
+    bids_jsons.extend(jsons)
+    bids_bvals.extend(bvals)
+    bids_bvecs.extend(bvecs)
+
+    assert len(bids_imgs) == 1
+    assert len(bids_jsons) == 1
+    assert len(bids_bvals) == 1
+    assert len(bids_bvecs) == 1
 
     # Test 2
     bids_name_dict: Dict = deepcopy(BIDS_PARAM)
@@ -371,18 +377,24 @@ def test_data_to_bids():
                         meta_dict=meta_com_dict,
                         mod_dict=meta_scan_dict)
 
-    subs_img_data: BIDSImgData = BIDSImgData(imgs=imgs,
-                                             jsons=jsons,
-                                             bvals=bvals,
-                                             bvecs=bvecs)
-    assert len(subs_img_data.imgs) == 2
-    assert len(subs_img_data.jsons) == 2
-    assert len(subs_img_data.bvals) == 2
-    assert len(subs_img_data.bvecs) == 2
+    bids_imgs: List = []
+    bids_jsons: List = []
+    bids_bvals: List = []
+    bids_bvecs: List = []
+
+    bids_imgs.extend(imgs)
+    bids_jsons.extend(jsons)
+    bids_bvals.extend(bvals)
+    bids_bvecs.extend(bvecs)
+
+    assert len(bids_imgs) == 2
+    assert len(bids_jsons) == 2
+    assert len(bids_bvals) == 2
+    assert len(bids_bvecs) == 2
 
     ## These strings should be empty - only DWIs have these
-    assert subs_img_data.bvals[0] == ""
-    assert subs_img_data.bvecs[0] == ""
+    assert bids_bvals[0] == ""
+    assert bids_bvecs[0] == ""
 
     # Test 3
     bids_name_dict: Dict = deepcopy(BIDS_PARAM)
@@ -417,18 +429,24 @@ def test_data_to_bids():
                         meta_dict=meta_com_dict,
                         mod_dict=meta_scan_dict)
 
-    subs_img_data: BIDSImgData = BIDSImgData(imgs=imgs,
-                                             jsons=jsons,
-                                             bvals=bvals,
-                                             bvecs=bvecs)
-    assert len(subs_img_data.imgs) == 1
-    assert len(subs_img_data.jsons) == 1
-    assert len(subs_img_data.bvals) == 1
-    assert len(subs_img_data.bvecs) == 1
+    bids_imgs: List = []
+    bids_jsons: List = []
+    bids_bvals: List = []
+    bids_bvecs: List = []
+
+    bids_imgs.extend(imgs)
+    bids_jsons.extend(jsons)
+    bids_bvals.extend(bvals)
+    bids_bvecs.extend(bvecs)
+
+    assert len(bids_imgs) == 1
+    assert len(bids_jsons) == 1
+    assert len(bids_bvals) == 1
+    assert len(bids_bvecs) == 1
 
     ## These strings should be empty - only DWIs have these
-    assert subs_img_data.bvals[0] == ""
-    assert subs_img_data.bvecs[0] == ""
+    assert bids_bvals[0] == ""
+    assert bids_bvecs[0] == ""
 
 def test_tmp_cleanup():
     shutil.rmtree(out_dir)
@@ -477,11 +495,20 @@ def test_make_bids_name():
     assert bids_4 == "sub-TEST001_ses-UNIT001_task-rest_run-04_bold"
 
 def test_batch_proc():
+    # NOTE: test_config2 excludes PAR file test data, as
+    #   the test data included only contains the PAR
+    #   headers, and not the associated REC imaging 
+    #   data.
+
     [imgs,
      jsons,
      bvals,
      bvecs] =batch_proc(config_file=test_config2,
                         study_img_dir=data_dir,
                         out_dir=out_dir,
-                        verbose=True,
-                        return_obj=False)
+                        verbose=True)
+
+    assert len(imgs) == 12
+    assert len(jsons) == 12
+    assert len(bvals) == 12
+    assert len(bvecs) == 12

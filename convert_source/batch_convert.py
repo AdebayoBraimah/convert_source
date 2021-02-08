@@ -211,8 +211,7 @@ def batch_proc(config_file: str,
                study_img_dir: str,
                out_dir: str,
                path_envs: List[str] = [],
-               verbose: bool = False,
-               return_obj: bool = False
+               verbose: bool = False
                ) -> Union[Tuple[List[str]],List[BIDSImgData]]:
     '''Batch processes a study's source image data provided a configuration, the parent directory of the study's imaging data,
     and an output directory to place the BIDS NIFTI data.
@@ -225,21 +224,13 @@ def batch_proc(config_file: str,
 
     Arguments:
         config_file: Configuration file.
+        path_envs: List of directory paths to append to the system's 'PATH' variable.
         study_img_dir: Path to study image parent directory that contains all the subjects' source image data.
         out_dir: Output directory.
         verbose: Verbose output.
-        return_obj: Return a single object that is collection of lists, rather than a tuple of lists.
 
     Returns:
         Tuple of lists that consists of: 
-            * List of NIFTI images.
-            * Corresponding list of JSON sidecars.
-            * Corresponding list of bval files.
-            * Corresponding list of bvec files.
-
-            OR 
-
-        List of BIDSImgData objects. The BIDSImgData object that contains:
             * List of NIFTI images.
             * Corresponding list of JSON sidecars.
             * Corresponding list of bval files.
