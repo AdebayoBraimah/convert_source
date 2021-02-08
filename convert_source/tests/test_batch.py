@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 """Tests for convert_source's batch processing functions.
+
+TODO:
+    * deprecate `BIDSImgData` class.
 """
 import pytest
 
