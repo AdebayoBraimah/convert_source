@@ -238,12 +238,7 @@ class BIDSimg():
 
 # Define function(s)
 def file_to_screen(file: str) -> str:
-    '''
-    TODO:
-        * Re-factor and re-name function
-        * use exec perhaps
-
-    Reads the contents of a file and prints it to screen.
+    '''Reads the contents of a file and prints it to screen.
 
     Arguments:
         file: Path to file.
@@ -253,7 +248,8 @@ def file_to_screen(file: str) -> str:
     '''
 
     with open(file,"r") as f:
-        file_contents = f.read()
+        file_contents: str = f.read()
+        file_contents: str = file_contents.strip("\n")
         f.close()
     return file_contents
 
@@ -287,6 +283,41 @@ def zeropad(num: Union[str,int],
         return num
     except ValueError:
         return num
+
+def add_to_zeropadded(num1: Union[int,str],
+                      num2: int
+                      ) -> str:
+    '''Adds some specified integer to another zeropadded integer.
+
+    Usage example:
+        >>> add_to_zeropadded('005',2)
+        '007'
+        
+    Arguments:
+        num1: Input integer, or zeropadded integer represented as a string.
+        num2: Integer to add to num1.
+
+    Returns:
+        Sum of the two perceived integer values, represented as a string.
+
+    Raises:
+        ValueError: Error that arises if non-integer string representations are passed as an argument for num1.
+        TypeError: Error that arise if non-integer arguments are passed for num2, OR if floats are passed for either num1 or num2.
+    '''
+    try:
+        int(num1)
+    except ValueError:
+        raise ValueError(f"Input value {num1} is not an integer represented as a string.")
+
+    if isinstance(num2,int) and (isinstance(num1,int) or isinstance(num1,str)):
+        if isinstance(num1,int):
+            pad_len: int = 0
+        else:
+            pad_len: int = len(num1)
+        new_num: int = int(num1) + num2
+        return zeropad(num=new_num,num_zeros=pad_len)
+    else:
+        raise TypeError(f"Input {num1} is not a string or integer OR {num2} is not an integer. Please check.")
 
 def get_echo(json_file: str) -> float:
     '''Reads the echo time (TE) from the NIFTI JSON sidecar and returns it.
@@ -411,10 +442,14 @@ def read_json(json_file: str) -> Dict:
     '''
 
     # Get absolute path to file
-    json_file: str = os.path.abspath(json_file)
+    if ('.json' in json_file) and os.path.exists(json_file):
+        pass
+    else:
+        json_file: str = ""
     
     # Read JSON file
     if json_file:
+        json_file: str = os.path.abspath(json_file)
         with open(json_file) as file:
             return json.load(file)
     else:
@@ -629,10 +664,10 @@ def convert_image_data(file: str,
                        ignore_2D: bool = True,
                        merge_2D: bool = True,
                        text: bool = False,
-                       progress: bool = True,
+                       progress: bool = False,
                        verbose: bool = False,
                        write_conflicts: str = "suffix",
-                       crop_3D: bool = False,
+                       crop_3D: str = 'n',
                        lossless: bool = False,
                        big_endian: str = "o",
                        xml: bool = False,
@@ -642,7 +677,18 @@ def convert_image_data(file: str,
                        return_obj: bool = False
                        ) -> Union[BIDSimg,Tuple[List[str],List[str],List[str],List[str]]]:
     '''Converts medical image data (DICOM, PAR REC, or Bruker) to NifTi (or NRRD) using dcm2niix.
-    This is a wrapper function for dcm2niix (v1.0.20190902+).
+    This is a wrapper function for dcm2niix (v1.0.20201102+).
+
+    NOTE: IF `dcm2niix` is not in system path, then its parent's directory path can be appended to 
+        the system's PATH variable by doing:
+
+            >>> from convert_source.cs_utils.fileio import Command
+            >>> dcm2niix_command = Command("dcm2niix")
+            >>> dcm2niix_command.check_dependency(path_envs=['<path/to/dcm2niix/dir>'])
+
+        One should note that argument passed for the `path_envs` argument is a list.
+        Additionally, the last statement above should return `True` if the executable is found, or raise 
+        a DependencyError otherwise.
 
     Usage example:
         >>> data = convert_image_data("IM00001.dcm",
@@ -675,13 +721,13 @@ def convert_image_data(file: str,
         ignore_2D: Ignore derived, localizer and 2D images (default: True).
         merge_2D: Merge 2D slices from same series regardless of echo, exposure, etc. (default: True).
         text: Text notes includes private patient details in separate text file (default: False).
-        progress: Report progress, slicer format progress information (default: True).
+        progress: Report progress, slicer format progress information (default: False).
         verbose: Enable verbosity (default: False).
         write_conflicts: Write behavior for name conflicts:
             * 'suffix' = Add suffix to name conflict (default)
             * 'overwrite' = Overwrite name conflict
             * 'skip' = Skip name conflict
-        crop_3D: crop 3D acquisitions (default: False).
+        crop_3D: Crop 3D acquisitions (y/n/i, default n, use 'i'gnore to neither crop nor rotate 3D acquistions).
         lossless: Losslessly scale 16-bit integers to use dynamic range (default: True).
         big_endian: Byte order:
             * 'o' = optimal/native byte order (default)
@@ -710,6 +756,7 @@ def convert_image_data(file: str,
     
     Raises:
         ConversionError: Error that arises if no converted (NIFTI) images are created.
+        IndexError: Error that arises if the specified options arrays/lists are of different lengths.
     '''
     
     # Get OS platform and construct command line args
@@ -719,12 +766,25 @@ def convert_image_data(file: str,
         convert: Command = Command("dcm2niix")
 
     # Boolean True/False options arrays
-    bool_opts: List[Union[str,bool]] = [bids, anon_bids, gzip, comment, adjacent, nrrd, ignore_2D, merge_2D, text, verbose, lossless, progress, xml]
-    bool_vars: List[str] = ["-b", "-ba", "-z", "-c", "-a", "-e", "-i", "-m", "-t", "-v", "-l", "--progress", "--xml"]
+    bool_opts: List[Union[str,bool]] = [bids, anon_bids, gzip, comment, adjacent, nrrd, ignore_2D, merge_2D, text, verbose, lossless]
+    bool_vars: List[str] = ["-b", "-ba", "-z", "-c", "-a", "-e", "-i", "-m", "-t", "-v", "-l"]
 
     # Initial option(s)
     if cprss_lvl:
         convert.cmd_list.append(f"-{cprss_lvl}")
+    
+    if dir_search:
+        convert.cmd_list.append("-d")
+        convert.cmd_list.append(f"{dir_search}")
+    
+    if crop_3D:
+        if (crop_3D.lower() == 'y') or (crop_3D.lower() == 'n') or (crop_3D.lower() == 'i'):
+            convert.cmd_list.append("-x")
+            convert.cmd_list.append(crop_3D)
+        else:
+            crop_3D = 'n'
+            convert.cmd_list.append("-x")
+            convert.cmd_list.append(crop_3D)
 
     # Keyword option(s)
     if write_conflicts.lower() == "suffix":
@@ -738,19 +798,29 @@ def convert_image_data(file: str,
         convert.cmd_list.append("0")
     
     if big_endian.lower() == "o":
-        convert.cmd_list.append("--big_endian")
+        convert.cmd_list.append("--big-endian")
         convert.cmd_list.append("o")
     elif big_endian.lower() == "n":
-        convert.cmd_list.append("--big_endian")
+        convert.cmd_list.append("--big-endian")
         convert.cmd_list.append("n")
     elif big_endian.lower() == "y":
-        convert.cmd_list.append("--big_endian")
+        convert.cmd_list.append("--big-endian")
         convert.cmd_list.append("y")
     
-    for opt in zip(bool_opts,bool_vars):
-        if opt[0]:
-            convert.cmd_list.append(opt[1])
-            convert.cmd_list.append("y")
+    # Boolean option(s)
+    if progress:
+        convert.cmd_list.append("--progress")
+    
+    if xml:
+        convert.cmd_list.append("--xml")
+    
+    if len(bool_opts) == len(bool_vars):
+        for opt in zip(bool_opts,bool_vars):
+            if opt[0]:
+                convert.cmd_list.append(opt[1])
+                convert.cmd_list.append("y")
+    else:
+        raise IndexError("Comparing arrays of two different lengths.")
 
     # Output filename
     convert.cmd_list.append("-f")
@@ -759,7 +829,7 @@ def convert_image_data(file: str,
     # Create TmpDir object
     with TmpDir(tmp_dir=out_dir,use_cwd=False) as tmp_dir:
         # Create temporary output directory
-        tmp_dir.mk_tmp_dir()
+        _ = tmp_dir.mk_tmp_dir()
         
         # Output directory
         out_dir: str = os.path.abspath(out_dir)
@@ -870,7 +940,10 @@ def img_exclude(img_list: List[str],
         List of image files that do not contain words in the exclusion list.
     '''
     if (exclusion_list is None) or (len(exclusion_list) == 0):
-        return img_list
+        img_set: Set = set(img_list)
+        new_list: List[str] = list(img_set)
+        new_list.sort(reverse=False)
+        return new_list
     else:
         img_set: Set = set(img_list)
         exclusion_set: Set = set()
@@ -881,7 +954,9 @@ def img_exclude(img_list: List[str],
                 if file.lower() in img.lower():
                     tmp_list.append(img)
             exclusion_set.update(set(tmp_list))
-        return list(img_set.difference(exclusion_set))
+        new_list: List[str] = list(img_set.difference(exclusion_set))
+        new_list.sort(reverse=False)
+        return new_list
 
 def collect_info(parent_dir: str,
                 exclusion_list: Optional[List[str]] = None
@@ -914,10 +989,7 @@ def collect_info(parent_dir: str,
     parent_dir: str = os.path.abspath(parent_dir)
     data: List[SubDataInfo] = []
 
-    if 'windows' in platform.platform().lower():
-        path_sep = "\\"
-    else:
-        path_sep = "/"
+    path_sep: str = os.path.sep
     
     # Get image directory information
     [dir_list, id_list] = img_dir_list(directory=parent_dir,
@@ -972,7 +1044,7 @@ def get_recon_mat(json_file: str) -> Union[float,str]:
     try:
         with open(json_file, "r") as read_file:
             data: Dict = json.load(read_file)
-            return data["ReconMatrixPE"]
+            return data.get("ReconMatrixPE","")
     except JSONDecodeError:
         return ''
 
@@ -992,7 +1064,7 @@ def get_pix_band(json_file: str) -> Union[float,str]:
     try:
         with open(json_file, "r") as read_file:
             data: Dict = json.load(read_file)
-            return data["PixelBandwidth"]
+            return data.get("PixelBandwidth","")
     except JSONDecodeError:
         return''
 
@@ -1057,9 +1129,9 @@ def calc_read_time(file: str,
         json_file: str = os.path.abspath(json_file)
 
     # check file extension
-    if 'dcm' in file:
+    if '.dcm' in file:
         calc_method = 'dcm'
-    elif 'PAR' in file:
+    elif '.PAR' in file:
         calc_method = 'par'
         
     # Create empty string variables
