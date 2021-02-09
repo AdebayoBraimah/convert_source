@@ -1,0 +1,31 @@
+
+version: 2.1
+
+jobs:
+    build:
+        docker:
+            - image: circleci/python:3.7.4
+        steps:
+            - checkout
+            - run:
+                command: python -m pip install -r requirements.txt --user
+                name: Install-deps
+            - run:
+                command: chmod -R 755 convert_source/tests
+                name: Change file permissions
+    test:
+        steps:
+            - run:
+                command: |
+                    pytest --junitxml=test-reports/junit.xml --html=test-reports/pytest_report.html --self-contained-html convert_source/tests/
+                name: Run unit tests
+            - store_test_results:
+                path: test-reports
+            - store_artifacts:
+                - path: test-reports
+
+workflows:
+    main:
+        jobs:
+            - build
+            - test
