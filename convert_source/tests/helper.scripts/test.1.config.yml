@@ -1,0 +1,199 @@
+# Test configuration file for convert_source.
+
+# NOTE: 
+#   * Most fields are left blank to test the available test data on hand
+#   * Most fields left in place to expand upon later, should more test data 
+#       become available.
+
+# Heurestic search terms for each modality
+modality_search:
+    # Anatomical scans
+    anat:
+        T1w: 
+            - T1
+            - TFE
+        T2w: 
+            - T2
+            - TSE
+        flair: 
+          - flair
+
+    # Functional scans
+    func:
+        # BOLD contrast
+        bold: 
+            rest: 
+                - rsfMR
+                - rest
+                - FFE
+                - FEEPI
+        # ASL (arterial spin labeling) contrast
+        cbv:
+            rest:
+                - casl
+                - pcas
+
+    # Field maps 
+    fmap:
+        fmap: 
+            - map
+
+    # Susceptiblity Weighted Images
+    swi:
+        swi: 
+            - swi 
+
+    # Diffusion Weighted Scans
+    dwi:
+        dwi: 
+            - diffusion
+            - DTI
+            - DWI
+
+# Heurestic search terms for BIDS descriptive naming conventions
+bids_search:
+    # Anatomical scans
+    anat:
+        T1w:
+            acq:
+            ce:
+            rec:
+        T2w:
+            acq:
+            ce:
+            rec: 
+        flair:
+            acq:
+            ce:
+            rec: 
+
+    # Functional scans
+    func:
+        # BOLD contrast
+        bold: 
+            rest:
+                acq:
+                ce:
+                dir:
+                rec:
+            visualstrobe:
+                acq:
+                ce:
+                dir:
+                rec:
+        # ASL (arterial spin labeling) contrast
+        cbv:
+            rest:
+                acq:
+                ce:
+                dir:
+                rec:
+
+    # Field maps 
+    fmap:
+        fmap: 
+            acq:
+            # BIDS case 4: Multiple phase encoded directions ("pepolar")
+            ce:
+            dir:
+
+    # Susceptiblity Weighted Images
+    swi:
+        swi: 
+
+    # Diffusion Weighted Scans
+    dwi:
+        dwi: 
+            acq:
+            dir:
+
+# BIDS terms to map to
+bids_map:
+    # Anatomical scans
+    anat:
+        T1w:
+            acq:
+            ce:
+            rec:
+        T2w:
+            acq:
+            ce:
+            rec: 
+        flair:
+            acq:
+            ce:
+            rec: 
+
+    # Functional scans
+    func:
+        # BOLD contrast
+        bold: 
+            rest:
+                acq:
+                ce:
+                dir:
+                rec:
+            visualstrobe:
+                acq:
+                ce:
+                dir:
+                rec:
+        # ASL (arterial spin labeling) contrast
+        cbv:
+            rest:
+                acq:
+                ce:
+                dir:
+                rec:
+
+    # Field maps 
+    fmap:
+        fmap: 
+            acq:
+            # BIDS case 4: Multiple phase encoded directions ("pepolar")
+            ce:
+            dir:
+
+    # Susceptiblity Weighted Images
+    swi:
+        swi: 
+
+    # Diffusion Weighted Scans
+    dwi:
+        dwi: 
+            acq:
+            dir:
+
+
+# Metadata Settings
+metadata:
+    common:
+        Manufacturer: Vendor
+        ManufacturersModelName: Scanner model
+        MagneticFieldStrength: 3
+        InstitutionName: Institution Name
+    func:
+        rest:
+            ParallelAcquisitionTechnique: GRAPPA
+            PhaseEncodingDirection: 'j'
+            MultibandAccelerationFactor: 2
+            TaskName: Resting State
+            NumberOfVolumesDiscardedByScanner: 5
+    dwi:
+        PhaseEncodingDirection: 'j'
+    fmap:
+        Units: 'Hz'
+
+# Exclusion List (these filenames are not converted)
+exclude: 
+    - SURVEY
+    - Reg
+    - SHORT
+    - LONG
+    - MRS
+    - PRESS
+    - DEFAULT
+    - ScreenCapture
+    - PD
+    - ALL
+    - SPECTRO

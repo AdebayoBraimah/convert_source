@@ -4,13 +4,12 @@
 import pydicom
 import re
 import os
-import glob
+
 from typing import (
     List, 
     Dict, 
     Optional, 
-    Union, 
-    Tuple
+    Union
 )
 
 # Define class(es)
@@ -65,7 +64,10 @@ def is_valid_dcm(dcm_file: str,
     # Invalid files include secondary image captures, and are not suitable for 
     # NIFTI conversion as they are often not converted and cause problems.
     # This string should be empty. If it is populated, then it is likely a secondary capture.
-    conv_type = ds.ConversionType
+    try:
+        conv_type = ds.ConversionType
+    except AttributeError:
+        conv_type = ""
     
     if conv_type in '':
         return True

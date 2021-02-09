@@ -6,6 +6,8 @@ bin/*/__pycache__/*
 bin/__pycache__/*
 convert_source/*.ipynb
 tests/img.test.dir/*
+.vscode/*
+test.data/*
 
 # Command to file al .DS_STOREs files:
 # find . -name ".DS_Store"

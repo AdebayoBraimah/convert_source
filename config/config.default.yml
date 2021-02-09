@@ -1,31 +1,3 @@
-# This YAML exclusion configuration (config) file lists all the types of modalities/sequences to 
-# be converted during the DICOM and/or PAR REC to nifti (BIDS) conversion. The config file requires
-# that lists of keywords be comma separated and to not contain spaces.
-# 
-# The keyword that convert_source is looking for is exclude, followed by the substrings to be matched 
-# and excluded. The substrings used for matching are not case sensitive.
-# 
-# example:
-# 
-# exclude: 
-#   - SWI
-#   - press
-
-# The files being exluded here are consistent with the neonatal scanning protocol for the IRC 287 and 317 studies.
-
-# The corresponding files in the exclude list are those not needed for conventional volumetric neuroimaging analyses:
-# 
-# - Surveys (or Default)
-# - Reg Images (exported by the scanner)
-# - Any spectroscopic modalities:
-#     - PRESS
-# - Secondary Screen Captures
-# - Proton Density (PD)
-
-# Configuration based on BIDS' directory names
-
-# line endings: https://forum.sublimetext.com/t/is-there-any-way-to-convert-files-line-ending-on-saving/25456/5
-
 # Heurestic search terms for each modality
 modality_search:
     # Anatomical scans
@@ -38,8 +10,8 @@ modality_search:
             - T2
             - T2w
             - TSE
-        # flair: 
-        #   - flair
+        flair: 
+          - flair
 
     # Functional scans
     func:
@@ -50,9 +22,6 @@ modality_search:
                 - rest
                 - FFE
                 - FEEPI
-            visualstrobe: 
-                - vis
-                - visual
 
         # ASL (arterial spin labeling) contrast
         cbv:
@@ -196,27 +165,18 @@ bids_map:
 # Metadata Settings
 metadata:
     common:
-        Manufacturer: Philips
-        ManufacturersModelName: Ingenia
+        Manufacturer: Vendor
+        ManufacturersModelName: Scanner Model
         MagneticFieldStrength: 3
-        InstitutionName: Cincinnati Children's Hospital Medical Center
+        InstitutionName: Institution Name
     func:
         rest:
-            ParallelAcquisitionTechnique: SENSE # GRAPPA, for the general term
+            ParallelAcquisitionTechnique: GRAPPA
             PhaseEncodingDirection: 'j'
-            MultibandAccelerationFactor: 6
+            MultibandAccelerationFactor: 1
             TaskName: Resting State
-            dir: PA
-            NumberOfVolumesDiscardedByScanner: 4
-        visualstrobe:
-            PhaseEncodingDirection: "j"
-            TaskName: Visual (Strobe) Task
-            NumberOfVolumesDiscardedByScanner: 4
     dwi:
         PhaseEncodingDirection: 'j'
-        dir: PA
-    fmap:
-        Units: 'Hz'
 
 # Exclusion List (these filenames are not converted)
 exclude: 
