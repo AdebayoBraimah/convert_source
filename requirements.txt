@@ -1,7 +1,7 @@
-numpy
-pydicom
-nibabel
-numpy
-pyyaml
+numpy>=1.18.5
+pydicom>=2.1.2
+nibabel>=3.2.1
+PyYAML>=5.3.1
+pandas>=1.0.5
 
 # dcm2niix. Should be added to system path.

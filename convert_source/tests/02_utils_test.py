@@ -25,7 +25,6 @@ sys.path.append(mod_path)
 
 from convert_source.cs_utils.fileio import (
     Command,
-    DependencyError,
     File
 )
 
@@ -48,7 +47,7 @@ from convert_source.cs_utils.utils import (
 )
 
 # Test variables
-scripts_dir: str = os.path.join(os.getcwd(),'helper.scripts')
+scripts_dir: str = os.path.abspath(os.path.join(os.path.dirname(__file__),'helper.scripts'))
 tmp_out: str = os.path.join(os.getcwd(),'tmp.subs.dir')
 tmp_json: str = os.path.join(scripts_dir,'test.orig.json')
 

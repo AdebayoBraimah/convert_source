@@ -50,7 +50,7 @@ from convert_source.cs_utils.utils import (
 # Recursively remove directories (and files, cmd): rmdir /s /q /f <directory>
 
 # Test variables
-data_dir: str = os.path.join(os.getcwd(),'test.study_dir')
+data_dir: str = os.path.abspath(os.path.join(os.path.dirname(__file__),'test.study_dir'))
 dcm_test_data: str = os.path.join(data_dir,'TEST001-UNIT001','data.dicom','ST000000')
 
 def test_download_prog():
@@ -74,10 +74,15 @@ def test_download_prog():
     
     assert os.path.exists(file_name) == True
     
-    extract: Command = Command("tar")
-    extract.cmd_list.append("-zxvf")
-    extract.cmd_list.append(file_name)
-    extract.run()
+    if platform.system().lower() == 'windows':
+        extract: Command = Command("tar")
+        extract.cmd_list.append("-zxvf")
+        extract.cmd_list.append(file_name)
+        extract.run()
+    else:
+        extract: Command = Command("unzip")
+        extract.cmd_list.append(file_name)
+        extract.run()
 
     os.remove(file_name)
     assert os.path.exists(file_name) == False
