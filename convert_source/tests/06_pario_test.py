@@ -28,7 +28,7 @@ from convert_source.imgio.pario import (
     get_flip_angle
 )
 
-data_dir: str = os.path.join(os.getcwd(),'test.study_dir')
+data_dir: str = os.path.abspath(os.path.join(os.path.dirname(__file__),'test.study_dir'))
 
 def get_subject_data():
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,

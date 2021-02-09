@@ -26,7 +26,7 @@ from convert_source.imgio.niio import (
 )
 
 # Test variables
-data_dir: str = os.path.join(os.getcwd(),'test.study_dir')
+data_dir: str = os.path.abspath(os.path.join(os.path.dirname(__file__),'test.study_dir'))
 nii_test_data: str = os.path.join(data_dir,'TEST001-UNIT001','data.nifti')
 
 # Begin tests
