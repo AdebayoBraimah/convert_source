@@ -74,10 +74,15 @@ def test_download_prog():
     
     assert os.path.exists(file_name) == True
     
-    extract: Command = Command("tar")
-    extract.cmd_list.append("-zxvf")
-    extract.cmd_list.append(file_name)
-    extract.run()
+    if platform.system().lower() == 'windows':
+        extract: Command = Command("tar")
+        extract.cmd_list.append("-zxvf")
+        extract.cmd_list.append(file_name)
+        extract.run()
+    else:
+        extract: Command = Command("unzip")
+        extract.cmd_list.append(file_name)
+        extract.run()
 
     os.remove(file_name)
     assert os.path.exists(file_name) == False
