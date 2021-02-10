@@ -3,7 +3,9 @@
 """
 
 # TODO:
-#     * [PENDING] Figure out where tmp directory path is being printed.
+#   * [PENDING] Figure out where tmp directory path is being printed.
+#   * Add 'append_dwi_info' arg to batch_proc.
+#   * Add 'gzip' option to batch_proc.
 
 import os
 import glob
