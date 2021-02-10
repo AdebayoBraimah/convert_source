@@ -6,6 +6,7 @@
 #   * [PENDING] Figure out where tmp directory path is being printed.
 #   * Add 'append_dwi_info' arg to batch_proc.
 #   * Add 'gzip' option to batch_proc.
+#   * Add doc building to CI workflow.
 
 import os
 import glob
