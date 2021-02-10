@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 """Tests for the imgio's dcmio module's functions.
-
-NOTE: 
-    * The test DICOM data used here is publicly available:
-        * Referenced citation(s): convert_source/convert_source/tests/test.study_dir/TEST001-UNIT001/data.dicom/citation.[bib][json]
-        * Website: https://zenodo.org/record/16956#.YBw5kI9Kgq0
-        * Download link: https://zenodo.org/api/files/03deb9b8-e9a8-4727-a560-beff99b843db/DICOM.zip
-    * Some parameter data is missing, likely due to the anonymization process.
 """
+
+# NOTE: 
+#     * The test DICOM data used here is publicly available:
+#         * Referenced citation(s): convert_source/convert_source/tests/test.study_dir/TEST001-UNIT001/data.dicom/citation.[bib][json]
+#         * Website: https://zenodo.org/record/16956#.YBw5kI9Kgq0
+#         * Download link: https://zenodo.org/api/files/03deb9b8-e9a8-4727-a560-beff99b843db/DICOM.zip
+#     * Some parameter data is missing, likely due to the anonymization process.
+
 import pytest
 
 import os

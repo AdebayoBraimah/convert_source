@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """Tests for the imgio's niio module's functions.
-
-NOTE: Unable to reliably write NIFTI header information.
 """
+
+# NOTE: Unable to reliably write NIFTI header information.
+
 import pytest
 
 import os

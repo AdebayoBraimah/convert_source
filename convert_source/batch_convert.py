@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """Batch conversion wrapper and its associated classes and functions for the `convert_source` package.
-
-TODO:
-    * [PENDING] Figure out where tmp directory path is being printed.
 """
+
+# TODO:
+#     * [PENDING] Figure out where tmp directory path is being printed.
+
 import os
 import glob
 import yaml
@@ -1214,12 +1215,13 @@ def data_to_bids(sub_data: SubDataInfo,
             * List of corresponding JSON (sidecar) file(s). Empty string is returned if this file does not exist.
             * List of corresponding FSL-style bval file(s). Empty string is returned if this file does not exist.
             * List of corresponding FSL-style bvec file(s). Empty string is returned if this file does not exist.
-    
-    TODO: 
-        * Init subject log file here.
-        * Write log files for each subject.
-            * BUG: logging class only writes to one file.
     '''
+    
+    # TODO: 
+    # * Init subject log file here.
+    # * Write log files for each subject.
+    #     * BUG: logging class only writes to one file.
+
     if ('.dcm' in sub_data.data.lower()) or ('.par' in sub_data.data.lower()):
         [imgs,
          jsons,

@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 """Tests for the cs_utils' utils module's functions.
-
-NOTE: 
-    * get_metadata is tested elsewhere.
-    * convert_image_data is tested elsewhere.
-    * header_search is tested elsewhere.
-        * This function wraps `get_dcm_scan_tech` and `get_par_scan_tech`.
 """
+
+# NOTE: 
+#     * get_metadata is tested elsewhere.
+#     * convert_image_data is tested elsewhere.
+#     * header_search is tested elsewhere.
+#         * This function wraps `get_dcm_scan_tech` and `get_par_scan_tech`.
+
 import pytest
 
 import os
