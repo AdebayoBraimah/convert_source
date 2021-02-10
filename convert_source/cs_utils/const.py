@@ -12,6 +12,8 @@ from typing import (
     List
 )
 
+from convert_source import __version__
+
 # Default configuration file
 DEFAULT_CONFIG: str = os.path.join(str(pathlib.Path(os.path.abspath(__file__)).parents[2]),"config","config.default.yml")
 
@@ -22,6 +24,8 @@ with open(_bids_version_file, "r") as f:
     _bids_version = f.read().replace('\n','')
 
 DEFAULT_BIDS_VERSION: str = _bids_version
+
+CS_VERSION: str = __version__
 
 # Empty BIDS metadata dictionary
 BIDS_INFO: Dict = {
@@ -94,7 +98,8 @@ BIDS_INFO: Dict = {
     "IntendedFor":"",
     # Custom BIDS fields
     "SourceDataFormat":"",
-    "BIDSVersion":DEFAULT_BIDS_VERSION
+    "BIDSVersion":DEFAULT_BIDS_VERSION,
+    "ConvertSourceVersion": CS_VERSION
 }
 
 # Ordered array of BIDS metadata fields
@@ -155,7 +160,8 @@ BIDS_ORD_ARR: List[str] = [
     "Units",
     "IntendedFor",
     "SourceDataFormat",
-    "BIDSVersion"
+    "BIDSVersion",
+    "ConvertSourceVersion"
 ]
 
 # Empty BIDS parameter dictionary for naming files
