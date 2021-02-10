@@ -8,7 +8,7 @@ import os
 import sys
 import pathlib
 
-from typing import List
+from typing import Dict
 
 # Add package/module to PYTHONPATH
 mod_path: str = os.path.join(str(pathlib.Path(os.path.abspath(__file__)).parents[2]))
