@@ -908,6 +908,7 @@ def source_to_bids(sub_data: SubDataInfo,
                             jsons,
                             bvals,
                             bvecs)
+                            
                 elif len(img_data.imgs) >= 2 and not modality_type:
                     modality_type = 'fmap'
                     modality_label = 'fmap'
@@ -932,6 +933,7 @@ def source_to_bids(sub_data: SubDataInfo,
                             jsons,
                             bvals,
                             bvecs)
+
                 if os.path.exists(out_data_dir):
                     pass
                 else:
