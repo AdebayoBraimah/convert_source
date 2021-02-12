@@ -75,7 +75,11 @@ def batch_proc(config_file: str,
                path_envs: List[str] = [],
                gzip: bool = True,
                append_dwi_info: bool = True,
-               verbose: bool = False
+               zero_pad: int = 2,
+               cprss_lvl: int = 6,
+               verbose: bool = False,
+               env: Optional[Dict] = {},
+               dryrun: bool = False
                ) -> Tuple[List[str]]:
     '''Batch processes a study's source image data provided a configuration, the parent directory of the study's imaging data,
     and an output directory to place the BIDS NIFTI data.
@@ -93,7 +97,12 @@ def batch_proc(config_file: str,
         out_dir: Output directory.
         gzip: Gzip output NIFTI files.
         append_dwi_info: Appends DWI acquisition information (unique non-zero b-values, and TE, in msec.) to BIDS acquisition filename.
-        verbose: Verbose output.
+        zero_pad: Number of zeroes to pad the run number up to (zero_pad=2 is '01').
+        cprss_lvl: Compression level [1 - 9] - 1 is fastest, 9 is smallest.
+        verbose: Enable verbose output.
+        env: Path environment dictionary.
+        dryrun: Perform dryrun (creates the command, but does not execute it).
+
 
     Returns:
         Tuple of lists that consists of: 
@@ -183,7 +192,12 @@ def batch_proc(config_file: str,
                                 mod_dict=meta_scan_dict,
                                 log=log,
                                 gzip=gzip,
-                                append_dwi_info=append_dwi_info)
+                                append_dwi_info=append_dwi_info,
+                                zero_pad=zero_pad,
+                                cprss_lvl=cprss_lvl,
+                                verbose=verbose,
+                                env=env,
+                                dryrun=dryrun)
         except AttributeError:
             imgs = [""]
             jsons = [""]
@@ -869,17 +883,19 @@ def source_to_bids(sub_data: SubDataInfo,
                                                            out_dir=out_data_dir)
 
                 # Ensure that DWI and Fieldmap data are not kept as unknown
-                # by back-tracking if that is the case.
+                # by calling nifti_to_bids if that is the case.
                 if img_data.bvals[0] and img_data.bvecs[0] and not modality_type:
                     modality_type = 'dwi'
                     modality_label = 'dwi'
                     sub_data.data = img_data.imgs[0]
                     # Recursive function call here
+                    tmp.rm_tmp_dir()
                 elif len(img_data.imgs) >= 2 and not modality_type:
                     modality_type = 'fmap'
                     modality_label = 'fmap'
                     sub_data.data = img_data.imgs[0]
                     # Recursive function call here
+                    tmp.rm_tmp_dir()
 
                 if os.path.exists(out_data_dir):
                     pass
@@ -956,7 +972,8 @@ def nifti_to_bids(sub_data: SubDataInfo,
                   mod_dict: Optional[Dict] = {},
                   gzip: bool = True,
                   append_dwi_info: bool = True,
-                  zero_pad: int = 2
+                  zero_pad: int = 2,
+                  cprss_lvl: int = 6
                   ) -> Tuple[List[str],List[str],List[str],List[str]]:
     '''Converts existing NIFTI data to BIDS raw data.
     
@@ -980,6 +997,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
         gzip: Gzip output NIFTI files.
         append_dwi_info: Appends DWI acquisition information (unique non-zero b-values, and TE, in msec.) to BIDS acquisition filename.
         zero_pad: Number of zeroes to pad the run number up to (zero_pad=2 is '01').
+        cprss_lvl: Compression level [1 - 9] - 1 is fastest, 9 is smallest.
 
     Returns:
         Tuple of lists that contains:
@@ -1144,6 +1162,10 @@ def nifti_to_bids(sub_data: SubDataInfo,
             out_json = write_json(json_file=out_json,
                                   dictionary=bids_dict)
             
+            # TODO: Add compression level to gzip
+            # function.
+            # See this link: https://linuxize.com/post/gzip-command-in-linux/#:~:text=and%20it's%20subdirectories.-,Change%20the%20compression%20level,default%20compression%20level%20is%20%2D6%20.
+            # See this link: https://docs.python.org/3/library/gzip.html
             if gzip and ('.nii.gz' in out_nii):
                 pass
             elif (not gzip) and ('.nii.gz' in out_nii):
@@ -1269,7 +1291,8 @@ def data_to_bids(sub_data: SubDataInfo,
                                 mod_dict=mod_dict,
                                 gzip=gzip,
                                 append_dwi_info=append_dwi_info,
-                                zero_pad=zero_pad)
+                                zero_pad=zero_pad,
+                                cprss_lvl=cprss_lvl)
         return (imgs,
                 jsons,
                 bvals,
