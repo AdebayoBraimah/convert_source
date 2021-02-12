@@ -898,7 +898,7 @@ def source_to_bids(sub_data: SubDataInfo,
                                            modality_label=modality_label,
                                            task=task,
                                            meta_dict=meta_dict,
-                                           mod_dict=mod_dict=,
+                                           mod_dict=mod_dict,
                                            gzip=gzip,
                                            append_dwi_info=append_dwi_info,
                                            zero_pad=zero_pad,
@@ -922,7 +922,7 @@ def source_to_bids(sub_data: SubDataInfo,
                                            modality_label=modality_label,
                                            task=task,
                                            meta_dict=meta_dict,
-                                           mod_dict=mod_dict=,
+                                           mod_dict=mod_dict,
                                            gzip=gzip,
                                            append_dwi_info=append_dwi_info,
                                            zero_pad=zero_pad,
@@ -1077,6 +1077,9 @@ def nifti_to_bids(sub_data: SubDataInfo,
         bval_file: str = ''.join(glob.glob(os.path.join(path,basename + "*.bval*")))
         bvec_file: str = ''.join(glob.glob(os.path.join(path,basename + "*.bvec*")))
 
+        # NOTE: This assumes that there is ONLY one set of JSON, bval, and bvec files,
+        #   while several, or multiple NIFTI images may exist.
+
         if json_file:
             json_dict: Dict = read_json(json_file=json_file)
 
@@ -1202,12 +1205,18 @@ def nifti_to_bids(sub_data: SubDataInfo,
             # See this link: https://linuxize.com/post/gzip-command-in-linux/#:~:text=and%20it's%20subdirectories.-,Change%20the%20compression%20level,default%20compression%20level%20is%20%2D6%20.
             # See this link: https://docs.python.org/3/library/gzip.html
             if gzip and ('.nii.gz' in out_nii):
-                pass
+                out_tmp:str = gunzip_file(file=out_nii,
+                                          native=True)
+                out_nii = gzip_file(file=out_tmp,
+                                    cprss_lvl=cprss_lvl,
+                                    native=True)
+                os.remove(out_tmp)
             elif (not gzip) and ('.nii.gz' in out_nii):
                 out_nii = gunzip_file(file=out_nii,
                                       native=True)
             elif gzip and ('.nii' in out_nii):
                 out_nii = gzip_file(file=out_nii,
+                                    cprss_lvl=cprss_lvl,
                                     native=True)
             
             imgs.append(out_nii)

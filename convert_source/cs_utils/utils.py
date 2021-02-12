@@ -1238,7 +1238,7 @@ def depth(d: Dict) -> int:
         d: Input dictionary.
         
     Returns:
-        Number of levels in dictionary
+        Number of levels in dictionary.
     '''
     queue = deque([(id(d), d, 1)])
     memo = set()
