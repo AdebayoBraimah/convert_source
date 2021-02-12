@@ -338,6 +338,7 @@ def get_echo(json_file: str) -> float:
     return float(echo)
 
 def gzip_file(file: str,
+              cprss_lvl: int = 6,
               native: bool = True
               ) -> str:
     '''Gzips file. Native implementation of gzipping files is prefered with
@@ -346,6 +347,7 @@ def gzip_file(file: str,
     
     Arguments:
         file: Input file.
+        cprss_lvl: Compression level [1 - 9] - 1 is fastest, 9 is smallest.
         native: Uses native implementation of gzip.
         
     Returns: 
@@ -366,6 +368,7 @@ def gzip_file(file: str,
         [path, filename, ext] = tmp_file.file_parts()
         out_file: str = os.path.join(path,filename + ext + '.gz')
         gzip_cmd: Command = Command("gzip")
+        gzip_cmd.cmd_list.append(f"-{cprss_lvl}")
         gzip_cmd.cmd_list.append(file)
         gzip_cmd.run()
         return out_file
@@ -378,7 +381,7 @@ def gzip_file(file: str,
         # Pythonic gzip
         with open(file,"rb") as in_file:
             data = in_file.read(); in_file.close()
-            with gzip.GzipFile(out_file,"wb") as tmp_out:
+            with gzip.GzipFile(out_file,"wb",compresslevel=cprss_lvl) as tmp_out:
                 tmp_out.write(data)
                 tmp_out.close()
                 os.remove(file) 
