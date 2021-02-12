@@ -888,15 +888,50 @@ def source_to_bids(sub_data: SubDataInfo,
                     modality_type = 'dwi'
                     modality_label = 'dwi'
                     sub_data.data = img_data.imgs[0]
-                    # Recursive function call here
+                    [imgs,
+                    jsons,
+                    bvals,
+                    bvecs] = nifti_to_bids(sub_data=sub_data,
+                                           bids_name_dict=bids_name_dict,
+                                           out_dir=out_dir,
+                                           modality_type=modality_type,
+                                           modality_label=modality_label,
+                                           task=task,
+                                           meta_dict=meta_dict,
+                                           mod_dict=mod_dict=,
+                                           gzip=gzip,
+                                           append_dwi_info=append_dwi_info,
+                                           zero_pad=zero_pad,
+                                           cprss_lvl=cprss_lvl)
                     tmp.rm_tmp_dir()
+                    return (imgs,
+                            jsons,
+                            bvals,
+                            bvecs)
                 elif len(img_data.imgs) >= 2 and not modality_type:
                     modality_type = 'fmap'
                     modality_label = 'fmap'
                     sub_data.data = img_data.imgs[0]
-                    # Recursive function call here
+                    [imgs,
+                    jsons,
+                    bvals,
+                    bvecs] = nifti_to_bids(sub_data=sub_data,
+                                           bids_name_dict=bids_name_dict,
+                                           out_dir=out_dir,
+                                           modality_type=modality_type,
+                                           modality_label=modality_label,
+                                           task=task,
+                                           meta_dict=meta_dict,
+                                           mod_dict=mod_dict=,
+                                           gzip=gzip,
+                                           append_dwi_info=append_dwi_info,
+                                           zero_pad=zero_pad,
+                                           cprss_lvl=cprss_lvl)
                     tmp.rm_tmp_dir()
-
+                    return (imgs,
+                            jsons,
+                            bvals,
+                            bvecs)
                 if os.path.exists(out_data_dir):
                     pass
                 else:
