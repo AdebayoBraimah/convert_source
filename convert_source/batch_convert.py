@@ -73,6 +73,8 @@ def batch_proc(config_file: str,
                study_img_dir: str,
                out_dir: str,
                path_envs: List[str] = [],
+               gzip: bool = True,
+               append_dwi_info: bool = True,
                verbose: bool = False
                ) -> Tuple[List[str]]:
     '''Batch processes a study's source image data provided a configuration, the parent directory of the study's imaging data,
@@ -89,6 +91,8 @@ def batch_proc(config_file: str,
         path_envs: List of directory paths to append to the system's 'PATH' variable.
         study_img_dir: Path to study image parent directory that contains all the subjects' source image data.
         out_dir: Output directory.
+        gzip: Gzip output NIFTI files.
+        append_dwi_info: Appends DWI acquisition information (unique non-zero b-values, and TE, in msec.) to BIDS acquisition filename.
         verbose: Verbose output.
 
     Returns:
@@ -177,7 +181,9 @@ def batch_proc(config_file: str,
                                 task=task,
                                 meta_dict=meta_com_dict,
                                 mod_dict=meta_scan_dict,
-                                log=log)
+                                log=log,
+                                gzip=gzip,
+                                append_dwi_info=append_dwi_info)
         except AttributeError:
             imgs = [""]
             jsons = [""]
