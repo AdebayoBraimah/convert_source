@@ -4,9 +4,8 @@
 
 # TODO:
 #   * [PENDING] Figure out where tmp directory path is being printed.
-#   * Add 'append_dwi_info' arg to batch_proc.
-#   * Add 'gzip' option to batch_proc.
 #   * Add doc building to CI workflow.
+#   * Figure out why CI tests are failing.
 
 import os
 import glob
@@ -908,7 +907,7 @@ def source_to_bids(sub_data: SubDataInfo,
                             jsons,
                             bvals,
                             bvecs)
-                            
+
                 elif len(img_data.imgs) >= 2 and not modality_type:
                     modality_type = 'fmap'
                     modality_label = 'fmap'
@@ -1212,7 +1211,6 @@ def nifti_to_bids(sub_data: SubDataInfo,
                 out_nii = gzip_file(file=out_tmp,
                                     cprss_lvl=cprss_lvl,
                                     native=True)
-                os.remove(out_tmp)
             elif (not gzip) and ('.nii.gz' in out_nii):
                 out_nii = gunzip_file(file=out_nii,
                                       native=True)
