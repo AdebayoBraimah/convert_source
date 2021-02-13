@@ -70,9 +70,9 @@ from convert_source.imgio.niio import (
 )
 
 # Define function(s)
-def batch_proc(config_file: str,
-               study_img_dir: str,
+def batch_proc(study_img_dir: str,
                out_dir: str,
+               config_file: str,
                path_envs: List[str] = [],
                gzip: bool = True,
                append_dwi_info: bool = True,
@@ -92,10 +92,10 @@ def batch_proc(config_file: str,
         ...
 
     Arguments:
-        config_file: Configuration file.
-        path_envs: List of directory paths to append to the system's 'PATH' variable.
         study_img_dir: Path to study image parent directory that contains all the subjects' source image data.
         out_dir: Output directory.
+        config_file: Configuration file.
+        path_envs: List of directory paths to append to the system's 'PATH' variable.
         gzip: Gzip output NIFTI files.
         append_dwi_info: Appends DWI acquisition information (unique non-zero b-values, and TE, in msec.) to BIDS acquisition filename.
         zero_pad: Number of zeroes to pad the run number up to (zero_pad=2 is '01').
