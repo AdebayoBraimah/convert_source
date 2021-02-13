@@ -1070,37 +1070,43 @@ def nifti_to_bids(sub_data: SubDataInfo,
     elif _task:
         task: str = _task
 
+    # TODO: Use TmpDir context manager to create temporary directory.
     # Use NiiFile context manager
     with NiiFile(data) as n:
         [path, basename, ext] = n.file_parts()
         img_files: List[str] = glob.glob(os.path.join(path,basename + "*" + ext))
-        json_file: str = ''.join(glob.glob(os.path.join(path,basename + "*.json*")))
-        bval_file: str = ''.join(glob.glob(os.path.join(path,basename + "*.bval*")))
-        bvec_file: str = ''.join(glob.glob(os.path.join(path,basename + "*.bvec*")))
+        json_files: str = ''.join(glob.glob(os.path.join(path,basename + "*.json*")))
+        bval_files: str = ''.join(glob.glob(os.path.join(path,basename + "*.bval*")))
+        bvec_files: str = ''.join(glob.glob(os.path.join(path,basename + "*.bvec*")))
 
-        # NOTE: This assumes that there is ONLY one set of JSON, bval, and bvec files,
-        #   while several, or multiple NIFTI images may exist.
+        # TODO: Copy all NIFTI images and associated data to TmpDir directory object.
+        #   Create BIDSimg object.
 
-        if json_file:
-            json_dict: Dict = read_json(json_file=json_file)
+        # NOTE: This assumes that there is ONLY one set of bval, and bvec files,
+        #   while several, or multiple NIFTI images or JSON files may exist.
 
-            param_dict: Dict = get_data_params(file=data,
-                                               json_file=json_file)
+        # TODO: write JSON file information to each file
+        for json_file in json_files:
+            if json_file:
+                json_dict: Dict = read_json(json_file=json_file)
 
-            metadata: Dict = dict_multi_update(dictionary=None, **meta_dict)
-            metadata: Dict = dict_multi_update(dictionary=metadata, **param_dict)
-            metadata: Dict = dict_multi_update(dictionary=metadata, **mod_dict)
+                param_dict: Dict = get_data_params(file=data,
+                                                json_file=json_file)
 
-            bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
-                                                  json_dict=json_dict)
-        else:
-            json_dict: Dict = read_json(json_file="")
+                metadata: Dict = dict_multi_update(dictionary=None, **meta_dict)
+                metadata: Dict = dict_multi_update(dictionary=metadata, **param_dict)
+                metadata: Dict = dict_multi_update(dictionary=metadata, **mod_dict)
 
-            metadata: Dict = dict_multi_update(dictionary=None, **meta_dict)
-            metadata: Dict = dict_multi_update(dictionary=metadata, **mod_dict)
-            
-            bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
-                                                  json_dict=json_dict)
+                bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
+                                                    json_dict=json_dict)
+            else:
+                json_dict: Dict = read_json(json_file="")
+
+                metadata: Dict = dict_multi_update(dictionary=None, **meta_dict)
+                metadata: Dict = dict_multi_update(dictionary=metadata, **mod_dict)
+                
+                bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
+                                                    json_dict=json_dict)
 
         # BIDS 'fmap' cases
         case1: bool = False
@@ -1201,13 +1207,9 @@ def nifti_to_bids(sub_data: SubDataInfo,
             out_json = write_json(json_file=out_json,
                                   dictionary=bids_dict)
             
-            # TODO: Add compression level to gzip
-            # function.
-            # See this link: https://linuxize.com/post/gzip-command-in-linux/#:~:text=and%20it's%20subdirectories.-,Change%20the%20compression%20level,default%20compression%20level%20is%20%2D6%20.
-            # See this link: https://docs.python.org/3/library/gzip.html
             if gzip and ('.nii.gz' in out_nii):
-                out_tmp:str = gunzip_file(file=out_nii,
-                                          native=True)
+                out_tmp: str = gunzip_file(file=out_nii,
+                                           native=True)
                 out_nii = gzip_file(file=out_tmp,
                                     cprss_lvl=cprss_lvl,
                                     native=True)
