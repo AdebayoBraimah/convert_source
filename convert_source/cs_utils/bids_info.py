@@ -162,7 +162,7 @@ def construct_bids_name(sub_data: SubDataInfo,
                         out_dir: Optional[str] = "",
                         zero_pad: Optional[int] = 0
                         ) -> Dict:
-    '''Constructs BIDS filenames from input paraemter descriptions.
+    '''Constructs BIDS filenames dictionary from input parameter descriptions.
 
     More information can be obtained from: 
         https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html.

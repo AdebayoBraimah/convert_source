@@ -1,0 +1,172 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""Command line wrapper for `convert_source`'s batch process function. 
+   Performs batch conversion for a study's source imaging data, which may consist of: DICOMs, PAR RECs, or NIFTI image files.
+"""
+
+import pathlib
+import sys
+import os
+
+from typing import (
+    List,
+    Tuple
+)
+
+import argparse
+
+_pkg_path: str = str(pathlib.Path(os.path.abspath(__file__)).parents[1])
+sys.path.append(_pkg_path)
+
+from convert_source import __version__ as version
+
+from convert_source.batch_convert import batch_proc
+
+from convert_source.cs_utils.const import DEFAULT_CONFIG
+
+def main() -> Tuple[List[str]]:
+    '''Main function.
+    * Parses arguements.
+    * Returns 4-tuple of lists of BIDS NIFTI files.
+    '''
+    args, parser = arg_parser()
+
+    # Print help message in the case of no arguments
+    try:
+        args = parser.parse_args()
+    except SystemExit as err:
+        if err.code == 2:
+            parser.print_help()
+    
+    if args.cs_version:
+        print(version)
+        sys.exit(0)
+    
+    if args.study_dir and args.out_dir:
+        pass
+    else:
+        parser.print_help()
+        sys.exit(1)
+    
+    if args.no_gzip:
+        gzip: bool = False
+    else:
+        gzip: bool = True
+    
+    # Execute function here
+    imgs: List[str] = []
+    jsons: List[str] = []
+    bvals: List[str] = []
+    bvecs: List[str] = []
+
+    [imgs,
+    jsons,
+    bvals,
+    bvecs] = batch_proc(study_img_dir=args.study_dir,
+                        out_dir=args.out_dir,
+                        config_file=args.config,
+                        path_envs=args.path_envs,
+                        gzip=gzip,
+                        append_dwi_info=args.append_dwi_info,
+                        zero_pad=args.zero_pad,
+                        cprss_lvl=args.compression_level,
+                        verbose=args.verbose,
+                        env=None,
+                        dryrun=False)
+    return (imgs,
+            jsons,
+            bvals,
+            bvecs)
+
+
+
+# def parser():
+def arg_parser():
+    '''Argument parser for `convert_source`.
+    '''
+    # Parse arguments
+    parser = argparse.ArgumentParser(description="Convert source data of a study's imaging data to BIDS NIFTI data.")
+
+    # Parse Arguments
+
+    # Required Arguments
+    reqoptions = parser.add_argument_group('Required Argument(s)')
+    reqoptions.add_argument('-s','-study','--study-dir',
+                            type=str,
+                            dest="study_dir",
+                            metavar="STUDY_DIR",
+                            # required=True,
+                            required=False,
+                            help="Parent study image directory for all subjects.")
+    reqoptions.add_argument('-o','-out','--out-dir',
+                            type=str,
+                            dest="out_dir",
+                            metavar="OUT_DIR",
+                            # required=True,
+                            required=False,
+                            help="Output directory.")
+    # Optional Arguements
+    optoptions = parser.add_argument_group('Optional Argument(s)')
+    optoptions.add_argument('-c','-config','--config-file',
+                            type=str,
+                            dest="config",
+                            metavar="CONFIG.yml",
+                            required=False,
+                            default=DEFAULT_CONFIG,
+                            help="Input YAML configuration file. If no configuration file is provided, then the default configuration file is used.")
+    optoptions.add_argument('--no-gzip',
+                            dest="no_gzip",
+                            required=False,
+                            action="store_true",
+                            default=False,
+                            help="DO NOT gzip the resulting BIDS NIFTI files [default: False].")
+    optoptions.add_argument('--compress',
+                            type=int,
+                            dest="compression_level",
+                            metavar="INT",
+                            required=False,
+                            default=6,
+                            help="Compression level [1 - 9] - 1 is fastest, 9 is smallest [default: 6].")
+    optoptions.add_argument('--zero-pad',
+                            type=int,
+                            dest="zero_pad",
+                            metavar="INT",
+                            required=False,
+                            default=2,
+                            help="The amount of zeropadding to pad the run numbers of the BIDS NIFTI files (e.g. '--zero-pad=2' corresponds to '01') [default: 2].")
+    optoptions.add_argument('--append-dwi-info',
+                            dest="append_dwi_info",
+                            required=False,
+                            action='store_true',
+                            default=False,
+                            help="RECOMMENDED: Appends DWI acquisition information (unique non-zero b-values, and TE, in msec.) to BIDS acquisition filename of diffusion weighted image files [default: False].")
+    optoptions.add_argument('--verbose',
+                            dest="verbose",
+                            required=False,
+                            action='store_true',
+                            default=False,
+                            help="Enables verbose output to the command line.")
+    optoptions.add_argument('--version',
+                            dest="cs_version",
+                            required=False,
+                            action='store_true',
+                            default=False,
+                            help="Prints the version of 'convert_source', then exits.")
+    # Expert Options
+    expoptions = parser.add_argument_group('Expert Option(s)')
+    expoptions.add_argument('--path-env',
+                            type=str,
+                            dest="path_envs",
+                            metavar="PATH_VAR",
+                            required=False,
+                            action='append',
+                            default="",
+                            help="Environmental path variable or variables for dependencies (e.g. the path to 'dcm2niix'). \
+                                NOTE: This option is repeatable, and can thus be specified multiple times.")
+
+    args = parser.parse_args()
+
+    return args,parser
+
+if __name__ == "__main__":
+    main()

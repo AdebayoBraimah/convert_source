@@ -5,17 +5,13 @@
 '''
 TODO:
     - Decide if image is T1 or T2 using TR and TE.
-    - Remove all .DS_STORE files and add it to .gitignore.
     - NEED to make sure that session ID is either included or excluded, but cannot be inconsistent.
-    - Add option to use dcm2nii to image conversion function.
-    - Add (hidden) log file directory and .bidsignore file
-    - Add simpler example configurations file
     - Add file handling capabilities of task csv/tsv files
-        - use BIDSimg class to keep track of files
-            or
-        - create new class
     - Add option for creating sessions TSV file(s)
 '''
+
+# Changes to commit:
+#   * Updated TODOs
 
 def batch_convert():
 

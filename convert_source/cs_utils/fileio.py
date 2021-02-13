@@ -4,10 +4,11 @@
     * temporary directory, and temporary file handling
     * Logging
     * Wrapper class for UNIX command line executables.
-
-TODO:
-    * Update/refactor logging class to logging decorator.
 """
+
+# TODO:
+#     * Update/refactor logging class to logging decorator.
+
 import subprocess
 import logging
 import os

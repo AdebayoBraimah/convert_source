@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 """Batch conversion wrapper and its associated classes and functions for the `convert_source` package.
-
-TODO:
-    * [PENDING] Figure out where tmp directory path is being printed.
 """
+
+# TODO:
+#   * [PENDING] Figure out where tmp directory path is being printed.
+#       * See functions that use TmpDir class's rm_tmp_dir() function
+#   * Add doc building to CI workflow.
+#   * Replace triple single quotes (''') with triple double quotes (""")
+
 import os
 import glob
 import yaml
@@ -35,6 +39,7 @@ from convert_source.cs_utils.fileio import (
 )
 
 from convert_source.cs_utils.utils import (
+    BIDSimg,
     SubDataInfo,
     depth,
     list_dict,
@@ -65,11 +70,17 @@ from convert_source.imgio.niio import (
 )
 
 # Define function(s)
-def batch_proc(config_file: str,
-               study_img_dir: str,
+def batch_proc(study_img_dir: str,
                out_dir: str,
+               config_file: str,
                path_envs: List[str] = [],
-               verbose: bool = False
+               gzip: bool = True,
+               append_dwi_info: bool = True,
+               zero_pad: int = 2,
+               cprss_lvl: int = 6,
+               verbose: bool = False,
+               env: Optional[Dict] = {},
+               dryrun: bool = False
                ) -> Tuple[List[str]]:
     '''Batch processes a study's source image data provided a configuration, the parent directory of the study's imaging data,
     and an output directory to place the BIDS NIFTI data.
@@ -81,11 +92,17 @@ def batch_proc(config_file: str,
         ...
 
     Arguments:
-        config_file: Configuration file.
-        path_envs: List of directory paths to append to the system's 'PATH' variable.
         study_img_dir: Path to study image parent directory that contains all the subjects' source image data.
         out_dir: Output directory.
-        verbose: Verbose output.
+        config_file: Configuration file.
+        path_envs: List of directory paths to append to the system's 'PATH' variable.
+        gzip: Gzip output NIFTI files.
+        append_dwi_info: Appends DWI acquisition information (unique non-zero b-values, and TE, in msec.) to BIDS acquisition filename.
+        zero_pad: Number of zeroes to pad the run number up to (zero_pad=2 is '01').
+        cprss_lvl: Compression level [1 - 9] - 1 is fastest, 9 is smallest.
+        verbose: Enable verbose output.
+        env: Path environment dictionary.
+        dryrun: Perform dryrun (creates the command, but does not execute it).
 
     Returns:
         Tuple of lists that consists of: 
@@ -173,7 +190,14 @@ def batch_proc(config_file: str,
                                 task=task,
                                 meta_dict=meta_com_dict,
                                 mod_dict=meta_scan_dict,
-                                log=log)
+                                log=log,
+                                gzip=gzip,
+                                append_dwi_info=append_dwi_info,
+                                zero_pad=zero_pad,
+                                cprss_lvl=cprss_lvl,
+                                verbose=verbose,
+                                env=env,
+                                dryrun=dryrun)
         except AttributeError:
             imgs = [""]
             jsons = [""]
@@ -859,17 +883,56 @@ def source_to_bids(sub_data: SubDataInfo,
                                                            out_dir=out_data_dir)
 
                 # Ensure that DWI and Fieldmap data are not kept as unknown
-                # by back-tracking if that is the case.
+                # by calling nifti_to_bids if that is the case.
                 if img_data.bvals[0] and img_data.bvecs[0] and not modality_type:
                     modality_type = 'dwi'
                     modality_label = 'dwi'
                     sub_data.data = img_data.imgs[0]
-                    # Recursive function call here
+                    [imgs,
+                    jsons,
+                    bvals,
+                    bvecs] = nifti_to_bids(sub_data=sub_data,
+                                           bids_name_dict=bids_name_dict,
+                                           out_dir=out_dir,
+                                           modality_type=modality_type,
+                                           modality_label=modality_label,
+                                           task=task,
+                                           meta_dict=meta_dict,
+                                           mod_dict=mod_dict,
+                                           gzip=gzip,
+                                           append_dwi_info=append_dwi_info,
+                                           zero_pad=zero_pad,
+                                           cprss_lvl=cprss_lvl)
+                    tmp.rm_tmp_dir()
+                    return (imgs,
+                            jsons,
+                            bvals,
+                            bvecs)
+
                 elif len(img_data.imgs) >= 2 and not modality_type:
                     modality_type = 'fmap'
                     modality_label = 'fmap'
                     sub_data.data = img_data.imgs[0]
-                    # Recursive function call here
+                    [imgs,
+                    jsons,
+                    bvals,
+                    bvecs] = nifti_to_bids(sub_data=sub_data,
+                                           bids_name_dict=bids_name_dict,
+                                           out_dir=out_dir,
+                                           modality_type=modality_type,
+                                           modality_label=modality_label,
+                                           task=task,
+                                           meta_dict=meta_dict,
+                                           mod_dict=mod_dict,
+                                           gzip=gzip,
+                                           append_dwi_info=append_dwi_info,
+                                           zero_pad=zero_pad,
+                                           cprss_lvl=cprss_lvl)
+                    tmp.rm_tmp_dir()
+                    return (imgs,
+                            jsons,
+                            bvals,
+                            bvecs)
 
                 if os.path.exists(out_data_dir):
                     pass
@@ -946,7 +1009,8 @@ def nifti_to_bids(sub_data: SubDataInfo,
                   mod_dict: Optional[Dict] = {},
                   gzip: bool = True,
                   append_dwi_info: bool = True,
-                  zero_pad: int = 2
+                  zero_pad: int = 2,
+                  cprss_lvl: int = 6
                   ) -> Tuple[List[str],List[str],List[str],List[str]]:
     '''Converts existing NIFTI data to BIDS raw data.
     
@@ -970,6 +1034,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
         gzip: Gzip output NIFTI files.
         append_dwi_info: Appends DWI acquisition information (unique non-zero b-values, and TE, in msec.) to BIDS acquisition filename.
         zero_pad: Number of zeroes to pad the run number up to (zero_pad=2 is '01').
+        cprss_lvl: Compression level [1 - 9] - 1 is fastest, 9 is smallest.
 
     Returns:
         Tuple of lists that contains:
@@ -983,6 +1048,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
     data: str = sub_data.data
     
     sub_dir: str = os.path.join(out_dir,"sub-" + sub)
+    sub_tmp: str = sub_dir
     
     if ses:
         sub_dir: str = os.path.join(sub_dir,"ses-" + ses)
@@ -1006,157 +1072,201 @@ def nifti_to_bids(sub_data: SubDataInfo,
     elif _task:
         task: str = _task
 
-    # Use NiiFile context manager
-    with NiiFile(data) as n:
-        [path, basename, ext] = n.file_parts()
-        img_files: List[str] = glob.glob(os.path.join(path,basename + "*" + ext))
-        json_file: str = ''.join(glob.glob(os.path.join(path,basename + "*.json*")))
-        bval_file: str = ''.join(glob.glob(os.path.join(path,basename + "*.bval*")))
-        bvec_file: str = ''.join(glob.glob(os.path.join(path,basename + "*.bvec*")))
+    # Use TmpDir and NiiFile class context managers
+    with TmpDir(tmp_dir=sub_tmp, use_cwd=False) as tmp:
+        tmp.mk_tmp_dir()
+        with NiiFile(data) as n:
+            [path, basename, ext] = n.file_parts()
+            img_files: List[str] = glob.glob(os.path.join(path,basename + "*" + ext))
+            json_files: List[str] = glob.glob(os.path.join(path,basename + "*.json*"))
+            bval_files: List[str] = glob.glob(os.path.join(path,basename + "*.bval*"))
+            bvec_files: List[str] = glob.glob(os.path.join(path,basename + "*.bvec*"))
 
-        if json_file:
-            json_dict: Dict = read_json(json_file=json_file)
-
-            param_dict: Dict = get_data_params(file=data,
-                                               json_file=json_file)
-
-            metadata: Dict = dict_multi_update(dictionary=None, **meta_dict)
-            metadata: Dict = dict_multi_update(dictionary=metadata, **param_dict)
-            metadata: Dict = dict_multi_update(dictionary=metadata, **mod_dict)
-
-            bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
-                                                  json_dict=json_dict)
-        else:
-            json_dict: Dict = read_json(json_file="")
-
-            metadata: Dict = dict_multi_update(dictionary=None, **meta_dict)
-            metadata: Dict = dict_multi_update(dictionary=metadata, **mod_dict)
+            for i in range(0,len(img_files)):
+                if img_files[i]:
+                    copy(img_files[i],tmp.tmp_dir)
+                
+                try:
+                    if json_files[i]:
+                        copy(json_files[i],tmp.tmp_dir)
+                except IndexError:
+                    pass
+                
+                try:
+                    if bval_files[i]:
+                        copy(bval_files[i],tmp.tmp_dir)
+                except IndexError:
+                    pass
+                
+                try:
+                    if bvec_files[i]:
+                        copy(bvec_files[i],tmp.tmp_dir)
+                except IndexError:
+                    pass
             
-            bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
-                                                  json_dict=json_dict)
+            img_data: BIDSimg = BIDSimg(work_dir=tmp.tmp_dir)
 
-        # BIDS 'fmap' cases
-        case1: bool = False
-        case2: bool = False
-        case3: bool = False
-        case4: bool = False
-        mag2: bool = False
-        
-        if modality_type.lower() == 'fmap':
-            if len(img_files) == 4:
-                case2: bool = True
-            elif len(img_files) == 3:
-                case1: bool = True
-                mag2: bool = True
-            elif len(img_files) == 1:
-                case4 = True
-            elif len(img_files) == 2:
-                for i in img_files:
-                    # This needs more review, need to know output of fieldmaps from dcm2niix
-                    if list_in_substr(['mag','map','a'],i):
-                        case3: bool = True
-                        break
-                    else:
-                        case1: bool = True
-        
-        if modality_type.lower() == 'dwi' or modality_type.lower() == 'func' :
-            num_frames = get_num_frames(img_files[0])
-            if num_frames == 1:
-                modality_label: str = "sbref"
+            # NOTE: This assumes that there is ONLY one set of bval, and bvec files,
+            #   while several, or multiple NIFTI images or JSON files may exist.
 
-        if (modality_type.lower() == 'dwi' or modality_label.lower() == 'dwi') and append_dwi_info:
-            bvals: List[int] = get_bvals(bval_file)
-            echo_time: Union[int,str] = bids_dict["EchoTime"] * 1000
-            _label: str = ""
-            for bval in bvals:
-                if bval != 0:
-                    _label += f"b{bval}"
-            if echo_time:
-                _label += f"TE{int(echo_time)}"
-            if acq:
-                acq += _label
+            for i in range(0,len(img_data.imgs)):
+                if img_data.jsons[i]:
+                    json_dict: Dict = read_json(json_file=img_data.jsons[i])
+
+                    param_dict: Dict = get_data_params(file=data,
+                                                    json_file=img_data.jsons[i])
+
+                    metadata: Dict = dict_multi_update(dictionary=None, **meta_dict)
+                    metadata: Dict = dict_multi_update(dictionary=metadata, **param_dict)
+                    metadata: Dict = dict_multi_update(dictionary=metadata, **mod_dict)
+
+                    bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
+                                                        json_dict=json_dict)
+
+                    img_data.jsons[i] = write_json(json_file=img_data.jsons[i],
+                                                    dictionary=bids_dict)
+                elif (not img_data.jsons[i]) and (i == 0):
+                    json_dict: Dict = read_json(json_file="")
+
+                    metadata: Dict = dict_multi_update(dictionary=None, **meta_dict)
+                    metadata: Dict = dict_multi_update(dictionary=metadata, **mod_dict)
+                    
+                    bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
+                                                        json_dict=json_dict)
+
+                    img_data.jsons[i] = write_json(json_file=img_data.jsons[i],
+                                                    dictionary=bids_dict)
+
+            # BIDS 'fmap' cases
+            case1: bool = False
+            case2: bool = False
+            case3: bool = False
+            case4: bool = False
+            mag2: bool = False
+            
+            if modality_type.lower() == 'fmap':
+                if len(img_data.imgs) == 4:
+                    case2: bool = True
+                elif len(img_data.imgs) == 3:
+                    case1: bool = True
+                    mag2: bool = True
+                elif len(img_data.imgs) == 1:
+                    case4 = True
+                elif len(img_data.imgs) == 2:
+                    for i in img_data.imgs:
+                        # This needs more review, need to know output of fieldmaps from dcm2niix
+                        if list_in_substr(['mag','map','a'],i):
+                            case3: bool = True
+                            break
+                        else:
+                            case1: bool = True
+            
+            if modality_type.lower() == 'dwi' or modality_type.lower() == 'func' :
+                num_frames = get_num_frames(img_data.imgs[0])
+                if num_frames == 1:
+                    modality_label: str = "sbref"
+
+            if (modality_type.lower() == 'dwi' or modality_label.lower() == 'dwi') and append_dwi_info:
+                bvals: List[int] = get_bvals(img_data.bvals[0])
+                echo_time: Union[int,str] = bids_dict["EchoTime"] * 1000
+                _label: str = ""
+                for bval in bvals:
+                    if bval != 0:
+                        _label += f"b{bval}"
+                if echo_time:
+                    _label += f"TE{int(echo_time)}"
+                if acq:
+                    acq += _label
+                else:
+                    acq = _label
+
+            if modality_type:    
+                out_data_dir: str = os.path.join(sub_dir, modality_type)
             else:
-                acq = _label
+                out_data_dir: str = os.path.join(out_dir, "unknown")
 
-        if modality_type:    
-            out_data_dir: str = os.path.join(sub_dir, modality_type)
-        else:
-            out_data_dir: str = os.path.join(out_dir, "unknown")
+            # Re-write BIDS name dictionary and update to reflect NIFTI data
+            bids_name_dict: Dict = construct_bids_name(sub_data=sub_data,
+                                                        modality_type=modality_type,
+                                                        modality_label=modality_label,
+                                                        acq=acq,
+                                                        ce=ce,
+                                                        task=task,
+                                                        acq_dir=acq_dir,
+                                                        rec=rec,
+                                                        echo=echo,
+                                                        case1=case1,
+                                                        mag2=mag2,
+                                                        case2=case2,
+                                                        case3=case3,
+                                                        case4=case4,
+                                                        zero_pad=zero_pad,
+                                                        out_dir=out_data_dir)
 
-        # Re-write BIDS name dictionary and update to reflect NIFTI data
-        bids_name_dict: Dict = construct_bids_name(sub_data=sub_data,
-                                                    modality_type=modality_type,
-                                                    modality_label=modality_label,
-                                                    acq=acq,
-                                                    ce=ce,
-                                                    task=task,
-                                                    acq_dir=acq_dir,
-                                                    rec=rec,
-                                                    echo=echo,
-                                                    case1=case1,
-                                                    mag2=mag2,
-                                                    case2=case2,
-                                                    case3=case3,
-                                                    case4=case4,
-                                                    zero_pad=zero_pad,
-                                                    out_dir=out_data_dir)
-
-        if os.path.exists(out_data_dir):
-            pass
-        else:
-            os.makedirs(out_data_dir)
-
-        if modality_type:
-            pass
-        else:
-            modality_type: str = "unknown"
-        
-        [bids_1, bids_2, bids_3, bids_4] = make_bids_name(bids_name_dict=bids_name_dict,
-                                                           modality_type=modality_type)
-        
-        bids_names: List[str] = [bids_1, bids_2, bids_3, bids_4]
-        
-        # Image data return lists
-        imgs: List[str] = []
-        jsons: List[str] = []
-        bvals: List[str] = []
-        bvecs: List[str] = []
-        
-        for i in range(0,len(img_files)):
-            out_name: str = os.path.join(out_data_dir,bids_names[i])
-
-            out_nii: str = out_name + ext
-            out_json: str = out_name + ".json"
-            out_bval: str = out_name + ".bval"
-            out_bvec: str = out_name + ".bvec"
-
-            out_nii = copy(img_files[i],out_nii)
-            out_json = write_json(json_file=out_json,
-                                  dictionary=bids_dict)
-            
-            if gzip and ('.nii.gz' in out_nii):
+            if os.path.exists(out_data_dir):
                 pass
-            elif (not gzip) and ('.nii.gz' in out_nii):
-                out_nii = gunzip_file(file=out_nii,
-                                      native=True)
-            elif gzip and ('.nii' in out_nii):
-                out_nii = gzip_file(file=out_nii,
-                                    native=True)
-            
-            imgs.append(out_nii)
-            jsons.append(out_json)
-            
-            if bval_file and bvec_file:
-                out_bval = copy(bval_file,out_bval)
-                out_bvec = copy(bvec_file,out_bvec)
-                bvals.append(out_bval)
-                bvecs.append(out_bvec)
             else:
-                out_bval: str = ""
-                out_bvec: str = ""
-                bvals.append("")
-                bvecs.append("")
-    
+                os.makedirs(out_data_dir)
+
+            if modality_type:
+                pass
+            else:
+                modality_type: str = "unknown"
+            
+            [bids_1, bids_2, bids_3, bids_4] = make_bids_name(bids_name_dict=bids_name_dict,
+                                                            modality_type=modality_type)
+            
+            bids_names: List[str] = [bids_1, bids_2, bids_3, bids_4]
+            
+            # Image data return lists
+            imgs: List[str] = []
+            jsons: List[str] = []
+            bvals: List[str] = []
+            bvecs: List[str] = []
+            
+            for i in range(0,len(img_data.imgs)):
+                out_name: str = os.path.join(out_data_dir,bids_names[i])
+
+                out_nii: str = out_name + ext
+                out_json: str = out_name + ".json"
+                out_bval: str = out_name + ".bval"
+                out_bvec: str = out_name + ".bvec"
+
+                out_nii = copy(img_data.imgs[i],out_nii)
+
+                if img_data.jsons[i]:
+                    out_json = copy(img_data.jsons[i],out_json)
+                
+                if gzip and ('.nii.gz' in out_nii):
+                    out_tmp: str = gunzip_file(file=out_nii,
+                                            native=True)
+                    out_nii = gzip_file(file=out_tmp,
+                                        cprss_lvl=cprss_lvl,
+                                        native=True)
+                elif (not gzip) and ('.nii.gz' in out_nii):
+                    out_nii = gunzip_file(file=out_nii,
+                                        native=True)
+                elif gzip and ('.nii' in out_nii):
+                    out_nii = gzip_file(file=out_nii,
+                                        cprss_lvl=cprss_lvl,
+                                        native=True)
+                
+                imgs.append(out_nii)
+                jsons.append(out_json)
+                
+                if img_data.bvals[i] and img_data.bvecs[i]:
+                    out_bval = copy(img_data.bvals[i],out_bval)
+                    out_bvec = copy(img_data.bvecs[i],out_bvec)
+                    bvals.append(out_bval)
+                    bvecs.append(out_bvec)
+                else:
+                    out_bval: str = ""
+                    out_bvec: str = ""
+                    bvals.append("")
+                    bvecs.append("")
+        # Clean-up
+        tmp.rm_tmp_dir()
+
         return (imgs,
                 jsons,
                 bvals,
@@ -1214,11 +1324,6 @@ def data_to_bids(sub_data: SubDataInfo,
             * List of corresponding JSON (sidecar) file(s). Empty string is returned if this file does not exist.
             * List of corresponding FSL-style bval file(s). Empty string is returned if this file does not exist.
             * List of corresponding FSL-style bvec file(s). Empty string is returned if this file does not exist.
-    
-    TODO: 
-        * Init subject log file here.
-        * Write log files for each subject.
-            * BUG: logging class only writes to one file.
     '''
     if ('.dcm' in sub_data.data.lower()) or ('.par' in sub_data.data.lower()):
         [imgs,
@@ -1258,7 +1363,8 @@ def data_to_bids(sub_data: SubDataInfo,
                                 mod_dict=mod_dict,
                                 gzip=gzip,
                                 append_dwi_info=append_dwi_info,
-                                zero_pad=zero_pad)
+                                zero_pad=zero_pad,
+                                cprss_lvl=cprss_lvl)
         return (imgs,
                 jsons,
                 bvals,
