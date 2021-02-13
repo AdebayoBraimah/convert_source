@@ -6,8 +6,6 @@
 #   * [PENDING] Figure out where tmp directory path is being printed.
 #       * See functions that use TmpDir class's rm_tmp_dir() function
 #   * Add doc building to CI workflow.
-#   * Commit changes: 
-#       * Changed nifti_to_bids flow control to accomodate multiple image, json, bval, and bvec files.
 #   * Replace triple single quotes (''') with triple double quotes (""")
 
 import os
@@ -1088,14 +1086,23 @@ def nifti_to_bids(sub_data: SubDataInfo,
                 if img_files[i]:
                     copy(img_files[i],tmp.tmp_dir)
                 
-                if json_files[i]:
-                    copy(json_files[i],tmp.tmp_dir)
+                try:
+                    if json_files[i]:
+                        copy(json_files[i],tmp.tmp_dir)
+                except IndexError:
+                    pass
                 
-                if bval_files[i]:
-                    copy(bval_files[i],tmp.tmp_dir)
+                try:
+                    if bval_files[i]:
+                        copy(bval_files[i],tmp.tmp_dir)
+                except IndexError:
+                    pass
                 
-                if bvec_files[i]:
-                    copy(bvec_files[i],tmp.tmp_dir)
+                try:
+                    if bvec_files[i]:
+                        copy(bvec_files[i],tmp.tmp_dir)
+                except IndexError:
+                    pass
             
             img_data: BIDSimg = BIDSimg(work_dir=tmp.tmp_dir)
 
