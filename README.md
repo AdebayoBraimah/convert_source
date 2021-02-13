@@ -3,15 +3,14 @@
 # convert_source
 Convert source `DICOM`, `PAR REC` or `NIFTI` image data to BIDS directory layout.
 
-The YAML configuration file used as input dictates the search terms used to find and rename files. Please see `config.default.yml` as an example.
+The YAML configuration file used as input dictates the search terms used to find and rename files. Please see `config/config.default.yml` or `config/config.example.yml` for examples.
 
 Requires `dcm2niix` and `pydicom`.
 
 ```
-usage: study_proc.py [-h] [-s STUDY_DIR] [-o OUT_DIR] [-c CONFIG.yml]
-                     [--no-gzip] [--compress INT] [--zero-pad INT]
-                     [--append-dwi-info] [--verbose] [--version]
-                     [--path-env PATH_VAR]
+usage: study_proc [-h] [-s STUDY_DIR] [-o OUT_DIR] [-c CONFIG.yml] [--no-gzip]
+                  [--compress INT] [--zero-pad INT] [--append-dwi-info]
+                  [--verbose] [--version] [--path-env PATH_VAR]
 
 Convert source data of a study's imaging data to BIDS NIFTI data.
 
