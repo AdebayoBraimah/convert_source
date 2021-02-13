@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-doc-string
+"""Command line wrapper for `convert_source`'s batch process function. 
+   Performs batch conversion for a study's source imaging data, which may consist of: DICOMs, PAR RECs, or NIFTI image files.
 """
 
 import pathlib
