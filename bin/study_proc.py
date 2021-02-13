@@ -8,6 +8,11 @@ import pathlib
 import sys
 import os
 
+from typing import (
+    List,
+    Tuple
+)
+
 import argparse
 
 _pkg_path: str = str(pathlib.Path(os.path.abspath(__file__)).parents[1])
@@ -19,9 +24,65 @@ from convert_source.batch_convert import batch_proc
 
 from convert_source.cs_utils.const import DEFAULT_CONFIG
 
-def parser():
+def main() -> Tuple[List[str]]:
+    '''Main function.
+    * Parses arguements.
+    * Returns 4-tuple of lists of BIDS NIFTI files.
     '''
-    working doc-string
+    args, parser = arg_parser()
+
+    # Print help message in the case of no arguments
+    try:
+        args = parser.parse_args()
+    except SystemExit as err:
+        if err.code == 2:
+            parser.print_help()
+    
+    if args.cs_version:
+        print(version)
+        sys.exit(0)
+    
+    if args.study_dir and args.out_dir:
+        pass
+    else:
+        parser.print_help()
+        sys.exit(1)
+    
+    if args.no_gzip:
+        gzip: bool = False
+    else:
+        gzip: bool = True
+    
+    # Execute function here
+    imgs: List[str] = []
+    jsons: List[str] = []
+    bvals: List[str] = []
+    bvecs: List[str] = []
+
+    [imgs,
+    jsons,
+    bvals,
+    bvecs] = batch_proc(study_img_dir=args.study_dir,
+                        out_dir=args.out_dir,
+                        config_file=args.config,
+                        path_envs=args.path_envs,
+                        gzip=gzip,
+                        append_dwi_info=args.append_dwi_info,
+                        zero_pad=args.zero_pad,
+                        cprss_lvl=args.compression_level,
+                        verbose=args.verbose,
+                        env=None,
+                        dryrun=False)
+    return (imgs,
+            jsons,
+            bvals,
+            bvecs)
+
+
+
+# def parser():
+def arg_parser():
+    '''Argument parser for `convert_source`.
     '''
     # Parse arguments
     parser = argparse.ArgumentParser(description="Convert source data of a study's imaging data to BIDS NIFTI data.")
@@ -34,13 +95,15 @@ def parser():
                             type=str,
                             dest="study_dir",
                             metavar="STUDY_DIR",
-                            required=True,
+                            # required=True,
+                            required=False,
                             help="Parent study image directory for all subjects.")
     reqoptions.add_argument('-o','-out','--out-dir',
                             type=str,
                             dest="out_dir",
                             metavar="OUT_DIR",
-                            required=True,
+                            # required=True,
+                            required=False,
                             help="Output directory.")
     # Optional Arguements
     optoptions = parser.add_argument_group('Optional Argument(s)')
@@ -103,15 +166,7 @@ def parser():
 
     args = parser.parse_args()
 
-    # Print help message in the case of no arguments
-    try:
-        args = parser.parse_args()
-    except SystemExit as err:
-        if err.code == 2:
-            parser.print_help()
-    
-    if args.cs_version:
-        print(version)
-        sys.exit(0)
+    return args,parser
 
-    return args
+if __name__ == "__main__":
+    main()
