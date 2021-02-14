@@ -28,7 +28,6 @@ convert\_source.imgio.pario module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

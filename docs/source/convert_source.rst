@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   convert_source.bin
    convert_source.cs_utils
    convert_source.imgio
 
@@ -20,7 +21,6 @@ convert\_source.batch\_convert module
    :members:
    :undoc-members:
    :show-inheritance:
-
 
 Module contents
 ---------------

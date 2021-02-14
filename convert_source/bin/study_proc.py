@@ -31,12 +31,12 @@ def main() -> Tuple[List[str]]:
     '''
     args, parser = arg_parser()
 
-    # Print help message in the case of no arguments
-    try:
-        args = parser.parse_args()
-    except SystemExit as err:
-        if err.code == 2:
-            parser.print_help()
+    # # Print help message in the case of no arguments
+    # try:
+    #     args = parser.parse_args()
+    # except SystemExit as err:
+    #     if err.code == 2:
+    #         parser.print_help()
     
     if args.cs_version:
         print(version)
@@ -78,9 +78,6 @@ def main() -> Tuple[List[str]]:
             bvals,
             bvecs)
 
-
-
-# def parser():
 def arg_parser():
     '''Argument parser for `convert_source`.
     '''

@@ -15,10 +15,12 @@ import sys
 import pathlib
 
 # _pkg_path: str = os.path.join(str(pathlib.Path(os.path.abspath(__file__)).parents[2]),'convert_source')
+# _pkg_path: str = str(pathlib.Path(os.path.abspath(__file__)).parents[2])
+
 _pkg_path: str = str(pathlib.Path(os.path.abspath(__file__)).parents[2])
+
 sys.path.insert(0,_pkg_path)
 sys.path.append(_pkg_path)
-
 
 # -- Project information -----------------------------------------------------
 
@@ -27,7 +29,8 @@ copyright = '2021, Adebayo Braimah'
 author = 'Adebayo Braimah'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1.dev0'
+from convert_source import __version__ as cs_version
+release = cs_version
 
 
 # -- General configuration ---------------------------------------------------
@@ -39,7 +42,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx_autodoc_typehints',
-    # 'sphinx_autodoc_napoleon_typehints'
+    # 'sphinx_autodoc_napoleon_typehints',
+    'sphinxarg.ext'
 ]
 
 # Add any paths that contain templates here, relative to this directory.

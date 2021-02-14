@@ -7,10 +7,12 @@ wd=$(pwd)
 
 # echo ${wd}
 
-# pip install sphinx sphinx-autodoc-typehints sphinx_rtd_theme sphinx-autodoc-napoleon-typehints
-sphinx-apidoc -o source ../convert_source
+pip install sphinx sphinx-autodoc-typehints sphinx_rtd_theme sphinx-autodoc-napoleon-typehints sphinx-argparse
+# sphinx-apidoc -o source ../convert_source
 
-make clean
-make html
+# make clean
+# make html
+
+sphinx-apidoc -o source ../convert_source; make clean; make html
 
 cd ${cwd}
