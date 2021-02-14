@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>convert_source package &mdash; convert_source 0.1.dev0 documentation</title>
+  <title>convert_source package &mdash; convert_source 0.1.0 documentation</title>
   
 
   
@@ -207,7 +207,7 @@
 <p>Batch conversion wrapper and its associated classes and functions for the <cite>convert_source</cite> package.</p>
 <dl class="py function">
 <dt id="convert_source.batch_convert.batch_proc">
-<code class="sig-prename descclassname">convert_source.batch_convert.</code><code class="sig-name descname">batch_proc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config_file</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">study_img_dir</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">out_dir</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">path_envs</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#convert_source.batch_convert.batch_proc" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.batch_convert.</code><code class="sig-name descname">batch_proc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">study_img_dir</span></em>, <em class="sig-param"><span class="n">out_dir</span></em>, <em class="sig-param"><span class="n">config_file</span></em>, <em class="sig-param"><span class="n">path_envs</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">gzip</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">append_dwi_info</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">zero_pad</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">cprss_lvl</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">env</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">dryrun</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.batch_convert.batch_proc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Batch processes a study’s source image data provided a configuration, the parent directory of the study’s imaging data,
 and an output directory to place the BIDS NIFTI data.</p>
 <dl>
@@ -222,11 +222,17 @@ and an output directory to place the BIDS NIFTI data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>config_file</strong> – Configuration file.</p></li>
-<li><p><strong>path_envs</strong> – List of directory paths to append to the system’s ‘PATH’ variable.</p></li>
-<li><p><strong>study_img_dir</strong> – Path to study image parent directory that contains all the subjects’ source image data.</p></li>
-<li><p><strong>out_dir</strong> – Output directory.</p></li>
-<li><p><strong>verbose</strong> – Verbose output.</p></li>
+<li><p><strong>study_img_dir</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Path to study image parent directory that contains all the subjects’ source image data.</p></li>
+<li><p><strong>out_dir</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Output directory.</p></li>
+<li><p><strong>config_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Configuration file.</p></li>
+<li><p><strong>path_envs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – List of directory paths to append to the system’s ‘PATH’ variable.</p></li>
+<li><p><strong>gzip</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Gzip output NIFTI files.</p></li>
+<li><p><strong>append_dwi_info</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Appends DWI acquisition information (unique non-zero b-values, and TE, in msec.) to BIDS acquisition filename.</p></li>
+<li><p><strong>zero_pad</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of zeroes to pad the run number up to (zero_pad=2 is ‘01’).</p></li>
+<li><p><strong>cprss_lvl</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Compression level [1 - 9] - 1 is fastest, 9 is smallest.</p></li>
+<li><p><strong>verbose</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Enable verbose output.</p></li>
+<li><p><strong>env</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – Path environment dictionary.</p></li>
+<li><p><strong>dryrun</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Perform dryrun (creates the command, but does not execute it).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -246,7 +252,7 @@ and an output directory to place the BIDS NIFTI data.</p>
 
 <dl class="py function">
 <dt id="convert_source.batch_convert.bids_id">
-<code class="sig-prename descclassname">convert_source.batch_convert.</code><code class="sig-name descname">bids_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">search_dict</span><span class="p">:</span> <span class="n">Dict</span></em>, <em class="sig-param"><span class="n">bids_search</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Dict<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bids_map</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Dict<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bids_name_dict</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Dict<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parent_dir</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">modality_type</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">modality_label</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">task</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">mod_found</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>Dict<span class="p">[</span>str<span class="p">, </span>str<span class="p">]</span><span class="p">, </span>str<span class="p">, </span>str<span class="p">, </span>str<span class="p">]</span><a class="headerlink" href="#convert_source.batch_convert.bids_id" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.batch_convert.</code><code class="sig-name descname">bids_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span></em>, <em class="sig-param"><span class="n">search_dict</span></em>, <em class="sig-param"><span class="n">bids_search</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bids_map</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bids_name_dict</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parent_dir</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">modality_type</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">modality_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">task</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">mod_found</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.batch_convert.bids_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs identification of descriptive BIDS information relevant for file naming, provided
 a BIDS search dictionary and a BIDS map dictionary. The resulting information is then placed
 in nested dictionary of BIDS related descriptive terms.</p>
@@ -259,17 +265,17 @@ in nested dictionary of BIDS related descriptive terms.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>s</strong> – Input str/file to be searched.</p></li>
-<li><p><strong>search_dict</strong> – Dictionary of modality specific search terms.</p></li>
-<li><p><strong>bids_search</strong> – Dictionary of BIDS specific search terms.</p></li>
-<li><p><strong>bids_map</strong> – Dictionary of BIDS related terms to be mapped to BIDS search terms.</p></li>
-<li><p><strong>bids_name_dict</strong> – Existing BIDS name dictionary. If provided, an updated copy of this dictionary is returned.</p></li>
-<li><p><strong>parent_dir</strong> – Parent or study image directory of the image file. This path is removed from the string search
+<li><p><strong>s</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Input str/file to be searched.</p></li>
+<li><p><strong>search_dict</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>) – Dictionary of modality specific search terms.</p></li>
+<li><p><strong>bids_search</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – Dictionary of BIDS specific search terms.</p></li>
+<li><p><strong>bids_map</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – Dictionary of BIDS related terms to be mapped to BIDS search terms.</p></li>
+<li><p><strong>bids_name_dict</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – Existing BIDS name dictionary. If provided, an updated copy of this dictionary is returned.</p></li>
+<li><p><strong>parent_dir</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Parent or study image directory of the image file. This path is removed from the string search
 to prevent false positives.</p></li>
-<li><p><strong>modality_type</strong> – (BIDS) modality type (e.g. ‘anat’, ‘func’, etc).</p></li>
-<li><p><strong>modality_label</strong> – (BIDS) modality label (e.g. ‘T1w’, ‘bold’, etc).</p></li>
-<li><p><strong>task</strong> – (BIDS) task label (e.g. ‘rest’,’nback’, etc).</p></li>
-<li><p><strong>mod_found</strong> – Boolean value that indicates if the (BIDS) modality or matching modality has been identified/found.</p></li>
+<li><p><strong>modality_type</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – (BIDS) modality type (e.g. ‘anat’, ‘func’, etc).</p></li>
+<li><p><strong>modality_label</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – (BIDS) modality label (e.g. ‘T1w’, ‘bold’, etc).</p></li>
+<li><p><strong>task</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – (BIDS) task label (e.g. ‘rest’,’nback’, etc).</p></li>
+<li><p><strong>mod_found</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Boolean value that indicates if the (BIDS) modality or matching modality has been identified/found.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -289,7 +295,7 @@ to prevent false positives.</p></li>
 
 <dl class="py function">
 <dt id="convert_source.batch_convert.bids_ignore">
-<code class="sig-prename descclassname">convert_source.batch_convert.</code><code class="sig-name descname">bids_ignore</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">out_dir</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#convert_source.batch_convert.bids_ignore" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.batch_convert.</code><code class="sig-name descname">bids_ignore</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">out_dir</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.batch_convert.bids_ignore" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes ‘.bidsignore’ file. This file functions
 similarly to the ‘.gitignore’ file.</p>
 <dl>
@@ -300,17 +306,20 @@ similarly to the ‘.gitignore’ file.</p>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>out_dir</strong> – Output directory to place the file.</p>
+<dd class="field-odd"><p><strong>out_dir</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Output directory to place the file.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>String of the file path to the ‘.bidsignore’ file.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>String of the file path to the ‘.bidsignore’ file.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.batch_convert.data_to_bids">
-<code class="sig-prename descclassname">convert_source.batch_convert.</code><code class="sig-name descname">data_to_bids</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sub_data</span><span class="p">:</span> <span class="n"><a class="reference internal" href="convert_source.cs_utils.html#convert_source.cs_utils.utils.SubDataInfo" title="convert_source.cs_utils.utils.SubDataInfo">convert_source.cs_utils.utils.SubDataInfo</a></span></em>, <em class="sig-param"><span class="n">bids_name_dict</span><span class="p">:</span> <span class="n">Dict</span></em>, <em class="sig-param"><span class="n">out_dir</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">modality_type</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">modality_label</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">task</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">meta_dict</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Dict<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">mod_dict</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Dict<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">gzip</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">append_dwi_info</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">zero_pad</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">2</span></em>, <em class="sig-param"><span class="n">cprss_lvl</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">6</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">log</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference internal" href="convert_source.cs_utils.html#convert_source.cs_utils.fileio.LogFile" title="convert_source.cs_utils.fileio.LogFile">convert_source.cs_utils.fileio.LogFile</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">env</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Dict<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">dryrun</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>List<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>List<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>List<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#convert_source.batch_convert.data_to_bids" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.batch_convert.</code><code class="sig-name descname">data_to_bids</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sub_data</span></em>, <em class="sig-param"><span class="n">bids_name_dict</span></em>, <em class="sig-param"><span class="n">out_dir</span></em>, <em class="sig-param"><span class="n">modality_type</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">modality_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">task</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">meta_dict</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">mod_dict</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">gzip</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">append_dwi_info</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">zero_pad</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">cprss_lvl</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">log</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">env</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">dryrun</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.batch_convert.data_to_bids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts source data to BIDS compliant data. This functions also
 renames already existing NIFTI data so that it can be BIDS compliant.</p>
 <dl>
@@ -327,22 +336,22 @@ renames already existing NIFTI data so that it can be BIDS compliant.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sub_data</strong> – Subject data information object.</p></li>
-<li><p><strong>bids_name_dict</strong> – BIDS name dictionary.</p></li>
-<li><p><strong>out_dir</strong> – Output directory.</p></li>
-<li><p><strong>modality_type</strong> – Modality type (BIDS label e.g. ‘anat’, ‘func’, etc).</p></li>
-<li><p><strong>modality_label</strong> – Modality label (BIDS label  e.g. ‘T1w’, ‘bold’, etc).</p></li>
-<li><p><strong>task</strong> – Task label (BIDS filename task label, e.g. ‘rest’, ‘nback’, etc.)</p></li>
-<li><p><strong>meta_dict</strong> – BIDS common metadata dictoinary.</p></li>
-<li><p><strong>mod_dict</strong> – Modality specific metadata dictionary.</p></li>
-<li><p><strong>gzip</strong> – Gzip output NIFTI files.</p></li>
-<li><p><strong>append_dwi_info</strong> – Appends DWI acquisition information (unique non-zero b-values, and TE, in msec.) to BIDS acquisition filename.</p></li>
-<li><p><strong>zero_pad</strong> – Number of zeroes to pad the run number up to (zero_pad=2 is ‘01’).</p></li>
-<li><p><strong>cprss_lvl</strong> – Compression level [1 - 9] - 1 is fastest, 9 is smallest (dcm2niix option).</p></li>
-<li><p><strong>verbose</strong> – Enable verbose output (dcm2niix option).</p></li>
-<li><p><strong>log</strong> – LogFile object for logging.</p></li>
-<li><p><strong>env</strong> – Path environment dictionary.</p></li>
-<li><p><strong>dryrun</strong> – Perform dryrun (creates the command, but does not execute it).</p></li>
+<li><p><strong>sub_data</strong> (<a class="reference internal" href="convert_source.cs_utils.html#convert_source.cs_utils.utils.SubDataInfo" title="convert_source.cs_utils.utils.SubDataInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubDataInfo</span></code></a>) – Subject data information object.</p></li>
+<li><p><strong>bids_name_dict</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>) – BIDS name dictionary.</p></li>
+<li><p><strong>out_dir</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Output directory.</p></li>
+<li><p><strong>modality_type</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Modality type (BIDS label e.g. ‘anat’, ‘func’, etc).</p></li>
+<li><p><strong>modality_label</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Modality label (BIDS label  e.g. ‘T1w’, ‘bold’, etc).</p></li>
+<li><p><strong>task</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Task label (BIDS filename task label, e.g. ‘rest’, ‘nback’, etc.)</p></li>
+<li><p><strong>meta_dict</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – BIDS common metadata dictoinary.</p></li>
+<li><p><strong>mod_dict</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – Modality specific metadata dictionary.</p></li>
+<li><p><strong>gzip</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Gzip output NIFTI files.</p></li>
+<li><p><strong>append_dwi_info</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Appends DWI acquisition information (unique non-zero b-values, and TE, in msec.) to BIDS acquisition filename.</p></li>
+<li><p><strong>zero_pad</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of zeroes to pad the run number up to (zero_pad=2 is ‘01’).</p></li>
+<li><p><strong>cprss_lvl</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Compression level [1 - 9] - 1 is fastest, 9 is smallest (dcm2niix option).</p></li>
+<li><p><strong>verbose</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Enable verbose output (dcm2niix option).</p></li>
+<li><p><strong>log</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="convert_source.cs_utils.html#convert_source.cs_utils.fileio.LogFile" title="convert_source.cs_utils.fileio.LogFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogFile</span></code></a>]) – LogFile object for logging.</p></li>
+<li><p><strong>env</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – Path environment dictionary.</p></li>
+<li><p><strong>dryrun</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Perform dryrun (creates the command, but does not execute it).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -362,7 +371,7 @@ renames already existing NIFTI data so that it can be BIDS compliant.</p>
 
 <dl class="py function">
 <dt id="convert_source.batch_convert.log_file">
-<code class="sig-prename descclassname">convert_source.batch_convert.</code><code class="sig-name descname">log_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">log</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="convert_source.cs_utils.html#convert_source.cs_utils.fileio.LogFile" title="convert_source.cs_utils.fileio.LogFile">convert_source.cs_utils.fileio.LogFile</a><a class="headerlink" href="#convert_source.batch_convert.log_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.batch_convert.</code><code class="sig-name descname">log_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">log</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.batch_convert.log_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes log file object for logging purposes.</p>
 <dl>
 <dt>Usage example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">logger</span> <span class="o">=</span> <span class="n">log</span><span class="p">(</span><span class="n">log_file</span><span class="p">)</span>
@@ -375,17 +384,20 @@ renames already existing NIFTI data so that it can be BIDS compliant.</p>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>log</strong> – Log file name.</p>
+<dd class="field-odd"><p><strong>log</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Log file name.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>LogFile object to be logged to.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="convert_source.cs_utils.html#convert_source.cs_utils.fileio.LogFile" title="convert_source.cs_utils.fileio.LogFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogFile</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>LogFile object to be logged to.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.batch_convert.make_bids_name">
-<code class="sig-prename descclassname">convert_source.batch_convert.</code><code class="sig-name descname">make_bids_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bids_name_dict</span><span class="p">:</span> <span class="n">Dict</span></em>, <em class="sig-param"><span class="n">modality_type</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>str<span class="p">, </span>str<span class="p">, </span>str<span class="p">, </span>str<span class="p">]</span><a class="headerlink" href="#convert_source.batch_convert.make_bids_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.batch_convert.</code><code class="sig-name descname">make_bids_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bids_name_dict</span></em>, <em class="sig-param"><span class="n">modality_type</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.batch_convert.make_bids_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a BIDS compliant filename given a BIDS name description dictionary, and the modality type.</p>
 <dl>
 <dt>Usage example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">make_bids_name</span><span class="p">(</span><span class="n">bids_name_dict</span><span class="o">=</span><span class="n">bids_dict</span><span class="p">,</span>
@@ -399,19 +411,22 @@ renames already existing NIFTI data so that it can be BIDS compliant.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>bids_name_dict</strong> – BIDS name description dictionary.</p></li>
-<li><p><strong>modality_type</strong> – Modality type.</p></li>
+<li><p><strong>bids_name_dict</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>) – BIDS name description dictionary.</p></li>
+<li><p><strong>modality_type</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Modality type.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>BIDS compliant filename string.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>BIDS compliant filename string.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.batch_convert.nifti_to_bids">
-<code class="sig-prename descclassname">convert_source.batch_convert.</code><code class="sig-name descname">nifti_to_bids</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sub_data</span><span class="p">:</span> <span class="n"><a class="reference internal" href="convert_source.cs_utils.html#convert_source.cs_utils.utils.SubDataInfo" title="convert_source.cs_utils.utils.SubDataInfo">convert_source.cs_utils.utils.SubDataInfo</a></span></em>, <em class="sig-param"><span class="n">bids_name_dict</span><span class="p">:</span> <span class="n">Dict</span></em>, <em class="sig-param"><span class="n">out_dir</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">modality_type</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">modality_label</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">task</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">meta_dict</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Dict<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">mod_dict</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Dict<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">gzip</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">append_dwi_info</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">zero_pad</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">2</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>List<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>List<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>List<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#convert_source.batch_convert.nifti_to_bids" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.batch_convert.</code><code class="sig-name descname">nifti_to_bids</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sub_data</span></em>, <em class="sig-param"><span class="n">bids_name_dict</span></em>, <em class="sig-param"><span class="n">out_dir</span></em>, <em class="sig-param"><span class="n">modality_type</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">modality_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">task</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">meta_dict</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">mod_dict</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">gzip</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">append_dwi_info</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">zero_pad</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">cprss_lvl</span><span class="o">=</span><span class="default_value">6</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.batch_convert.nifti_to_bids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts existing NIFTI data to BIDS raw data.</p>
 <dl>
 <dt>Usage example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">imgs</span><span class="p">,</span> <span class="n">jsons</span><span class="p">,</span> <span class="n">bvals</span><span class="p">,</span> <span class="n">bvecs</span><span class="p">]</span> <span class="o">=</span> <span class="n">nifti_to_bids</span><span class="p">(</span><span class="n">sub_obj</span><span class="p">,</span>
@@ -427,17 +442,18 @@ renames already existing NIFTI data so that it can be BIDS compliant.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sub_data</strong> – Subject data information object.</p></li>
-<li><p><strong>bids_name_dict</strong> – BIDS name dictionary.</p></li>
-<li><p><strong>out_dir</strong> – Output directory.</p></li>
-<li><p><strong>modality_type</strong> – Modality type (BIDS label e.g. ‘anat’, ‘func’, etc).</p></li>
-<li><p><strong>modality_label</strong> – Modality label (BIDS label  e.g. ‘T1w’, ‘bold’, etc).</p></li>
-<li><p><strong>task</strong> – Task label (BIDS filename task label, e.g. ‘rest’, ‘nback’, etc.)</p></li>
-<li><p><strong>meta_dict</strong> – BIDS common metadata dictoinary.</p></li>
-<li><p><strong>mod_dict</strong> – Modality specific metadata dictionary.</p></li>
-<li><p><strong>gzip</strong> – Gzip output NIFTI files.</p></li>
-<li><p><strong>append_dwi_info</strong> – Appends DWI acquisition information (unique non-zero b-values, and TE, in msec.) to BIDS acquisition filename.</p></li>
-<li><p><strong>zero_pad</strong> – Number of zeroes to pad the run number up to (zero_pad=2 is ‘01’).</p></li>
+<li><p><strong>sub_data</strong> (<a class="reference internal" href="convert_source.cs_utils.html#convert_source.cs_utils.utils.SubDataInfo" title="convert_source.cs_utils.utils.SubDataInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubDataInfo</span></code></a>) – Subject data information object.</p></li>
+<li><p><strong>bids_name_dict</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>) – BIDS name dictionary.</p></li>
+<li><p><strong>out_dir</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Output directory.</p></li>
+<li><p><strong>modality_type</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Modality type (BIDS label e.g. ‘anat’, ‘func’, etc).</p></li>
+<li><p><strong>modality_label</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Modality label (BIDS label  e.g. ‘T1w’, ‘bold’, etc).</p></li>
+<li><p><strong>task</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Task label (BIDS filename task label, e.g. ‘rest’, ‘nback’, etc.)</p></li>
+<li><p><strong>meta_dict</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – BIDS common metadata dictoinary.</p></li>
+<li><p><strong>mod_dict</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – Modality specific metadata dictionary.</p></li>
+<li><p><strong>gzip</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Gzip output NIFTI files.</p></li>
+<li><p><strong>append_dwi_info</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Appends DWI acquisition information (unique non-zero b-values, and TE, in msec.) to BIDS acquisition filename.</p></li>
+<li><p><strong>zero_pad</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of zeroes to pad the run number up to (zero_pad=2 is ‘01’).</p></li>
+<li><p><strong>cprss_lvl</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Compression level [1 - 9] - 1 is fastest, 9 is smallest.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -457,7 +473,7 @@ renames already existing NIFTI data so that it can be BIDS compliant.</p>
 
 <dl class="py function">
 <dt id="convert_source.batch_convert.read_config">
-<code class="sig-prename descclassname">convert_source.batch_convert.</code><code class="sig-name descname">read_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config_file</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>bool<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>Dict<span class="p">[</span>str<span class="p">, </span>str<span class="p">]</span><span class="p">, </span>Dict<span class="p">, </span>Dict<span class="p">, </span>Dict<span class="p">, </span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#convert_source.batch_convert.read_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.batch_convert.</code><code class="sig-name descname">read_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config_file</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.batch_convert.read_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads configuration file and creates a dictionary of search terms for
 each modality provided that each BIDS modality is used as a key via the
 keyword ‘modality_search’. Should BIDS related parameter descriptions need
@@ -506,8 +522,8 @@ then an empty list is returned.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>config_file</strong> – File path to yaml configuration file. If no file is used, then the default configuration file is used.</p></li>
-<li><p><strong>verbose</strong> – Prints additional information to screen.</p></li>
+<li><p><strong>config_file</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – File path to yaml configuration file. If no file is used, then the default configuration file is used.</p></li>
+<li><p><strong>verbose</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>]) – Prints additional information to screen.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -531,7 +547,7 @@ then an empty list is returned.</p>
 
 <dl class="py function">
 <dt id="convert_source.batch_convert.source_to_bids">
-<code class="sig-prename descclassname">convert_source.batch_convert.</code><code class="sig-name descname">source_to_bids</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sub_data</span><span class="p">:</span> <span class="n"><a class="reference internal" href="convert_source.cs_utils.html#convert_source.cs_utils.utils.SubDataInfo" title="convert_source.cs_utils.utils.SubDataInfo">convert_source.cs_utils.utils.SubDataInfo</a></span></em>, <em class="sig-param"><span class="n">bids_name_dict</span><span class="p">:</span> <span class="n">Dict</span></em>, <em class="sig-param"><span class="n">out_dir</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">modality_type</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">modality_label</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">task</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">meta_dict</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Dict<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">mod_dict</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Dict<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">gzip</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">append_dwi_info</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">zero_pad</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">2</span></em>, <em class="sig-param"><span class="n">cprss_lvl</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">6</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">log</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference internal" href="convert_source.cs_utils.html#convert_source.cs_utils.fileio.LogFile" title="convert_source.cs_utils.fileio.LogFile">convert_source.cs_utils.fileio.LogFile</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">env</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Dict<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">dryrun</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>List<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>List<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>List<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#convert_source.batch_convert.source_to_bids" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.batch_convert.</code><code class="sig-name descname">source_to_bids</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sub_data</span></em>, <em class="sig-param"><span class="n">bids_name_dict</span></em>, <em class="sig-param"><span class="n">out_dir</span></em>, <em class="sig-param"><span class="n">modality_type</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">modality_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">task</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">meta_dict</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">mod_dict</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">gzip</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">append_dwi_info</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">zero_pad</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">cprss_lvl</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">log</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">env</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">dryrun</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.batch_convert.source_to_bids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts source data to BIDS raw data.</p>
 <dl>
 <dt>Usage example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">imgs</span><span class="p">,</span> <span class="n">jsons</span><span class="p">,</span> <span class="n">bvals</span><span class="p">,</span> <span class="n">bvecs</span><span class="p">]</span> <span class="o">=</span> <span class="n">source_to_bids</span><span class="p">(</span><span class="n">sub_obj</span><span class="p">,</span>
@@ -547,22 +563,22 @@ then an empty list is returned.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sub_data</strong> – Subject data information object.</p></li>
-<li><p><strong>bids_name_dict</strong> – BIDS name dictionary.</p></li>
-<li><p><strong>out_dir</strong> – Output directory.</p></li>
-<li><p><strong>modality_type</strong> – Modality type (BIDS label e.g. ‘anat’, ‘func’, etc).</p></li>
-<li><p><strong>modality_label</strong> – Modality label (BIDS label  e.g. ‘T1w’, ‘bold’, etc).</p></li>
-<li><p><strong>task</strong> – Task label (BIDS filename task label, e.g. ‘rest’, ‘nback’, etc.)</p></li>
-<li><p><strong>meta_dict</strong> – BIDS common metadata dictoinary.</p></li>
-<li><p><strong>mod_dict</strong> – Modality specific metadata dictionary.</p></li>
-<li><p><strong>gzip</strong> – Gzip output NIFTI files.</p></li>
-<li><p><strong>append_dwi_info</strong> – Appends DWI acquisition information (unique non-zero b-values, and TE, in msec.) to BIDS acquisition filename.</p></li>
-<li><p><strong>zero_pad</strong> – Number of zeroes to pad the run number up to (zero_pad=2 is ‘01’).</p></li>
-<li><p><strong>cprss_lvl</strong> – Compression level [1 - 9] - 1 is fastest, 9 is smallest (dcm2niix option).</p></li>
-<li><p><strong>verbose</strong> – Enable verbose output (dcm2niix option).</p></li>
-<li><p><strong>log</strong> – LogFile object for logging.</p></li>
-<li><p><strong>env</strong> – Path environment dictionary.</p></li>
-<li><p><strong>dryrun</strong> – Perform dryrun (creates the command, but does not execute it).</p></li>
+<li><p><strong>sub_data</strong> (<a class="reference internal" href="convert_source.cs_utils.html#convert_source.cs_utils.utils.SubDataInfo" title="convert_source.cs_utils.utils.SubDataInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubDataInfo</span></code></a>) – Subject data information object.</p></li>
+<li><p><strong>bids_name_dict</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>) – BIDS name dictionary.</p></li>
+<li><p><strong>out_dir</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Output directory.</p></li>
+<li><p><strong>modality_type</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Modality type (BIDS label e.g. ‘anat’, ‘func’, etc).</p></li>
+<li><p><strong>modality_label</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Modality label (BIDS label  e.g. ‘T1w’, ‘bold’, etc).</p></li>
+<li><p><strong>task</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Task label (BIDS filename task label, e.g. ‘rest’, ‘nback’, etc.)</p></li>
+<li><p><strong>meta_dict</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – BIDS common metadata dictoinary.</p></li>
+<li><p><strong>mod_dict</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – Modality specific metadata dictionary.</p></li>
+<li><p><strong>gzip</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Gzip output NIFTI files.</p></li>
+<li><p><strong>append_dwi_info</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Appends DWI acquisition information (unique non-zero b-values, and TE, in msec.) to BIDS acquisition filename.</p></li>
+<li><p><strong>zero_pad</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of zeroes to pad the run number up to (zero_pad=2 is ‘01’).</p></li>
+<li><p><strong>cprss_lvl</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Compression level [1 - 9] - 1 is fastest, 9 is smallest (dcm2niix option).</p></li>
+<li><p><strong>verbose</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Enable verbose output (dcm2niix option).</p></li>
+<li><p><strong>log</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="convert_source.cs_utils.html#convert_source.cs_utils.fileio.LogFile" title="convert_source.cs_utils.fileio.LogFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogFile</span></code></a>]) – LogFile object for logging.</p></li>
+<li><p><strong>env</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – Path environment dictionary.</p></li>
+<li><p><strong>dryrun</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Perform dryrun (creates the command, but does not execute it).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

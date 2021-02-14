@@ -18,6 +18,7 @@ setup(name                           = 'convert_source',    # Required
       packages                       = find_packages(),     # Required
       install_requires               = requirements,
       python_requires                = '>=3.6',
+      scripts                        = ['bin/study_proc'],
       setup_requires                 = ["pytest-runner"],
       tests_require                  = ["pytest", "pytest-cov", "coverage"],
       classifiers                    = ['Programming Language :: Python :: 3',

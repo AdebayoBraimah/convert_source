@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>convert_source.cs_utils package &mdash; convert_source 0.1.dev0 documentation</title>
+  <title>convert_source.cs_utils package &mdash; convert_source 0.1.0 documentation</title>
   
 
   
@@ -196,7 +196,7 @@
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.bids_info.construct_bids_dict">
-<code class="sig-prename descclassname">convert_source.cs_utils.bids_info.</code><code class="sig-name descname">construct_bids_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">meta_dict</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Dict<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">json_dict</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Dict<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Dict<a class="headerlink" href="#convert_source.cs_utils.bids_info.construct_bids_dict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.bids_info.</code><code class="sig-name descname">construct_bids_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">meta_dict</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">json_dict</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.bids_info.construct_bids_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructs dictionary of relevant BIDS related information that includes subject and session IDs, in addition
 to various metadata. Custom BIDS fields can also be added through the metadata dictionary.</p>
 <dl>
@@ -212,23 +212,26 @@ to various metadata. Custom BIDS fields can also be added through the metadata d
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>meta_dict</strong> – Metadata dictionary that contains the relevant BIDS metadata.</p></li>
-<li><p><strong>json_dict</strong> – Dictionary constructed from the BIDS JSON file, or some secondary dictionary.</p></li>
+<li><p><strong>meta_dict</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – Metadata dictionary that contains the relevant BIDS metadata.</p></li>
+<li><p><strong>json_dict</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – Dictionary constructed from the BIDS JSON file, or some secondary dictionary.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Dictionary containing BIDS related metadata.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></p>
 </dd>
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><strong>IndexError</strong> – Error that arises if constant variables <cite>BIDS_INFO</cite>’s keys and BIDS_ORD_ARR are of different lengths.</p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Dictionary containing BIDS related metadata.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>IndexError</strong> – Error that arises if constant variables <cite>BIDS_INFO</cite>’s keys and BIDS_ORD_ARR are of different lengths.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.bids_info.construct_bids_name">
-<code class="sig-prename descclassname">convert_source.cs_utils.bids_info.</code><code class="sig-name descname">construct_bids_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sub_data</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#convert_source.cs_utils.utils.SubDataInfo" title="convert_source.cs_utils.utils.SubDataInfo">convert_source.cs_utils.utils.SubDataInfo</a></span></em>, <em class="sig-param"><span class="n">modality_type</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">modality_label</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">acq</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">ce</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">task</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">acq_dir</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">rec</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">run</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Union<span class="p">[</span>str<span class="p">, </span>int<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">echo</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Union<span class="p">[</span>str<span class="p">, </span>int<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">case1</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">mag2</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">case2</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">case3</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">case4</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">out_dir</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">zero_pad</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span> &#x2192; Dict<a class="headerlink" href="#convert_source.cs_utils.bids_info.construct_bids_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Constructs BIDS filenames from input paraemter descriptions.</p>
+<code class="sig-prename descclassname">convert_source.cs_utils.bids_info.</code><code class="sig-name descname">construct_bids_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sub_data</span></em>, <em class="sig-param"><span class="n">modality_type</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">modality_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">acq</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">ce</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">task</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">acq_dir</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">rec</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">run</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">echo</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">case1</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">mag2</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">case2</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">case3</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">case4</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">out_dir</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">zero_pad</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.bids_info.construct_bids_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs BIDS filenames dictionary from input parameter descriptions.</p>
 <dl>
 <dt>More information can be obtained from:</dt><dd><p><a class="reference external" href="https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html">https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html</a>.</p>
 </dd>
@@ -245,14 +248,14 @@ to various metadata. Custom BIDS fields can also be added through the metadata d
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sub_data</strong> – SubDataInfo object that contains subject and session ID.</p></li>
-<li><p><strong>modality_type</strong> – Modality type associated with the data. Valid modality types include, but are not limited to:
+<li><p><strong>sub_data</strong> (<a class="reference internal" href="#convert_source.cs_utils.utils.SubDataInfo" title="convert_source.cs_utils.utils.SubDataInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubDataInfo</span></code></a>) – SubDataInfo object that contains subject and session ID.</p></li>
+<li><p><strong>modality_type</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Modality type associated with the data. Valid modality types include, but are not limited to:
 * ‘anat’: Anatomical scans
 * ‘func’: Functional scans
 * ‘dwi’: Diffusion weighted image scans
 * ‘fmap: ‘: Fieldmaps
 * ‘swi’: Susceptibility weighted image scans</p></li>
-<li><p><strong>modality_label</strong> – <p>Modality label of associated with the data. Valid modality labels include, but are not limited to:
+<li><p><strong>modality_label</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – <p>Modality label of associated with the data. Valid modality labels include, but are not limited to:
 * ‘T1w’, ‘T2w’, ‘PD’, ‘FLAIR’, ‘T1rho’ (in the case of ‘anat’).
 * ‘bold’, ‘cbv’, ‘phase’ (in the case of ‘func’).</p>
 <blockquote>
@@ -261,42 +264,45 @@ to various metadata. Custom BIDS fields can also be added through the metadata d
 </ul>
 </div></blockquote>
 </p></li>
-<li><p><strong>acq</strong> – Acquisition description of the associated image data.</p></li>
-<li><p><strong>ce</strong> – Contrast enhanced description of the associated image data.</p></li>
-<li><p><strong>task</strong> – Task associated with the image data, required if ‘func’ is used as the modality_type.</p></li>
-<li><p><strong>acq_dir</strong> – Acquisition direction of the image (e.g. PA, AP, LR, RL).</p></li>
-<li><p><strong>rec</strong> – Image reconstruction description.</p></li>
-<li><p><strong>run</strong> – Run number of the associated image data.</p></li>
-<li><p><strong>echo</strong> – Echo number of the associated image data (, in the case of multi-echo data).</p></li>
-<li><p><strong>case1</strong> – BIDS fieldmap case 1, set to True if the following files are present:
+<li><p><strong>acq</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Acquisition description of the associated image data.</p></li>
+<li><p><strong>ce</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Contrast enhanced description of the associated image data.</p></li>
+<li><p><strong>task</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Task associated with the image data, required if ‘func’ is used as the modality_type.</p></li>
+<li><p><strong>acq_dir</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Acquisition direction of the image (e.g. PA, AP, LR, RL).</p></li>
+<li><p><strong>rec</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Image reconstruction description.</p></li>
+<li><p><strong>run</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – Run number of the associated image data.</p></li>
+<li><p><strong>echo</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – Echo number of the associated image data (, in the case of multi-echo data).</p></li>
+<li><p><strong>case1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – BIDS fieldmap case 1, set to True if the following files are present:
 * sub-&lt;label&gt;[_ses-&lt;label&gt;][_acq-&lt;label&gt;][_run-&lt;index&gt;]_phasediff.nii[.gz]
 * sub-&lt;label&gt;[_ses-&lt;label&gt;][_acq-&lt;label&gt;][_run-&lt;index&gt;]_phasediff.json
 * sub-&lt;label&gt;[_ses-&lt;label&gt;][_acq-&lt;label&gt;][_run-&lt;index&gt;]_magnitude1.nii[.gz]
 * [ sub-&lt;label&gt;[_ses-&lt;label&gt;][_acq-&lt;label&gt;][_run-&lt;index&gt;]_magnitude2.nii[.gz] ]</p></li>
-<li><p><strong>mag2</strong> – Should be set to True, if case 1 contains a second magnitude image.</p></li>
-<li><p><strong>case2</strong> – BIDS fieldmap case 2, set to True if the following files are present:
+<li><p><strong>mag2</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Should be set to True, if case 1 contains a second magnitude image.</p></li>
+<li><p><strong>case2</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – BIDS fieldmap case 2, set to True if the following files are present:
 * sub-&lt;label&gt;[_ses-&lt;label&gt;][_acq-&lt;label&gt;][_run-&lt;index&gt;]_phase1.nii[.gz]
 * sub-&lt;label&gt;[_ses-&lt;label&gt;][_acq-&lt;label&gt;][_run-&lt;index&gt;]_phase1.json
 * sub-&lt;label&gt;[_ses-&lt;label&gt;][_acq-&lt;label&gt;][_run-&lt;index&gt;]_phase2.nii[.gz]
 * sub-&lt;label&gt;[_ses-&lt;label&gt;][_acq-&lt;label&gt;][_run-&lt;index&gt;]_phase2.json
 * sub-&lt;label&gt;[_ses-&lt;label&gt;][_acq-&lt;label&gt;][_run-&lt;index&gt;]_magnitude1.nii[.gz]
 * sub-&lt;label&gt;[_ses-&lt;label&gt;][_acq-&lt;label&gt;][_run-&lt;index&gt;]_magnitude2.nii[.gz]</p></li>
-<li><p><strong>case3</strong> – BIDS fieldmap case 3, set to True if the following files are present:
+<li><p><strong>case3</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – BIDS fieldmap case 3, set to True if the following files are present:
 * sub-&lt;label&gt;[_ses-&lt;label&gt;][_acq-&lt;label&gt;][_run-&lt;index&gt;]_magnitude.nii[.gz]
 * sub-&lt;label&gt;[_ses-&lt;label&gt;][_acq-&lt;label&gt;][_run-&lt;index&gt;]_fieldmap.nii[.gz]
 * sub-&lt;label&gt;[_ses-&lt;label&gt;][_acq-&lt;label&gt;][_run-&lt;index&gt;]_fieldmap.json</p></li>
-<li><p><strong>case4</strong> – BIDS fieldmap case 4, set to True if the following files are present:
+<li><p><strong>case4</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – BIDS fieldmap case 4, set to True if the following files are present:
 * sub-&lt;label&gt;[_ses-&lt;label&gt;][_acq-&lt;label&gt;][_ce-&lt;label&gt;]_dir-&lt;label&gt;[_run-&lt;index&gt;]_epi.nii[.gz]
 * sub-&lt;label&gt;[_ses-&lt;label&gt;][_acq-&lt;label&gt;][_ce-&lt;label&gt;]_dir-&lt;label&gt;[_run-&lt;index&gt;]_epi.json</p></li>
-<li><p><strong>out_dir</strong> – Target output directory for a subject’s BIDS files.</p></li>
-<li><p><strong>zero_pad</strong> – Number of zeroes to zeropad the output value.</p></li>
+<li><p><strong>out_dir</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Target output directory for a subject’s BIDS files.</p></li>
+<li><p><strong>zero_pad</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – Number of zeroes to zeropad the output value.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Nested dictionary that contains the necessary information to name BIDS files.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></p>
 </dd>
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#convert_source.cs_utils.bids_info.BIDSNameError" title="convert_source.cs_utils.bids_info.BIDSNameError"><strong>BIDSNameError</strong></a> – Error raised if:
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Nested dictionary that contains the necessary information to name BIDS files.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#convert_source.cs_utils.bids_info.BIDSNameError" title="convert_source.cs_utils.bids_info.BIDSNameError"><strong>BIDSNameError</strong></a> – Error raised if:
     * ‘anat’ is the speicified modality_type, but no modality_label is specified.
     * ‘func’ is the speicified modality_type, but no modality_label is specified.
     * ‘func’ is the speicified modality_type, but no task is specified.
@@ -307,7 +313,7 @@ to various metadata. Custom BIDS fields can also be added through the metadata d
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.bids_info.is_camel_case">
-<code class="sig-prename descclassname">convert_source.cs_utils.bids_info.</code><code class="sig-name descname">is_camel_case</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">bids_case</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#convert_source.cs_utils.bids_info.is_camel_case" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.bids_info.</code><code class="sig-name descname">is_camel_case</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span></em>, <em class="sig-param"><span class="n">bids_case</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.bids_info.is_camel_case" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tests if some input string is camel case (CamelCase).</p>
 <dl>
 <dt>NOTE: This function is configured for BIDS use cases, in which metadata must</dt><dd><p>be in camel case, with the first letter being uppercase.</p>
@@ -327,20 +333,23 @@ to various metadata. Custom BIDS fields can also be added through the metadata d
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>s</strong> – Input string to test.</p></li>
-<li><p><strong>bids_case</strong> – In addition to being in camel case, the string’s first letter must also be
+<li><p><strong>s</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Input string to test.</p></li>
+<li><p><strong>bids_case</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – In addition to being in camel case, the string’s first letter must also be
 uppercase.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Boolean.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Boolean.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.bids_info.num_runs">
-<code class="sig-prename descclassname">convert_source.cs_utils.bids_info.</code><code class="sig-name descname">num_runs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">directory</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">modality_type</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">modality_label</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">bids_dict</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Dict<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">zero_pad</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Union<span class="p">[</span>int<span class="p">, </span>str<span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.bids_info.num_runs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.bids_info.</code><code class="sig-name descname">num_runs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">directory</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">modality_type</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">modality_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">bids_dict</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">zero_pad</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.bids_info.num_runs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Counts the number of similarly named files in a directory to obtain a unique run number.
 Optimal use of this function requires the:</p>
 <blockquote>
@@ -365,14 +374,14 @@ Optimal use of this function requires the:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>directory</strong> – Input directory to search.</p></li>
-<li><p><strong>modality_type</strong> – Modality type associated with the data. Valid modality types include, but are not limited to:
+<li><p><strong>directory</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Input directory to search.</p></li>
+<li><p><strong>modality_type</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Modality type associated with the data. Valid modality types include, but are not limited to:
 * ‘anat’: Anatomical scans
 * ‘func’: Functional scans
 * ‘dwi’: Diffusion weighted image scans
 * ‘fmap: ‘: Fieldmaps
 * ‘swi’: Susceptibility weighted image scans</p></li>
-<li><p><strong>modality_label</strong> – <p>Modality label of associated with the data. Valid modality labels include, but are not limited to:
+<li><p><strong>modality_label</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – <p>Modality label of associated with the data. Valid modality labels include, but are not limited to:
 * ‘T1w’, ‘T2w’, ‘PD’, ‘FLAIR’, ‘T1rho’ (in the case of ‘anat’).
 * ‘bold’, ‘cbv’, ‘phase’ (in the case of ‘func’).</p>
 <blockquote>
@@ -381,19 +390,22 @@ Optimal use of this function requires the:</p>
 </ul>
 </div></blockquote>
 </p></li>
-<li><p><strong>bids_dict</strong> – Nested BIDS name dictionary that contains relevant information to naming files.</p></li>
-<li><p><strong>zero_pad</strong> – Number of zeroes to zeropad the output value.</p></li>
+<li><p><strong>bids_dict</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – Nested BIDS name dictionary that contains relevant information to naming files.</p></li>
+<li><p><strong>zero_pad</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – Number of zeroes to zeropad the output value.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Integer (or string should the value be zeropadded).</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Integer (or string should the value be zeropadded).</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.bids_info.search_bids">
-<code class="sig-prename descclassname">convert_source.cs_utils.bids_info.</code><code class="sig-name descname">search_bids</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">bids_search</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Dict<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bids_map</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Dict<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">modality_type</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">modality_label</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">task</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">bids_name_dict</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Dict<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">{}</span></em><span class="sig-paren">)</span> &#x2192; Dict<a class="headerlink" href="#convert_source.cs_utils.bids_info.search_bids" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.bids_info.</code><code class="sig-name descname">search_bids</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span></em>, <em class="sig-param"><span class="n">bids_search</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bids_map</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">modality_type</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">modality_label</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">task</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">bids_name_dict</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.bids_info.search_bids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs search of BIDS (or related terms) provided there are bids_search, and bids_map dictionaries, and some input
 string (or file, represented as a string).</p>
 <dl>
@@ -411,17 +423,20 @@ string (or file, represented as a string).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>s</strong> – Input string (or file, represented as a string).</p></li>
-<li><p><strong>bids_search</strong> – Heurestic BIDS related search terms.</p></li>
-<li><p><strong>bids_map</strong> – Descriptive BIDS terms to be mapped to.</p></li>
-<li><p><strong>modality_type</strong> – Modality type (e.g. ‘anat’, ‘func’, ‘dwi’ etc).</p></li>
-<li><p><strong>modality_label</strong> – Modality label (e.g. ‘T1w’,’bold’,’dwi’ etc).</p></li>
-<li><p><strong>task</strong> – Task label.</p></li>
-<li><p><strong>bids_name_dict</strong> – Existing BIDS name dictionary.</p></li>
+<li><p><strong>s</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Input string (or file, represented as a string).</p></li>
+<li><p><strong>bids_search</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – Heurestic BIDS related search terms.</p></li>
+<li><p><strong>bids_map</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – Descriptive BIDS terms to be mapped to.</p></li>
+<li><p><strong>modality_type</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Modality type (e.g. ‘anat’, ‘func’, ‘dwi’ etc).</p></li>
+<li><p><strong>modality_label</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Modality label (e.g. ‘T1w’,’bold’,’dwi’ etc).</p></li>
+<li><p><strong>task</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Task label.</p></li>
+<li><p><strong>bids_name_dict</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – Existing BIDS name dictionary.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Nested dictionary of BIDS descriptive naming related terms.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Nested dictionary of BIDS descriptive naming related terms.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -441,18 +456,14 @@ The constant variables contained here include:</p>
 </div>
 <div class="section" id="module-convert_source.cs_utils.fileio">
 <span id="convert-source-cs-utils-fileio-module"></span><h2>convert_source.cs_utils.fileio module<a class="headerlink" href="#module-convert_source.cs_utils.fileio" title="Permalink to this headline">¶</a></h2>
-<dl class="simple">
-<dt>Utility module for classes and functions that pertain to:</dt><dd><ul class="simple">
-<li><p>file, and filename handling</p></li>
-<li><p>temporary directory, and temporary file handling</p></li>
-<li><p>Logging</p></li>
-<li><p>Wrapper class for UNIX command line executables.</p></li>
-</ul>
-</dd>
-</dl>
+<p>Utility module for classes and functions that pertain to:
+* file, and filename handling
+* temporary directory, and temporary file handling
+* Logging
+* Wrapper class for UNIX command line executables.</p>
 <dl class="py class">
 <dt id="convert_source.cs_utils.fileio.Command">
-<em class="property">class </em><code class="sig-prename descclassname">convert_source.cs_utils.fileio.</code><code class="sig-name descname">Command</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">command</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.Command" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">convert_source.cs_utils.fileio.</code><code class="sig-name descname">Command</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">command</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.Command" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Creates a command and an empty command list for UNIX command line programs/applications. Primary use and
 use-cases are intended for the subprocess module and its associated classes (i.e. Popen/call/run).</p>
@@ -463,7 +474,7 @@ cmd_list (instance): Mutable list that can be appended to.</p>
 </dl>
 <dl class="py method">
 <dt id="convert_source.cs_utils.fileio.Command.check_dependency">
-<code class="sig-name descname">check_dependency</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">err_msg</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">path_envs</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">[]</span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span>bool<span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.fileio.Command.check_dependency" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">check_dependency</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">err_msg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">path_envs</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.Command.check_dependency" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks dependency of some command line executable. Should the
 dependency not be met, then an exception is raised. Check the
 system path should problems arise and ensure that the executable
@@ -478,15 +489,18 @@ of interest is installed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>err_msg</strong> – Error message to print to screen.</p></li>
-<li><p><strong>path_envs</strong> – List of directory paths to append to the system’s ‘PATH’ variable.</p></li>
+<li><p><strong>err_msg</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Error message to print to screen.</p></li>
+<li><p><strong>path_envs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – List of directory paths to append to the system’s ‘PATH’ variable.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Returns True if dependency is met.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>]</p>
 </dd>
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#convert_source.cs_utils.fileio.DependencyError" title="convert_source.cs_utils.fileio.DependencyError"><strong>DependencyError</strong></a> – Dependency error exception is raised if the dependency
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Returns True if dependency is met.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#convert_source.cs_utils.fileio.DependencyError" title="convert_source.cs_utils.fileio.DependencyError"><strong>DependencyError</strong></a> – Dependency error exception is raised if the dependency
     is not met.</p>
 </dd>
 </dl>
@@ -494,7 +508,7 @@ of interest is installed.</p>
 
 <dl class="py method">
 <dt id="convert_source.cs_utils.fileio.Command.run">
-<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">log</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference internal" href="#convert_source.cs_utils.fileio.LogFile" title="convert_source.cs_utils.fileio.LogFile">convert_source.cs_utils.fileio.LogFile</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">debug</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">dryrun</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">path_envs</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">env</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">stdout</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#convert_source.cs_utils.fileio.File" title="convert_source.cs_utils.fileio.File">convert_source.cs_utils.fileio.File</a></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">shell</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>int<span class="p">, </span><a class="reference internal" href="#convert_source.cs_utils.fileio.File" title="convert_source.cs_utils.fileio.File">convert_source.cs_utils.fileio.File</a><span class="p">, </span><a class="reference internal" href="#convert_source.cs_utils.fileio.File" title="convert_source.cs_utils.fileio.File">convert_source.cs_utils.fileio.File</a><span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.fileio.Command.run" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">log</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">dryrun</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">path_envs</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">env</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">stdout</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">shell</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.Command.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Uses python’s built-in subprocess class to execute (run) a command from an input command list.
 The standard output and error can optionally be written to file.</p>
 <div class="admonition note">
@@ -525,13 +539,13 @@ The standard output and error can optionally be written to file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>log</strong> – LogFile object</p></li>
-<li><p><strong>debug</strong> – Sets logging function verbosity to DEBUG level</p></li>
-<li><p><strong>dryrun</strong> – Dry run – does not run task. Command is recorded to log file.</p></li>
-<li><p><strong>path_envs</strong> – List of directory paths to append to the system’s ‘PATH’ variable.</p></li>
-<li><p><strong>env</strong> – Dictionary of environment variables to add to subshell.</p></li>
-<li><p><strong>stdout</strong> – Output file to write standard output to.</p></li>
-<li><p><strong>shell</strong> – Use shell to execute command.</p></li>
+<li><p><strong>log</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="#convert_source.cs_utils.fileio.LogFile" title="convert_source.cs_utils.fileio.LogFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogFile</span></code></a>]) – LogFile object</p></li>
+<li><p><strong>debug</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Sets logging function verbosity to DEBUG level</p></li>
+<li><p><strong>dryrun</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Dry run – does not run task. Command is recorded to log file.</p></li>
+<li><p><strong>path_envs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – List of directory paths to append to the system’s ‘PATH’ variable.</p></li>
+<li><p><strong>env</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>) – Dictionary of environment variables to add to subshell.</p></li>
+<li><p><strong>stdout</strong> (<a class="reference internal" href="#convert_source.cs_utils.fileio.File" title="convert_source.cs_utils.fileio.File"><code class="xref py py-class docutils literal notranslate"><span class="pre">File</span></code></a>) – Output file to write standard output to.</p></li>
+<li><p><strong>shell</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Use shell to execute command.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -561,7 +575,7 @@ stderr: Standard error writtent to file should the ‘stdout’ option be used.<
 
 <dl class="py class">
 <dt id="convert_source.cs_utils.fileio.File">
-<em class="property">class </em><code class="sig-prename descclassname">convert_source.cs_utils.fileio.</code><code class="sig-name descname">File</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">ext</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.File" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">convert_source.cs_utils.fileio.</code><code class="sig-name descname">File</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">ext</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.File" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Creates File object that encapsulates a number of methods and properites
 for file and filename handling.</p>
@@ -571,7 +585,7 @@ for file and filename handling.</p>
 </dl>
 <dl class="py method">
 <dt id="convert_source.cs_utils.fileio.File.abs_path">
-<code class="sig-name descname">abs_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#convert_source.cs_utils.fileio.File.abs_path" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">abs_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.File.abs_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns absolute path of file.</p>
 <dl>
 <dt>Usage example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">file_obj</span> <span class="o">=</span> <span class="n">File</span><span class="p">(</span><span class="s2">&quot;file_name.txt&quot;</span><span class="p">)</span>
@@ -579,6 +593,11 @@ for file and filename handling.</p>
 <span class="go">&quot;abspath/to/file_namt.txt&quot;</span>
 </pre></div>
 </div>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -590,7 +609,7 @@ for file and filename handling.</p>
 
 <dl class="py method">
 <dt id="convert_source.cs_utils.fileio.File.file_parts">
-<code class="sig-name descname">file_parts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ext</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>str<span class="p">, </span>str<span class="p">, </span>str<span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.fileio.File.file_parts" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">file_parts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ext</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.File.file_parts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Similar to MATLAB’s <cite>fileparts</cite>, this function splits a file and its path
 into its constituent parts:</p>
 <blockquote>
@@ -610,7 +629,7 @@ into its constituent parts:</p>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>ext</strong> – File extension, needed if the file extension of file
+<dd class="field-odd"><p><strong>ext</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – File extension, needed if the file extension of file
 object is longer than 4 characters.</p>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -626,7 +645,7 @@ ext: File extension.</p>
 
 <dl class="py method">
 <dt id="convert_source.cs_utils.fileio.File.rm_ext">
-<code class="sig-name descname">rm_ext</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ext</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#convert_source.cs_utils.fileio.File.rm_ext" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">rm_ext</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ext</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.File.rm_ext" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes file extension from the file.</p>
 <dl>
 <dt>Usage example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">file_obj</span> <span class="o">=</span> <span class="n">File</span><span class="p">(</span><span class="s2">&quot;file_name.txt&quot;</span><span class="p">)</span>
@@ -638,7 +657,7 @@ ext: File extension.</p>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>ext</strong> – File extension.</p>
+<dd class="field-odd"><p><strong>ext</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – File extension.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>File name with no extension.</p>
@@ -651,7 +670,7 @@ ext: File extension.</p>
 
 <dl class="py method">
 <dt id="convert_source.cs_utils.fileio.File.touch">
-<code class="sig-name descname">touch</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#convert_source.cs_utils.fileio.File.touch" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">touch</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.File.touch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates empty file.</p>
 <dl>
 <dt>Usage example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">file_obj</span> <span class="o">=</span> <span class="n">File</span><span class="p">(</span><span class="s2">&quot;file_name.txt&quot;</span><span class="p">)</span>
@@ -660,11 +679,16 @@ ext: File extension.</p>
 </div>
 </dd>
 </dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="convert_source.cs_utils.fileio.File.write_txt">
-<code class="sig-name descname">write_txt</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">txt</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#convert_source.cs_utils.fileio.File.write_txt" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">write_txt</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">txt</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.File.write_txt" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes/appends text to file.</p>
 <dl>
 <dt>Usage example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">file_obj</span> <span class="o">=</span> <span class="n">File</span><span class="p">(</span><span class="s2">&quot;file_name.txt&quot;</span><span class="p">)</span>
@@ -675,7 +699,7 @@ ext: File extension.</p>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>txt</strong> – Text to be written to file.</p>
+<dd class="field-odd"><p><strong>txt</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Text to be written to file.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>File with text written/appended to it.</p>
@@ -690,7 +714,7 @@ ext: File extension.</p>
 
 <dl class="py class">
 <dt id="convert_source.cs_utils.fileio.LogFile">
-<em class="property">class </em><code class="sig-prename descclassname">convert_source.cs_utils.fileio.</code><code class="sig-name descname">LogFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">log_file</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.LogFile" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">convert_source.cs_utils.fileio.</code><code class="sig-name descname">LogFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">log_file</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.LogFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#convert_source.cs_utils.fileio.File" title="convert_source.cs_utils.fileio.File"><code class="xref py py-class docutils literal notranslate"><span class="pre">convert_source.cs_utils.fileio.File</span></code></a></p>
 <p>Class that creates a log file for logging purposes. Due to how this
 class is constructed - its intended use case requires that this class
@@ -703,7 +727,7 @@ methods can be used.</p>
 </dl>
 <dl class="py method">
 <dt id="convert_source.cs_utils.fileio.LogFile.debug">
-<code class="sig-name descname">debug</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#convert_source.cs_utils.fileio.LogFile.debug" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">debug</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.LogFile.debug" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes debug information to file.</p>
 <dl>
 <dt>Usage examples:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">LogFile</span><span class="p">(</span><span class="s2">&quot;file.log&quot;</span><span class="p">)</span>
@@ -714,14 +738,17 @@ methods can be used.</p>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>msg</strong> – String to be printed to log file.</p>
+<dd class="field-odd"><p><strong>msg</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – String to be printed to log file.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="convert_source.cs_utils.fileio.LogFile.error">
-<code class="sig-name descname">error</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#convert_source.cs_utils.fileio.LogFile.error" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">error</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.LogFile.error" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes error information to file.</p>
 <dl>
 <dt>Usage examples:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">LogFile</span><span class="p">(</span><span class="s2">&quot;file.log&quot;</span><span class="p">)</span>
@@ -732,14 +759,17 @@ methods can be used.</p>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>msg</strong> – String to be printed to log file.</p>
+<dd class="field-odd"><p><strong>msg</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – String to be printed to log file.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="convert_source.cs_utils.fileio.LogFile.info">
-<code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#convert_source.cs_utils.fileio.LogFile.info" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.LogFile.info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes information to log file.</p>
 <dl>
 <dt>Usage examples:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">LogFile</span><span class="p">(</span><span class="s2">&quot;file.log&quot;</span><span class="p">)</span>
@@ -750,14 +780,17 @@ methods can be used.</p>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>msg</strong> – String to be printed to log file.</p>
+<dd class="field-odd"><p><strong>msg</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – String to be printed to log file.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="convert_source.cs_utils.fileio.LogFile.log">
-<code class="sig-name descname">log</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">log_cmd</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#convert_source.cs_utils.fileio.LogFile.log" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">log</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">log_cmd</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.LogFile.log" title="Permalink to this definition">¶</a></dt>
 <dd><p>Log function for logging commands and messages to some log file.</p>
 <dl>
 <dt>Usage examples:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">LogFile</span><span class="p">(</span><span class="s2">&quot;file.log&quot;</span><span class="p">)</span>
@@ -768,14 +801,17 @@ methods can be used.</p>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>log_cmd</strong> – Message to be written to log file</p>
+<dd class="field-odd"><p><strong>log_cmd</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Message to be written to log file</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="convert_source.cs_utils.fileio.LogFile.warning">
-<code class="sig-name descname">warning</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#convert_source.cs_utils.fileio.LogFile.warning" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">warning</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.LogFile.warning" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes warnings to file.</p>
 <dl>
 <dt>Usage examples:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">LogFile</span><span class="p">(</span><span class="s2">&quot;file.log&quot;</span><span class="p">)</span>
@@ -786,7 +822,10 @@ methods can be used.</p>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>msg</strong> – String to be printed to log file.</p>
+<dd class="field-odd"><p><strong>msg</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – String to be printed to log file.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -795,7 +834,7 @@ methods can be used.</p>
 
 <dl class="py class">
 <dt id="convert_source.cs_utils.fileio.NiiFile">
-<em class="property">class </em><code class="sig-prename descclassname">convert_source.cs_utils.fileio.</code><code class="sig-name descname">NiiFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#convert_source.cs_utils.fileio.File" title="convert_source.cs_utils.fileio.File">convert_source.cs_utils.fileio.File</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.NiiFile" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">convert_source.cs_utils.fileio.</code><code class="sig-name descname">NiiFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.NiiFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#convert_source.cs_utils.fileio.File" title="convert_source.cs_utils.fileio.File"><code class="xref py py-class docutils literal notranslate"><span class="pre">convert_source.cs_utils.fileio.File</span></code></a></p>
 <p>NIFTI file class object for handling NIFTI files. Inherits methods and
 properties from the File class.</p>
@@ -807,7 +846,7 @@ properties from the File class.</p>
 
 <dl class="py class">
 <dt id="convert_source.cs_utils.fileio.TmpDir">
-<em class="property">class </em><code class="sig-prename descclassname">convert_source.cs_utils.fileio.</code><code class="sig-name descname">TmpDir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tmp_dir</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">use_cwd</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.TmpDir" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">convert_source.cs_utils.fileio.</code><code class="sig-name descname">TmpDir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tmp_dir</span></em>, <em class="sig-param"><span class="n">use_cwd</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.TmpDir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Temporary directory class that creates temporary directories and files
 given a parent directory.</p>
@@ -818,7 +857,7 @@ parent_tmp_dir (class and instance): Input parent directory.</p>
 </dl>
 <dl class="py class">
 <dt id="convert_source.cs_utils.fileio.TmpDir.TmpFile">
-<em class="property">class </em><code class="sig-name descname">TmpFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tmp_dir</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">tmp_file</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">ext</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.TmpDir.TmpFile" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">TmpFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tmp_dir</span></em>, <em class="sig-param"><span class="n">tmp_file</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">ext</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.TmpDir.TmpFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#convert_source.cs_utils.fileio.File" title="convert_source.cs_utils.fileio.File"><code class="xref py py-class docutils literal notranslate"><span class="pre">convert_source.cs_utils.fileio.File</span></code></a></p>
 <p>Child/sub-class of TmpDir. Creates temporary files by inheriting File object
 methods and properties from the File class.</p>
@@ -841,13 +880,18 @@ tmp_dir (class and instance): Temporary directory name.</p>
 
 <dl class="py method">
 <dt id="convert_source.cs_utils.fileio.TmpDir.mk_tmp_dir">
-<code class="sig-name descname">mk_tmp_dir</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span>str<span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.fileio.TmpDir.mk_tmp_dir" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">mk_tmp_dir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.TmpDir.mk_tmp_dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates/makes temporary directory.</p>
 <dl>
 <dt>Usage example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tmp_directory</span> <span class="o">=</span> <span class="n">TmpDir</span><span class="p">(</span><span class="s2">&quot;/path/to/temporary_directory&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tmp_directory</span><span class="o">.</span><span class="n">mk_tmp_dir</span><span class="p">()</span>
 </pre></div>
 </div>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -859,7 +903,7 @@ tmp_dir (class and instance): Temporary directory name.</p>
 
 <dl class="py method">
 <dt id="convert_source.cs_utils.fileio.TmpDir.rm_tmp_dir">
-<code class="sig-name descname">rm_tmp_dir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rm_parent</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#convert_source.cs_utils.fileio.TmpDir.rm_tmp_dir" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">rm_tmp_dir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rm_parent</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.fileio.TmpDir.rm_tmp_dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes temporary directory.</p>
 <dl>
 <dt>Usage example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tmp_directory</span> <span class="o">=</span> <span class="n">TmpDir</span><span class="p">(</span><span class="s2">&quot;/path/to/temporary_directory&quot;</span><span class="p">)</span>
@@ -870,7 +914,10 @@ tmp_dir (class and instance): Temporary directory name.</p>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>rm_parent</strong> – Removes parent directory as well.</p>
+<dd class="field-odd"><p><strong>rm_parent</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Removes parent directory as well.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -889,16 +936,16 @@ tmp_dir (class and instance): Temporary directory name.</p>
 Currently supports use with: DICOM, PAR REC, and NIFTI files.</p>
 <dl class="py function">
 <dt id="convert_source.cs_utils.img_dir.generate_img_list">
-<code class="sig-prename descclassname">convert_source.cs_utils.img_dir.</code><code class="sig-name descname">generate_img_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">directory</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">out_prefix</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>List<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>List<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>str<span class="p">, </span>str<span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.img_dir.generate_img_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.img_dir.</code><code class="sig-name descname">generate_img_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">directory</span></em>, <em class="sig-param"><span class="n">out_prefix</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.img_dir.generate_img_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates list of image-containing directories and their corresponding image types from some parent directory.
 The full path of the child directories that contain the images are written to file, in addition to their respective
 file types. The written files will contain ‘.dir_list.txt’ and ‘.type_list.txt’ appended to them.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>directory</strong> – Input parent directory of that contain medical images somewhere in its directory structure.</p></li>
-<li><p><strong>out_prefix</strong> – Output file prefix for written files.</p></li>
-<li><p><strong>verbose</strong> – Enable verbosity.</p></li>
+<li><p><strong>directory</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Input parent directory of that contain medical images somewhere in its directory structure.</p></li>
+<li><p><strong>out_prefix</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Output file prefix for written files.</p></li>
+<li><p><strong>verbose</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Enable verbosity.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -915,24 +962,27 @@ out_file_type: Output file that contains the contents of ‘file_types’.</p>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.img_dir.id_img_file">
-<code class="sig-prename descclassname">convert_source.cs_utils.img_dir.</code><code class="sig-name descname">id_img_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dir_names</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">verbose</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>str<span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.img_dir.id_img_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.img_dir.</code><code class="sig-name descname">id_img_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dir_names</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.img_dir.id_img_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates list of file-types that either contain the label: DCM (DICOM), NII (NifTi), PAR (PAR REC), or Unknown.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dir_names</strong> – Input directory names list.</p></li>
-<li><p><strong>verbose</strong> – Enable verbose output.</p></li>
+<li><p><strong>dir_names</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Input directory names list.</p></li>
+<li><p><strong>verbose</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Enable verbose output.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>List of file-types that corresponds to input directory names list.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of file-types that corresponds to input directory names list.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.img_dir.img_dir_list">
-<code class="sig-prename descclassname">convert_source.cs_utils.img_dir.</code><code class="sig-name descname">img_dir_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">directory</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>List<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.img_dir.img_dir_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.img_dir.</code><code class="sig-name descname">img_dir_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">directory</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.img_dir.img_dir_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates list of image file directories and file-types for some parent directy. The image file directories list
 is a sorted list consisting of unique file paths for each image file parent directory. The corresponding file-
 types list consists of labels that are: DCM (DICOM), NII (NifTi), PAR (PAR REC), or Unknown - depending on the
@@ -946,8 +996,8 @@ file-types in the image file parent directories.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>directory</strong> – Parent directory that contains subject image data directories</p></li>
-<li><p><strong>verbose</strong> – Enable verbose output</p></li>
+<li><p><strong>directory</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Parent directory that contains subject image data directories</p></li>
+<li><p><strong>verbose</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Enable verbose output</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -962,17 +1012,20 @@ file_types: List of file-types that corresponds to directory names list.</p>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.img_dir.list_to_file">
-<code class="sig-prename descclassname">convert_source.cs_utils.img_dir.</code><code class="sig-name descname">list_to_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">in_list</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">out_file</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#convert_source.cs_utils.img_dir.list_to_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.img_dir.</code><code class="sig-name descname">list_to_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">in_list</span></em>, <em class="sig-param"><span class="n">out_file</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.img_dir.list_to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes some input list to some file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>in_list</strong> – List of subjects.</p></li>
-<li><p><strong>out_file</strong> – Output filename.</p></li>
+<li><p><strong>in_list</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – List of subjects.</p></li>
+<li><p><strong>out_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Output filename.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Output file with list written to file.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Output file with list written to file.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -984,7 +1037,7 @@ file_types: List of file-types that corresponds to directory names list.</p>
 in addition to subject and session information data collection methods.</p>
 <dl class="py class">
 <dt id="convert_source.cs_utils.utils.BIDSimg">
-<em class="property">class </em><code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">BIDSimg</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">work_dir</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.BIDSimg" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">BIDSimg</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">work_dir</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.BIDSimg" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>File collection and organization object intended for handling
 Brain Imaging Data Structure (BIDS) data in the process of being converted from source data to
@@ -1015,7 +1068,7 @@ NIFTI.</p>
 
 <dl class="py method">
 <dt id="convert_source.cs_utils.utils.BIDSimg.copy_img_data">
-<code class="sig-name descname">copy_img_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target_dir</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>List<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>List<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>List<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.utils.BIDSimg.copy_img_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">copy_img_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target_dir</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.BIDSimg.copy_img_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Copies image data and their associated files to some target directory.</p>
 <dl class="simple">
 <dt>NOTE: This function resets the class attributes of the class instance with the</dt><dd><p>returns of this function.</p>
@@ -1023,7 +1076,7 @@ NIFTI.</p>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>target_dir</strong> – Target directory to copy files to.</p>
+<dd class="field-odd"><p><strong>target_dir</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Target directory to copy files to.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
@@ -1044,7 +1097,7 @@ NIFTI.</p>
 
 <dl class="py class">
 <dt id="convert_source.cs_utils.utils.SubDataInfo">
-<em class="property">class </em><code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">SubDataInfo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sub</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>int<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">data</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">ses</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Union<span class="p">[</span>str<span class="p">, </span>int<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.SubDataInfo" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">SubDataInfo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sub</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">ses</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.SubDataInfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class instance that creates a data object that organizes a subject’s
 identification (ID) number, session ID number, and the
@@ -1074,7 +1127,7 @@ usage.</p>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.add_to_zeropadded">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">add_to_zeropadded</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num1</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>int<span class="p">, </span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">num2</span><span class="p">:</span> <span class="n">int</span></em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#convert_source.cs_utils.utils.add_to_zeropadded" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">add_to_zeropadded</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num1</span></em>, <em class="sig-param"><span class="n">num2</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.add_to_zeropadded" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds some specified integer to another zeropadded integer.</p>
 <dl>
 <dt>Usage example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">add_to_zeropadded</span><span class="p">(</span><span class="s1">&#39;005&#39;</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
@@ -1086,15 +1139,18 @@ usage.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>num1</strong> – Input integer, or zeropadded integer represented as a string.</p></li>
-<li><p><strong>num2</strong> – Integer to add to num1.</p></li>
+<li><p><strong>num1</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Input integer, or zeropadded integer represented as a string.</p></li>
+<li><p><strong>num2</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Integer to add to num1.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Sum of the two perceived integer values, represented as a string.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
 </dd>
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Sum of the two perceived integer values, represented as a string.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
 <li><p><strong>ValueError</strong> – Error that arises if non-integer string representations are passed as an argument for num1.</p></li>
 <li><p><strong>TypeError</strong> – Error that arise if non-integer arguments are passed for num2, OR if floats are passed for either num1 or num2.</p></li>
 </ul>
@@ -1104,7 +1160,7 @@ usage.</p>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.calc_read_time">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">calc_read_time</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">json_file</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em><span class="sig-paren">)</span> &#x2192; Union<span class="p">[</span>Tuple<span class="p">[</span>float<span class="p">, </span>float<span class="p">]</span><span class="p">, </span>Tuple<span class="p">[</span>str<span class="p">, </span>str<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.utils.calc_read_time" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">calc_read_time</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">json_file</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.calc_read_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the effective echo spacing and total readout time provided several combinations of parameters.
 Several approaches and methods to calculating the effective echo spacing and total readout within this function
 differ and are dependent on the parameters found within the provided JSON sidecar. Currently, there a four
@@ -1144,12 +1200,15 @@ Approach 2: <a class="reference external" href="https://osf.io/hks7x/">https://o
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>file</strong> – Filepath to raw image data file (DICOM or PAR REC)</p></li>
-<li><p><strong>json_file</strong> – Filepath to corresponding JSON sidecar.</p></li>
+<li><p><strong>file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Filepath to raw image data file (DICOM or PAR REC)</p></li>
+<li><p><strong>json_file</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Filepath to corresponding JSON sidecar.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><dl class="simple">
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
 <dt>Tuple of floats that correspond to the Effective Echo Spacing and the Total Readout Time,</dt><dd><p>OR</p>
 </dd>
 </dl>
@@ -1161,7 +1220,7 @@ Approach 2: <a class="reference external" href="https://osf.io/hks7x/">https://o
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.collect_info">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">collect_info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent_dir</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">exclusion_list</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span><a class="reference internal" href="#convert_source.cs_utils.utils.SubDataInfo" title="convert_source.cs_utils.utils.SubDataInfo">convert_source.cs_utils.utils.SubDataInfo</a><span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.utils.collect_info" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">collect_info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent_dir</span></em>, <em class="sig-param"><span class="n">exclusion_list</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.collect_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Collects image data information for each subject for a study,
 provided there exists some parent directory. Certain image files
 can be excluded provided a list of exclusion keywords/terms.</p>
@@ -1183,10 +1242,13 @@ can be excluded provided a list of exclusion keywords/terms.</p>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>parent_dir</strong> – Parent directory that contains each subject.</p>
+<dd class="field-odd"><p><strong>parent_dir</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Parent directory that contains each subject.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><dl class="simple">
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#convert_source.cs_utils.utils.SubDataInfo" title="convert_source.cs_utils.utils.SubDataInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubDataInfo</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
 <dt>List/Array of SubDataInfo objects that corresponds to a subject ID,</dt><dd><p>session ID, and path to medical image data.</p>
 </dd>
 </dl>
@@ -1197,7 +1259,7 @@ can be excluded provided a list of exclusion keywords/terms.</p>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.comp_dict">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">comp_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d1</span><span class="p">:</span> <span class="n">Dict</span></em>, <em class="sig-param"><span class="n">d2</span><span class="p">:</span> <span class="n">Dict</span></em>, <em class="sig-param"><span class="n">path</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span>bool<span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.utils.comp_dict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">comp_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d1</span></em>, <em class="sig-param"><span class="n">d2</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.comp_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compares 2 dictionaries to see if they have matching keys, and that each key maps
 to a value (that is NOT of type None). This is performed recursively.</p>
 <dl>
@@ -1210,17 +1272,20 @@ to a value (that is NOT of type None). This is performed recursively.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>d1</strong> – Input dictionary.</p></li>
-<li><p><strong>d2</strong> – Input dictionary.</p></li>
-<li><p><strong>path</strong> – Visualized path that has been traversed.</p></li>
-<li><p><strong>verbose</strong> – Print verbose output.</p></li>
+<li><p><strong>d1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>) – Input dictionary.</p></li>
+<li><p><strong>d2</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>) – Input dictionary.</p></li>
+<li><p><strong>path</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Visualized path that has been traversed.</p></li>
+<li><p><strong>verbose</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Print verbose output.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Boolean ‘True’, raises exceptions otherwise.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>]</p>
 </dd>
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Boolean ‘True’, raises exceptions otherwise.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
 <li><p><strong>KeyError</strong> – Error that arises if input dictionaries do not have matching keys.</p></li>
 <li><p><strong>ValueError</strong> – Error that arises if one or more of the keys in either dictionary map
     NoneType values.</p></li>
@@ -1231,7 +1296,7 @@ to a value (that is NOT of type None). This is performed recursively.</p>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.convert_image_data">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">convert_image_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">basename</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">out_dir</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">cprss_lvl</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">6</span></em>, <em class="sig-param"><span class="n">bids</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">anon_bids</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">gzip</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">comment</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">adjacent</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">dir_search</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">5</span></em>, <em class="sig-param"><span class="n">nrrd</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ignore_2D</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">merge_2D</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">text</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">progress</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">write_conflicts</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'suffix'</span></em>, <em class="sig-param"><span class="n">crop_3D</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'n'</span></em>, <em class="sig-param"><span class="n">lossless</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">big_endian</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'o'</span></em>, <em class="sig-param"><span class="n">xml</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">log</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference internal" href="#convert_source.cs_utils.fileio.LogFile" title="convert_source.cs_utils.fileio.LogFile">convert_source.cs_utils.fileio.LogFile</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">env</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Dict<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dryrun</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">return_obj</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; Union<span class="p">[</span><a class="reference internal" href="#convert_source.cs_utils.utils.BIDSimg" title="convert_source.cs_utils.utils.BIDSimg">convert_source.cs_utils.utils.BIDSimg</a><span class="p">, </span>Tuple<span class="p">[</span>List<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>List<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>List<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span><span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.utils.convert_image_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">convert_image_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">basename</span></em>, <em class="sig-param"><span class="n">out_dir</span></em>, <em class="sig-param"><span class="n">cprss_lvl</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">bids</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">anon_bids</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">gzip</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">adjacent</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">dir_search</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">nrrd</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ignore_2D</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">merge_2D</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">text</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">write_conflicts</span><span class="o">=</span><span class="default_value">'suffix'</span></em>, <em class="sig-param"><span class="n">crop_3D</span><span class="o">=</span><span class="default_value">'n'</span></em>, <em class="sig-param"><span class="n">lossless</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">big_endian</span><span class="o">=</span><span class="default_value">'o'</span></em>, <em class="sig-param"><span class="n">xml</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">log</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">env</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dryrun</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">return_obj</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.convert_image_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts medical image data (DICOM, PAR REC, or Bruker) to NifTi (or NRRD) using dcm2niix.
 This is a wrapper function for dcm2niix (v1.0.20201102+).</p>
 <dl>
@@ -1266,37 +1331,37 @@ a DependencyError otherwise.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>file</strong> – Absolute path to raw image data file.</p></li>
-<li><p><strong>basename</strong> – Output file(s) basename.</p></li>
-<li><p><strong>out_dir</strong> – Absolute path to output directory (must exist at runtime).</p></li>
-<li><p><strong>cprss_lvl</strong> – Compression level [1 - 9] - 1 is fastest, 9 is smallest (default: 6).</p></li>
-<li><p><strong>bids</strong> – BIDS (JSON) sidecar (default: True).</p></li>
-<li><p><strong>anon_bids</strong> – Anonymize BIDS (default: True).</p></li>
-<li><p><strong>gzip</strong> – Gzip compress images (default: True).</p></li>
-<li><p><strong>comment</strong> – Image comment(s) stored in NifTi header (default: True).</p></li>
-<li><p><strong>adjacent</strong> – Assumes adjacent DICOMs/Image data (images from same series always in same folder) for faster conversion (default: False).</p></li>
-<li><p><strong>dir_search</strong> – Directory search depth (default: 5).</p></li>
-<li><p><strong>nrrd</strong> – Export as NRRD instead of NifTi, not recommended (default: False).</p></li>
-<li><p><strong>ignore_2D</strong> – Ignore derived, localizer and 2D images (default: True).</p></li>
-<li><p><strong>merge_2D</strong> – Merge 2D slices from same series regardless of echo, exposure, etc. (default: True).</p></li>
-<li><p><strong>text</strong> – Text notes includes private patient details in separate text file (default: False).</p></li>
-<li><p><strong>progress</strong> – Report progress, slicer format progress information (default: False).</p></li>
-<li><p><strong>verbose</strong> – Enable verbosity (default: False).</p></li>
-<li><p><strong>write_conflicts</strong> – Write behavior for name conflicts:
+<li><p><strong>file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Absolute path to raw image data file.</p></li>
+<li><p><strong>basename</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Output file(s) basename.</p></li>
+<li><p><strong>out_dir</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Absolute path to output directory (must exist at runtime).</p></li>
+<li><p><strong>cprss_lvl</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Compression level [1 - 9] - 1 is fastest, 9 is smallest (default: 6).</p></li>
+<li><p><strong>bids</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – BIDS (JSON) sidecar (default: True).</p></li>
+<li><p><strong>anon_bids</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Anonymize BIDS (default: True).</p></li>
+<li><p><strong>gzip</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Gzip compress images (default: True).</p></li>
+<li><p><strong>comment</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Image comment(s) stored in NifTi header (default: True).</p></li>
+<li><p><strong>adjacent</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Assumes adjacent DICOMs/Image data (images from same series always in same folder) for faster conversion (default: False).</p></li>
+<li><p><strong>dir_search</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Directory search depth (default: 5).</p></li>
+<li><p><strong>nrrd</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Export as NRRD instead of NifTi, not recommended (default: False).</p></li>
+<li><p><strong>ignore_2D</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Ignore derived, localizer and 2D images (default: True).</p></li>
+<li><p><strong>merge_2D</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Merge 2D slices from same series regardless of echo, exposure, etc. (default: True).</p></li>
+<li><p><strong>text</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Text notes includes private patient details in separate text file (default: False).</p></li>
+<li><p><strong>progress</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Report progress, slicer format progress information (default: False).</p></li>
+<li><p><strong>verbose</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Enable verbosity (default: False).</p></li>
+<li><p><strong>write_conflicts</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Write behavior for name conflicts:
 * ‘suffix’ = Add suffix to name conflict (default)
 * ‘overwrite’ = Overwrite name conflict
 * ‘skip’ = Skip name conflict</p></li>
-<li><p><strong>crop_3D</strong> – Crop 3D acquisitions (y/n/i, default n, use ‘i’gnore to neither crop nor rotate 3D acquistions).</p></li>
-<li><p><strong>lossless</strong> – Losslessly scale 16-bit integers to use dynamic range (default: True).</p></li>
-<li><p><strong>big_endian</strong> – Byte order:
+<li><p><strong>crop_3D</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Crop 3D acquisitions (y/n/i, default n, use ‘i’gnore to neither crop nor rotate 3D acquistions).</p></li>
+<li><p><strong>lossless</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Losslessly scale 16-bit integers to use dynamic range (default: True).</p></li>
+<li><p><strong>big_endian</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Byte order:
 * ‘o’ = optimal/native byte order (default)
 * ‘n’ = little endian
 * ‘y’ = big endian</p></li>
-<li><p><strong>xml</strong> – Slicer format features (default: False).</p></li>
-<li><p><strong>log</strong> – LogFile object for logging.</p></li>
-<li><p><strong>env</strong> – Path environment dictionary.</p></li>
-<li><p><strong>dryrun</strong> – Perform dryrun (creates the command, but does not execute it).</p></li>
-<li><p><strong>return_obj</strong> – Boolean to return object, rather than a tuple of lists.</p></li>
+<li><p><strong>xml</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Slicer format features (default: False).</p></li>
+<li><p><strong>log</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="#convert_source.cs_utils.fileio.LogFile" title="convert_source.cs_utils.fileio.LogFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogFile</span></code></a>]) – LogFile object for logging.</p></li>
+<li><p><strong>env</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – Path environment dictionary.</p></li>
+<li><p><strong>dryrun</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Perform dryrun (creates the command, but does not execute it).</p></li>
+<li><p><strong>return_obj</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Boolean to return object, rather than a tuple of lists.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1337,7 +1402,7 @@ a DependencyError otherwise.</p>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.depth">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">depth</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span><span class="p">:</span> <span class="n">Dict</span></em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#convert_source.cs_utils.utils.depth" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">depth</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.depth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Uses breadth-first search approach to find the depth of a dictionary.</p>
 <dl>
 <dt>Usage example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">depth</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
@@ -1348,17 +1413,20 @@ a DependencyError otherwise.</p>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>d</strong> – Input dictionary.</p>
+<dd class="field-odd"><p><strong>d</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>) – Input dictionary.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Number of levels in dictionary</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Number of levels in dictionary.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.dict_multi_update">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">dict_multi_update</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dictionary</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Dict<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; Dict<a class="headerlink" href="#convert_source.cs_utils.utils.dict_multi_update" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">dict_multi_update</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dictionary</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.dict_multi_update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates a dictionary multiple times depending on the number key word mapped pairs that are provided and
 returns a separate updated dictionary. The dictionary passed as an argument need not exist at runtime.</p>
 <dl>
@@ -1375,48 +1443,57 @@ returns a separate updated dictionary. The dictionary passed as an argument need
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dictionary</strong> – Dictionary of key mapped items to be updated.</p></li>
+<li><p><strong>dictionary</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – Dictionary of key mapped items to be updated.</p></li>
 <li><p><strong>**kwargs</strong> – Key-value (key=value) pairs.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>New updated dictionary.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>New updated dictionary.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.file_to_screen">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">file_to_screen</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#convert_source.cs_utils.utils.file_to_screen" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">file_to_screen</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.file_to_screen" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads the contents of a file and prints it to screen.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file</strong> – Path to file.</p>
+<dd class="field-odd"><p><strong>file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Path to file.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>File contents returned as string, printed to screen.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>File contents returned as string, printed to screen.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.get_bvals">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">get_bvals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bval_file</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">''</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>int<span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.utils.get_bvals" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">get_bvals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bval_file</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.get_bvals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads the bvals from the (FSL-style) bvalue file and returns a list of unique non-zero bvalues.
 If the bval file does not exist or is not provided, then zero is returned in a list.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>bval_file</strong> – Bval (.bval) file.</p>
+<dd class="field-odd"><p><strong>bval_file</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Bval (.bval) file.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>List of unique, non-zero bvalues (as ints), or zero in a list.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of unique, non-zero bvalues (as ints), or zero in a list.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.get_dcm_scan_tech">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">get_dcm_scan_tech</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dcm_file</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">search_dict</span><span class="p">:</span> <span class="n">Dict</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>str<span class="p">, </span>str<span class="p">, </span>str<span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.utils.get_dcm_scan_tech" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">get_dcm_scan_tech</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dcm_file</span></em>, <em class="sig-param"><span class="n">search_dict</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.get_dcm_scan_tech" title="Permalink to this definition">¶</a></dt>
 <dd><p>Searches DICOM file header for scan technique/MR modality used in accordance with the search terms provided by the
 nested heursitic search dictionary. The DICOM header field searched is a Philips DICOM private tag (2001,1020) [Scanning
 Technique Description MR]. In the case that matches are found in that field, is empty, or does not exist - then common
@@ -1439,8 +1516,8 @@ DICOM tags are searched which include:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dcm_file</strong> – DICOM filename.</p></li>
-<li><p><strong>search_dict</strong> – Nested heursitic search dictionary (from the <cite>read_config</cite> function).</p></li>
+<li><p><strong>dcm_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – DICOM filename.</p></li>
+<li><p><strong>search_dict</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>) – Nested heursitic search dictionary (from the <cite>read_config</cite> function).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1459,21 +1536,24 @@ DICOM tags are searched which include:</p>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.get_echo">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">get_echo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">json_file</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#convert_source.cs_utils.utils.get_echo" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">get_echo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">json_file</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.get_echo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads the echo time (TE) from the NIFTI JSON sidecar and returns it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>json_file</strong> (<em>string</em>) – Absolute path to JSON sidecar.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Echo time as a float.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Echo time as a float.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.get_metadata">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">get_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dictionary</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Dict<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">modality_type</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">task</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>Dict<span class="p">[</span>str<span class="p">, </span>str<span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>Union<span class="p">[</span>int<span class="p">, </span>str<span class="p">]</span><span class="p">]</span><span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.utils.get_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">get_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dictionary</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">modality_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">task</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.get_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads the metadata dictionary and looks for keywords to indicate what metadata should be written to which
 dictionary. For example, the keyword ‘common’ is used to indicate the common information for the imaging
 protocol and may contain information such as: field strength, phase encoding direction, institution name, etc.
@@ -1484,9 +1564,9 @@ as a result.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dictionary</strong> – Nested dictionary of key mapped items from the ‘read_config’ function.</p></li>
-<li><p><strong>modality_type</strong> – BIDS modality type (e.g. anat, func, dwi, etc.).</p></li>
-<li><p><strong>task</strong> – Task name to search in the key mapped dictionary.</p></li>
+<li><p><strong>dictionary</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – Nested dictionary of key mapped items from the ‘read_config’ function.</p></li>
+<li><p><strong>modality_type</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – BIDS modality type (e.g. anat, func, dwi, etc.).</p></li>
+<li><p><strong>task</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Task name to search in the key mapped dictionary.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1504,7 +1584,7 @@ as a result.</p>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.get_par_scan_tech">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">get_par_scan_tech</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">par_file</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">search_dict</span><span class="p">:</span> <span class="n">Dict</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>str<span class="p">, </span>str<span class="p">, </span>str<span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.utils.get_par_scan_tech" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">get_par_scan_tech</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">par_file</span></em>, <em class="sig-param"><span class="n">search_dict</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.get_par_scan_tech" title="Permalink to this definition">¶</a></dt>
 <dd><p>Searches PAR file header for scan technique/MR modality used in accordance with the search terms provided by the
 nested heursitic search dictionary. A regular expression (regEx) search string is defined and is searched in the
 PAR header file.</p>
@@ -1519,8 +1599,8 @@ PAR header file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>par_file</strong> – PAR filename.</p></li>
-<li><p><strong>search_dict</strong> – Nested heursitic search dictionary (from the <cite>read_config</cite> function).</p></li>
+<li><p><strong>par_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – PAR filename.</p></li>
+<li><p><strong>search_dict</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>) – Nested heursitic search dictionary (from the <cite>read_config</cite> function).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1539,35 +1619,41 @@ PAR header file.</p>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.get_pix_band">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">get_pix_band</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">json_file</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; Union<span class="p">[</span>float<span class="p">, </span>str<span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.utils.get_pix_band" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">get_pix_band</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">json_file</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.get_pix_band" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads pixel bandwidth value from the JSON sidecar.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>json_file</strong> (<em>string</em>) – BIDS JSON file.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Pixel bandwidth value (as a float if it exists in the file, or as an empty string if not in the file).</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Pixel bandwidth value (as a float if it exists in the file, or as an empty string if not in the file).</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.get_recon_mat">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">get_recon_mat</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">json_file</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; Union<span class="p">[</span>float<span class="p">, </span>str<span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.utils.get_recon_mat" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">get_recon_mat</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">json_file</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.get_recon_mat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads ReconMatrixPE (reconstruction matrix phase encode) value from the JSON sidecar.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>json_file</strong> – BIDS JSON file.</p>
+<dd class="field-odd"><p><strong>json_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – BIDS JSON file.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Recon Matrix PE value (as a float if it exists in the file, or as an empty string if not in the file).</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Recon Matrix PE value (as a float if it exists in the file, or as an empty string if not in the file).</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.glob_dcm">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">glob_dcm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dcm_dir</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>str<span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.utils.glob_dcm" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">glob_dcm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dcm_dir</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.glob_dcm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Globs subject DICOM data directories for the top-most DICOM file
 in each respective directory.</p>
 <dl>
@@ -1578,17 +1664,20 @@ in each respective directory.</p>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dcm_dir</strong> – Subject DICOM data directory.</p>
+<dd class="field-odd"><p><strong>dcm_dir</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Subject DICOM data directory.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>List of strings of image files.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of strings of image files.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.glob_img">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">glob_img</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">img_dir</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>str<span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.utils.glob_img" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">glob_img</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">img_dir</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.glob_img" title="Permalink to this definition">¶</a></dt>
 <dd><p>Globs image data files given a subject image data directory.
 The image file types that are search for are:</p>
 <blockquote>
@@ -1606,55 +1695,65 @@ The image file types that are search for are:</p>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>img_dir</strong> – Path to image directory.</p>
+<dd class="field-odd"><p><strong>img_dir</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Path to image directory.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>List of strings of file paths to images.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of strings of file paths to images.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.gunzip_file">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">gunzip_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">native</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#convert_source.cs_utils.utils.gunzip_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">gunzip_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">native</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.gunzip_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gunzips file. Native implementation of gunzipping files is prefered with
 this function provided that the system is UNIX. Otherwise, a pythonic
 implementation of gunzipping is performed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>file</strong> – Input file.</p></li>
-<li><p><strong>native</strong> – Uses native implementation of gunzip.</p></li>
+<li><p><strong>file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Input file.</p></li>
+<li><p><strong>native</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Uses native implementation of gunzip.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Gunzipped file.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gunzipped file.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.gzip_file">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">gzip_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">native</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#convert_source.cs_utils.utils.gzip_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">gzip_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">cprss_lvl</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">native</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.gzip_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gzips file. Native implementation of gzipping files is prefered with
 this function provided that the system is UNIX. Otherwise, a pythonic
 implementation of gzipping is performed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>file</strong> – Input file.</p></li>
-<li><p><strong>native</strong> – Uses native implementation of gzip.</p></li>
+<li><p><strong>file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Input file.</p></li>
+<li><p><strong>cprss_lvl</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Compression level [1 - 9] - 1 is fastest, 9 is smallest.</p></li>
+<li><p><strong>native</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Uses native implementation of gzip.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Gzipped file.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gzipped file.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.header_search">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">header_search</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">img_file</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">search_dict</span><span class="p">:</span> <span class="n">Dict</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>str<span class="p">, </span>str<span class="p">, </span>str<span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.utils.header_search" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">header_search</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">img_file</span></em>, <em class="sig-param"><span class="n">search_dict</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.header_search" title="Permalink to this definition">¶</a></dt>
 <dd><p>Searches a DICOM or PAR file header for relevant scan technique/parameter information provided a nested heursitic search dictionary
 of search terms to map scan acquisitions of interest. Any other image file passed as an argument will return a tuple of empty strings.</p>
 <dl>
@@ -1668,8 +1767,8 @@ of search terms to map scan acquisitions of interest. Any other image file passe
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>img_file</strong> – Input image data file path.</p></li>
-<li><p><strong>search_dict</strong> – Nested heursitic dictionary of (BIDS) related search terms.</p></li>
+<li><p><strong>img_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Input image data file path.</p></li>
+<li><p><strong>search_dict</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>) – Nested heursitic dictionary of (BIDS) related search terms.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1688,7 +1787,7 @@ of search terms to map scan acquisitions of interest. Any other image file passe
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.img_exclude">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">img_exclude</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">img_list</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">exclusion_list</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>str<span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.utils.img_exclude" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">img_exclude</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">img_list</span></em>, <em class="sig-param"><span class="n">exclusion_list</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.img_exclude" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructs a new list with files that DO NOT contain words in the exclusion list.
 Should this list be empty, then the original input list is returned.</p>
 <dl>
@@ -1700,19 +1799,22 @@ Should this list be empty, then the original input list is returned.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>img_list</strong> – Input list of paths to image files.</p></li>
-<li><p><strong>exclusion_list</strong> – Exclusion list that consists of keywords used to exclude files.</p></li>
+<li><p><strong>img_list</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Input list of paths to image files.</p></li>
+<li><p><strong>exclusion_list</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Exclusion list that consists of keywords used to exclude files.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>List of image files that do not contain words in the exclusion list.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of image files that do not contain words in the exclusion list.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.list_dict">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">list_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>str<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>Dict<span class="p">[</span>str<span class="p">, </span>str<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#convert_source.cs_utils.utils.list_dict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">list_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.list_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a list of dictionaries provided a nested dictionary using the
 top-most level of the dictionaries as list (array) indices.</p>
 <dl>
@@ -1724,17 +1826,20 @@ top-most level of the dictionaries as list (array) indices.</p>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>d</strong> – Input (nested) dictionary.</p>
+<dd class="field-odd"><p><strong>d</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Input (nested) dictionary.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>List of dictionaries.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of dictionaries.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.list_in_substr">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">list_in_substr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">in_list</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">in_str</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#convert_source.cs_utils.utils.list_in_substr" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">list_in_substr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">in_list</span></em>, <em class="sig-param"><span class="n">in_str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.list_in_substr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Searches a string using a list that contains substrings. Returns boolean ‘True’ or ‘False’
 if any elements of the list are found within the string.</p>
 <dl>
@@ -1750,51 +1855,60 @@ if any elements of the list are found within the string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>in_list</strong> – List containing strings used for matching.</p></li>
-<li><p><strong>in_str</strong> – Larger string to be searched for matches within substring.</p></li>
+<li><p><strong>in_list</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – List containing strings used for matching.</p></li>
+<li><p><strong>in_str</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Larger string to be searched for matches within substring.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>boolean True or False.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>boolean True or False.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.read_json">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">read_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">json_file</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; Dict<a class="headerlink" href="#convert_source.cs_utils.utils.read_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">read_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">json_file</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.read_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads JavaScript Object Notation (JSON) file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>json_file</strong> – Input file.</p>
+<dd class="field-odd"><p><strong>json_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Input file.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Dictionary of key mapped items from JSON file.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Dictionary of key mapped items from JSON file.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.update_json">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">update_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">json_file</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">dictionary</span><span class="p">:</span> <span class="n">Dict</span></em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#convert_source.cs_utils.utils.update_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">update_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">json_file</span></em>, <em class="sig-param"><span class="n">dictionary</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.update_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates JavaScript Object Notation (JSON) file. If the file does not exist, it is created once
 this function is called.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>json_file</strong> – Input file.</p></li>
-<li><p><strong>dictionary</strong> – Dictionary of key mapped items to write to JSON file.</p></li>
+<li><p><strong>json_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Input file.</p></li>
+<li><p><strong>dictionary</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>) – Dictionary of key mapped items to write to JSON file.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Updated JSON file.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Updated JSON file.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.write_json">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">write_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">json_file</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">dictionary</span><span class="p">:</span> <span class="n">Dict</span></em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#convert_source.cs_utils.utils.write_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">write_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">json_file</span></em>, <em class="sig-param"><span class="n">dictionary</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.write_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes python dictionary to a JavaScript Object Notation (JSON) file. The speicifed JSON file need not exist.</p>
 <dl>
 <dt>Usage example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">json_file</span> <span class="o">=</span> <span class="n">write_json</span><span class="p">(</span><span class="s2">&quot;file.json&quot;</span><span class="p">,</span>
@@ -1807,19 +1921,22 @@ this function is called.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>json_file</strong> – Input JSON file.</p></li>
-<li><p><strong>dictionary</strong> – Input python dictionary</p></li>
+<li><p><strong>json_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Input JSON file.</p></li>
+<li><p><strong>dictionary</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>) – Input python dictionary</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>String that represents path to written JSON file.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>String that represents path to written JSON file.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="convert_source.cs_utils.utils.zeropad">
-<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">zeropad</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>int<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">num_zeros</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">2</span></em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#convert_source.cs_utils.utils.zeropad" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">convert_source.cs_utils.utils.</code><code class="sig-name descname">zeropad</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num</span></em>, <em class="sig-param"><span class="n">num_zeros</span><span class="o">=</span><span class="default_value">2</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.cs_utils.utils.zeropad" title="Permalink to this definition">¶</a></dt>
 <dd><p>Zeropads a number, should that number be an int or str.</p>
 <dl>
 <dt>Usage example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">zeropad</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
@@ -1833,19 +1950,22 @@ this function is called.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>num</strong> – Input number (as str or int) to zeropad.</p></li>
-<li><p><strong>num_zeros</strong> – Number of zeroes to pad with.</p></li>
+<li><p><strong>num</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – Input number (as str or int) to zeropad.</p></li>
+<li><p><strong>num_zeros</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of zeroes to pad with.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><dl class="simple">
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
 <dt>Zeropadded string of the number, or the original string if the input string could not</dt><dd><p>be represented as an integer.</p>
 </dd>
 </dl>
 </p>
 </dd>
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><strong>TypeError</strong> – Error that arises if floats are passed as an argument.</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>TypeError</strong> – Error that arises if floats are passed as an argument.</p>
 </dd>
 </dl>
 </dd></dl>
