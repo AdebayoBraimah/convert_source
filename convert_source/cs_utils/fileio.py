@@ -638,7 +638,7 @@ class Command(object):
             >>> echo = Command("echo")
             >>> echo.cmd_list.append("Hi!")
             >>> echo.cmd_list.append("I have arrived!")
-            
+            >>>
             >>> # Run/execute command
             >>> echo.run()
             (0, '', '')
