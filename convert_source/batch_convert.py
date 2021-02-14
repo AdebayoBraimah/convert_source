@@ -97,7 +97,7 @@ def batch_proc(study_img_dir: str,
         config_file: Configuration file.
         path_envs: List of directory paths to append to the system's 'PATH' variable.
         gzip: Gzip output NIFTI files.
-        append_dwi_info: Appends DWI acquisition information (unique non-zero b-values, and TE, in msec.) to BIDS acquisition filename.
+        append_dwi_info: RECOMMENDED: Appends DWI acquisition information (unique non-zero b-values, and TE, in msec.) to BIDS acquisition filename.
         zero_pad: Number of zeroes to pad the run number up to (zero_pad=2 is '01').
         cprss_lvl: Compression level [1 - 9] - 1 is fastest, 9 is smallest.
         verbose: Enable verbose output.

@@ -87,7 +87,8 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="outputs.html">Ouputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration File</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">convert_source</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="convert_source.html">convert_source package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="convert_source.html#subpackages">Subpackages</a><ul class="current">
@@ -191,7 +192,10 @@
 <dt id="convert_source.imgio.dcmio.get_bwpppe">
 <code class="sig-prename descclassname">convert_source.imgio.dcmio.</code><code class="sig-name descname">get_bwpppe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dcm_file</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.imgio.dcmio.get_bwpppe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads the Bandwidth Per Pixel PhaseEncode value from a DICOM header.</p>
-<p>NOTE: This DICOM field is usually left blank on Philips DICOM headers.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This DICOM field is usually left blank on Philips DICOM headers.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>dcm_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – DICOM file.</p>
@@ -210,7 +214,10 @@
 <code class="sig-prename descclassname">convert_source.imgio.dcmio.</code><code class="sig-name descname">get_mb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dcm_file</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.imgio.dcmio.get_mb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extracts multi-band acceleration factor from file description in the DICOM header for (philips MR scanners).
 If this information cannont be inferred from the DICOM header file description - then it is assumed to be 1.</p>
-<p>N.B.: This is done via a regEx search as no DICOM tag stores this information explicitly.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is done via a regEx search as no DICOM tag stores this information explicitly.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>dcm_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – DICOM file.</p>
@@ -320,11 +327,11 @@ function returns an string.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>nii_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – NIFTI image filename.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Repetition time (TR, sec), if not zero, or an empty string otherwise.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>tr</p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Repetition time (TR, sec), if not zero, or an empty string otherwise.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -360,11 +367,14 @@ function returns an string.</p>
 <dt id="convert_source.imgio.pario.get_echo_time">
 <code class="sig-prename descclassname">convert_source.imgio.pario.</code><code class="sig-name descname">get_echo_time</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">par_file</span></em>, <em class="sig-param"><span class="n">tmp_dir</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.imgio.pario.get_echo_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads the echo time (TE, in sec.) from a PAR header file.</p>
-<dl>
-<dt>NOTE: Echo time is obtained from the PAR file header by reading in the PAR header file as a</dt><dd><p>pandas dataframe, followed by saving the resulting dataframe as a M x N | N = 35. The echo times
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Echo time is obtained from the PAR file header by reading in the PAR header file as a
+pandas dataframe, followed by saving the resulting dataframe as a M x N | N = 35. The echo times
 are stored in the resulting matrix (constructed from numpy as a numpy multi-dimensional array) in
 row 16 (count starts at 0).</p>
-</dd>
+</div>
+<dl>
 <dt>Usage example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_echo_time</span><span class="p">(</span><span class="n">par_file</span><span class="o">=</span><span class="s2">&quot;File.PAR&quot;</span><span class="p">)</span>
 <span class="go">88.0</span>
 </pre></div>
@@ -391,7 +401,10 @@ row 16 (count starts at 0).</p>
 <dt id="convert_source.imgio.pario.get_etl">
 <code class="sig-prename descclassname">convert_source.imgio.pario.</code><code class="sig-name descname">get_etl</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">par_file</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.imgio.pario.get_etl" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets EPI factor (Echo Train Length) from Philips’ PAR Header.</p>
-<p>N.B.: This is done via a regEx search as the PAR header is not assumed to change significantly between scanners.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is done via a regEx search as the PAR header is not assumed to change significantly between scanners.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>par_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – PAR header file.</p>
@@ -409,11 +422,14 @@ row 16 (count starts at 0).</p>
 <dt id="convert_source.imgio.pario.get_flip_angle">
 <code class="sig-prename descclassname">convert_source.imgio.pario.</code><code class="sig-name descname">get_flip_angle</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">par_file</span></em>, <em class="sig-param"><span class="n">tmp_dir</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.imgio.pario.get_flip_angle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads the flip angle (in degrees) from a PAR header file.</p>
-<dl>
-<dt>NOTE: Flip angle is obtained from the PAR file header by reading in the PAR header file as a</dt><dd><p>pandas dataframe, followed by saving the resulting dataframe as a M x N | N = 35. The flip angles
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Flip angle is obtained from the PAR file header by reading in the PAR header file as a
+pandas dataframe, followed by saving the resulting dataframe as a M x N | N = 35. The flip angles
 are stored in the resulting matrix (constructed from numpy as a numpy multi-dimensional array) in
 row 21 (count starts at 0).</p>
-</dd>
+</div>
+<dl>
 <dt>Usage example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_flip_angle</span><span class="p">(</span><span class="n">par_file</span><span class="o">=</span><span class="s2">&quot;File.PAR&quot;</span><span class="p">)</span>
 <span class="go">90.0</span>
 </pre></div>
@@ -440,7 +456,10 @@ row 21 (count starts at 0).</p>
 <dt id="convert_source.imgio.pario.get_mb">
 <code class="sig-prename descclassname">convert_source.imgio.pario.</code><code class="sig-name descname">get_mb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">par_file</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.imgio.pario.get_mb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extracts multi-band acceleration factor from from Philips’ PAR Header.</p>
-<p>N.B.: This is done via a regEx search as the PAR header does not normally store this value.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is done via a regEx search as the PAR header does not normally store this value.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>par_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Absolute filepath to PAR header file</p>
@@ -460,7 +479,10 @@ row 21 (count starts at 0).</p>
 <dd><p>Extracts parallel reduction factor in-plane value (SENSE factor) from the file description in the PAR REC header
 for Philips MR scanners. This reduction factor is assumed to be 1 if a value cannot be found from witin
 the PAR REC header.</p>
-<p>N.B.: This is done via a regEx search as the PAR header is not assumed to change significantly between scanners.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is done via a regEx search as the PAR header is not assumed to change significantly between scanners.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>par_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – PAR header file.</p>
@@ -478,7 +500,10 @@ the PAR REC header.</p>
 <dt id="convert_source.imgio.pario.get_scan_time">
 <code class="sig-prename descclassname">convert_source.imgio.pario.</code><code class="sig-name descname">get_scan_time</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">par_file</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.imgio.pario.get_scan_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the acquisition duration (scan time, in s) from the PAR header.</p>
-<p>N.B.: This is done via a regEx search as the PAR header is not assumed to change significantly between scanners.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is done via a regEx search as the PAR header is not assumed to change significantly between scanners.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>par_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – PAR header file.</p>
@@ -496,7 +521,10 @@ the PAR REC header.</p>
 <dt id="convert_source.imgio.pario.get_wfs">
 <code class="sig-prename descclassname">convert_source.imgio.pario.</code><code class="sig-name descname">get_wfs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">par_file</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convert_source.imgio.pario.get_wfs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets Water Fat Shift from Philips’ PAR Header.</p>
-<p>N.B.: This is done via a regEx search as the PAR header is not assumed to change significantly between scanners.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is done via a regEx search as the PAR header is not assumed to change significantly between scanners.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>par_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – PAR header file.</p>

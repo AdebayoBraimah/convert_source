@@ -41,7 +41,7 @@ def get_nii_tr(nii_file: str) -> Union[float,str]:
         nii_file: NIFTI image filename.
         
     Returns: 
-        tr: Repetition time (TR, sec), if not zero, or an empty string otherwise.
+        Repetition time (TR, sec), if not zero, or an empty string otherwise.
     '''
     nii_file: str = os.path.abspath(nii_file)
     

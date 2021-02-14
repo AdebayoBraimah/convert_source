@@ -39,7 +39,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Ouputs" href="outputs.html" />
+    <link rel="next" title="Examples" href="examples.html" />
     <link rel="prev" title="Installation" href="installation.html" /> 
 </head>
 
@@ -88,12 +88,19 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#command-line-interface">Command line interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#study-directory-layout">Study Directory Layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#command-line-interface">Command Line Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#python-module-interface">Python Module Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#study-directory-layout">Study Directory Layout</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#study-directory-layout-1">Study Directory Layout 1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#study-directory-layout-2">Study Directory Layout 2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#study-directory-layout-3">Study Directory Layout 3</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#subject-directory-layout">Subject Directory Layout</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="outputs.html">Ouputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration File</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">convert_source</a></li>
 </ul>
 
@@ -165,7 +172,7 @@
   <div class="section" id="usage">
 <h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="command-line-interface">
-<h2>Command line interface<a class="headerlink" href="#command-line-interface" title="Permalink to this headline">¶</a></h2>
+<h2>Command Line Interface<a class="headerlink" href="#command-line-interface" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>usage: study_proc [-h] [-s STUDY_DIR] [-o OUT_DIR] [-c CONFIG.yml] [--no-gzip]
                 [--compress INT] [--zero-pad INT] [--append-dwi-info]
                 [--verbose] [--version] [--path-env PATH_VAR]
@@ -208,8 +215,28 @@ Expert Option(s):
 </pre></div>
 </div>
 </div>
+<div class="section" id="python-module-interface">
+<h2>Python Module Interface<a class="headerlink" href="#python-module-interface" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">convert_source.batch_convert</span> <span class="kn">import</span> <span class="n">batch_proc</span>
+
+<span class="p">[</span><span class="n">imgs</span><span class="p">,</span> <span class="n">jsons</span><span class="p">,</span> <span class="n">bvals</span><span class="p">,</span> <span class="n">bvecs</span><span class="p">]</span> <span class="o">=</span> <span class="n">batch_proc</span><span class="p">(</span><span class="n">study_img_dir</span><span class="o">=</span><span class="s1">&#39;&lt;/path/to/study/directory&gt;&#39;</span><span class="p">,</span>
+<span class="o">...</span>                                      <span class="n">out_dir</span><span class="o">=</span><span class="s1">&#39;&lt;/path/to/output/directory&gt;&#39;</span><span class="p">,</span>
+<span class="o">...</span>                                      <span class="n">gzip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="o">...</span>                                      <span class="n">append_dwi_info</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="o">...</span>                                      <span class="n">zero_pad</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="o">...</span>                                      <span class="n">cprss_lvl</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="study-directory-layout">
 <h2>Study Directory Layout<a class="headerlink" href="#study-directory-layout" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The following directory layouts shown below are used in the following examples in the examples section.</p>
+</div>
+<div class="section" id="study-directory-layout-1">
+<h3>Study Directory Layout 1<a class="headerlink" href="#study-directory-layout-1" title="Permalink to this headline">¶</a></h3>
 <p>For <code class="docutils literal notranslate"><span class="pre">convert_source</span></code> to infer each subject’s and session ID correctly, the study directory layout must conform to one of the layouts shown below.</p>
 <p>The study directory layout shown here is for a study consisting of 14 subjects, each with one session.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Study_Image_Directory
@@ -229,6 +256,9 @@ Expert Option(s):
 └── 014-001
 </pre></div>
 </div>
+</div>
+<div class="section" id="study-directory-layout-2">
+<h3>Study Directory Layout 2<a class="headerlink" href="#study-directory-layout-2" title="Permalink to this headline">¶</a></h3>
 <p>In the case of a study with only one session, the directory layout could also be as shown:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Study_Image_Directory
 ├── 001
@@ -247,6 +277,9 @@ Expert Option(s):
 └── 014
 </pre></div>
 </div>
+</div>
+<div class="section" id="study-directory-layout-3">
+<h3>Study Directory Layout 3<a class="headerlink" href="#study-directory-layout-3" title="Permalink to this headline">¶</a></h3>
 <p>This layout is for a study of 7 subjects with 2 sessions.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Study_Image_Directory
 ├── 001-001
@@ -264,6 +297,7 @@ Expert Option(s):
 ├── 007-001
 └── 007-002
 </pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="subject-directory-layout">
@@ -306,7 +340,6 @@ directories of image files.</p>
         └── DWI_MB4_SENSE_1_3.PAR
 </pre></div>
 </div>
-<p>Some text here…</p>
 </div>
 </div>
 
@@ -316,7 +349,7 @@ directories of image files.</p>
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="outputs.html" class="btn btn-neutral float-right" title="Ouputs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="examples.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 

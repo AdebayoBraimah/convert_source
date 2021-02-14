@@ -3,7 +3,7 @@ Usage
 ------
 
 Command Line Interface
-----------------------
+-----------------------
 
 .. code-block:: none
 
@@ -47,9 +47,30 @@ Command Line Interface
                             option is repeatable, and can thus be specified
                             multiple times.
 
+Python Module Interface
+------------------------
+
+.. code-block:: python
+
+    from convert_source.batch_convert import batch_proc
+
+    [imgs, jsons, bvals, bvecs] = batch_proc(study_img_dir='</path/to/study/directory>',
+    ...                                      out_dir='</path/to/output/directory>',
+    ...                                      gzip=True,
+    ...                                      append_dwi_info=True,
+    ...                                      zero_pad=2,
+    ...                                      cprss_lvl=6)
+    ...
+
 
 Study Directory Layout
 -----------------------
+
+.. note:: The following directory layouts shown below are used in the following examples in the examples section.
+
+
+Study Directory Layout 1
+========================
 
 For ``convert_source`` to infer each subject's and session ID correctly, the study directory layout must conform to one of the layouts shown below.
 
@@ -73,6 +94,9 @@ The study directory layout shown here is for a study consisting of 14 subjects, 
     ├── 013-001
     └── 014-001
 
+Study Directory Layout 2
+=========================
+
 In the case of a study with only one session, the directory layout could also be as shown: 
 
 .. code-block:: none
@@ -93,6 +117,8 @@ In the case of a study with only one session, the directory layout could also be
     ├── 013
     └── 014
 
+Study Directory Layout 3
+========================
 
 This layout is for a study of 7 subjects with 2 sessions.
 
@@ -158,4 +184,3 @@ directories of image files.
             ├── B0_DWI.PAR
             └── DWI_MB4_SENSE_1_3.PAR
 
-Some text here...

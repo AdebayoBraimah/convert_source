@@ -11,7 +11,8 @@ Welcome to convert_source's documentation!
 
    installation
    usage
-   outputs
+   examples
+   config
    modules
 
 Indices and tables
