@@ -1,0 +1,361 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Usage &mdash; convert_source 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Ouputs" href="outputs.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> convert_source
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#command-line-interface">Command line interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#study-directory-layout">Study Directory Layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#subject-directory-layout">Subject Directory Layout</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="outputs.html">Ouputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">convert_source</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">convert_source</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Usage</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="command-line-interface">
+<h2>Command line interface<a class="headerlink" href="#command-line-interface" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>usage: study_proc [-h] [-s STUDY_DIR] [-o OUT_DIR] [-c CONFIG.yml] [--no-gzip]
+                [--compress INT] [--zero-pad INT] [--append-dwi-info]
+                [--verbose] [--version] [--path-env PATH_VAR]
+
+Convert source data of a study&#39;s imaging data to BIDS NIFTI data.
+
+optional arguments:
+-h, --help            show this help message and exit
+
+Required Argument(s):
+-s STUDY_DIR, -study STUDY_DIR, --study-dir STUDY_DIR
+                        Parent study image directory for all subjects.
+-o OUT_DIR, -out OUT_DIR, --out-dir OUT_DIR
+                        Output directory.
+
+Optional Argument(s):
+-c CONFIG.yml, -config CONFIG.yml, --config-file CONFIG.yml
+                        Input YAML configuration file. If no configuration
+                        file is provided, then the default configuration file
+                        is used.
+--no-gzip             DO NOT gzip the resulting BIDS NIFTI files [default:
+                        False].
+--compress INT        Compression level [1 - 9] - 1 is fastest, 9 is
+                        smallest [default: 6].
+--zero-pad INT        The amount of zeropadding to pad the run numbers of
+                        the BIDS NIFTI files (e.g. &#39;--zero-pad=2&#39; corresponds
+                        to &#39;01&#39;) [default: 2].
+--append-dwi-info     RECOMMENDED: Appends DWI acquisition information
+                        (unique non-zero b-values, and TE, in msec.) to BIDS
+                        acquisition filename of diffusion weighted image files
+                        [default: False].
+--verbose             Enables verbose output to the command line.
+--version             Prints the version of &#39;convert_source&#39;, then exits.
+
+Expert Option(s):
+--path-env PATH_VAR   Environmental path variable or variables for
+                        dependencies (e.g. the path to &#39;dcm2niix&#39;). NOTE: This
+                        option is repeatable, and can thus be specified
+                        multiple times.
+</pre></div>
+</div>
+</div>
+<div class="section" id="study-directory-layout">
+<h2>Study Directory Layout<a class="headerlink" href="#study-directory-layout" title="Permalink to this headline">¶</a></h2>
+<p>For <code class="docutils literal notranslate"><span class="pre">convert_source</span></code> to infer each subject’s and session ID correctly, the study directory layout must conform to one of the layouts shown below.</p>
+<p>The study directory layout shown here is for a study consisting of 14 subjects, each with one session.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Study_Image_Directory
+├── 001-001
+├── 002-001
+├── 003-001
+├── 004-001
+├── 005-001
+├── 006-001
+├── 007-001
+├── 008-001
+├── 009-001
+├── 010-001
+├── 011-001
+├── 012-001
+├── 013-001
+└── 014-001
+</pre></div>
+</div>
+<p>In the case of a study with only one session, the directory layout could also be as shown:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Study_Image_Directory
+├── 001
+├── 002
+├── 003
+├── 004
+├── 005
+├── 006
+├── 007
+├── 008
+├── 009
+├── 010
+├── 011
+├── 012
+├── 013
+└── 014
+</pre></div>
+</div>
+<p>This layout is for a study of 7 subjects with 2 sessions.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Study_Image_Directory
+├── 001-001
+├── 001-002
+├── 002-001
+├── 002-002
+├── 003-001
+├── 003-002
+├── 004-001
+├── 004-002
+├── 005-001
+├── 005-002
+├── 006-001
+├── 006-002
+├── 007-001
+└── 007-002
+</pre></div>
+</div>
+</div>
+<div class="section" id="subject-directory-layout">
+<h2>Subject Directory Layout<a class="headerlink" href="#subject-directory-layout" title="Permalink to this headline">¶</a></h2>
+<p>Each subject’s directory should consist of image files, or in the case shown below, nested
+directories of image files.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Study_Image_Directory
+└── 001-001
+    ├── DICOM
+    │   └── ST000000
+    │       ├── SE000000
+    │       │   └── MR000002.dcm
+    │       ├── SE000001
+    │       │   ├── MR000001.dcm
+    │       │   .
+    │       │   .
+    │       │   .
+    │       │   └── MR000056.dcm
+    │       └── SE000002
+    │           ├── MR000000.dcm
+    │           .
+    │           .
+    │           .
+    │           └── MR000015.dcm
+    ├── NIFTI
+    │   ├── DWI_68_DIR.bvec
+    │   ├── DWI_68_DIR.bval
+    │   ├── DWI_68_DIR.json
+    │   ├── DWI_68_DIR.nii.gz
+    │   ├── DWI_B0.json
+    │   ├── DWI_B0.nii.gz
+    │   ├── rsfMRI.json
+    │   ├── rsfMRI.nii.gz
+    │   ├── T1_AXIAL.json
+    │   └── T1_AXIAL.nii.gz
+    └── PAR REC
+        ├── AXIAL.PAR
+        ├── AX_SWIP_MPR.PAR
+        ├── B0_DWI.PAR
+        └── DWI_MB4_SENSE_1_3.PAR
+</pre></div>
+</div>
+<p>Some text here…</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="outputs.html" class="btn btn-neutral float-right" title="Ouputs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Adebayo Braimah.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
