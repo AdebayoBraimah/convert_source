@@ -100,6 +100,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="outputs.html">Outputs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration File</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">convert_source</a></li>
 </ul>
@@ -171,6 +172,14 @@
             
   <div class="section" id="usage">
 <h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">convert_source</span></code> package is intended to be used for the conversion of source <code class="docutils literal notranslate"><span class="pre">DICOM</span></code>, <code class="docutils literal notranslate"><span class="pre">PAR</span> <span class="pre">REC</span></code>, and <code class="docutils literal notranslate"><span class="pre">NIFTI</span></code> data to BIDS NIFTI.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<ul class="simple">
+<li><p>The use of <code class="docutils literal notranslate"><span class="pre">PAR</span> <span class="pre">REC</span></code> files for image conversion should be discouraged as this is not an archival format (as most of the necessary metadata is not written to file). [PLACE LINK HERE]</p></li>
+<li><p>The use of <code class="docutils literal notranslate"><span class="pre">NIFTI</span></code> files is also discouraged as most, if not all of the metadata information is lost once the source data has been converted (, unless there is a corresponding JSON file of the same name).</p></li>
+</ul>
+</div>
 <div class="section" id="command-line-interface">
 <h2>Command Line Interface<a class="headerlink" href="#command-line-interface" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>usage: study_proc [-h] [-s STUDY_DIR] [-o OUT_DIR] [-c CONFIG.yml] [--no-gzip]

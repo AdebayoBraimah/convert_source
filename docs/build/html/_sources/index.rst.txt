@@ -12,6 +12,7 @@ Welcome to convert_source's documentation!
    installation
    usage
    examples
+   outputs
    config
    modules
 

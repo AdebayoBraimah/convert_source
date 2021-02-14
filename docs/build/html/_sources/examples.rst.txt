@@ -77,7 +77,10 @@ Likewise, in python:
     ├── sub-011
     ├── sub-012
     ├── sub-013
-    └── sub-014
+    ├── sub-014
+    ├── unknown
+    ├──.bidsignore
+    └──.misc
 
 Study Directory Layout 2
 -------------------------
@@ -119,7 +122,10 @@ Using the same commands from above on **study directory layout 2**, we get the f
     ├── sub-011
     ├── sub-012
     ├── sub-013
-    └── sub-014
+    ├── sub-014
+    ├── unknown
+    ├──.bidsignore
+    └──.misc
 
 Study Directory Layout 3
 -------------------------
@@ -182,5 +188,7 @@ Likewise with **study directory layout 3**:
     ├── sub-011
     ├── sub-012
     ├── sub-013
-    └── sub-014
-
+    ├── sub-014
+    ├── unknown
+    ├──.bidsignore
+    └──.misc

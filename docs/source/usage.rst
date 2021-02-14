@@ -2,6 +2,12 @@
 Usage
 ------
 
+The ``convert_source`` package is intended to be used for the conversion of source ``DICOM``, ``PAR REC``, and ``NIFTI`` data to BIDS NIFTI.
+
+.. warning :: 
+    * The use of ``PAR REC`` files for image conversion should be discouraged as this is not an archival format (as most of the necessary metadata is not written to file). [PLACE LINK HERE]
+    * The use of ``NIFTI`` files is also discouraged as most, if not all of the metadata information is lost once the source data has been converted (, unless there is a corresponding JSON file of the same name).
+
 Command Line Interface
 -----------------------
 

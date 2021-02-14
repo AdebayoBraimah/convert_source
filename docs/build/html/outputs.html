@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Installation &mdash; convert_source 0.1.0 documentation</title>
+  <title>Outputs &mdash; convert_source 0.1.0 documentation</title>
   
 
   
@@ -39,8 +39,8 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Usage" href="usage.html" />
-    <link rel="prev" title="Welcome to convert_source’s documentation!" href="index.html" /> 
+    <link rel="next" title="Configuration File" href="config.html" />
+    <link rel="prev" title="Examples" href="examples.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -86,10 +86,15 @@
             
             
               <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="outputs.html">Outputs</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Outputs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#unknown">Unknown</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#misc">.misc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#bidsignore">.bidsignore</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration File</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">convert_source</a></li>
 </ul>
@@ -140,13 +145,13 @@
     
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Installation</li>
+      <li>Outputs</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/outputs.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -159,8 +164,62 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="outputs">
+<h1>Outputs<a class="headerlink" href="#outputs" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="unknown">
+<h2>Unknown<a class="headerlink" href="#unknown" title="Permalink to this headline">¶</a></h2>
+<p>The directory named <code class="docutils literal notranslate"><span class="pre">unknown</span></code> in the output directory is populated by NIFTI images
+that could not be identified. Files in this directory are generally named following
+this convention: <code class="docutils literal notranslate"><span class="pre">sub-&lt;label&gt;[ses-&lt;label&gt;]_run-&lt;label&gt;_unknown.nii.gz</span></code>, as shown in
+the example below (assuming that this study only had one session).</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Output_Directory
+├── sub-001
+├── sub-002
+.
+.
+.
+├── unknown
+|   ├── sub-001_ses-001_run-01_unknown.json
+|   ├── sub-001_ses-001_run-01_unknown.nii.gz
+|   ├── sub-001_ses-001_run-02_unknown.json
+|   └── sub-001_ses-001_run-02_unknown.nii.gz
+├──.bidsignore
+└──.misc
+</pre></div>
+</div>
+</div>
+<div class="section" id="misc">
+<h2>.misc<a class="headerlink" href="#misc" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">.misc</span></code> directory contains miscellaneous files that pertain to the image conversion
+process, such as log files (as shown below).</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Output_Directory
+├── sub-001
+├── sub-002
+.
+.
+.
+├── unknown
+├──.bidsignore
+└──.misc
+    └── convert_source.log
+</pre></div>
+</div>
+</div>
+<div class="section" id="bidsignore">
+<h2>.bidsignore<a class="headerlink" href="#bidsignore" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">.bidsignore</span></code> file is generated and intended for BIDS validation
+after data conversion. This file acts similarly to the <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code>
+file - meaning files that should be ignored in the output BIDS directory
+should have their filenames written to this file. For example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># .bidsignore file</span>
+
+unknown
+.misc
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">unknown</span></code> and <code class="docutils literal notranslate"><span class="pre">.misc</span></code> directories are not BIDS valid directories and as such,
+would likely throw errors during BIDS validation.</p>
+</div>
 </div>
 
 
@@ -169,8 +228,8 @@
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="usage.html" class="btn btn-neutral float-right" title="Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to convert_source’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="config.html" class="btn btn-neutral float-right" title="Configuration File" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="examples.html" class="btn btn-neutral float-left" title="Examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
