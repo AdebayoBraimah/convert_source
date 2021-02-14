@@ -124,7 +124,7 @@ def batch_proc(study_img_dir: str,
         misc_dir: str = os.path.abspath(misc_dir)
     
     now = datetime.now()
-    dt_string: str = str(now.strftime("%m_%d_%Y_%H_%M%_%S"))
+    dt_string: str = str(now.strftime("%m_%d_%Y_%H_%M"))
 
     _log: str = os.path.join(misc_dir,f"convert_source_{dt_string}.log")
     log: LogFile = log_file(log=_log)
@@ -157,6 +157,7 @@ def batch_proc(study_img_dir: str,
     bids_bvecs: List = []
        
     for sub_data in subs_data:
+        log.info(f"Processing: {sub_data.data}")
         if verbose:
             print(f"Processing: {sub_data.data}")
         data: str = sub_data.data
@@ -1134,7 +1135,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
                     bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
                                                         json_dict=json_dict)
 
-                    img_data.jsons[i] = write_json(json_file=img_data.jsons[i],
+                    img_data.jsons[i] = write_json(json_file=os.path.join(tmp.tmp_dir,'tmp.json'),
                                                     dictionary=bids_dict)
 
             # BIDS 'fmap' cases

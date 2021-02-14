@@ -2,7 +2,7 @@
 Usage
 ------
 
-Command line interface
+Command Line Interface
 ----------------------
 
 .. code-block:: none
