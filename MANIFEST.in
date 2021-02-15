@@ -1,0 +1,4 @@
+# Misc
+include LICENSE
+include CHANGES.rst
+exclude .circleci/config.yml
