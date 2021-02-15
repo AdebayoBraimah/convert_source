@@ -41,7 +41,7 @@ release = cs_version
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
-    # 'sphinxarg.ext',
+    'sphinxarg.ext',
     'sphinx_autodoc_typehints',
     # 'sphinx_autodoc_napoleon_typehints'
 ]
