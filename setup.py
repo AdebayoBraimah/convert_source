@@ -13,12 +13,17 @@ with open(path.join(path.abspath(path.dirname(__file__)), 'README.md'), encoding
 with open(path.join(path.abspath(path.dirname(__file__)), 'requirements.txt')) as fid:
     requirements = fid.read().splitlines()
 
-setup(name                           = 'convert_source',    # Required
-      version                        = version,             # Required
-      packages                       = find_packages(),     # Required
+setup(name                           = 'convert_source',                    # Required
+      version                        = version,                             # Required
+      packages                       = find_packages(exclude=['tests']),    # Required
+      license                        = 'GPL-3.0 License',
+      classifiers                    = ['Intended Audience :: Science/Research',
+                                        'Natural Language :: English',
+                                        'License :: OSI Approved :: GPL-3.0 License',
+                                        'Programming Language :: Python :: 3'],
       install_requires               = requirements,
-      python_requires                = '>=3.6',
-      scripts                        = ['bin/study_proc'],
+      python_requires                = '>=3.7',
+      scripts                        = ['convert_source/bin/study_proc'],
       setup_requires                 = ["pytest-runner"],
       tests_require                  = ["pytest", "pytest-cov", "coverage"],
       classifiers                    = ['Programming Language :: Python :: 3',
@@ -30,4 +35,7 @@ setup(name                           = 'convert_source',    # Required
       long_description_content_type  = 'text/markdown',
       author                         = 'Adebayo Braimah',
       author_email                   = 'adebayo.braimah@cchmc.org',
-      url                            = 'https://github.com/AdebayoBraimah/convert_source')
+      include_package_data           = True,
+      url                            = 'https://github.com/AdebayoBraimah/convert_source',
+      entry_points                   = {'console_scripts': ['study_proc=convert_source.bin.study_proc:main']}
+      )

@@ -232,7 +232,7 @@ Moreover, any non-BIDS related data can be accomdated by following this layout i
                     .
 
 ``bids_search`` & ``bids_map``
-=====================
+================================
 
 The ``bids_search`` and ``bids_map`` keywords are optional and intended for a heurestic search and mapping (, respectively) for BIDS descriptive labels 
 in the source data, and what the output BIDS filename should contain.
