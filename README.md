@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/AdebayoBraimah/convert_source.svg?style=svg)](https://app.circleci.com/pipelines/github/AdebayoBraimah/convert_source) [![Documentation Status](https://readthedocs.org/projects/convert-source/badge/?version=latest)](https://convert-source.readthedocs.io/en/latest/?badge=latest)
+[![CircleCI](https://circleci.com/gh/AdebayoBraimah/convert_source.svg?style=svg)](https://app.circleci.com/pipelines/github/AdebayoBraimah/convert_source) [![Documentation Status](https://readthedocs.org/projects/convert-source/badge/?version=latest)](https://convert-source.readthedocs.io/en/master/)
 
 # convert_source
 Convert source `DICOM`, `PAR REC` or `NIFTI` image data to BIDS directory layout.
