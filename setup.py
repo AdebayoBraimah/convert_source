@@ -2,7 +2,7 @@ from os import path
 from setuptools import setup, find_packages
 
 # Read the version from file
-with open(path.join(path.dirname(__file__), 'version.txt')) as fid:
+with open(path.join(path.dirname(__file__), 'convert_source', 'version.txt')) as fid:
     version = fid.read().strip()
 
 # Read the contents of the README file
