@@ -3,6 +3,7 @@
 """
 
 # TODO:
+#   * Add option for renaming identified unknown files
 #   * Add file search for image files with no extensions (DICOMs)
 #   * [PENDING] Figure out where tmp directory path is being printed.
 #       * See functions that use TmpDir class's rm_tmp_dir() function
@@ -1130,7 +1131,11 @@ def nifti_to_bids(sub_data: SubDataInfo,
                 elif (not img_data.jsons[i]) and (i == 0):
                     json_dict: Dict = read_json(json_file="")
 
+                    param_dict: Dict = get_data_params(file=data,
+                                                    json_file=img_data.jsons[i])
+
                     metadata: Dict = dict_multi_update(dictionary=None, **meta_dict)
+                    metadata: Dict = dict_multi_update(dictionary=metadata, **param_dict)
                     metadata: Dict = dict_multi_update(dictionary=metadata, **mod_dict)
                     
                     bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
