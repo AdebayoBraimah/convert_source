@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Configuration File &mdash; convert_source 0.1.rc1 documentation</title>
+  <title>Configuration File &mdash; convert_source 0.1.rc5 documentation</title>
   
 
   
@@ -100,6 +100,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#bids-search-bids-map"><code class="docutils literal notranslate"><span class="pre">bids_search</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">bids_map</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#metadata"><code class="docutils literal notranslate"><span class="pre">metadata</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#exclude"><code class="docutils literal notranslate"><span class="pre">exclude</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-configuration-file">Example Configuration File</a></li>
 </ul>
 </li>
 </ul>
@@ -328,7 +329,7 @@ Secondly, this keyword directly dictates the BIDS directory layout for each subj
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">cbv</span></code> <code class="docutils literal notranslate"><span class="pre">modality_type</span></code> may be deprecated in BIDS version 1.5+. LINK: <a class="reference external" href="https://bids-specification.readthedocs.io/en/latest/04-modality-specific-files/01-magnetic-resonance-imaging-data.html#deprecated-suffixes">https://bids-specification.readthedocs.io/en/latest/04-modality-specific-files/01-magnetic-resonance-imaging-data.html#deprecated-suffixes</a></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">cbv</span></code> <code class="docutils literal notranslate"><span class="pre">modality_type</span></code> for pCASL and CASL acquisitions may be better accomdated in <a class="reference external" href="https://bids-specification.readthedocs.io/en/latest/04-modality-specific-files/01-magnetic-resonance-imaging-data.html#deprecated-suffixes">BIDS version 1.5+</a> .</p>
 </div>
 </div>
 <div class="section" id="non-bids-related-modalities">
@@ -528,6 +529,60 @@ files and/or image data that would generally correspond to:</p>
 <li><p>Proton Density images</p></li>
 <li><p>T1 rho images</p></li>
 </ul>
+</div>
+<div class="section" id="example-configuration-file">
+<h3>Example Configuration File<a class="headerlink" href="#example-configuration-file" title="Permalink to this headline">¶</a></h3>
+<p>Below is an example configuration file.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example configuration file</span>
+
+<span class="c1"># Heurestic search terms for each modality</span>
+<span class="nt">modality_search</span><span class="p">:</span>
+    <span class="c1"># Anatomical scans</span>
+    <span class="nt">anat</span><span class="p">:</span>
+        <span class="nt">T1w</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">T1</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">T1w</span>
+        <span class="nt">T2w</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">T2</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">T2w</span>
+
+    <span class="c1"># Functional scans</span>
+    <span class="nt">func</span><span class="p">:</span>
+        <span class="c1"># BOLD contrast</span>
+        <span class="nt">bold</span><span class="p">:</span>
+            <span class="nt">rest</span><span class="p">:</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">rsfMR</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">rest</span>
+
+    <span class="c1"># Diffusion Weighted Scans</span>
+    <span class="nt">dwi</span><span class="p">:</span>
+        <span class="nt">dwi</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">diffusion</span>
+
+
+<span class="c1"># Metadata Settings</span>
+<span class="nt">metadata</span><span class="p">:</span>
+    <span class="nt">common</span><span class="p">:</span>
+        <span class="nt">Manufacturer</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Philips</span>
+        <span class="nt">ManufacturersModelName</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Ingenia</span>
+        <span class="nt">MagneticFieldStrength</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">3</span>
+        <span class="nt">InstitutionName</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Cincinnati Children&#39;s Hospital Medical Center</span>
+    <span class="nt">func</span><span class="p">:</span>
+        <span class="nt">rest</span><span class="p">:</span>
+            <span class="nt">ParallelAcquisitionTechnique</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">SENSE</span> <span class="c1"># GRAPPA, for the general term</span>
+            <span class="nt">PhaseEncodingDirection</span><span class="p">:</span> <span class="s">&#39;j&#39;</span>
+            <span class="nt">MultibandAccelerationFactor</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2</span>
+            <span class="nt">TaskName</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Resting State</span>
+            <span class="nt">NumberOfVolumesDiscardedByScanner</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">4</span>
+
+<span class="c1"># Exclusion List (these filenames are not converted)</span>
+<span class="nt">exclude</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">SURVEY</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">Reg</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">DEFAULT</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ScreenCapture</span>
+</pre></div>
+</div>
 </div>
 </div>
 </div>

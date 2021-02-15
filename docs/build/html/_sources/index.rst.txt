@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to convert_source's documentation!
-==========================================
+`convert_source`: Converts source data to BIDS
+================================================
 
 .. toctree::
    :maxdepth: 3

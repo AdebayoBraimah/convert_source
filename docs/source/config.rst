@@ -170,7 +170,7 @@ The corresponding BIDS output directory layout would look something like:
     ├──.bidsignore
     └──.misc
 
-.. warning:: The ``cbv`` ``modality_type`` may be deprecated in BIDS version 1.5+. LINK: https://bids-specification.readthedocs.io/en/latest/04-modality-specific-files/01-magnetic-resonance-imaging-data.html#deprecated-suffixes
+.. warning:: The ``cbv`` ``modality_type`` for pCASL and CASL acquisitions may be better accomdated in `BIDS version 1.5+ <https://bids-specification.readthedocs.io/en/latest/04-modality-specific-files/01-magnetic-resonance-imaging-data.html#deprecated-suffixes>`_ . 
 
 Non-BIDS Related Modalities
 +++++++++++++++++++++++++++++
@@ -380,3 +380,59 @@ files and/or image data that would generally correspond to:
 * Secondary screen captures
 * Proton Density images
 * T1 rho images
+
+Example Configuration File
+===========================
+
+Below is an example configuration file.
+
+.. code-block:: yaml
+
+    # Example configuration file
+
+    # Heurestic search terms for each modality
+    modality_search:
+        # Anatomical scans
+        anat:
+            T1w: 
+                - T1
+                - T1w
+            T2w: 
+                - T2
+                - T2w
+
+        # Functional scans
+        func:
+            # BOLD contrast
+            bold: 
+                rest: 
+                    - rsfMR
+                    - rest
+
+        # Diffusion Weighted Scans
+        dwi:
+            dwi: 
+                - diffusion
+
+
+    # Metadata Settings
+    metadata:
+        common:
+            Manufacturer: Philips
+            ManufacturersModelName: Ingenia
+            MagneticFieldStrength: 3
+            InstitutionName: Cincinnati Children's Hospital Medical Center
+        func:
+            rest:
+                ParallelAcquisitionTechnique: SENSE # GRAPPA, for the general term
+                PhaseEncodingDirection: 'j'
+                MultibandAccelerationFactor: 2
+                TaskName: Resting State
+                NumberOfVolumesDiscardedByScanner: 4
+
+    # Exclusion List (these filenames are not converted)
+    exclude: 
+        - SURVEY
+        - Reg
+        - DEFAULT
+        - ScreenCapture

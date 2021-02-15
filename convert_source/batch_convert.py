@@ -5,8 +5,6 @@
 # TODO:
 #   * Add option for renaming identified unknown files
 #   * Add file search for image files with no extensions (DICOMs)
-#   * [PENDING] Figure out where tmp directory path is being printed.
-#       * See functions that use TmpDir class's rm_tmp_dir() function
 #   * Add doc building to CI workflow.
 #   * Replace triple single quotes (''') with triple double quotes (""")
 
@@ -1404,7 +1402,7 @@ def bids_ignore(out_dir: str) -> str:
     # Write to file using File class context manager
     with File(new_file) as f:
         f.write_txt(".misc \n")
-        f.write_txt("unknown \n")
+        f.write_txt("unknown/* \n")
     
     return new_file
 
