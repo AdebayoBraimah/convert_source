@@ -1,4 +1,5 @@
 # Misc
 include LICENSE
 include CHANGES.rst
+include convert_source/version.txt
 exclude .circleci/config.yml
