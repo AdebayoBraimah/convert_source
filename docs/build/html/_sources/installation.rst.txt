@@ -13,4 +13,4 @@ External Dependencies
 ======================
 
 The main external dependency for ``convert_source`` is ``dcm2niix``, which can be downloaded from `here <https://github.com/rordenlab/dcm2niix>`_.
-Follow the installation instructions and ensure that ``dcm2niix`` is added the system PATH variable.
+Follow the installation instructions and ensure that ``dcm2niix`` is added to the system PATH variable.
