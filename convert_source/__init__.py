@@ -10,7 +10,12 @@ import os
 
 _pkg_path: str = str(pathlib.Path(os.path.abspath(__file__)).parents[1])
 sys.path.append(_pkg_path)
-_version_file: str = os.path.abspath("version.txt")
+_version_file: str = os.path.abspath(
+    os.path.join(
+        os.path.dirname(__file__),
+        "version.txt"
+        )
+)
 
 from convert_source.cs_utils.utils import file_to_screen
 

@@ -866,7 +866,7 @@ def convert_image_data(file: str,
         [imgs, jsons, bvals, bvecs] = img_data.copy_img_data(target_dir=out_dir)
         
         # Clean-up
-        tmp_dir.rm_tmp_dir(rm_parent=False)
+        _ = tmp_dir.rm_tmp_dir(rm_parent=False)
     
     # Image file check
     if len(imgs) == 0:

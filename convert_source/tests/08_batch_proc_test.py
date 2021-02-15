@@ -123,7 +123,7 @@ def test_dependency():
     assert dcm2niix_cmd.check_dependency(path_envs=[os.getcwd()]) == True
 
 def test_extract_data():
-    dcm_data: str = os.path.join(data_dir,'TEST001-UNIT001','data.dicom','data.tar.gz')
+    dcm_data: str = os.path.join(data_dir,'TEST001-UNIT001','data.dicom','data.1.tar.gz')
     extract: Command = Command("tar")
     extract.cmd_list.append("-zxvf")
     extract.cmd_list.append(dcm_data)

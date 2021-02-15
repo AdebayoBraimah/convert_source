@@ -13,20 +13,18 @@ from typing import (
     List
 )
 
-from convert_source import __version__
+from convert_source import __version__ as CS_VERSION
 
 # Default configuration file
-DEFAULT_CONFIG: str = os.path.join(str(pathlib.Path(os.path.abspath(__file__)).parents[2]),"config","config.default.yml")
+DEFAULT_CONFIG: str = os.path.join(str(pathlib.Path(os.path.abspath(__file__)).parents[1]),"config","config.default.yml")
 
 # Default BIDS version
-_bids_version_file: str = os.path.join(str(pathlib.Path(os.path.abspath(__file__)).parents[2]),"config","bids_version.txt")
+_bids_version_file: str = os.path.join(str(pathlib.Path(os.path.abspath(__file__)).parents[1]),"config","bids_version.txt")
 
 with open(_bids_version_file, "r") as f: 
     _bids_version = f.read().replace('\n','')
 
 DEFAULT_BIDS_VERSION: str = _bids_version
-
-CS_VERSION: str = __version__
 
 # Empty BIDS metadata dictionary
 BIDS_INFO: Dict = {

@@ -1,13 +1,19 @@
 CHANGES
 =========
 
+v0.1.0
+---------
+
+* BUG FIX: Fixed bug in setup, which prevented proper installation and usage of the ``study_proc`` executable.
+* UPDATE: The documentation is now `available <https://convert-source.readthedocs.io/en/master/>`_.
+
 v0.1.rc1
 ---------
 
 * Includes ``setup.py`` file, in addition to be published on PyPI.
 * Much improved documentation.
 
-v0.1.rc1alpha
+v0.1.rc1a
 --------------
 
 Version: ``0.1 - release candidate 1 - alpha``

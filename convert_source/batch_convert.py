@@ -3,8 +3,8 @@
 """
 
 # TODO:
-#   * [PENDING] Figure out where tmp directory path is being printed.
-#       * See functions that use TmpDir class's rm_tmp_dir() function
+#   * Add option for renaming identified unknown files
+#   * Add file search for image files with no extensions (DICOMs)
 #   * Add doc building to CI workflow.
 #   * Replace triple single quotes (''') with triple double quotes (""")
 
@@ -904,7 +904,7 @@ def source_to_bids(sub_data: SubDataInfo,
                                            append_dwi_info=append_dwi_info,
                                            zero_pad=zero_pad,
                                            cprss_lvl=cprss_lvl)
-                    tmp.rm_tmp_dir()
+                    _ = tmp.rm_tmp_dir()
                     return (imgs,
                             jsons,
                             bvals,
@@ -929,7 +929,7 @@ def source_to_bids(sub_data: SubDataInfo,
                                            append_dwi_info=append_dwi_info,
                                            zero_pad=zero_pad,
                                            cprss_lvl=cprss_lvl)
-                    tmp.rm_tmp_dir()
+                    _ = tmp.rm_tmp_dir()
                     return (imgs,
                             jsons,
                             bvals,
@@ -991,13 +991,13 @@ def source_to_bids(sub_data: SubDataInfo,
                     else:
                         bvecs.append("")
                 # Clean-up
-                tmp.rm_tmp_dir()
+                _ = tmp.rm_tmp_dir()
                 return (imgs,
                         jsons,
                         bvals,
                         bvecs)
             except ConversionError:
-                tmp.rm_tmp_dir()
+                _ = tmp.rm_tmp_dir()
                 return [""],[""],[""],[""]
 
 def nifti_to_bids(sub_data: SubDataInfo,
@@ -1075,7 +1075,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
 
     # Use TmpDir and NiiFile class context managers
     with TmpDir(tmp_dir=sub_tmp, use_cwd=False) as tmp:
-        tmp.mk_tmp_dir()
+        _ = tmp.mk_tmp_dir()
         with NiiFile(data) as n:
             [path, basename, ext] = n.file_parts()
             img_files: List[str] = glob.glob(os.path.join(path,basename + "*" + ext))
@@ -1129,7 +1129,11 @@ def nifti_to_bids(sub_data: SubDataInfo,
                 elif (not img_data.jsons[i]) and (i == 0):
                     json_dict: Dict = read_json(json_file="")
 
+                    param_dict: Dict = get_data_params(file=data,
+                                                    json_file=img_data.jsons[i])
+
                     metadata: Dict = dict_multi_update(dictionary=None, **meta_dict)
+                    metadata: Dict = dict_multi_update(dictionary=metadata, **param_dict)
                     metadata: Dict = dict_multi_update(dictionary=metadata, **mod_dict)
                     
                     bids_dict: Dict = construct_bids_dict(meta_dict=metadata,
@@ -1266,7 +1270,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
                     bvals.append("")
                     bvecs.append("")
         # Clean-up
-        tmp.rm_tmp_dir()
+        _ = tmp.rm_tmp_dir()
 
         return (imgs,
                 jsons,
@@ -1398,7 +1402,7 @@ def bids_ignore(out_dir: str) -> str:
     # Write to file using File class context manager
     with File(new_file) as f:
         f.write_txt(".misc \n")
-        f.write_txt("unknown \n")
+        f.write_txt("unknown/* \n")
     
     return new_file
 

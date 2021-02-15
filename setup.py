@@ -34,6 +34,6 @@ setup(name                           = 'convert_source',                    # Re
       author                         = 'Adebayo Braimah',
       author_email                   = 'adebayo.braimah@cchmc.org',
       include_package_data           = True,
-      url                            = 'https://github.com/AdebayoBraimah/convert_source',
-      entry_points                   = {'console_scripts': ['study_proc=convert_source.bin.study_proc:main']}
+      url                            = 'https://github.com/AdebayoBraimah/convert_source'
+      # entry_points                   = {'console_scripts': ['study_proc=convert_source.bin.study_proc:main']}
       )
