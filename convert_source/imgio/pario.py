@@ -24,7 +24,8 @@ class PARfileReadError(Exception):
 def get_etl(par_file: str) -> float:
     '''Gets EPI factor (Echo Train Length) from Philips' PAR Header.
     
-    N.B.: This is done via a regEx search as the PAR header is not assumed to change significantly between scanners.
+    NOTE: 
+        This is done via a regEx search as the PAR header is not assumed to change significantly between scanners.
     
     Arguments:
         par_file: PAR header file.
@@ -45,7 +46,8 @@ def get_etl(par_file: str) -> float:
 def get_wfs(par_file: str) -> float:
     '''Gets Water Fat Shift from Philips' PAR Header.
     
-    N.B.: This is done via a regEx search as the PAR header is not assumed to change significantly between scanners.
+    NOTE: 
+        This is done via a regEx search as the PAR header is not assumed to change significantly between scanners.
     
     Arguments:
         par_file: PAR header file.
@@ -69,7 +71,8 @@ def get_red_fact(par_file: str) -> float:
     for Philips MR scanners. This reduction factor is assumed to be 1 if a value cannot be found from witin
     the PAR REC header.
     
-    N.B.: This is done via a regEx search as the PAR header is not assumed to change significantly between scanners.
+    NOTE: 
+        This is done via a regEx search as the PAR header is not assumed to change significantly between scanners.
     
     Arguments:
         par_file: PAR header file.
@@ -95,7 +98,8 @@ def get_red_fact(par_file: str) -> float:
 def get_mb(par_file: str) -> int:
     '''Extracts multi-band acceleration factor from from Philips' PAR Header.
     
-    N.B.: This is done via a regEx search as the PAR header does not normally store this value.
+    NOTE: 
+        This is done via a regEx search as the PAR header does not normally store this value.
     
     Arguments:
         par_file: Absolute filepath to PAR header file
@@ -120,7 +124,8 @@ def get_mb(par_file: str) -> int:
 def get_scan_time(par_file: str) -> Union[float,str]:
     '''Gets the acquisition duration (scan time, in s) from the PAR header.
     
-    N.B.: This is done via a regEx search as the PAR header is not assumed to change significantly between scanners.
+    NOTE: 
+        This is done via a regEx search as the PAR header is not assumed to change significantly between scanners.
     
     Arguments:
         par_file: PAR header file.
@@ -145,7 +150,8 @@ def get_echo_time(par_file: str,
                  ) -> float:
     '''Reads the echo time (TE, in sec.) from a PAR header file.
 
-    NOTE: Echo time is obtained from the PAR file header by reading in the PAR header file as a
+    NOTE: 
+        Echo time is obtained from the PAR file header by reading in the PAR header file as a
         pandas dataframe, followed by saving the resulting dataframe as a M x N | N = 35. The echo times
         are stored in the resulting matrix (constructed from numpy as a numpy multi-dimensional array) in 
         row 16 (count starts at 0).
@@ -188,7 +194,8 @@ def get_flip_angle(par_file: str,
                   ) -> float:
     '''Reads the flip angle (in degrees) from a PAR header file.
 
-    NOTE: Flip angle is obtained from the PAR file header by reading in the PAR header file as a
+    NOTE: 
+        Flip angle is obtained from the PAR file header by reading in the PAR header file as a
         pandas dataframe, followed by saving the resulting dataframe as a M x N | N = 35. The flip angles
         are stored in the resulting matrix (constructed from numpy as a numpy multi-dimensional array) in 
         row 21 (count starts at 0).
@@ -225,4 +232,3 @@ def get_flip_angle(par_file: str,
         raise PARfileReadError(f"Two or more unique flip angles were found in {par_file}. Please check.")
     else:
         return float(np.unique(mat[0:,21]))
-

@@ -14,7 +14,7 @@ from typing import(
 def id_img_file(dir_names: List[str],
                 verbose: bool = False
                 ) -> List[str]:
-    '''Creates list of file-types that either contain the label: DCM (DICOM), NII (NifTi), PAR (PAR REC), or Unknown.
+    '''Creates list of file-types that either contain the label: DCM (``DICOM``), NII (``NIFTI``), PAR (``PAR REC``), or Unknown.
     
     Arguments:
         dir_names: Input directory names list.
@@ -57,7 +57,7 @@ def img_dir_list(directory: str,
                  ) -> Tuple[List[str],List[str]]:
     '''Creates list of image file directories and file-types for some parent directy. The image file directories list
     is a sorted list consisting of unique file paths for each image file parent directory. The corresponding file-
-    types list consists of labels that are: DCM (DICOM), NII (NifTi), PAR (PAR REC), or Unknown - depending on the
+    types list consists of labels that are: DCM (``DICOM``), NII (``NIFTI``), PAR (``PAR REC``), or Unknown - depending on the
     file-types in the image file parent directories.
 
     Usage example:
@@ -68,8 +68,9 @@ def img_dir_list(directory: str,
         verbose: Enable verbose output
 
     Returns:
-        dir_names: List of child directory names that contain image data.
-        file_types: List of file-types that corresponds to directory names list.
+        Tuple:
+            List of child directory names that contain image data.
+            List of file-types that corresponds to directory names list.
     '''
     
     # Init empty list
@@ -141,10 +142,11 @@ def generate_img_list(directory: str,
         verbose: Enable verbosity.
 
     Returns:
-        dir_names: Child directories that contain medical images.
-        file_types: Corresponding file types to 'dir_names' list.
-        out_file_dir: Output file that contains the contents of 'dir_names'.
-        out_file_type: Output file that contains the contents of 'file_types'.
+        Tuple:
+            * Child directories that contain medical images.
+            * Corresponding file types to 'dir_names' list.
+            * Output file that contains the contents of 'dir_names'.
+            * Output file that contains the contents of 'file_types'.
     '''
     
     # Generate directories list and child directories' file types

@@ -66,6 +66,14 @@ class SubDataInfo():
         >>> 
         >>> sub_info.ses
         "001"
+    
+    Arguments:
+        sub: Subject ID.
+        data: Path to image data directory.
+        ses: Session ID.
+    
+    Raises:
+        SubInfoError: Error that arises from either not specifying the subject ID or the path to the image file.
     '''
 
     def __init__(self,
@@ -111,6 +119,9 @@ class BIDSimg():
         jsons: Corresponding list of JSON sidecar(s).
         bvals: Corresponding list of bval file(s).
         bvecs: Corresponding list of bvec file(s).
+    
+    Arguments:
+        work_dir: Input working directory that contains the image files and their associated output files.
     '''
 
     def __init__(self,
@@ -118,8 +129,7 @@ class BIDSimg():
         '''Constructs class instance lists for NIFTI, JSON, bval, and bvec files.
         
         Arguments:
-            work_dir: Input working directory that contains the image files and 
-                their associated output files.
+            work_dir: Input working directory that contains the image files and their associated output files.
         '''
         # Working directory
         self.work_dir: str = os.path.abspath(work_dir)
@@ -178,18 +188,18 @@ class BIDSimg():
                      ) -> Tuple[List[str],List[str],List[str],List[str]]:
         '''Copies image data and their associated files to some target directory.
 
-        NOTE: This function resets the class attributes of the class instance with the
-            returns of this function.
+        NOTE: 
+            This function resets the class attributes of the class instance with the returns of this function.
         
         Arguments:
             target_dir: Target directory to copy files to.
             
         Returns:
-            Tuple of four lists of strings that correspond to:
-                - NIFTI image files
-                - Corresponding JSON file(s)
-                - Corresponding bval file(s)
-                - Corresponding bvec file(s)
+            Tuple of four lists:
+                * NIFTI image files
+                * Corresponding JSON file(s)
+                * Corresponding bval file(s)
+                * Corresponding bvec file(s)
         '''
         
         # Init new lists
@@ -244,7 +254,7 @@ def file_to_screen(file: str) -> str:
         file: Path to file.
 
     Returns:
-        File contents returned as string, printed to screen.
+        File contents returned as string, can be printed to screen.
     '''
 
     with open(file,"r") as f:
@@ -269,8 +279,7 @@ def zeropad(num: Union[str,int],
         num_zeros: Number of zeroes to pad with.
 
     Returns:
-        Zeropadded string of the number, or the original string if the input string could not
-            be represented as an integer.
+        Zeropadded string of the number, or the original string if the input string could not be represented as an integer.
 
     Raises:
         TypeError: Error that arises if floats are passed as an argument.
@@ -295,14 +304,14 @@ def add_to_zeropadded(num1: Union[int,str],
         
     Arguments:
         num1: Input integer, or zeropadded integer represented as a string.
-        num2: Integer to add to num1.
+        num2: Integer to add to ``num1``.
 
     Returns:
         Sum of the two perceived integer values, represented as a string.
 
     Raises:
-        ValueError: Error that arises if non-integer string representations are passed as an argument for num1.
-        TypeError: Error that arise if non-integer arguments are passed for num2, OR if floats are passed for either num1 or num2.
+        ValueError: Error that arises if non-integer string representations are passed as an argument for ``num1``.
+        TypeError: Error that arise if non-integer arguments are passed for ``num2``, **OR** if floats are passed for either ``num1`` or ``num2``.
     '''
     try:
         int(num1)
@@ -593,7 +602,7 @@ def get_metadata(dictionary: Optional[Dict] = None,
         task: Task name to search in the key mapped dictionary.
         
     Returns:
-        Tuple of dictionaries that contain:
+        Tuple:
             * Common metadata dictionary.
             * Modality specific metadata dictionaries.
     '''
@@ -679,19 +688,19 @@ def convert_image_data(file: str,
                        dryrun: bool = False,
                        return_obj: bool = False
                        ) -> Union[BIDSimg,Tuple[List[str],List[str],List[str],List[str]]]:
-    '''Converts medical image data (DICOM, PAR REC, or Bruker) to NifTi (or NRRD) using dcm2niix.
-    This is a wrapper function for dcm2niix (v1.0.20201102+).
+    '''Converts medical image data (``DICOM``, ``PAR REC``, or ``Bruker``) to ``NIFTI`` (or NRRD, not recommended) using ``dcm2niix``.
+    This is a wrapper function for ``dcm2niix`` (v1.0.20201102+).
 
-    NOTE: IF `dcm2niix` is not in system path, then its parent's directory path can be appended to 
-        the system's PATH variable by doing:
+    NOTE: 
+        **IF** ``dcm2niix`` is not in system path, then its parent's directory path can be appended to the system's ``PATH`` variable by doing:
 
             >>> from convert_source.cs_utils.fileio import Command
             >>> dcm2niix_command = Command("dcm2niix")
             >>> dcm2niix_command.check_dependency(path_envs=['<path/to/dcm2niix/dir>'])
 
-        One should note that argument passed for the `path_envs` argument is a list.
+        One should note that argument passed for the ``path_envs`` argument is a list.
         Additionally, the last statement above should return `True` if the executable is found, or raise 
-        a DependencyError otherwise.
+        a ``DependencyError`` otherwise.
 
     Usage example:
         >>> data = convert_image_data("IM00001.dcm",
@@ -727,15 +736,19 @@ def convert_image_data(file: str,
         progress: Report progress, slicer format progress information (default: False).
         verbose: Enable verbosity (default: False).
         write_conflicts: Write behavior for name conflicts:
+
             * 'suffix' = Add suffix to name conflict (default)
             * 'overwrite' = Overwrite name conflict
             * 'skip' = Skip name conflict
+
         crop_3D: Crop 3D acquisitions (y/n/i, default n, use 'i'gnore to neither crop nor rotate 3D acquistions).
         lossless: Losslessly scale 16-bit integers to use dynamic range (default: True).
         big_endian: Byte order:
+
             * 'o' = optimal/native byte order (default)
             * 'n' = little endian
             * 'y' = big endian
+
         xml: Slicer format features (default: False).
         log: LogFile object for logging.
         env: Path environment dictionary.
@@ -743,19 +756,21 @@ def convert_image_data(file: str,
         return_obj: Boolean to return object, rather than a tuple of lists.
         
     Returns:
-        BIDSimg data object that contains:
+        BIDSimg data object or Tuple of lists
+
+        BIDSimg data object:
             * imgs: List of NIFTI image files
             * jsons: Corresponding list of JSON file(s)
             * bvals: Corresponding bval file(s)
             * bvecs: Corresponding bvec file(s)
 
-        OR
+        **OR**
 
-        Tuple of four lists of strings that correspond to:
-            * NIFTI image files
-            * Corresponding JSON file(s)
-            * Corresponding bval file(s)
-            * Corresponding bvec file(s)
+        Tuple:
+            * List of NIFTI image files
+            * List of corresponding JSON file(s)
+            * List of corresponding bval file(s)
+            * List of corresponding bvec file(s)
     
     Raises:
         ConversionError: Error that arises if no converted (NIFTI) images are created.
@@ -896,9 +911,10 @@ def glob_dcm(dcm_dir: str) -> List[str]:
 def glob_img(img_dir: str) -> List[str]:
     '''Globs image data files given a subject image data directory.
     The image file types that are search for are:
-        * DICOMs
-        * PAR RECs
-        * NIFTIs
+
+        * ``DICOM``
+        * ``PAR REC``
+        * ``NIFTI``
     
     Example usage:
         >>> img_list = glob_img(img_dir)
@@ -985,8 +1001,7 @@ def collect_info(parent_dir: str,
         parent_dir: Parent directory that contains each subject.
         
     Returns:
-        List/Array of SubDataInfo objects that corresponds to a subject ID, 
-            session ID, and path to medical image data.
+        List/Array of SubDataInfo objects that corresponds to a subject ID, session ID, and path to medical image data.
     '''
     
     parent_dir: str = os.path.abspath(parent_dir)
@@ -1084,47 +1099,53 @@ def calc_read_time(file: str,
     WaterFatShift is a private tag in the Philips DICOM header - approaches 3 and 4 are intended for Philips/GE DICOMs 
     as those values are anticipated to exist in their DICOM headers).
 
-    NOTE: This function's calculation of the Effective Echo Spacing and the Total Readout Time ASSUME that the magnetic field strength is 3T.
+    NOTE: 
+        This function's calculation of the Effective Echo Spacing and the Total Readout Time ASSUME that the magnetic field strength is 3T.
     
     The approaches are listed below:
     
     Approach 1 (BIDS method, Siemens):
-        BWPPPE = BandwidthPerPixelPhaseEncode
-        EffectiveEchoSpacing = 1/[BWPPPE * ReconMatrixPE]
-        TotalReadoutTime = EffectiveEchoSpacing * (ReconMatrixPE - 1)
+        ``BWPPPE = BandwidthPerPixelPhaseEncode``
+        ``EffectiveEchoSpacing = 1/[BWPPPE * ReconMatrixPE]``
+        ``TotalReadoutTime = EffectiveEchoSpacing * (ReconMatrixPE - 1)``
         
     Approach 2 (Philips method - PAR REC):
-        EffectiveEchoSpacing = (((1000 * WaterFatShift)/(434.215 * (EchoTrainLength + 1)))/ParallelReductionFactorInPlane)
-        TotalReadoutTime = 0.001 * EffectiveEchoSpacing * EchoTrainLength
+        ``EffectiveEchoSpacing = (((1000 * WaterFatShift)/(434.215 * (EchoTrainLength + 1)))/ParallelReductionFactorInPlane)``
+        ``TotalReadoutTime = 0.001 * EffectiveEchoSpacing * EchoTrainLength``
     
     Approach 3 (Philips/GE method - DICOM):
-        EffectiveEchoSpacing = ((1/(PixelBandwidth * EchoTrainLength)) * (EchoTrainLength - 1)) * 1.3
-        TotalReadoutTime = EffectiveEchoSpacing * (EchoTrainLength - 1)
+        ``EffectiveEchoSpacing = ((1/(PixelBandwidth * EchoTrainLength)) * (EchoTrainLength - 1)) * 1.3``
+        ``TotalReadoutTime = EffectiveEchoSpacing * (EchoTrainLength - 1)``
         
     Approach 4 (Philips/GE method - DICOM):
-        EffectiveEchoSpacing = ((1/(PixelBandwidth * ReconMatrixPE)) * (ReconMatrixPE - 1)) * 1.3
-        tot_read_time = EffectiveEchoSpacing * (ReconMatrixPE - 1)
+        ``EffectiveEchoSpacing = ((1/(PixelBandwidth * ReconMatrixPE)) * (ReconMatrixPE - 1)) * 1.3``
+        ``tot_read_time = EffectiveEchoSpacing * (ReconMatrixPE - 1)``
         
-        Note: EchoTrainLength is assumed to be equal to ReconMatrixPE for approaches 3 and 4, as these values are generally close.
-        Note: Approaches 3 and 4 appear to have about a 30% decrease in Siemens data when this was tested. The solution was to implement a fudge factor that accounted for the 30% decrease.
+    NOTE: 
+        EchoTrainLength is assumed to be equal to ReconMatrixPE for approaches 3 and 4, as these values are generally close.
+    NOTE: 
+        Approaches 3 and 4 appear to have about a 30% decrease in Siemens data when this was tested. The solution was to implement a fudge factor that accounted for the 30% decrease.
     
     References:
-        Approach 1: https://github.com/bids-standard/bids-specification/blob/master/src/04-modality-specific-files/01-magnetic-resonance-imaging-data.md
-        Approach 2: https://osf.io/hks7x/ - page 7; 
+        * Approach 1: 
+            https://github.com/bids-standard/bids-specification/blob/master/src/04-modality-specific-files/01-magnetic-resonance-imaging-data.md
+        * Approach 2: 
+            https://osf.io/hks7x/ - page 7; 
             https://support.brainvoyager.com/brainvoyager/functional-analysis-preparation/29-pre-processing/78-epi-distortion-correction-echo-spacing-and-bandwidth
     
-        Forum that raised this specific issue with Philips: https://neurostars.org/t/consolidating-epi-echo-spacing-and-readout-time-for-philips-scanner/4406
+        * Forum that raised this specific issue with Philips MR data: 
+            https://neurostars.org/t/consolidating-epi-echo-spacing-and-readout-time-for-philips-scanner/4406
     
-        Approaches 3 and 4 were found thorugh trial and error and yielded similar, but not the same values as approaches 1 and 2.
+        * Approaches 3 and 4:
+            Found thorugh trial and error and yielded similar, but not the same values as approaches 1 and 2.
     
     Arguments:
         file: Filepath to raw image data file (DICOM or PAR REC)
         json_file: Filepath to corresponding JSON sidecar.
         
     Returns:
-        Tuple of floats that correspond to the Effective Echo Spacing and the Total Readout Time,
-            OR
-        Empty strings if the values cannot be calculated.
+        Tuple:
+            Tuple of floats or empty strings if unable to determine either of the values.
     '''
     file: str = os.path.abspath(file)
 
@@ -1183,7 +1204,7 @@ def comp_dict(d1: Dict,
               verbose: bool = False
              ) -> Union[bool,None]:
     '''Compares 2 dictionaries to see if they have matching keys, and that each key maps
-    to a value (that is NOT of type None). This is performed recursively.
+    to a value (that is **NOT** of type None). This is performed recursively.
     
     Usage example:
         >>> comp_dict(d1, d2)
@@ -1200,8 +1221,7 @@ def comp_dict(d1: Dict,
         
     Raises:
         KeyError: Error that arises if input dictionaries do not have matching keys.
-        ValueError: Error that arises if one or more of the keys in either dictionary map
-            NoneType values.
+        ValueError: Error that arises if one or more of the keys in either dictionary map NoneType values.
     '''
     for k in d1:
         if (k not in d2):
@@ -1285,14 +1305,14 @@ def get_par_scan_tech(par_file: str,
         ...
 
     Arguments:
-        par_file: PAR filename.
-        search_dict: Nested heursitic search dictionary (from the `read_config` function).
+        par_file: PAR header filename.
+        search_dict: Nested heursitic search dictionary (from the ``read_config`` function).
     
     Returns: 
-        Tuple of strings that consist of:
-            * modality_type: Modality type (e.g. 'anat', 'func', etc.)
-            * modality_label: Modality label (e.g. 'T1w','bold', etc.)
-            * task: Task name.
+        Tuple:
+            * ``modality_type``: Modality type (e.g. ``anat``, ``func``, etc.)
+            * ``modality_label``: Modality label (e.g. ``T1w``, ``bold``, etc.)
+            * ``task``: Task name (e.g. ``rest``).
     '''
     par_file: str = os.path.abspath(par_file)
 
@@ -1360,6 +1380,7 @@ def get_dcm_scan_tech(dcm_file: str,
     nested heursitic search dictionary. The DICOM header field searched is a Philips DICOM private tag (2001,1020) [Scanning 
     Technique Description MR]. In the case that matches are found in that field, is empty, or does not exist - then common 
     DICOM tags are searched which include: 
+
         * Series Description
         * Protocol Name
         * Image Type.
@@ -1371,13 +1392,13 @@ def get_dcm_scan_tech(dcm_file: str,
     
     Arguments:
         dcm_file: DICOM filename.
-        search_dict: Nested heursitic search dictionary (from the `read_config` function).
+        search_dict: Nested heursitic search dictionary (from the ``read_config`` function).
     
     Returns: 
-        Tuple of strings that consist of:
-            * modality_type: Modality type (e.g. 'anat', 'func', etc.)
-            * modality_label: Modality label (e.g. 'T1w','bold', etc.)
-            * task: Task name.
+        Tuple:
+            * ``modality_type``: Modality type (e.g. ``anat``, ``func``, etc.)
+            * ``modality_label``: Modality label (e.g. ``T1w``, ``bold``, etc.)
+            * ``task``: Task name (e.g. ``rest``).
     '''
     dcm_file: str = os.path.abspath(dcm_file)
 
@@ -1482,14 +1503,14 @@ def header_search(img_file: str,
         ...
 
     Arguments:
-        img_file: Input image data file path.
-        search_dict: Nested heursitic dictionary of (BIDS) related search terms.
-
+        img_file: Image file.
+        search_dict: Nested heursitic search dictionary (from the ``read_config`` function).
+    
     Returns: 
-        Tuple of strings that consist of:
-            * modality_type: Modality type (e.g. 'anat', 'func', etc.)
-            * modality_label: Modality label (e.g. 'T1w','bold', etc.)
-            * task: Task name.
+        Tuple:
+            * ``modality_type``: Modality type (e.g. ``anat``, ``func``, etc.)
+            * ``modality_label``: Modality label (e.g. ``T1w``, ``bold``, etc.)
+            * ``task``: Task name (e.g. ``rest``).
     '''
     img_file: str = os.path.abspath(img_file)
 

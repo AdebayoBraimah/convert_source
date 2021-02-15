@@ -155,7 +155,6 @@ def arg_parser():
                             metavar="PATH_VAR",
                             required=False,
                             action='append',
-                            default="",
                             help="Environmental path variable or variables for dependencies (e.g. the path to 'dcm2niix'). \
                                 NOTE: This option is repeatable, and can thus be specified multiple times.")
 

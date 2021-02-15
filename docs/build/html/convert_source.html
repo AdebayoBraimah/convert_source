@@ -88,7 +88,9 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="outputs.html">Ouputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="outputs.html">Outputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration File</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">convert_source</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">convert_source package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
@@ -227,7 +229,7 @@ and an output directory to place the BIDS NIFTI data.</p>
 <li><p><strong>config_file</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Configuration file.</p></li>
 <li><p><strong>path_envs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – List of directory paths to append to the system’s ‘PATH’ variable.</p></li>
 <li><p><strong>gzip</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Gzip output NIFTI files.</p></li>
-<li><p><strong>append_dwi_info</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Appends DWI acquisition information (unique non-zero b-values, and TE, in msec.) to BIDS acquisition filename.</p></li>
+<li><p><strong>append_dwi_info</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – RECOMMENDED: Appends DWI acquisition information (unique non-zero b-values, and TE, in msec.) to BIDS acquisition filename.</p></li>
 <li><p><strong>zero_pad</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of zeroes to pad the run number up to (zero_pad=2 is ‘01’).</p></li>
 <li><p><strong>cprss_lvl</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Compression level [1 - 9] - 1 is fastest, 9 is smallest.</p></li>
 <li><p><strong>verbose</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Enable verbose output.</p></li>

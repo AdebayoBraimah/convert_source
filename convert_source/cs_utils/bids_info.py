@@ -40,8 +40,8 @@ def is_camel_case(s: str,
                   ) -> bool:
     '''Tests if some input string is camel case (CamelCase).
 
-    NOTE: This function is configured for BIDS use cases, in which metadata must 
-        be in camel case, with the first letter being uppercase.
+    NOTE: 
+        This function is configured for BIDS use cases, in which metadata must be in camel case, with the first letter being uppercase.
 
     Usage example:
         >>> is_camel_case("CamelCase", bids_case=True)
@@ -88,7 +88,7 @@ def construct_bids_dict(meta_dict: Optional[Dict] = None,
         Dictionary containing BIDS related metadata.
     
     Raises:
-        IndexError: Error that arises if constant variables `BIDS_INFO`'s keys and BIDS_ORD_ARR are of different lengths.
+        IndexError: Error that arises if constant variables ``BIDS_INFO``'s keys and ``BIDS_ORD_ARR`` are of different lengths.
     '''
     # BIDS informatino dictionary
     bids_info: Dict = deepcopy(BIDS_INFO)
@@ -178,42 +178,56 @@ def construct_bids_name(sub_data: SubDataInfo,
     Arguments:
         sub_data: SubDataInfo object that contains subject and session ID.
         modality_type: Modality type associated with the data. Valid modality types include, but are not limited to:
-            * 'anat': Anatomical scans
-            * 'func': Functional scans
-            * 'dwi': Diffusion weighted image scans
-            * 'fmap: ': Fieldmaps
-            * 'swi': Susceptibility weighted image scans
+
+            * ``anat``: Anatomical scans
+            * ``func``: Functional scans
+            * ``dwi``: Diffusion weighted image scans
+            * ``fmap``: Fieldmaps
+            * ``swi``: Susceptibility weighted image scans
+
         modality_label: Modality label of associated with the data. Valid modality labels include, but are not limited to:
-            * 'T1w', 'T2w', 'PD', 'FLAIR', 'T1rho' (in the case of 'anat').
-            * 'bold', 'cbv', 'phase' (in the case of 'func').
-                * NOTE: In the case of 'func' modalities, these are referred to as "contrast_labels" in the BIDS documentation.
+
+            * ``T1w``, ``T2w``, ``PD``, ``FLAIR``, ``T1rho`` (in the case of ``anat``).
+            * ``bold``, ``cbv``, ``phase`` (in the case of ``func``).
+
+            NOTE: 
+                In the case of ``func`` modalities, these are referred to as ``contrast_labels`` in the BIDS documentation.
+
         acq: Acquisition description of the associated image data.
         ce: Contrast enhanced description of the associated image data.
-        task: Task associated with the image data, required if 'func' is used as the modality_type.
+        task: Task associated with the image data, required if ``func`` is used as the modality_type.
         acq_dir: Acquisition direction of the image (e.g. PA, AP, LR, RL).
         rec: Image reconstruction description.
         run: Run number of the associated image data.
         echo: Echo number of the associated image data (, in the case of multi-echo data).
         case1: BIDS fieldmap case 1, set to True if the following files are present:
-            * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phasediff.nii[.gz]
-            * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phasediff.json
-            * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude1.nii[.gz]
-            * [ sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude2.nii[.gz] ]
+
+            * ``sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phasediff.nii[.gz]``
+            * ``sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phasediff.json``
+            * ``sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude1.nii[.gz]``
+            * ``[ sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude2.nii[.gz] ]``
+
         mag2: Should be set to True, if case 1 contains a second magnitude image.
         case2: BIDS fieldmap case 2, set to True if the following files are present:
-            * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phase1.nii[.gz]
-            * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phase1.json
-            * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phase2.nii[.gz]
-            * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phase2.json
-            * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude1.nii[.gz]
-            * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude2.nii[.gz]
+
+            * ``sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phase1.nii[.gz]``
+            * ``sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phase1.json``
+            * ``sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phase2.nii[.gz]``
+            * ``sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phase2.json``
+            * ``sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude1.nii[.gz]``
+            * ``sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude2.nii[.gz]``
+
         case3: BIDS fieldmap case 3, set to True if the following files are present:
-            * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude.nii[.gz]
-            * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_fieldmap.nii[.gz]
-            * sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_fieldmap.json
+
+            * ``sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude.nii[.gz]``
+            * ``sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_fieldmap.nii[.gz]``
+            * ``sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_fieldmap.json``
+
         case4: BIDS fieldmap case 4, set to True if the following files are present:
-            * sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>]_dir-<label>[_run-<index>]_epi.nii[.gz]
-            * sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>]_dir-<label>[_run-<index>]_epi.json
+
+            * ``sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>]_dir-<label>[_run-<index>]_epi.nii[.gz]``
+            * ``sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>]_dir-<label>[_run-<index>]_epi.json``
+
         out_dir: Target output directory for a subject's BIDS files.
         zero_pad: Number of zeroes to zeropad the output value.
 
@@ -222,10 +236,10 @@ def construct_bids_name(sub_data: SubDataInfo,
     
     Raises:
         BIDSNameError: Error raised if:
-            * 'anat' is the speicified modality_type, but no modality_label is specified.
-            * 'func' is the speicified modality_type, but no modality_label is specified.
-            * 'func' is the speicified modality_type, but no task is specified.
-            * 'fmap' is the speicified modality_type, but no fieldmap 'case' is specified.
+            * ``anat`` is the speicified modality_type, but no modality_label is specified.
+            * ``func`` is the speicified modality_type, but no modality_label is specified.
+            * ``func`` is the speicified modality_type, but no task is specified.
+            * ``fmap`` is the speicified modality_type, but no fieldmap 'case' is specified.
     '''
     # BIDS parameter dictionary
     bids_param: Dict = deepcopy(BIDS_PARAM)
@@ -342,11 +356,13 @@ def num_runs(directory: Optional[str] = "",
              ) -> Union[int,str]:
     '''Counts the number of similarly named files in a directory to obtain a unique run number.
     Optimal use of this function requires the:
-        * search directory (directory)
-        * modality type (modality_type)
-        * BIDS filename dictionary (bids_dict)
+
+        * search directory (``directory``)
+        * modality type (``modality_type``)
+        * BIDS filename dictionary (``bids_dict``)
     
-    NOTE: The optional input bids_dict is a nested dictionary constructed by the function `construct_bids_name`.
+    NOTE: 
+        The optional input ``bids_dict`` is a nested dictionary constructed by the function ``construct_bids_name``.
     
     Usage example:
         >>> num_runs(directory: str,
@@ -359,15 +375,21 @@ def num_runs(directory: Optional[str] = "",
     Arguments:
         directory: Input directory to search.
         modality_type: Modality type associated with the data. Valid modality types include, but are not limited to:
-            * 'anat': Anatomical scans
-            * 'func': Functional scans
-            * 'dwi': Diffusion weighted image scans
-            * 'fmap: ': Fieldmaps
-            * 'swi': Susceptibility weighted image scans
+
+            * ``anat``: Anatomical scans
+            * ``func``: Functional scans
+            * ``dwi``: Diffusion weighted image scans
+            * ``fmap``: Fieldmaps
+            * ``swi``: Susceptibility weighted image scans
+
         modality_label: Modality label of associated with the data. Valid modality labels include, but are not limited to:
-            * 'T1w', 'T2w', 'PD', 'FLAIR', 'T1rho' (in the case of 'anat').
-            * 'bold', 'cbv', 'phase' (in the case of 'func').
-                * NOTE: In the case of 'func' modalities, these are referred to as "contrast_labels" in the BIDS documentation.
+
+            * ``T1w``, ``T2w``, ``PD``, ``FLAIR``, ``T1rho`` (in the case of ``anat``).
+            * ``bold``, ``cbv``, ``phase`` (in the case of ``func``).
+
+            NOTE: 
+                In the case of ``func`` modalities, these are referred to as "contrast_labels" in the BIDS documentation.
+
         bids_dict: Nested BIDS name dictionary that contains relevant information to naming files.
         zero_pad: Number of zeroes to zeropad the output value.
 
@@ -426,7 +448,7 @@ def search_bids(s: str,
                 task: Optional[str] = "",
                 bids_name_dict: Optional[Dict] = {}
                 ) -> Dict:
-    '''Performs search of BIDS (or related terms) provided there are bids_search, and bids_map dictionaries, and some input
+    '''Performs search of BIDS (or related terms) provided there are ``bids_search``, and ``bids_map`` dictionaries, and some input
     string (or file, represented as a string).
     
     Usage example:
@@ -442,8 +464,8 @@ def search_bids(s: str,
         s: Input string (or file, represented as a string).
         bids_search: Heurestic BIDS related search terms.
         bids_map: Descriptive BIDS terms to be mapped to.
-        modality_type: Modality type (e.g. 'anat', 'func', 'dwi' etc).
-        modality_label: Modality label (e.g. 'T1w','bold','dwi' etc).
+        modality_type: Modality type (e.g. ``anat``, ``func``, ``dwi`` etc).
+        modality_label: Modality label (e.g. ``T1w``, ``bold``, ``dwi`` etc).
         task: Task label.
         bids_name_dict: Existing BIDS name dictionary.
         

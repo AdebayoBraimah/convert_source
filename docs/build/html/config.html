@@ -1,0 +1,583 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Configuration File &mdash; convert_source 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="convert_source" href="modules.html" />
+    <link rel="prev" title="Outputs" href="outputs.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> convert_source
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="outputs.html">Outputs</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration File</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-file-keywords">Configuration File Keywords</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#modality-search"><code class="docutils literal notranslate"><span class="pre">modality_search</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#functional-task-data">Functional Task Data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#non-bids-related-modalities">Non-BIDS Related Modalities</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#bids-search-bids-map"><code class="docutils literal notranslate"><span class="pre">bids_search</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">bids_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metadata"><code class="docutils literal notranslate"><span class="pre">metadata</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#exclude"><code class="docutils literal notranslate"><span class="pre">exclude</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">convert_source</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">convert_source</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Configuration File</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/config.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="configuration-file">
+<h1>Configuration File<a class="headerlink" href="#configuration-file" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">YAML</span></code> (<code class="docutils literal notranslate"><span class="pre">.yml</span></code>) configuration file dictates what modalities and parameter information
+is used to write the BIDS NIFTI files, in addition to its associated metadata.</p>
+<div class="section" id="configuration-file-keywords">
+<h2>Configuration File Keywords<a class="headerlink" href="#configuration-file-keywords" title="Permalink to this headline">¶</a></h2>
+<p>The configuration file will look for these 5 distinct keywords:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">modality_search</span></code>: Heuristic search terms for each modality (<strong>required</strong>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bids_search</span></code>: Heuristic search terms for each BIDS related filename description.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bids_map</span></code>: Corresponding terms to map <code class="docutils literal notranslate"><span class="pre">bids_search</span></code>’s search terms to.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metadata</span></code>: The metadata to write to each image file’s JSON (sidecar) file.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">exclude</span></code>: Files and/or modalities to exclude that contain any words in this list.</p></li>
+</ul>
+<div class="section" id="modality-search">
+<h3><code class="docutils literal notranslate"><span class="pre">modality_search</span></code><a class="headerlink" href="#modality-search" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">modality_search</span></code> keyword is required and serves several purposes.
+The main purpose of this keyword is that it provides a mapping between the
+intended BIDS <code class="docutils literal notranslate"><span class="pre">modality_label</span></code> and some corresponding heuristic search terms.
+Secondly, this keyword directly dictates the BIDS directory layout for each subject.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Heurestic search terms for each modality</span>
+
+<span class="nt">modality_search</span><span class="p">:</span>        <span class="c1"># Configuration file modality_search keyword</span>
+    <span class="nt">anat</span><span class="p">:</span>               <span class="c1"># BIDS modality type (for anatomical images)</span>
+        <span class="nt">T1w</span><span class="p">:</span>            <span class="c1"># BIDS modality label (for T1w images)</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">T1</span>        <span class="c1"># Heurestic search terms list (for T1w images)</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">T1w</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">TFE</span>
+        <span class="nt">T2w</span><span class="p">:</span>            <span class="c1"># BIDS modality label (for T2w images)</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">T2</span>        <span class="c1"># Heurestic search terms list (for T2w images)</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">T2w</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">TSE</span>
+        <span class="nt">flair</span><span class="p">:</span>          <span class="c1"># BIDS modality label (for FLAIR images)</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">flair</span>     <span class="c1"># Heurestic search terms list (for FLAIR images)</span>
+                <span class="l l-Scalar l-Scalar-Plain">.</span>
+                <span class="l l-Scalar l-Scalar-Plain">.</span>
+                <span class="l l-Scalar l-Scalar-Plain">.</span>
+</pre></div>
+</div>
+<p>Additionally, the corresponding BIDS directory layout this would create would look like:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Output_Directory
+├── sub-001
+|   └── anat
+|       ├── sub-001_run-01_T1w.json
+|       ├── sub-001_run-01_T1w.nii.gz
+|       ├── sub-001_run-01_T2w.json
+|       ├── sub-001_run-01_T2w.nii.gz
+|       ├── sub-001_run-01_flair.json
+|       └── sub-001_run-01_flair.nii.gz
+├── sub-002
+├── sub-003
+├── sub-004
+├── sub-005
+.
+.
+.
+├── unknown
+├──.bidsignore
+└──.misc
+</pre></div>
+</div>
+<p>This schema can be further extended to accomdate other BIDS related modality types and labels as shown below:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Heurestic search terms for each modality</span>
+
+<span class="nt">modality_search</span><span class="p">:</span>            <span class="c1"># Configuration file modality_search keyword</span>
+    <span class="nt">dwi</span><span class="p">:</span>                    <span class="c1"># BIDS modality type (for diffusion weighted images, DWI)</span>
+        <span class="nt">dwi</span><span class="p">:</span>                <span class="c1"># BIDS modality label (for DWIs)</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">diffusion</span>     <span class="c1"># Heurestic search terms list (for DWIs)</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">DTI</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">DWI</span>
+    <span class="nt">fmap</span><span class="p">:</span>                   <span class="c1"># BIDS modality type (for field maps)</span>
+        <span class="nt">fmap</span><span class="p">:</span>               <span class="c1"># BIDS modality label (for field maps)</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">fieldmap</span>      <span class="c1"># Heurestic search terms list (for field maps)</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">map</span>
+                <span class="l l-Scalar l-Scalar-Plain">.</span>
+                <span class="l l-Scalar l-Scalar-Plain">.</span>
+                <span class="l l-Scalar l-Scalar-Plain">.</span>
+</pre></div>
+</div>
+<p>The above schema would produce the following BIDS output directory layout:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Output_Directory
+├── sub-001
+|   ├── anat
+|   ├── dwi
+|   |   ├── sub-001_run-01_dwi.bval
+|   |   ├── sub-001_run-01_dwi.bvec
+|   |   ├── sub-001_run-01_dwi.json
+|   |   └── sub-001_run-01_dwi.nii.gz
+|   └── fmap
+|       ├── sub-001_run-01_magnitude.nii.gz
+|       ├── sub-001_run-01_fieldmap.nii.gz
+|       └── sub-001_run-01_fieldmap.json
+├── sub-002
+├── sub-003
+├── sub-004
+├── sub-005
+.
+.
+.
+├── unknown
+├──.bidsignore
+└──.misc
+</pre></div>
+</div>
+<div class="section" id="functional-task-data">
+<h4>Functional Task Data<a class="headerlink" href="#functional-task-data" title="Permalink to this headline">¶</a></h4>
+<p>Functional task data is handled similarly, with the task name being included in the search list as shown below:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Heurestic search terms for each modality</span>
+
+<span class="nt">modality_search</span><span class="p">:</span>            <span class="c1"># Configuration file modality_search keyword</span>
+    <span class="nt">func</span><span class="p">:</span>                   <span class="c1"># BIDS modality type (for functional images)</span>
+        <span class="nt">bold</span><span class="p">:</span>               <span class="c1"># BIDS modality label (, or contrast label for functional BOLD images)</span>
+            <span class="nt">rest</span><span class="p">:</span>           <span class="c1"># BIDS task name</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">rsfMR</span>     <span class="c1"># Heurestic search terms list (for functional BOLD images with resting state task)</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">rest</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">FFE</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">FEEPI</span>
+            <span class="nt">nback</span><span class="p">:</span>          <span class="c1"># BIDS task name</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">nback</span>     <span class="c1"># Heurestic search terms list (for functional BOLD images with N-back task)</span>
+
+        <span class="nt">cbv</span><span class="p">:</span>                <span class="c1"># BIDS modality label (, or contrast label for functional CBV, cerebral bloold volume images)</span>
+            <span class="nt">rest</span><span class="p">:</span>           <span class="c1"># BIDS task name</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">casl</span>      <span class="c1"># Heurestic search terms list (for functional CBV images with resting state task)</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pcas</span>
+                    <span class="l l-Scalar l-Scalar-Plain">.</span>
+                    <span class="l l-Scalar l-Scalar-Plain">.</span>
+                    <span class="l l-Scalar l-Scalar-Plain">.</span>
+</pre></div>
+</div>
+<p>The corresponding BIDS output directory layout would look something like:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Output_Directory
+├── sub-001
+|   ├── anat
+|   ├── dwi
+|   ├── fmap
+|   └── func
+|       ├── sub-001_run-01_bold.json
+|       ├── sub-001_run-01_bold.nii.gz
+|       ├── sub-001_run-01_sbref.json
+|       ├── sub-001_run-01_sbref.nii.gz
+|       ├── sub-001_run-01_cbv.json
+|       └── sub-001_run-01_cbv.nii.gz
+├── sub-002
+├── sub-003
+├── sub-004
+├── sub-005
+.
+.
+.
+├── unknown
+├──.bidsignore
+└──.misc
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">cbv</span></code> <code class="docutils literal notranslate"><span class="pre">modality_type</span></code> may be deprecated in BIDS version 1.5+. LINK: <a class="reference external" href="https://bids-specification.readthedocs.io/en/latest/04-modality-specific-files/01-magnetic-resonance-imaging-data.html#deprecated-suffixes">https://bids-specification.readthedocs.io/en/latest/04-modality-specific-files/01-magnetic-resonance-imaging-data.html#deprecated-suffixes</a></p>
+</div>
+</div>
+<div class="section" id="non-bids-related-modalities">
+<h4>Non-BIDS Related Modalities<a class="headerlink" href="#non-bids-related-modalities" title="Permalink to this headline">¶</a></h4>
+<p>Non-BIDS related data may also be added to the configuration file to accomdate the study dataset.</p>
+<p>To do so, see the example below:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Heurestic search terms for each modality</span>
+
+<span class="nt">modality_search</span><span class="p">:</span>        <span class="c1"># Configuration file modality_search keyword</span>
+    <span class="nt">swi</span><span class="p">:</span>                <span class="c1"># BIDS modality type (for SWIs)</span>
+        <span class="nt">swi</span><span class="p">:</span>            <span class="c1"># BIDS modality label (for SWIs)</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">swi</span>       <span class="c1"># Heurestic search terms list (for SWIs)</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">sw_image</span>
+                <span class="l l-Scalar l-Scalar-Plain">.</span>
+                <span class="l l-Scalar l-Scalar-Plain">.</span>
+                <span class="l l-Scalar l-Scalar-Plain">.</span>
+</pre></div>
+</div>
+<p>The corresponding output BIDS directory layout would look like:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Output_Directory
+├── sub-001
+|   ├── anat
+|   ├── dwi
+|   ├── fmap
+|   ├── func
+|   └── swi
+|       ├── sub-001_run-01_swi.json
+|       └── sub-001_run-01_swi.nii.gz
+├── sub-002
+├── sub-003
+├── sub-004
+├── sub-005
+.
+.
+.
+├── unknown
+├──.bidsignore
+└──.misc
+</pre></div>
+</div>
+<p>Moreover, any non-BIDS related data can be accomdated by following this layout in the configuration file:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Heurestic search terms for each modality</span>
+
+<span class="nt">modality_search</span><span class="p">:</span>                <span class="c1"># Configuration file modality_search keyword</span>
+    <span class="nt">modality_type</span><span class="p">:</span>              <span class="c1"># Modality type</span>
+        <span class="nt">modality_label</span><span class="p">:</span>         <span class="c1"># Modality label</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">search_term_1</span>     <span class="c1"># Heurestic search terms list</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">search_term_2</span>
+                <span class="l l-Scalar l-Scalar-Plain">.</span>
+                <span class="l l-Scalar l-Scalar-Plain">.</span>
+                <span class="l l-Scalar l-Scalar-Plain">.</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="bids-search-bids-map">
+<h3><code class="docutils literal notranslate"><span class="pre">bids_search</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">bids_map</span></code><a class="headerlink" href="#bids-search-bids-map" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">bids_search</span></code> and <code class="docutils literal notranslate"><span class="pre">bids_map</span></code> keywords are optional and intended for a heurestic search and mapping (, respectively) for BIDS descriptive labels
+in the source data, and what the output BIDS filename should contain.
+For example, subject 1 has a high resolution T1 weighted image stored in a DICOM directory as <code class="docutils literal notranslate"><span class="pre">001/T1_HighRes_05mm/MR000001.dcm</span></code>. The output BIDS
+NIFTI file should <cite>preferably</cite> have the <code class="docutils literal notranslate"><span class="pre">acq</span></code> field populated to reflect this: <code class="docutils literal notranslate"><span class="pre">sub-001/anat/sub-001_acq-highres05mm_run-01_T1w.nii.gz</span></code>. This can be accomplished
+in the configuration file as shown below:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Heurestic search terms for BIDS descriptive naming conventions</span>
+
+<span class="nt">bids_search</span><span class="p">:</span>
+    <span class="nt">anat</span><span class="p">:</span>
+        <span class="nt">T1w</span><span class="p">:</span>
+            <span class="nt">acq</span><span class="p">:</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">HighRes_05mm</span>
+            <span class="nt">ce</span><span class="p">:</span>
+            <span class="nt">rec</span><span class="p">:</span>
+
+<span class="c1"># BIDS terms to map to</span>
+
+<span class="nt">bids_map</span><span class="p">:</span>
+    <span class="nt">anat</span><span class="p">:</span>
+        <span class="nt">T1w</span><span class="p">:</span>
+            <span class="nt">acq</span><span class="p">:</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">highres05mm</span>
+            <span class="nt">ce</span><span class="p">:</span>
+            <span class="nt">rec</span><span class="p">:</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>As <code class="docutils literal notranslate"><span class="pre">bids_search</span></code> parameters can accept a multiple search terms, <code class="docutils literal notranslate"><span class="pre">bids_map</span></code> is only capable of mapping to only one term. For example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Heurestic search terms for BIDS descriptive naming conventions</span>
+
+<span class="nt">bids_search</span><span class="p">:</span>
+    <span class="nt">anat</span><span class="p">:</span>
+        <span class="nt">T1w</span><span class="p">:</span>
+            <span class="nt">acq</span><span class="p">:</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">HighRes_05mm</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">HighRes_01mm</span>
+            <span class="nt">ce</span><span class="p">:</span>
+            <span class="nt">rec</span><span class="p">:</span>
+
+<span class="c1"># BIDS terms to map to</span>
+
+<span class="nt">bids_map</span><span class="p">:</span>
+    <span class="nt">anat</span><span class="p">:</span>
+        <span class="nt">T1w</span><span class="p">:</span>
+            <span class="nt">acq</span><span class="p">:</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">highres05mm</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">highres01mm</span>
+            <span class="nt">ce</span><span class="p">:</span>
+            <span class="nt">rec</span><span class="p">:</span>
+</pre></div>
+</div>
+<p>This would result in only the last entry in <code class="docutils literal notranslate"><span class="pre">bids_map</span></code> for the <code class="docutils literal notranslate"><span class="pre">acq</span></code> field being written to the output NIFTI files that match these search terms (<code class="docutils literal notranslate"><span class="pre">sub-001/anat/sub-001_acq-highres01mm_run-01_T1w.nii.gz</span></code>)
+despite the fact that files may be found that contain either <cite>HighRes_05mm</cite> or <cite>HighRes_01mm</cite> in their filename or file header.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The work-around for this issue would be to use one set of search and map labels to process one set of files, while ignoring/excluding the other, followed by switching <cite>HighRes_01mm</cite> and <cite>HighRes_05mm</cite>, as shown below:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Heurestic search terms for BIDS descriptive naming conventions</span>
+
+<span class="nt">bids_search</span><span class="p">:</span>
+    <span class="nt">anat</span><span class="p">:</span>
+        <span class="nt">T1w</span><span class="p">:</span>
+            <span class="nt">acq</span><span class="p">:</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">HighRes_05mm</span>
+            <span class="nt">ce</span><span class="p">:</span>
+            <span class="nt">rec</span><span class="p">:</span>
+
+<span class="c1"># BIDS terms to map to</span>
+
+<span class="nt">bids_map</span><span class="p">:</span>
+    <span class="nt">anat</span><span class="p">:</span>
+        <span class="nt">T1w</span><span class="p">:</span>
+            <span class="nt">acq</span><span class="p">:</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">highres05mm</span>
+            <span class="nt">ce</span><span class="p">:</span>
+            <span class="nt">rec</span><span class="p">:</span>
+
+<span class="c1"># Exclude/Ignore terms</span>
+
+<span class="nt">exclude</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">HighRes_01mm</span>
+</pre></div>
+</div>
+<p>This would achieve the desired output: <code class="docutils literal notranslate"><span class="pre">sub-001/anat/sub-001_acq-highres05mm_run-01_T1w.nii.gz</span></code>.</p>
+</div>
+</div>
+<div class="section" id="metadata">
+<h3><code class="docutils literal notranslate"><span class="pre">metadata</span></code><a class="headerlink" href="#metadata" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">metadata</span></code> keyword is optional, but strongly recommended. The <code class="docutils literal notranslate"><span class="pre">metadata</span></code> field in the configuration file will write
+the modality specific metadata for each NIFTI file’s JSON (sidecar) file. Additionally, the word <code class="docutils literal notranslate"><span class="pre">common</span></code> may also be specified
+under <code class="docutils literal notranslate"><span class="pre">metadata</span></code> to include metadata that is common between all of the study’s source images.</p>
+<p>For example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">metadata</span><span class="p">:</span>
+    <span class="nt">common</span><span class="p">:</span>
+        <span class="nt">Manufacturer</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Philips</span>
+        <span class="nt">ManufacturersModelName</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Ingenia</span>
+        <span class="nt">MagneticFieldStrength</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">3</span>
+        <span class="nt">InstitutionName</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Cincinnati Children&#39;s Hospital Medical Center</span>
+    <span class="nt">func</span><span class="p">:</span>
+        <span class="nt">rest</span><span class="p">:</span>
+            <span class="nt">ParallelAcquisitionTechnique</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">SENSE</span>
+            <span class="nt">ParallelReductionFactorInPlane</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.5</span>
+            <span class="nt">MultibandAccelerationFactor</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2</span>
+            <span class="nt">TaskName</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Resting State</span>
+            <span class="nt">TaskDescription</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Resting state scan, in which the participant looks at a fixed cross (+).</span>
+        <span class="nt">nback</span><span class="p">:</span>
+            <span class="nt">ParallelAcquisitionTechnique</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">SENSE</span>
+            <span class="nt">ParallelReductionFactorInPlane</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
+            <span class="nt">MultibandAccelerationFactor</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+            <span class="nt">TaskName</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">N-back Task</span>
+            <span class="nt">TaskDescription</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Working memory task.</span>
+    <span class="nt">fmap</span><span class="p">:</span>
+        <span class="nt">Units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Hz</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The metadata names for the fields above (e.g. <code class="docutils literal notranslate"><span class="pre">TaskName</span></code>, <code class="docutils literal notranslate"><span class="pre">InstitutionName</span></code>, <code class="docutils literal notranslate"><span class="pre">MagneticFieldStrength</span></code> etc.) must be in <code class="docutils literal notranslate"><span class="pre">CamelCase</span></code> otherwise, a <code class="docutils literal notranslate"><span class="pre">BIDSMetaDataError</span></code> exception will be raised.</p>
+</div>
+</div>
+<div class="section" id="exclude">
+<h3><code class="docutils literal notranslate"><span class="pre">exclude</span></code><a class="headerlink" href="#exclude" title="Permalink to this headline">¶</a></h3>
+<p>Files and/or modalities that one wants ignored can be done by specifying the <code class="docutils literal notranslate"><span class="pre">exclude</span></code> keyword,
+followed by a list of words that the associated files/modalities would contain (and are not case sensitive).
+For example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">exclude</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">SURVEY</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ScreenCapture</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ProtonDensity</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">PD</span>            <span class="c1"># Some ProtonDensity images may be labeled with this in the filename</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">T1Rho</span>
+</pre></div>
+</div>
+<p>The above example would simply ignore all files that contain these words - which would achieve the goal of excluding
+files and/or image data that would generally correspond to:</p>
+<ul class="simple">
+<li><p>Survey images</p></li>
+<li><p>Secondary screen captures</p></li>
+<li><p>Proton Density images</p></li>
+<li><p>T1 rho images</p></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="modules.html" class="btn btn-neutral float-right" title="convert_source" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="outputs.html" class="btn btn-neutral float-left" title="Outputs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Adebayo Braimah.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

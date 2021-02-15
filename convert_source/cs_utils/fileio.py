@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 """Utility module for classes and functions that pertain to:
-    * file, and filename handling
-    * temporary directory, and temporary file handling
-    * Logging
-    * Wrapper class for UNIX command line executables.
-"""
 
-# TODO:
-#     * Update/refactor logging class to logging decorator.
+    * File, and filename handling
+    * Temporary directory, and temporary file handling
+    * Logging
+    * Wrapper class for command line executables.
+"""
 
 import subprocess
 import logging
@@ -31,11 +29,25 @@ class ConversionError(Exception):
     pass
 
 class File(object):
-    '''Creates File object that encapsulates a number of methods and properites
-    for file and filename handling.
+    '''Creates File object that encapsulates a number of methods and properites for file and filename handling.
     
-    Attributes (class and instance attributes):
-        file (class and instance): Class variable that is set once class is instantiated.
+    Attributes:
+        file: Class variable that is set once class is instantiated.
+
+    Usage example:
+            >>> with File("file_name.txt") as file:
+            ...     file.touch()
+            ...     file.write_txt("some text")
+            ...
+            >>> # or
+            >>> 
+            >>> file = File("file_name.txt")
+            >>> file
+            "file_name.txt"
+
+    Args:
+        file: Input file (need not exist at runtime/instantiated).
+        ext: File extension of input file. If no extension is provided, it is inferred.
     '''
     
     file: str = ""
@@ -118,7 +130,7 @@ class File(object):
             ext: File extension.
         
         Returns:
-            file: File name with no extension.
+            File name with no extension.
         '''
         if ext:
             ext_num: int = len(ext)
@@ -139,9 +151,6 @@ class File(object):
         
         Args:
             txt: Text to be written to file.
-
-        Returns:
-            file: File with text written/appended to it.
         '''
         with open(self.file,"a") as tmp_file:
             tmp_file.write(txt)
@@ -150,8 +159,8 @@ class File(object):
 
     def file_parts(self,
                   ext: str = "") -> Tuple[str,str,str]:
-        '''Similar to MATLAB's `fileparts`, this function splits a file and its path 
-        into its constituent parts:
+        '''Similar to MATLAB's ``fileparts``, this function splits a file and its path into its constituent parts:
+
             * file path
             * filename
             * extension
@@ -166,9 +175,10 @@ class File(object):
                 object is longer than 4 characters.
         
         Returns:
-            path: Absolute file path, excluding filename.
-            filename: Filename, excluding extension.
-            ext: File extension.
+            Tuple: 
+                * Absolute file path, excluding filename.
+                * Filename, excluding extension.
+                * File extension.
         '''
         
         file: str = self.file
@@ -194,12 +204,28 @@ class File(object):
         return path, filename, ext
 
 class TmpDir(object):
-    '''Temporary directory class that creates temporary directories and files
-    given a parent directory.
+    '''Temporary directory class that creates temporary directories and files given a parent directory.
     
-    Attributes (class and instance attributes):
-        tmp_dir (class and instance): Temproary directory.
-        parent_tmp_dir (class and instance): Input parent directory.
+    Attributes:
+        tmp_dir: Temproary directory.
+        parent_tmp_dir: Input parent directory.
+    
+    Usage example:
+            >>> with TmpDir("/path/to/temporary_directory",False) as tmp_dir:
+            ...     tmp_dir.mk_tmp_dir()
+            ...     # do more stuff
+            ...     tmp_dir.rm_tmp_dir(rm_parent=False)
+            ...
+            >>> # or
+            >>>
+            >>> tmp_dir = TmpDir("/path/to/temporary_directory")
+            >>> tmp_dir
+            "/path/to/temporary_directory"
+            >>> tmp_dir.rm_tmp_dir(rm_parent=False)
+        
+    Args:
+        tmp_dir: Temporary parent directory name/path.
+        use_cwd: Use current working directory as working direcory.
     '''
     
     # Set parent tmp directory, as tmp_dir is overwritten
@@ -278,11 +304,27 @@ class TmpDir(object):
     
     class TmpFile(File):
         '''Child/sub-class of TmpDir. Creates temporary files by inheriting File object
-        methods and properties from the File class.
+        methods and properties from the File class.  Allows for creation of a temporary file 
+        in parent class' temporary directory location. TmpFile also inherits methods from the 
+        File class.
         
-        Attributes (class and instance attributes):
-            tmp_file (class and instance): Temporary file name.
-            tmp_dir (class and instance): Temporary directory name.
+        Attributes:
+            tmp_file: Temporary file name.
+            tmp_dir: Temporary directory name.
+        
+        Usage example:
+            >>> tmp_directory = TmpDir("/path/to/temporary_directory")
+            >>>
+            >>> temp_file = TmpDir.TmpFile(tmp_directory.tmp_dir,
+            ...                             ext="txt")
+            ...
+            >>> temp_file
+            "/path/to/temporary_directory/temporary_file.txt"
+        
+        Args:
+            tmp_dir: Temporary directory name.
+            tmp_file: Temporary file name.
+            ext: Temporary directory file extension.
         '''
         
         tmp_file: File = ""
@@ -330,8 +372,13 @@ class NiiFile(File):
     '''NIFTI file class object for handling NIFTI files. Inherits methods and 
     properties from the File class.
     
-    Attributes (class and instance attributes):
-        file (class and instance): NIFTI file path.
+    Attributes:
+        file: NIFTI file path.
+    
+    Usage example:
+        >>> nii_file = NiiFile("file.nii")
+        >>> nii_file
+        "file.nii"
     '''
     def __init__(self,
                  file: File) -> None:
@@ -344,17 +391,26 @@ class NiiFile(File):
         '''
         self.file = file
         File.__init__(self,self.file)
-        
+
+# TODO:
+#     * Update/refactor logging class to logging decorator.
+
 class LogFile(File):
-    '''Class that creates a log file for logging purposes. Due to how this 
-    class is constructed - its intended use case requires that this class 
-    is instantiated/called once and ONLY once.
+    '''Class that creates a log file for logging purposes. Due to how this class is constructed - its 
+    intended use case requires that this class is instantiated/called once and ONLY once.
     
-    Once a class instance has been instantiated, then it and its associated
-    methods can be used.
+    Once a class instance has been instantiated, then it and its associated methods can be used.
     
-    Attributes (class and instance attributes):
-        log_file: Log file filename.
+    Attributes:
+        log_file: Log filename.
+    
+    Usage examples:
+        >>> log = LogFile("file.log")
+        >>> log
+        "file.log"
+
+    Args:
+        file: Log filename (need not exist at runtime).
     '''
     
     def __init__(self,
@@ -462,10 +518,32 @@ class LogFile(File):
 class Command(object):
     '''Creates a command and an empty command list for UNIX command line programs/applications. Primary use and
     use-cases are intended for the subprocess module and its associated classes (i.e. Popen/call/run).
+
+    The input argument is a command (string), and a mutable list is returned (, that can later be appended to).
+
+    NOTE: 
+        The specified command used must be in system path.
     
-    Attributes (class and instance attributes):
-        command (instance): Command to be performed on the command line.
-        cmd_list (instance): Mutable list that can be appended to.
+    Attributes:
+        command: Command to be performed on the command line.
+        cmd_list: Mutable list that can be appended to.
+    
+    Usage example:
+        >>> echo = Command("echo")
+        >>> echo.cmd_list.append("Hi!")
+        >>> echo.cmd_list.append("I have arrived!")
+        >>>
+        >>> echo
+        echo Hi! I have arrived!
+        >>>
+        >>> echo.run()
+        Hi! I have arrived!
+    
+    Arguments:
+        command: Command to be used. 
+    
+    Returns:
+        Mutable list that can be appended to.
     '''
 
     def __init__(self,
@@ -486,10 +564,11 @@ class Command(object):
             Hi! I have arrived!
         
         Arguments:
-            command: Command to be used. Note: command used must be in system path
+            command: Command to be used. 
+                NOTE: command used must be in system path
         
         Returns:
-            cmd_list: Mutable list that can be appended to.
+            Mutable list that can be appended to.
         '''
         self.command: str = command
         self.cmd_list: List[str] = [f"{self.command}"]
@@ -519,8 +598,7 @@ class Command(object):
             Returns True if dependency is met.
         
         Raises:
-            DependencyError: Dependency error exception is raised if the dependency
-                is not met.
+            DependencyError: Dependency error exception is raised if the dependency is not met.
         '''
         # Append to PATH environmental variable
         mod_path_env: str = os.environ['PATH']
@@ -552,16 +630,15 @@ class Command(object):
         The standard output and error can optionally be written to file.
         
         NOTE: 
-            * The contents of the 'stdout' output file will be empty if 'shell' is set to True.
-            * IF `check_dependency` was used with the `path_envs` argument, then the default system
-                PATH variable has been updated to include the list of specified paths.
+            * The contents of the ``stdout`` output file will be empty if ``shell`` is set to True.
+            * **IF** ``check_dependency`` was used with the ``path_envs`` argument, then the default system ``PATH`` variable has been updated to include the list of specified paths.
         
         Usage example:
             >>> # Create command and cmd_list
             >>> echo = Command("echo")
             >>> echo.cmd_list.append("Hi!")
             >>> echo.cmd_list.append("I have arrived!")
-            
+            >>>
             >>> # Run/execute command
             >>> echo.run()
             (0, '', '')
@@ -576,9 +653,10 @@ class Command(object):
             shell: Use shell to execute command.
             
         Returns:
-            p.returncode: Return code for command execution should the 'log_file' option be used.
-            stdout: Standard output writtent to file should the 'stdout' option be used.
-            stderr: Standard error writtent to file should the 'stdout' option be used.
+            Tuple:
+                * Return code for command execution.
+                * Standard output writtent to file should the 'stdout' option be used.
+                * Standard error writtent to file should the 'stdout' option be used.
         '''
         
         # Create command str for log

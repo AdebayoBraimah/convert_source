@@ -81,7 +81,8 @@ def is_valid_dcm(dcm_file: str,
 def get_bwpppe(dcm_file: str) -> Union[float,str]:
     '''Reads the Bandwidth Per Pixel PhaseEncode value from a DICOM header. 
     
-    NOTE: This DICOM field is usually left blank on Philips DICOM headers.
+    NOTE: 
+        This DICOM field is usually left blank on Philips DICOM headers.
     
     Arguments:
         dcm_file: DICOM file.
@@ -143,7 +144,8 @@ def get_mb(dcm_file: str) -> int:
     '''Extracts multi-band acceleration factor from file description in the DICOM header for (philips MR scanners).
     If this information cannont be inferred from the DICOM header file description - then it is assumed to be 1.
     
-    N.B.: This is done via a regEx search as no DICOM tag stores this information explicitly.
+    NOTE: 
+        This is done via a regEx search as no DICOM tag stores this information explicitly.
     
     Arguments:
         dcm_file: DICOM file.

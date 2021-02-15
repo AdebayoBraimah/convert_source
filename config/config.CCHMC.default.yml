@@ -10,8 +10,8 @@ modality_search:
             - T2
             - T2w
             - TSE
-        # flair: 
-        #   - flair
+        flair: 
+          - flair
 
     # Functional scans
     func:

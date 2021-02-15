@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """Constants needed for several utility modules in convert_source.
 The constant variables contained here include:
-    * BIDS_INFO: BIDS metadata dictionary of BIDS related fields.
-    * BIDS_ORD_ARR: Ordered array of BIDS metadata fields.
-    * BIDS_PARAM: BIDS related parameters used for naming NIFTI, and their corresponding JSON files.
+
+    * ``BIDS_INFO``: BIDS metadata dictionary of BIDS related fields.
+    * ``BIDS_ORD_ARR``: Ordered array of BIDS metadata fields.
+    * ``BIDS_PARAM``: BIDS related parameters used for naming NIFTI, and their corresponding JSON files.
 """
 import os
 import pathlib
