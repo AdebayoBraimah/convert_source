@@ -3,6 +3,7 @@
 """
 
 # TODO:
+#   * Add file search for image files with no extensions (DICOMs)
 #   * [PENDING] Figure out where tmp directory path is being printed.
 #       * See functions that use TmpDir class's rm_tmp_dir() function
 #   * Add doc building to CI workflow.
@@ -904,7 +905,7 @@ def source_to_bids(sub_data: SubDataInfo,
                                            append_dwi_info=append_dwi_info,
                                            zero_pad=zero_pad,
                                            cprss_lvl=cprss_lvl)
-                    tmp.rm_tmp_dir()
+                    _ = tmp.rm_tmp_dir()
                     return (imgs,
                             jsons,
                             bvals,
@@ -929,7 +930,7 @@ def source_to_bids(sub_data: SubDataInfo,
                                            append_dwi_info=append_dwi_info,
                                            zero_pad=zero_pad,
                                            cprss_lvl=cprss_lvl)
-                    tmp.rm_tmp_dir()
+                    _ = tmp.rm_tmp_dir()
                     return (imgs,
                             jsons,
                             bvals,
@@ -991,13 +992,13 @@ def source_to_bids(sub_data: SubDataInfo,
                     else:
                         bvecs.append("")
                 # Clean-up
-                tmp.rm_tmp_dir()
+                _ = tmp.rm_tmp_dir()
                 return (imgs,
                         jsons,
                         bvals,
                         bvecs)
             except ConversionError:
-                tmp.rm_tmp_dir()
+                _ = tmp.rm_tmp_dir()
                 return [""],[""],[""],[""]
 
 def nifti_to_bids(sub_data: SubDataInfo,
@@ -1075,7 +1076,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
 
     # Use TmpDir and NiiFile class context managers
     with TmpDir(tmp_dir=sub_tmp, use_cwd=False) as tmp:
-        tmp.mk_tmp_dir()
+        _ = tmp.mk_tmp_dir()
         with NiiFile(data) as n:
             [path, basename, ext] = n.file_parts()
             img_files: List[str] = glob.glob(os.path.join(path,basename + "*" + ext))
@@ -1266,7 +1267,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
                     bvals.append("")
                     bvecs.append("")
         # Clean-up
-        tmp.rm_tmp_dir()
+        _ = tmp.rm_tmp_dir()
 
         return (imgs,
                 jsons,

@@ -182,7 +182,7 @@ def get_echo_time(par_file: str,
         with TmpDir.TmpFile(tmp_dir=tmp.tmp_dir,ext="txt") as f:
             df.to_csv(f.file,sep=",",header=False,index=False)
             mat = np.loadtxt(f.file,delimiter=",")
-        tmp.rm_tmp_dir(rm_parent=False)
+        _ = tmp.rm_tmp_dir(rm_parent=False)
     
     if len(list(np.unique(mat[0:,16]))) > 1:
         raise PARfileReadError(f"Two or more unique echo times were found in {par_file}. Please check.")
@@ -226,7 +226,7 @@ def get_flip_angle(par_file: str,
         with TmpDir.TmpFile(tmp_file="file.tmp.txt",tmp_dir=tmp.tmp_dir) as f:
             df.to_csv(f.file,sep=",",header=False,index=False)
             mat = np.loadtxt(f.file,delimiter=",")
-        tmp.rm_tmp_dir(rm_parent=False)
+        _ = tmp.rm_tmp_dir(rm_parent=False)
     
     if len(list(np.unique(mat[0:,21]))) > 1:
         raise PARfileReadError(f"Two or more unique flip angles were found in {par_file}. Please check.")

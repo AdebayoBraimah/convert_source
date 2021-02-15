@@ -49,4 +49,4 @@ def test_tmpdir_class():
         with TmpDir.TmpFile(tmp.tmp_dir) as f:
             f.touch()
             assert os.path.exists(f.abs_path()) == True
-            tmp.rm_tmp_dir(rm_parent=True)
+            _ = tmp.rm_tmp_dir(rm_parent=True)
