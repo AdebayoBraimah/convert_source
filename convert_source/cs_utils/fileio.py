@@ -366,7 +366,7 @@ class TmpDir(object):
 
             self.tmp_file = os.path.join(self.tmp_dir,self.tmp_file)
             File.__init__(self,self.tmp_file)
-            print(self.tmp_dir)
+            # print(self.tmp_dir)
         
 class NiiFile(File):
     '''NIFTI file class object for handling NIFTI files. Inherits methods and 
