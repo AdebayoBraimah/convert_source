@@ -359,7 +359,7 @@ class TmpDir(object):
                 self.tmp_file: str = tmp_file
             else:
                 _n: int = 10000 # maximum N for random number generator
-                self.tmp_file: str = "tmp_file_" + str(random.randint(0,_n))
+                self.tmp_file: str = "tmp_file_" + str(random.randint(0,_n)) + ".txt"
             
             if ext:
                 self.tmp_file: str = self.tmp_file + f".{ext}"

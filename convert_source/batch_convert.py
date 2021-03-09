@@ -111,6 +111,8 @@ def batch_proc(study_img_dir: str,
             * Corresponding list of bval files.
             * Corresponding list of bvec files.
     '''
+    study_img_dir: str = os.path.abspath(study_img_dir)
+    
     # Check dependencies
     dcm2niix_cmd: Command = Command("dcm2niix")
     dcm2niix_cmd.check_dependency(path_envs=path_envs)
@@ -118,10 +120,12 @@ def batch_proc(study_img_dir: str,
     # Write logs
     misc_dir: str = os.path.join(out_dir,'.misc')
     if os.path.exists(misc_dir):
+        out_dir: str = os.path.abspath(out_dir)
         misc_dir: str = os.path.abspath(misc_dir)
     else:
         os.makedirs(misc_dir)
         misc_dir: str = os.path.abspath(misc_dir)
+        out_dir: str = os.path.abspath(out_dir)
     
     now = datetime.now()
     dt_string: str = str(now.strftime("%m_%d_%Y_%H_%M"))
