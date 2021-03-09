@@ -786,7 +786,7 @@ def source_to_bids(sub_data: SubDataInfo,
     # Using TmpDir and TmpFile context managers
     with TmpDir(tmp_dir=sub_tmp,use_cwd=False) as tmp:
         with TmpDir.TmpFile(tmp_dir=tmp.tmp_dir) as f:
-            _ = tmp.mk_tmp_dir()
+            tmp.mk_tmp_dir()
             [_path, basename, _ext] = f.file_parts()
             try:
                 img_data = convert_image_data(file=data,
@@ -904,7 +904,7 @@ def source_to_bids(sub_data: SubDataInfo,
                                            append_dwi_info=append_dwi_info,
                                            zero_pad=zero_pad,
                                            cprss_lvl=cprss_lvl)
-                    _ = tmp.rm_tmp_dir()
+                    tmp.rm_tmp_dir()
                     return (imgs,
                             jsons,
                             bvals,
@@ -929,7 +929,7 @@ def source_to_bids(sub_data: SubDataInfo,
                                            append_dwi_info=append_dwi_info,
                                            zero_pad=zero_pad,
                                            cprss_lvl=cprss_lvl)
-                    _ = tmp.rm_tmp_dir()
+                    tmp.rm_tmp_dir()
                     return (imgs,
                             jsons,
                             bvals,
@@ -991,13 +991,13 @@ def source_to_bids(sub_data: SubDataInfo,
                     else:
                         bvecs.append("")
                 # Clean-up
-                _ = tmp.rm_tmp_dir()
+                tmp.rm_tmp_dir()
                 return (imgs,
                         jsons,
                         bvals,
                         bvecs)
             except ConversionError:
-                _ = tmp.rm_tmp_dir()
+                tmp.rm_tmp_dir()
                 return [""],[""],[""],[""]
 
 def nifti_to_bids(sub_data: SubDataInfo,
@@ -1075,7 +1075,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
 
     # Use TmpDir and NiiFile class context managers
     with TmpDir(tmp_dir=sub_tmp, use_cwd=False) as tmp:
-        _ = tmp.mk_tmp_dir()
+        tmp.mk_tmp_dir()
         with NiiFile(data) as n:
             [path, basename, ext] = n.file_parts()
             img_files: List[str] = glob.glob(os.path.join(path,basename + "*" + ext))
@@ -1270,7 +1270,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
                     bvals.append("")
                     bvecs.append("")
         # Clean-up
-        _ = tmp.rm_tmp_dir()
+        tmp.rm_tmp_dir()
 
         return (imgs,
                 jsons,
@@ -1426,7 +1426,7 @@ def log_file(log: str) -> LogFile:
     log: LogFile = LogFile(log_file=log)
 
     now = datetime.now()
-    dt_string = now.strftime("%A %B %d, %Y %H:%M%:%S")
+    dt_string = now.strftime("%A %B %d, %Y %H:%M:%S")
 
     log.info(dt_string)
     log.info(f"convert_source v{__version__}")

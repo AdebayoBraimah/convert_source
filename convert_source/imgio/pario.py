@@ -178,7 +178,7 @@ def get_echo_time(par_file: str,
     df: pd.DataFrame = df.dropna(axis=0)
     
     with TmpDir(tmp_dir=tmp_dir,use_cwd=False) as tmp:
-        _ = tmp.mk_tmp_dir()
+        tmp.mk_tmp_dir()
         with TmpDir.TmpFile(tmp_dir=tmp.tmp_dir,ext="txt") as f:
             df.to_csv(f.file,sep=",",header=False,index=False)
             mat = np.loadtxt(f.file,delimiter=",")
@@ -222,7 +222,7 @@ def get_flip_angle(par_file: str,
     df: pd.DataFrame = df.dropna(axis=0)
     
     with TmpDir(tmp_dir=tmp_dir,use_cwd=False) as tmp:
-        _ = tmp.mk_tmp_dir()
+        tmp.mk_tmp_dir()
         with TmpDir.TmpFile(tmp_file="file.tmp.txt",tmp_dir=tmp.tmp_dir) as f:
             df.to_csv(f.file,sep=",",header=False,index=False)
             mat = np.loadtxt(f.file,delimiter=",")
