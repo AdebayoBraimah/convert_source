@@ -297,9 +297,9 @@ class TmpDir(object):
             rm_parent: Removes parent directory as well.
         '''
         if rm_parent and os.path.exists(self.parent_tmp_dir):
-            return shutil.rmtree(self.parent_tmp_dir)
+            return shutil.rmtree(self.parent_tmp_dir,ignore_errors=True)
         elif os.path.exists(self.tmp_dir):
-            return shutil.rmtree(self.tmp_dir)
+            return shutil.rmtree(self.tmp_dir,ignore_errors=True)
         else:
             print("Temporary directory does not exist")
     
