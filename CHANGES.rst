@@ -5,6 +5,7 @@ v0.1.1
 ---------
 
 * BUG FIX: Fixed issue for incorrect references to tmp directories. This caused image conversion exceptions to be thrown, and thus no NIFTI BIDS files would be returned.
+* BUG FIX: Fixed issue for cases in which hidden indexing files (._) would be included in the file search.
 
 v0.1.0
 ---------
