@@ -937,6 +937,16 @@ def glob_img(img_dir: str) -> List[str]:
         tmp_list: List[str] = glob.glob(dir_search)
         img_list.extend(tmp_list)
         
+        # BUG: Need contingency for DICOM file globbing behavior
+        #   here. As written - this will just glob all DICOMs,
+        #   which is undesired behavior.
+        #
+        # GOAL: For DICOMs, glob the image directory, and append
+        #   0th index to new array/list.
+        #
+        # EDIT: Remove 'dcm' from img_types list and rely solely
+        #   glob_dcm to glob DICOMs.
+        
         tmp_list: List[str] = glob_dcm(dcm_dir=img_dir)
         img_list.extend(tmp_list)
     
