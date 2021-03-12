@@ -111,6 +111,8 @@ def batch_proc(study_img_dir: str,
             * Corresponding list of bval files.
             * Corresponding list of bvec files.
     '''
+    study_img_dir: str = os.path.abspath(study_img_dir)
+    
     # Check dependencies
     dcm2niix_cmd: Command = Command("dcm2niix")
     dcm2niix_cmd.check_dependency(path_envs=path_envs)
@@ -118,10 +120,12 @@ def batch_proc(study_img_dir: str,
     # Write logs
     misc_dir: str = os.path.join(out_dir,'.misc')
     if os.path.exists(misc_dir):
+        out_dir: str = os.path.abspath(out_dir)
         misc_dir: str = os.path.abspath(misc_dir)
     else:
         os.makedirs(misc_dir)
         misc_dir: str = os.path.abspath(misc_dir)
+        out_dir: str = os.path.abspath(out_dir)
     
     now = datetime.now()
     dt_string: str = str(now.strftime("%m_%d_%Y_%H_%M"))
@@ -786,7 +790,7 @@ def source_to_bids(sub_data: SubDataInfo,
     # Using TmpDir and TmpFile context managers
     with TmpDir(tmp_dir=sub_tmp,use_cwd=False) as tmp:
         with TmpDir.TmpFile(tmp_dir=tmp.tmp_dir) as f:
-            _ = tmp.mk_tmp_dir()
+            tmp.mk_tmp_dir()
             [_path, basename, _ext] = f.file_parts()
             try:
                 img_data = convert_image_data(file=data,
@@ -904,7 +908,7 @@ def source_to_bids(sub_data: SubDataInfo,
                                            append_dwi_info=append_dwi_info,
                                            zero_pad=zero_pad,
                                            cprss_lvl=cprss_lvl)
-                    _ = tmp.rm_tmp_dir()
+                    tmp.rm_tmp_dir()
                     return (imgs,
                             jsons,
                             bvals,
@@ -929,7 +933,7 @@ def source_to_bids(sub_data: SubDataInfo,
                                            append_dwi_info=append_dwi_info,
                                            zero_pad=zero_pad,
                                            cprss_lvl=cprss_lvl)
-                    _ = tmp.rm_tmp_dir()
+                    tmp.rm_tmp_dir()
                     return (imgs,
                             jsons,
                             bvals,
@@ -991,13 +995,13 @@ def source_to_bids(sub_data: SubDataInfo,
                     else:
                         bvecs.append("")
                 # Clean-up
-                _ = tmp.rm_tmp_dir()
+                tmp.rm_tmp_dir()
                 return (imgs,
                         jsons,
                         bvals,
                         bvecs)
             except ConversionError:
-                _ = tmp.rm_tmp_dir()
+                tmp.rm_tmp_dir()
                 return [""],[""],[""],[""]
 
 def nifti_to_bids(sub_data: SubDataInfo,
@@ -1075,7 +1079,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
 
     # Use TmpDir and NiiFile class context managers
     with TmpDir(tmp_dir=sub_tmp, use_cwd=False) as tmp:
-        _ = tmp.mk_tmp_dir()
+        tmp.mk_tmp_dir()
         with NiiFile(data) as n:
             [path, basename, ext] = n.file_parts()
             img_files: List[str] = glob.glob(os.path.join(path,basename + "*" + ext))
@@ -1270,7 +1274,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
                     bvals.append("")
                     bvecs.append("")
         # Clean-up
-        _ = tmp.rm_tmp_dir()
+        tmp.rm_tmp_dir()
 
         return (imgs,
                 jsons,
@@ -1401,7 +1405,7 @@ def bids_ignore(out_dir: str) -> str:
 
     # Write to file using File class context manager
     with File(new_file) as f:
-        f.write_txt(".misc \n")
+        f.write_txt(".misc/* \n")
         f.write_txt("unknown/* \n")
     
     return new_file
@@ -1426,9 +1430,68 @@ def log_file(log: str) -> LogFile:
     log: LogFile = LogFile(log_file=log)
 
     now = datetime.now()
-    dt_string = now.strftime("%A %B %d, %Y %H:%M%:%S")
+    dt_string = now.strftime("%A %B %d, %Y %H:%M:%S")
 
     log.info(dt_string)
     log.info(f"convert_source v{__version__}")
 
     return log
+
+# This function was added for the Mac OS X case in which hidden
+# temporary indexing files are present throughout a given directory.
+#
+# This function was designed to handle that use case, however:
+#
+# * Implementation methods are currently unclear
+# * This approach is VERY SLOW as each parent directory is recursively searched.
+#
+# Moreover, this should be included in a later release should this continue to be an
+# issue moving forward.
+#
+# Adebayo Braimah - 12 March 2021
+#
+# def dir_clean_up(directory: str) -> str:
+#     '''Removes temporary indexing files (commonly found on
+#     Mac OS X).
+#
+#     These files are generally problematic as they cause several of
+#     ``convert_source``'s core functions to behave unpredictably.
+#
+#     Any identified tempoary indexing files are removed.
+#
+#     NOTE: The implementation here does work, but is VERY SLOW as the number of 
+#         files and directories is assumed to be large.
+#    
+#     Usage example:
+#         >>> directory = dir_clean_up(directory)
+#         >>>
+#        
+#     Arguments:
+#         directory: Input parent directory to recursively search (for hidden files in).
+#
+#     Returns:
+#         Absolute path to directory as a string.
+#     '''
+#     from shutil import rmtree
+#
+#     if os.path.exists(directory):
+#         directory = os.path.abspath(directory)
+#     else:
+#         raise FileNotFoundError("Input directory does not appear to exist.")
+#
+#     # This works - but is slow | O(n) space and time
+#     for root,dirnames,filenames in os.walk(directory):
+#         if len(dirnames) > 0:
+#             for dirname in dirnames:
+#                 if '._' in dirname:
+#                     hd_name: str = os.path.join(root,dirname)
+#                     rmtree(hd_name)
+#                     print(hd_name)
+#         if len(filenames) > 0:
+#             for file in filenames:
+#                 if '._' in file:
+#                     hf_name: str = os.path.join(root,file)
+#                     # hf_list.append(hf_name)
+#                     os.remove(hf_name)
+#                     print(hf_name)
+#     return directory

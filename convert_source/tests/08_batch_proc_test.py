@@ -517,6 +517,7 @@ def test_batch_proc():
     assert len(bvecs) == 11
 
 def test_cleanup():
+    """NOTE: This test currently FAILS on Windows operating systems."""
     shutil.rmtree(out_dir)
     assert os.path.exists(out_dir) == False
 

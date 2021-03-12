@@ -82,6 +82,9 @@ def img_dir_list(directory: str,
     for root,dirnames,filenames in os.walk(directory):
         if len(filenames) > 0:
             for file in filenames:
+                if '._' in file:
+                    # Skip hidden files if they exist.
+                    continue
                 if '.dcm' in file.lower() or '.PAR' in file.upper() or '.nii' in file.lower():
                     file_name = os.path.join(root,file)
                     if '.dcm' in file.lower():

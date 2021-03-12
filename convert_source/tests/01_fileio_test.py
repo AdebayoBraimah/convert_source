@@ -30,6 +30,7 @@ def test_file_class():
         assert f.file == 'test.file.txt'
 
 def test_command_class():
+    """NOTE: This test will FAIL on Windows operating systems."""
     x: str = 'ls'
     c = Command(x)
     c.cmd_list.append(os.getcwd())
@@ -44,7 +45,7 @@ def test_command_class():
 def test_tmpdir_class():
     x: str = 'tmpdir'
     with TmpDir(x,True) as tmp:
-        _ = tmp.mk_tmp_dir()
+        tmp.mk_tmp_dir()
         assert os.path.exists(tmp.tmp_dir) == True
         with TmpDir.TmpFile(tmp.tmp_dir) as f:
             f.touch()
