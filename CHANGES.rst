@@ -1,11 +1,16 @@
 CHANGES
 =========
 
+v0.1.1
+---------
+
+* BUG FIX: Fixed issue for incorrect references to tmp directories. This caused image conversion exceptions to be thrown, and thus no NIFTI BIDS files would be returned.
+
 v0.1.0
 ---------
 
 * BUG FIX: Fixed bug in setup, which prevented proper installation and usage of the ``study_proc`` executable.
-* UPDATE: The documentation is now `available <https://convert-source.readthedocs.io/en/master/>`_.
+* UPDATE: The documentation is now `available <https://convert-source.readthedocs.io/en/0.1.0/>`_.
 
 v0.1.rc1
 ---------

@@ -1436,3 +1436,62 @@ def log_file(log: str) -> LogFile:
     log.info(f"convert_source v{__version__}")
 
     return log
+
+# This function was added for the Mac OS X case in which hidden
+# temporary indexing files are present throughout a given directory.
+#
+# This function was designed to handle that use case, however:
+#
+# * Implementation methods are currently unclear
+# * This approach is VERY SLOW as each parent directory is recursively searched.
+#
+# Moreover, this should be included in a later release should this continue to be an
+# issue moving forward.
+#
+# Adebayo Braimah - 12 March 2021
+#
+# def dir_clean_up(directory: str) -> str:
+#     '''Removes temporary indexing files (commonly found on
+#     Mac OS X).
+#
+#     These files are generally problematic as they cause several of
+#     ``convert_source``'s core functions to behave unpredictably.
+#
+#     Any identified tempoary indexing files are removed.
+#
+#     NOTE: The implementation here does work, but is VERY SLOW as the number of 
+#         files and directories is assumed to be large.
+#    
+#     Usage example:
+#         >>> directory = dir_clean_up(directory)
+#         >>>
+#        
+#     Arguments:
+#         directory: Input parent directory to recursively search (for hidden files in).
+#
+#     Returns:
+#         Absolute path to directory as a string.
+#     '''
+#     from shutil import rmtree
+#
+#     if os.path.exists(directory):
+#         directory = os.path.abspath(directory)
+#     else:
+#         raise FileNotFoundError("Input directory does not appear to exist.")
+#
+#     # This works - but is slow | O(n) space and time
+#     for root,dirnames,filenames in os.walk(directory):
+#         if len(dirnames) > 0:
+#             for dirname in dirnames:
+#                 if '._' in dirname:
+#                     hd_name: str = os.path.join(root,dirname)
+#                     rmtree(hd_name)
+#                     print(hd_name)
+#         if len(filenames) > 0:
+#             for file in filenames:
+#                 if '._' in file:
+#                     hf_name: str = os.path.join(root,file)
+#                     # hf_list.append(hf_name)
+#                     os.remove(hf_name)
+#                     print(hf_name)
+#     return directory
