@@ -1036,6 +1036,9 @@ def collect_info(parent_dir: str,
         img_list = img_exclude(img_list=img_list,
                                exclusion_list=exclusion_list)
         
+        # BUG: Create set from img_list to ensure only unique files
+        #   are processed.
+        
         for img in img_list:
             # Collect and organize each subjects' session and data
             sub_info: SubDataInfo = SubDataInfo(sub=sub,data=img,ses=ses)
