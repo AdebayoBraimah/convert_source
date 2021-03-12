@@ -30,6 +30,7 @@ def test_file_class():
         assert f.file == 'test.file.txt'
 
 def test_command_class():
+    """NOTE: This test will FAIL on Windows operating systems."""
     x: str = 'ls'
     c = Command(x)
     c.cmd_list.append(os.getcwd())

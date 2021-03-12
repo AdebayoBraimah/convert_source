@@ -1405,7 +1405,7 @@ def bids_ignore(out_dir: str) -> str:
 
     # Write to file using File class context manager
     with File(new_file) as f:
-        f.write_txt(".misc \n")
+        f.write_txt(".misc/* \n")
         f.write_txt("unknown/* \n")
     
     return new_file

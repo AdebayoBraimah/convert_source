@@ -89,6 +89,9 @@ def test_download_prog():
     assert os.path.exists(file_name) == False
 
 def test_dependency():
+    """NOTE: This test will FAIL if ``dcm2niix`` is already in the
+    system path.
+    """
     dcm2niix_cmd: Command = Command("dcm2niix")
 
     with pytest.raises(DependencyError):
@@ -130,6 +133,7 @@ def test_data_conversion():
         [img, json, bval, bvec] = convert_image_data(data,'test_img',os.getcwd())
     
 def test_cleanup():
+    """NOTE: This test currently FAILS on Windows operating systems."""
     del_method: bool = False
     rm_method: bool = False
     rm_item_method: bool = False

@@ -185,7 +185,8 @@ class File(object):
         file = self.abs_path()
         
         if platform.system().lower() == "windows":
-            [path, _filename] = os.path.splitdrive(file)
+            # [path, _filename] = os.path.splitdrive(file)
+           [path, _filename] = os.path.split(file) 
         else:
             [path, _filename] = os.path.split(file)
         

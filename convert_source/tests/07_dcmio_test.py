@@ -127,6 +127,7 @@ def test_get_mb():
     assert get_mb(data) == 1 
 
 def test_cleanup():
+    """NOTE: This test currently FAILS on Windows operating systems."""
     del_method: bool = False
     rm_method: bool = False
     rm_item_method: bool = False
