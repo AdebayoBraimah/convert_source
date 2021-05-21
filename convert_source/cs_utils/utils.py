@@ -1053,9 +1053,6 @@ def collect_info(parent_dir: str,
             # Collect and organize each subjects' session and data
             sub_info: SubDataInfo = SubDataInfo(sub=sub,data=img,ses=ses)
             data.append(sub_info)
-        
-        # Clear variables
-        del sub, ses
     
     return data
 
