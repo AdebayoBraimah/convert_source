@@ -633,7 +633,7 @@ def get_metadata(dictionary: Optional[Dict] = None,
                         
         if len(scan_task_dict) != 0:
             scan_param_dict = scan_task_dict
-    
+
     return com_param_dict, scan_param_dict
 
 def list_in_substr(in_list: List[str],
@@ -905,7 +905,6 @@ def glob_dcm(dcm_dir: str) -> List[str]:
 
             dcm_files.append(tmp_file)
             break
-            
     return dcm_files
 
 def glob_img(img_dir: str) -> List[str]:
@@ -950,7 +949,6 @@ def glob_img(img_dir: str) -> List[str]:
         
         tmp_list: List[str] = glob_dcm(dcm_dir=img_dir)
         img_list.extend(tmp_list)
-    
     return img_list
 
 def img_exclude(img_list: List[str],
@@ -1053,7 +1051,6 @@ def collect_info(parent_dir: str,
             # Collect and organize each subjects' session and data
             sub_info: SubDataInfo = SubDataInfo(sub=sub,data=img,ses=ses)
             data.append(sub_info)
-    
     return data
 
 def get_recon_mat(json_file: str) -> Union[float,str]:
@@ -1538,3 +1535,89 @@ def header_search(img_file: str,
     return (modality_type, 
             modality_label, 
             task)
+
+# Functions for symlink creation
+def read_file_to_list(file: str) -> List[str]:
+    '''Opens the (text) file, reads its contents, and stores those contents in a list of strings. 
+    Should the input file not exist, then the text is assumed to be a string and is returned instead.
+    
+    Usage example:
+        >>> contents = read_file_to_list(file="filename.txt")
+        >>> contents
+        ["index_1", "index_2", "index_3"]
+    
+    Arguments:
+        file: Input file or string.
+        
+    Returns:
+        List of strings of the file contents
+    '''
+    if os.path.exists(file) and os.path.isfile(file):
+        file: str = os.path.realpath(file)
+        with open(file, "r") as file:
+            lines: List[str] = file.readlines()
+            file.close()
+    else:
+        lines: List[str] = [file]
+    return lines
+
+def create_study_sym_links(study_dir: str,
+                           infile: str,
+                           mapfile: str,
+                           outdir: str
+                          ) -> List[str]:
+    '''Creates another study directory of sym-linked subject directories to the original study directory.
+    The input file contains the directory names of subjects in the study directory. The corresponding map 
+    file contains the subject IDs to be mapped to.
+    
+    Usage example:
+        >>> dir_list  = create_study_sym_links(study_dir="input_dir",
+        ...                                    infile="file1.txt", 
+        ...                                    mapfile="file2.txt", 
+        ...                                    outdir="NewDirectory")
+        ...
+    
+    Arguments:
+        study_dir: Input parent study directory that contains each subjects' imaging data.
+        infile: Input file of directories to be mapped.
+        mapfile: Corresponding file that contains the subject directories to be mapped to.
+        outdir: Output directory for all symlinked directories.
+    
+    Returns:
+        List of sym-linked directories.
+        
+    Raises:
+        IndexError is raised if the number of entries in ``infile`` and ``mapfile`` are not equal.
+    '''
+    study_dir: str = os.path.abspath(study_dir)
+
+    if os.path.exists(outdir):
+        outdir: str = os.path.abspath(outdir)
+    else:
+        os.makedirs(outdir)
+        outdir: str = os.path.abspath(outdir)
+    
+    infile: str = os.path.realpath(infile)
+    mapfile: str = os.path.realpath(mapfile)
+    
+    img_dirs: List[str] = read_file_to_list(file=infile)
+    target_dirs: List[str] = read_file_to_list(file=mapfile)
+    
+    if len(img_dirs) == len(target_dirs):
+        pass
+    else:
+        raise IndexError(f"Input lists from {infile} and {mapfile} are of different lengths.")
+    
+    dir_list: List[str] = []
+
+    for i,j in zip(img_dirs,target_dirs):
+        sub_dir: str = os.path.join(study_dir,i)
+        tar_dir: str = os.path.join(outdir,j)
+
+        if os.path.exists(tar_dir):
+            pass
+        else:
+            os.symlink(sub_dir,tar_dir)
+        
+        dir_list.append(tar_dir)
+    return dir_list
