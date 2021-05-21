@@ -890,7 +890,7 @@ def glob_dcm(dcm_dir: str) -> List[str]:
     Returns:
         List of strings of image files.
     '''
-    dcm_dir: str = os.path.abspath(dcm_dir)
+    dcm_dir: str = os.path.abspath(os.path.realpath(dcm_dir))
     dir_search: str = os.path.join(dcm_dir,"*")
     dcm_dir_list: List[str] = glob.glob(dir_search)
     
@@ -925,7 +925,8 @@ def glob_img(img_dir: str) -> List[str]:
     Returns:
         List of strings of file paths to images.
     '''
-    
+    img_dir: str = os.path.abspath(os.path.realpath(img_dir))
+
     # Listed in most desirable order
     img_types: List[str] = [ "dcm", "PAR", "nii" ]
         
@@ -1013,7 +1014,6 @@ def collect_info(parent_dir: str,
     Returns:
         List/Array of SubDataInfo objects that corresponds to a subject ID, session ID, and path to medical image data.
     '''
-    
     parent_dir: str = os.path.abspath(parent_dir)
     data: List[SubDataInfo] = []
 

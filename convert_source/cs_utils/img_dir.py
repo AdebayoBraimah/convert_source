@@ -23,7 +23,6 @@ def id_img_file(dir_names: List[str],
     Returns:
         List of file-types that corresponds to input directory names list.
     '''
-    
     # Init empty list
     file_types: List[str] = list()
     
@@ -72,14 +71,13 @@ def img_dir_list(directory: str,
             List of child directory names that contain image data.
             List of file-types that corresponds to directory names list.
     '''
-    
     # Init empty list
     dir_names: List[str] = list()
 
     # Recursively iterate through all files in directory - find parent directory of image files
     if verbose:
         print("Creating list of directories...")
-    for root,dirnames,filenames in os.walk(directory):
+    for root,dirnames,filenames in os.walk(directory, topdown=True, followlinks=True):
         if len(filenames) > 0:
             for file in filenames:
                 if '._' in file:
@@ -121,7 +119,6 @@ def list_to_file(in_list: List[str],
     Returns:
         Output file with list written to file.
     '''
-
     # Write list to file
     with open(out_file, "w") as f:
         for sub in in_list:
@@ -151,7 +148,6 @@ def generate_img_list(directory: str,
             * Output file that contains the contents of 'dir_names'.
             * Output file that contains the contents of 'file_types'.
     '''
-    
     # Generate directories list and child directories' file types
     [dir_names,file_types] = img_dir_list(directory=directory,verbose=verbose)
     
