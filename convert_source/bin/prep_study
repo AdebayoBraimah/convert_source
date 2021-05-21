@@ -75,8 +75,6 @@ def main() -> List[str]:
                                                  mapfile=mapfile,
                                                  outdir=out_dir,
                                                  log_file=log)
-    
-    
     return sym_list
 
 def arg_parser():
@@ -173,6 +171,7 @@ def create_study_sym_links(study_dir: str,
         infile: Input file of directories to be mapped.
         mapfile: Corresponding file that contains the subject directories to be mapped to.
         outdir: Output directory for all symlinked directories.
+        log_file: LogFile object for logging.
     
     Returns:
         List of sym-linked directories.
