@@ -1537,6 +1537,10 @@ def header_search(img_file: str,
             task)
 
 # Functions for symlink creation
+# 
+# TODO: These functions should belong in a separate executable
+#   called `prep_study`.
+
 def read_file_to_list(file: str) -> List[str]:
     '''Opens the (text) file, reads its contents, and stores those contents in a list of strings. 
     Should the input file not exist, then the text is assumed to be a string and is returned instead.
