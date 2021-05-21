@@ -8,6 +8,7 @@ import pathlib
 import sys
 import os
 
+from copy import copy
 from datetime import datetime
 from typing import (
     List,
@@ -69,6 +70,9 @@ def main() -> List[str]:
 
     _log: str = os.path.join(misc_dir,f"prep_study_{dt_string}.log")
     log: LogFile = log_file(log=_log)
+
+    copy(infile, os.path.join(misc_dir,'orig_subject_id.txt'))
+    copy(mapfile, os.path.join(misc_dir,'map_subject_id.txt'))
 
     sym_list: List[str] = create_study_sym_links(study_dir=study_dir,
                                                  infile=infile,
@@ -243,3 +247,6 @@ def log_file(log: str) -> LogFile:
     log.info(f"prep_study v{__version__}")
 
     return log
+
+if __name__ == "__main__":
+    main()
