@@ -187,7 +187,7 @@ def create_study_sym_links(study_dir: str,
     study_dir: str = os.path.abspath(study_dir)
 
     if log_file:
-        log_file.log("Symbollically linking subject data directories.")
+        log_file.log("Symbollically linking subject data directories. \n")
 
     if os.path.exists(outdir):
         outdir: str = os.path.abspath(outdir)
