@@ -784,6 +784,9 @@ def convert_image_data(file: str,
         convert: Command = Command("dcm2niix")
 
     # Boolean True/False options arrays
+    # 
+    # IMPROVEMENT: 
+    #   This could be re-done using a dictionary/hash map for better readability.
     bool_opts: List[Union[str,bool]] = [bids, anon_bids, gzip, comment, adjacent, nrrd, ignore_2D, merge_2D, text, verbose, lossless]
     bool_vars: List[str] = ["-b", "-ba", "-z", "-c", "-a", "-e", "-i", "-m", "-t", "-v", "-l"]
 
