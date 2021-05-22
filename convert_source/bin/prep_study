@@ -39,7 +39,7 @@ def main() -> List[str]:
             parser.print_help()
     
     if args.ps_version:
-        print(__version__)
+        print(f"prep_study v{__version__}")
         sys.exit(0)
     
     if args.study_dir and args.out_dir and args.infile and args.mapfile:
@@ -122,7 +122,7 @@ def arg_parser():
                             required=False,
                             action='store_true',
                             default=False,
-                            help="Prints the version, then exits.")
+                            help="Prints the version, then exits. \n")
 
     args = parser.parse_args()
 
@@ -187,7 +187,10 @@ def create_study_sym_links(study_dir: str,
     study_dir: str = os.path.abspath(study_dir)
 
     if log_file:
-        log_file.log("Symbollically linking subject data directories. \n")
+        log_file.log("Symbollically linking subject data directories.")
+        log_file.log(f"Performed using: prep_study v{__version__}")
+        log_file.log(f"Input study directory: {study_dir}")
+        log_file.log(f"Output symbolic link directory: {outdir} \n")
 
     if os.path.exists(outdir):
         outdir: str = os.path.abspath(outdir)
