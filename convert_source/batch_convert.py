@@ -7,6 +7,9 @@
 #   * Add file search for image files with no extensions (DICOMs)
 #   * Add doc building to CI workflow.
 #   * Replace triple single quotes (''') with triple double quotes (""")
+#   * Get and write dcm2niix version to log file.
+#   * Add README to output directory (via function)
+#       * should include recommended actions to perform post data conversion
 
 import os
 import glob
