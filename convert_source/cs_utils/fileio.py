@@ -441,6 +441,11 @@ class LogFile(File):
         self.console.setLevel(logging.INFO)
         
         # Add the handler to the root logger
+        #   IMPROVEMENT:
+        #       * This adds console logger handler
+        #           which prints info to screen.
+        #               * Add conditional to avoid
+        #                   printing to screen.
         logging.getLogger().addHandler(self.console)
         
         # Define logging
