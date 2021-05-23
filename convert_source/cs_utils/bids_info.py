@@ -38,7 +38,7 @@ class BIDSMetaDataError(Exception):
 def is_camel_case(s: str,
                   bids_case: bool = True
                   ) -> bool:
-    '''Tests if some input string is camel case (CamelCase).
+    """Tests if some input string is camel case (CamelCase).
 
     NOTE: 
         This function is configured for BIDS use cases, in which metadata must be in camel case, with the first letter being uppercase.
@@ -60,7 +60,7 @@ def is_camel_case(s: str,
 
     Returns:
         Boolean.
-    '''
+    """
     if bids_case:
         return s != s.lower() and s != s.upper() and s[0].isupper() and "_" not in s
     else:
@@ -69,7 +69,7 @@ def is_camel_case(s: str,
 def construct_bids_dict(meta_dict: Optional[Dict] = None,
                         json_dict: Optional[Dict] = None,
                         ) -> Dict:
-    '''Constructs dictionary of relevant BIDS related information that includes subject and session IDs, in addition
+    """Constructs dictionary of relevant BIDS related information that includes subject and session IDs, in addition
     to various metadata. Custom BIDS fields can also be added through the metadata dictionary.
 
     More information can be obtained from: 
@@ -89,7 +89,7 @@ def construct_bids_dict(meta_dict: Optional[Dict] = None,
     
     Raises:
         IndexError: Error that arises if constant variables ``BIDS_INFO``'s keys and ``BIDS_ORD_ARR`` are of different lengths.
-    '''
+    """
     # BIDS informatino dictionary
     bids_info: Dict = deepcopy(BIDS_INFO)
 
@@ -162,7 +162,7 @@ def construct_bids_name(sub_data: SubDataInfo,
                         out_dir: Optional[str] = "",
                         zero_pad: Optional[int] = 0
                         ) -> Dict:
-    '''Constructs BIDS filenames dictionary from input parameter descriptions.
+    """Constructs BIDS filenames dictionary from input parameter descriptions.
 
     More information can be obtained from: 
         https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html.
@@ -240,7 +240,7 @@ def construct_bids_name(sub_data: SubDataInfo,
             * ``func`` is the speicified modality_type, but no modality_label is specified.
             * ``func`` is the speicified modality_type, but no task is specified.
             * ``fmap`` is the speicified modality_type, but no fieldmap 'case' is specified.
-    '''
+    """
     # BIDS parameter dictionary
     bids_param: Dict = deepcopy(BIDS_PARAM)
 
@@ -354,7 +354,7 @@ def num_runs(directory: Optional[str] = "",
              bids_dict: Optional[Dict] = None,
              zero_pad: Optional[int] = None
              ) -> Union[int,str]:
-    '''Counts the number of similarly named files in a directory to obtain a unique run number.
+    """Counts the number of similarly named files in a directory to obtain a unique run number.
     Optimal use of this function requires the:
 
         * search directory (``directory``)
@@ -395,7 +395,7 @@ def num_runs(directory: Optional[str] = "",
 
     Returns:
         Integer (or string should the value be zeropadded).
-    '''
+    """
     if os.path.exists(directory):
         directory: str = os.path.abspath(directory)
     elif zero_pad:
@@ -448,7 +448,7 @@ def search_bids(s: str,
                 task: Optional[str] = "",
                 bids_name_dict: Optional[Dict] = {}
                 ) -> Dict:
-    '''Performs search of BIDS (or related terms) provided there are ``bids_search``, and ``bids_map`` dictionaries, and some input
+    """Performs search of BIDS (or related terms) provided there are ``bids_search``, and ``bids_map`` dictionaries, and some input
     string (or file, represented as a string).
     
     Usage example:
@@ -471,7 +471,7 @@ def search_bids(s: str,
         
     Returns:
         Nested dictionary of BIDS descriptive naming related terms.
-    '''
+    """
     if bids_name_dict:
         bids_name_dict: Dict = deepcopy(bids_name_dict)
     else:

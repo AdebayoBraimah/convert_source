@@ -5,7 +5,7 @@
 # TODO:
 #   * Add file search for image files with no extensions (DICOMs)
 #   * Add doc building to CI workflow.
-#   * Replace triple single quotes (''') with triple double quotes (""")
+#   * Replace triple single quotes (""") with triple double quotes (""")
 #   * Get and write dcm2niix version to log file.
 #   * Add README to output directory (via function)
 #       * should include recommended actions to perform post data conversion
@@ -90,7 +90,7 @@ def batch_proc(study_img_dir: str,
                env: Optional[Dict] = {},
                dryrun: bool = False
                ) -> Tuple[List[str]]:
-    '''Batch processes a study's source image data provided a configuration, the parent directory of the study's imaging data,
+    """Batch processes a study's source image data provided a configuration, the parent directory of the study's imaging data,
     and an output directory to place the BIDS NIFTI data.
 
     Usage example:
@@ -118,7 +118,7 @@ def batch_proc(study_img_dir: str,
             * Corresponding list of JSON sidecars.
             * Corresponding list of bval files.
             * Corresponding list of bvec files.
-    '''
+    """
     study_img_dir: str = os.path.abspath(study_img_dir)
     
     # Check dependencies
@@ -237,7 +237,7 @@ def batch_proc(study_img_dir: str,
 def read_config(config_file: Optional[str] = "", 
                 verbose: Optional[bool] = False
                 ) -> Tuple[Dict[str,str],Dict,Dict,Dict,List[str]]:
-    '''Reads configuration file and creates a dictionary of search terms for 
+    """Reads configuration file and creates a dictionary of search terms for 
     each modality provided that each BIDS modality is used as a key via the 
     keyword 'modality_search'. Should BIDS related parameter descriptions need 
     to be used when renaming files, the related search and mapping terms can included 
@@ -273,7 +273,7 @@ def read_config(config_file: Optional[str] = "",
     
     Raises:
         ConfigFileReadError: Error that arises if no heuristic search terms are provided.
-    '''
+    """
     class ConfigFileReadError(Exception):
         pass
 
@@ -354,7 +354,7 @@ def bids_id(s:str,
             task: Optional[str] = "",
             mod_found: bool = False
            ) -> Tuple[Dict[str,str],str,str,str]:
-    '''Performs identification of descriptive BIDS information relevant for file naming, provided
+    """Performs identification of descriptive BIDS information relevant for file naming, provided
     a BIDS search dictionary and a BIDS map dictionary. The resulting information is then placed
     in nested dictionary of BIDS related descriptive terms.
     
@@ -380,7 +380,7 @@ def bids_id(s:str,
             * Modality type.
             * Modality label.
             * Task label.
-    '''
+    """
     search_arr: List[str] = list_dict(d=search_dict)
     
     if os.path.exists(s) and parent_dir:
@@ -480,7 +480,7 @@ def _gather_bids_name_args(bids_name_dict: Dict,
                            modality_type: str,
                            param: str
                           ) -> Union[str,bool]:
-    '''Helper function that gathers BIDS naming description arguments for the `construct_bids_name` function. In the case that 'fmap' is passed as the 
+    """Helper function that gathers BIDS naming description arguments for the `construct_bids_name` function. In the case that 'fmap' is passed as the 
     'modality_type' argument, then the 'param' argument must be either: 'mag2', 'case1', 'case2', 'case3', or 'case4'.
     
     Usage example:
@@ -496,7 +496,7 @@ def _gather_bids_name_args(bids_name_dict: Dict,
     
     Returns:
         String from the BIDS name description dictionary if it exists, or an empty string otherwise. In the case of 'fmap', then a boolean value is returned.
-    '''
+    """
     if modality_type.lower() == 'fmap' and (param == "case1" or param == "mag2" or param == "case2" or param == "case3" or param == "case4"):
         if param == 'mag2':
             param = 'case1'
@@ -533,7 +533,7 @@ def _gather_bids_name_args(bids_name_dict: Dict,
 def _get_bids_name_args(bids_name_dict: Dict,
                         modality_type: str
                         ) -> Tuple[str,bool]:
-    '''Helper function that wraps the funciton `_gather_bids_name_args`.
+    """Helper function that wraps the funciton `_gather_bids_name_args`.
     
     Usage example:
         >>> param_tuple = _get_bids_name_args(bids_dict,
@@ -557,7 +557,7 @@ def _get_bids_name_args(bids_name_dict: Dict,
             * case2: bool, fieldmap BIDS case 2.
             * case3: bool, fieldmap BIDS case 3.
             * case4: bool, fieldmap BIDS case 4.
-    '''
+    """
     task: str = ""
     acq: str = ""
     ce: str = ""
@@ -588,7 +588,7 @@ def _get_bids_name_args(bids_name_dict: Dict,
 def make_bids_name(bids_name_dict: Dict,
                     modality_type: str
                    ) -> Tuple[str,str,str,str]:
-    '''Creates a BIDS compliant filename given a BIDS name description dictionary, and the modality type.
+    """Creates a BIDS compliant filename given a BIDS name description dictionary, and the modality type.
 
     Usage example:
         >>> make_bids_name(bids_name_dict=bids_dict,
@@ -602,7 +602,7 @@ def make_bids_name(bids_name_dict: Dict,
 
     Returns:
         BIDS compliant filename string.
-    '''
+    """
     
     bids_keys: List[str] = list(bids_name_dict[modality_type].keys())
     
@@ -731,7 +731,7 @@ def source_to_bids(sub_data: SubDataInfo,
                    env: Optional[Dict] = {},
                    dryrun: bool = False
                    ) -> Tuple[List[str],List[str],List[str],List[str]]:
-    '''Converts source data to BIDS raw data.
+    """Converts source data to BIDS raw data.
     
     Usage example:
         >>> [imgs, jsons, bvals, bvecs] = source_to_bids(sub_obj,
@@ -765,7 +765,7 @@ def source_to_bids(sub_data: SubDataInfo,
             * List of corresponding JSON (sidecar) file(s). Empty string is returned if this file does not exist.
             * List of corresponding FSL-style bval file(s). Empty string is returned if this file does not exist.
             * List of corresponding FSL-style bvec file(s). Empty string is returned if this file does not exist.
-    '''
+    """
     sub: Union[int,str] = sub_data.sub
     ses: Union[int,str] = sub_data.ses
     data: str = sub_data.data
@@ -1025,7 +1025,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
                   zero_pad: int = 2,
                   cprss_lvl: int = 6
                   ) -> Tuple[List[str],List[str],List[str],List[str]]:
-    '''Converts existing NIFTI data to BIDS raw data.
+    """Converts existing NIFTI data to BIDS raw data.
     
     Usage example:
         >>> [imgs, jsons, bvals, bvecs] = nifti_to_bids(sub_obj,
@@ -1055,7 +1055,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
             * List of corresponding JSON (sidecar) file(s). Empty string is returned if this file does not exist.
             * List of corresponding FSL-style bval file(s). Empty string is returned if this file does not exist.
             * List of corresponding FSL-style bvec file(s). Empty string is returned if this file does not exist.
-    '''
+    """
     sub: Union[int,str] = sub_data.sub
     ses: Union[int,str] = sub_data.ses
     data: str = sub_data.data
@@ -1306,7 +1306,7 @@ def data_to_bids(sub_data: SubDataInfo,
                  env: Optional[Dict] = {},
                  dryrun: bool = False
                  ) -> Tuple[List[str],List[str],List[str],List[str]]:
-    '''Converts source data to BIDS compliant data. This functions also
+    """Converts source data to BIDS compliant data. This functions also
     renames already existing NIFTI data so that it can be BIDS compliant.
     
     Usage example:
@@ -1341,7 +1341,7 @@ def data_to_bids(sub_data: SubDataInfo,
             * List of corresponding JSON (sidecar) file(s). Empty string is returned if this file does not exist.
             * List of corresponding FSL-style bval file(s). Empty string is returned if this file does not exist.
             * List of corresponding FSL-style bvec file(s). Empty string is returned if this file does not exist.
-    '''
+    """
     if ('.dcm' in sub_data.data.lower()) or ('.par' in sub_data.data.lower()):
         [imgs,
          jsons,
@@ -1391,7 +1391,7 @@ def data_to_bids(sub_data: SubDataInfo,
 
 
 def bids_ignore(out_dir: str) -> str:
-    '''Writes '.bidsignore' file. This file functions 
+    """Writes '.bidsignore' file. This file functions 
     similarly to the '.gitignore' file.
 
     Usage example:
@@ -1402,7 +1402,7 @@ def bids_ignore(out_dir: str) -> str:
 
     Returns:
         String of the file path to the '.bidsignore' file.
-    '''
+    """
     if os.path.exists(out_dir):
         out_dir: str = os.path.abspath(out_dir)
     else:
@@ -1419,7 +1419,7 @@ def bids_ignore(out_dir: str) -> str:
     return new_file
 
 def log_file(log: str) -> LogFile:
-    '''Initializes log file object for logging purposes.
+    """Initializes log file object for logging purposes.
 
     Usage example:
         >>> logger = log(log_file)
@@ -1432,7 +1432,7 @@ def log_file(log: str) -> LogFile:
 
     Returns:
         LogFile object to be logged to.
-    '''
+    """
     from convert_source import __version__
 
     log: LogFile = LogFile(log_file=log)
@@ -1459,7 +1459,7 @@ def log_file(log: str) -> LogFile:
 # Adebayo Braimah - 12 March 2021
 #
 # def dir_clean_up(directory: str) -> str:
-#     '''Removes temporary indexing files (commonly found on
+#     """Removes temporary indexing files (commonly found on
 #     Mac OS X).
 #
 #     These files are generally problematic as they cause several of
@@ -1479,7 +1479,7 @@ def log_file(log: str) -> LogFile:
 #
 #     Returns:
 #         Absolute path to directory as a string.
-#     '''
+#     """
 #     from shutil import rmtree
 #
 #     if os.path.exists(directory):

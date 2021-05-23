@@ -29,7 +29,7 @@ class ConversionError(Exception):
     pass
 
 class File(object):
-    '''Creates File object that encapsulates a number of methods and properites for file and filename handling.
+    """Creates File object that encapsulates a number of methods and properites for file and filename handling.
     
     Attributes:
         file: Class variable that is set once class is instantiated.
@@ -48,14 +48,14 @@ class File(object):
     Args:
         file: Input file (need not exist at runtime/instantiated).
         ext: File extension of input file. If no extension is provided, it is inferred.
-    '''
+    """
     
     file: str = ""
     
     def __init__(self,
                  file: str,
                  ext: str = "") -> None:
-        '''Init doc-string for File object class.
+        """Init doc-string for File object class.
         
         Usage example:
             >>> with File("file_name.txt") as file:
@@ -72,7 +72,7 @@ class File(object):
             file: Input file (need not exist at runtime/instantiated).
             ext: File extension of input file. If no extension is provided, it
                 is inferred.
-        '''
+        """
         self.file: str = file
         if ext:
             self.ext: str = ext
@@ -91,24 +91,24 @@ class File(object):
         return self.file
         
     def touch(self) -> None:
-        '''Creates empty file.
+        """Creates empty file.
         
         Usage example:
             >>> file_obj = File("file_name.txt")
             >>> file_obj.touch()   # Creates empty file
-        '''
+        """
         with open(self.file,'w') as tmp_file:
             pass
         return None
     
     def abs_path(self) -> str:
-        '''Returns absolute path of file.
+        """Returns absolute path of file.
         
         Usage example:
             >>> file_obj = File("file_name.txt")
             >>> file_obj.abs_path()
             "abspath/to/file_namt.txt"
-        '''
+        """
         if os.path.exists(self.file):
             return os.path.abspath(self.file)
         else:
@@ -119,7 +119,7 @@ class File(object):
     
     def rm_ext(self,
               ext: str = "") -> str:
-        '''Removes file extension from the file.
+        """Removes file extension from the file.
         
         Usage example:
             >>> file_obj = File("file_name.txt")
@@ -131,7 +131,7 @@ class File(object):
         
         Returns:
             File name with no extension.
-        '''
+        """
         if ext:
             ext_num: int = len(ext)
             return self.file[:-(ext_num)]
@@ -143,7 +143,7 @@ class File(object):
         
     def write_txt(self,
                  txt: str = "") -> None:
-        '''Writes/appends text to file.
+        """Writes/appends text to file.
         
         Usage example:
             >>> file_obj = File("file_name.txt")
@@ -151,7 +151,7 @@ class File(object):
         
         Args:
             txt: Text to be written to file.
-        '''
+        """
         with open(self.file,"a") as tmp_file:
             tmp_file.write(txt)
             tmp_file.close()
@@ -159,7 +159,7 @@ class File(object):
 
     def file_parts(self,
                   ext: str = "") -> Tuple[str,str,str]:
-        '''Similar to MATLAB's ``fileparts``, this function splits a file and its path into its constituent parts:
+        """Similar to MATLAB's ``fileparts``, this function splits a file and its path into its constituent parts:
 
             * file path
             * filename
@@ -179,7 +179,7 @@ class File(object):
                 * Absolute file path, excluding filename.
                 * Filename, excluding extension.
                 * File extension.
-        '''
+        """
         
         file: str = self.file
         file = self.abs_path()
@@ -205,7 +205,7 @@ class File(object):
         return path, filename, ext
 
 class TmpDir(object):
-    '''Temporary directory class that creates temporary directories and files given a parent directory.
+    """Temporary directory class that creates temporary directories and files given a parent directory.
     
     Attributes:
         tmp_dir: Temproary directory.
@@ -227,7 +227,7 @@ class TmpDir(object):
     Args:
         tmp_dir: Temporary parent directory name/path.
         use_cwd: Use current working directory as working direcory.
-    '''
+    """
     
     # Set parent tmp directory, as tmp_dir is overwritten
     tmp_dir: str = ""
@@ -236,7 +236,7 @@ class TmpDir(object):
     def __init__(self,
                 tmp_dir: str,
                 use_cwd: bool = False) -> None:
-        '''Init doc-string for TmpDir class.
+        """Init doc-string for TmpDir class.
         
         Usage example:
             >>> with TmpDir("/path/to/temporary_directory",False) as tmp_dir:
@@ -253,7 +253,7 @@ class TmpDir(object):
         Args:
             tmp_dir: Temporary parent directory name/path.
             use_cwd: Use current working directory as working direcory.
-        '''
+        """
         _n: int = 10000 # maximum N for random number generator
         tmp_dir: str = os.path.join(tmp_dir,'tmp_dir_' + 
                                str(random.randint(0,_n)))
@@ -274,12 +274,12 @@ class TmpDir(object):
         return self.tmp_dir
         
     def mk_tmp_dir(self) -> Union[str,None]:
-        '''Creates/makes temporary directory.
+        """Creates/makes temporary directory.
         
         Usage example:
             >>> tmp_directory = TmpDir("/path/to/temporary_directory")
             >>> tmp_directory.mk_tmp_dir()
-        '''
+        """
         if not os.path.exists(self.tmp_dir):
             return os.makedirs(self.tmp_dir)
         else:
@@ -287,7 +287,7 @@ class TmpDir(object):
         
     def rm_tmp_dir(self,
                   rm_parent: bool = False) -> None:
-        '''Removes temporary directory.
+        """Removes temporary directory.
         
         Usage example:
             >>> tmp_directory = TmpDir("/path/to/temporary_directory")
@@ -295,7 +295,7 @@ class TmpDir(object):
         
         Args:
             rm_parent: Removes parent directory as well.
-        '''
+        """
         if rm_parent and os.path.exists(self.parent_tmp_dir):
             return shutil.rmtree(self.parent_tmp_dir,ignore_errors=True)
         elif os.path.exists(self.tmp_dir):
@@ -304,7 +304,7 @@ class TmpDir(object):
             print("Temporary directory does not exist")
     
     class TmpFile(File):
-        '''Child/sub-class of TmpDir. Creates temporary files by inheriting File object
+        """Child/sub-class of TmpDir. Creates temporary files by inheriting File object
         methods and properties from the File class.  Allows for creation of a temporary file 
         in parent class' temporary directory location. TmpFile also inherits methods from the 
         File class.
@@ -326,7 +326,7 @@ class TmpDir(object):
             tmp_dir: Temporary directory name.
             tmp_file: Temporary file name.
             ext: Temporary directory file extension.
-        '''
+        """
         
         tmp_file: File = ""
         tmp_dir: str = ""
@@ -336,7 +336,7 @@ class TmpDir(object):
                      tmp_file: Optional[str] = "",
                      ext: Optional[str] = "",
                     ) -> None:
-            '''Init doc-string for TmpFile class. Allows for creation of 
+            """Init doc-string for TmpFile class. Allows for creation of 
             a temporary file in parent class' temporary directory location.
             TmpFile also inherits methods from the File class.
             
@@ -353,7 +353,7 @@ class TmpDir(object):
                 tmp_dir: Temporary directory name.
                 tmp_file: Temporary file name.
                 ext: Temporary directory file extension.
-            '''
+            """
             self.tmp_dir: str = tmp_dir
             
             if tmp_file:
@@ -370,7 +370,7 @@ class TmpDir(object):
             # print(self.tmp_dir)
         
 class NiiFile(File):
-    '''NIFTI file class object for handling NIFTI files. Inherits methods and 
+    """NIFTI file class object for handling NIFTI files. Inherits methods and 
     properties from the File class.
     
     Attributes:
@@ -380,16 +380,16 @@ class NiiFile(File):
         >>> nii_file = NiiFile("file.nii")
         >>> nii_file
         "file.nii"
-    '''
+    """
     def __init__(self,
                  file: File) -> None:
-        '''Init doc-string for NiiFile class.
+        """Init doc-string for NiiFile class.
         
         Usage example:
             >>> nii_file = NiiFile("file.nii")
             >>> nii_file
             "file.nii"
-        '''
+        """
         self.file = file
         File.__init__(self,self.file)
 
@@ -397,7 +397,7 @@ class NiiFile(File):
 #     * Update/refactor logging class to logging decorator.
 
 class LogFile(File):
-    '''Class that creates a log file for logging purposes. Due to how this class is constructed - its 
+    """Class that creates a log file for logging purposes. Due to how this class is constructed - its 
     intended use case requires that this class is instantiated/called once and ONLY once.
     
     Once a class instance has been instantiated, then it and its associated methods can be used.
@@ -412,11 +412,11 @@ class LogFile(File):
 
     Args:
         file: Log filename (need not exist at runtime).
-    '''
+    """
     
     def __init__(self,
                  log_file: str = "") -> None:
-        '''Init doc-string for LogFile class. Initiates logging and its 
+        """Init doc-string for LogFile class. Initiates logging and its 
         associated methods.
         
         Usage examples:
@@ -426,7 +426,7 @@ class LogFile(File):
         
         Args:
             file: Log filename (need not exist at runtime).
-        '''
+        """
         self.log_file: str = log_file
         
         # Set-up logging to file
@@ -456,7 +456,7 @@ class LogFile(File):
         
     def info(self,
             msg: str = "") -> None:
-        '''Writes information to log file.
+        """Writes information to log file.
         
         Usage examples:
             >>> log = LogFile("file.log")
@@ -464,12 +464,12 @@ class LogFile(File):
         
         Args:
             msg: String to be printed to log file.
-        '''
+        """
         self.logger.info(msg)
         
     def debug(self,
             msg: str = "") -> None:
-        '''Writes debug information to file.
+        """Writes debug information to file.
         
         Usage examples:
             >>> log = LogFile("file.log")
@@ -477,12 +477,12 @@ class LogFile(File):
         
         Args:
             msg: String to be printed to log file.
-        '''
+        """
         self.logger.debug(msg)
         
     def error(self,
             msg: str = "") -> None:
-        '''Writes error information to file.
+        """Writes error information to file.
         
         Usage examples:
             >>> log = LogFile("file.log")
@@ -490,12 +490,12 @@ class LogFile(File):
         
         Args:
             msg: String to be printed to log file.
-        '''
+        """
         self.logger.error(msg)
         
     def warning(self,
             msg: str = "") -> None:
-        '''Writes warnings to file.
+        """Writes warnings to file.
         
         Usage examples:
             >>> log = LogFile("file.log")
@@ -503,12 +503,12 @@ class LogFile(File):
         
         Args:
             msg: String to be printed to log file.
-        '''
+        """
         self.logger.warning(msg)
     
     def log(self,
             log_cmd: str = "") -> None:
-        '''Log function for logging commands and messages to some log file.
+        """Log function for logging commands and messages to some log file.
         
         Usage examples:
             >>> log = LogFile("file.log")
@@ -516,13 +516,13 @@ class LogFile(File):
             
         Args:
             log_cmd: Message to be written to log file
-        '''
+        """
 
         # Log command/message
         self.info(log_cmd)
 
 class Command(object):
-    '''Creates a command and an empty command list for UNIX command line programs/applications. Primary use and
+    """Creates a command and an empty command list for UNIX command line programs/applications. Primary use and
     use-cases are intended for the subprocess module and its associated classes (i.e. Popen/call/run).
 
     The input argument is a command (string), and a mutable list is returned (, that can later be appended to).
@@ -550,11 +550,11 @@ class Command(object):
     
     Returns:
         Mutable list that can be appended to.
-    '''
+    """
 
     def __init__(self,
                  command: str) -> List[str]:
-        '''Init doc-string for Command class. Initializes a command to be used on UNIX command line.
+        """Init doc-string for Command class. Initializes a command to be used on UNIX command line.
         The input argument is a command (string), and a mutable list is returned (, that can later
         be appended to).
         
@@ -575,19 +575,19 @@ class Command(object):
         
         Returns:
             Mutable list that can be appended to.
-        '''
+        """
         self.command: str = command
         self.cmd_list: List[str] = [f"{self.command}"]
     
     def __repr__(self):
-        '''NOTE: This returns a string represnted as a joined list of strings.'''
+        """NOTE: This returns a string represnted as a joined list of strings."""
         return ' '.join(self.cmd_list)
         
     def check_dependency(self,
                          err_msg: Optional[str] = None,
                          path_envs: Optional[List[str]] = []
                          ) -> Union[bool,None]:
-        '''Checks dependency of some command line executable. Should the 
+        """Checks dependency of some command line executable. Should the 
         dependency not be met, then an exception is raised. Check the 
         system path should problems arise and ensure that the executable
         of interest is installed.
@@ -605,7 +605,7 @@ class Command(object):
         
         Raises:
             DependencyError: Dependency error exception is raised if the dependency is not met.
-        '''
+        """
         # Append to PATH environmental variable
         mod_path_env: str = os.environ['PATH']
         if path_envs:
@@ -632,7 +632,7 @@ class Command(object):
             stdout: File = "",
             shell: bool = False
            ) -> Tuple[int,File,File]:
-        '''Uses python's built-in subprocess class to execute (run) a command from an input command list.
+        """Uses python's built-in subprocess class to execute (run) a command from an input command list.
         The standard output and error can optionally be written to file.
         
         NOTE: 
@@ -663,7 +663,7 @@ class Command(object):
                 * Return code for command execution.
                 * Standard output writtent to file should the 'stdout' option be used.
                 * Standard error writtent to file should the 'stdout' option be used.
-        '''
+        """
         
         # Create command str for log
         cmd: str = ' '.join(self.cmd_list) # Join list for logging purposes

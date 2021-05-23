@@ -30,10 +30,10 @@ def batch_link(study_dir: str,
                 mapfile: str,
                 out_dir: str
                 ) -> List[str]:
-    '''Main function.
+    """Main function.
     * Parses arguements.
     * Returns list of sym-linked directories.
-    '''
+    """
     study_dir: str = os.path.abspath(study_dir)
 
     # Write logs
@@ -64,7 +64,7 @@ def batch_link(study_dir: str,
 
 # Functions for symlink creation
 def read_file_to_list(file: str) -> List[str]:
-    '''Opens the (text) file, reads its contents, and stores those contents in a list of strings. 
+    """Opens the (text) file, reads its contents, and stores those contents in a list of strings. 
     Should the input file not exist, then the text is assumed to be a string and is returned instead.
     
     Usage example:
@@ -77,7 +77,7 @@ def read_file_to_list(file: str) -> List[str]:
         
     Returns:
         List of strings of the file contents
-    '''
+    """
     if os.path.exists(file) and os.path.isfile(file):
         file: str = os.path.realpath(file)
         with open(file, "r") as file:
@@ -94,7 +94,7 @@ def create_study_sym_links(study_dir: str,
                            outdir: str,
                            log_file: Optional[LogFile]
                           ) -> List[str]:
-    '''Creates another study directory of sym-linked subject directories to the original study directory.
+    """Creates another study directory of sym-linked subject directories to the original study directory.
     The input file contains the directory names of subjects in the study directory. The corresponding map 
     file contains the subject IDs to be mapped to.
     
@@ -117,7 +117,7 @@ def create_study_sym_links(study_dir: str,
         
     Raises:
         IndexError is raised if the number of entries in ``infile`` and ``mapfile`` are not equal.
-    '''
+    """
     study_dir: str = os.path.abspath(study_dir)
 
     if log_file:
@@ -162,7 +162,7 @@ def create_study_sym_links(study_dir: str,
     return dir_list
 
 def log_file(log: str) -> LogFile:
-    '''Initializes log file object for logging purposes.
+    """Initializes log file object for logging purposes.
 
     Usage example:
         >>> logger = log(log_file)
@@ -175,7 +175,7 @@ def log_file(log: str) -> LogFile:
 
     Returns:
         LogFile object to be logged to.
-    '''
+    """
     log: LogFile = LogFile(log_file=log)
 
     now = datetime.now()

@@ -25,10 +25,10 @@ from convert_source.batch_convert import batch_proc
 from convert_source.cs_utils.const import DEFAULT_CONFIG
 
 def main() -> Tuple[List[str]]:
-    '''Main function.
+    """Main function.
     * Parses arguements.
     * Returns 4-tuple of lists of BIDS NIFTI files.
-    '''
+    """
     args, parser = arg_parser()
 
     # Print help message in the case of no arguments
@@ -79,8 +79,8 @@ def main() -> Tuple[List[str]]:
             bvecs)
 
 def arg_parser():
-    '''Argument parser for `convert_source`.
-    '''
+    """Argument parser for `convert_source`.
+    """
     # Parse arguments
     parser = argparse.ArgumentParser(description="Convert source data of a study's imaging data to BIDS NIFTI data.")
 

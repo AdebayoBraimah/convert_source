@@ -51,7 +51,7 @@ class SubInfoError(Exception):
 
 # Define class(es)
 class SubDataInfo():
-    '''Class instance that creates a data object that organizes a subject's 
+    """Class instance that creates a data object that organizes a subject's 
     identification (ID) number, session ID number, and the 
     path to the image data directory. This information is then stored for 
     each separate class instance, and can be accessed as shown in the example
@@ -74,13 +74,13 @@ class SubDataInfo():
     
     Raises:
         SubInfoError: Error that arises from either not specifying the subject ID or the path to the image file.
-    '''
+    """
 
     def __init__(self,
                  sub: Union[str,int],
                  data: str,
                  ses: Optional[Union[str,int]] = None):
-        '''Init doc-string for the 'SubDataInfo' class. 
+        """Init doc-string for the 'SubDataInfo' class. 
         
         Arguments:
             sub: Subject ID.
@@ -89,7 +89,7 @@ class SubDataInfo():
         
         Raises:
             SubInfoError: Error that arises from either not specifying the subject ID or the path to the image file.
-        '''
+        """
         if sub:
             self.sub: str = str(sub)
         else:
@@ -104,13 +104,13 @@ class SubDataInfo():
             self.ses: str = ""
     
     def __repr__(self):
-        '''NOTE: Returns string represented as dictionary.'''
+        """NOTE: Returns string represented as dictionary."""
         return (str({"sub": self.sub,
                      "ses": self.ses,
                      "data": self.data}))
 
 class BIDSimg():
-    '''File collection and organization object intended for handling 
+    """File collection and organization object intended for handling 
     Brain Imaging Data Structure (BIDS) data in the process of being converted from source data to 
     NIFTI.
     
@@ -122,15 +122,15 @@ class BIDSimg():
     
     Arguments:
         work_dir: Input working directory that contains the image files and their associated output files.
-    '''
+    """
 
     def __init__(self,
                  work_dir: str):
-        '''Constructs class instance lists for NIFTI, JSON, bval, and bvec files.
+        """Constructs class instance lists for NIFTI, JSON, bval, and bvec files.
         
         Arguments:
             work_dir: Input working directory that contains the image files and their associated output files.
-        '''
+        """
         # Working directory
         self.work_dir: str = os.path.abspath(work_dir)
 
@@ -177,7 +177,7 @@ class BIDSimg():
             del img_file,path,file,ext,json,bval,bvec
     
     def __repr__(self):
-        '''NOTE: Returns a string represented as a dictionary of list items.'''
+        """NOTE: Returns a string represented as a dictionary of list items."""
         return ( str({"imgs": self.imgs,
                       "jsons": self.jsons,
                       "bvals": self.bvals,
@@ -186,7 +186,7 @@ class BIDSimg():
     def copy_img_data(self,
                       target_dir: str
                      ) -> Tuple[List[str],List[str],List[str],List[str]]:
-        '''Copies image data and their associated files to some target directory.
+        """Copies image data and their associated files to some target directory.
 
         NOTE: 
             This function resets the class attributes of the class instance with the returns of this function.
@@ -200,7 +200,7 @@ class BIDSimg():
                 * Corresponding JSON file(s)
                 * Corresponding bval file(s)
                 * Corresponding bvec file(s)
-        '''
+        """
         
         # Init new lists
         imgs: List[str] = self.imgs
@@ -248,14 +248,14 @@ class BIDSimg():
 
 # Define function(s)
 def file_to_screen(file: str) -> str:
-    '''Reads the contents of a file and prints it to screen.
+    """Reads the contents of a file and prints it to screen.
 
     Arguments:
         file: Path to file.
 
     Returns:
         File contents returned as string, can be printed to screen.
-    '''
+    """
 
     with open(file,"r") as f:
         file_contents: str = f.read()
@@ -266,7 +266,7 @@ def file_to_screen(file: str) -> str:
 def zeropad(num: Union[str,int],
             num_zeros: int = 2
             ) -> str:
-    '''Zeropads a number, should that number be an int or str.
+    """Zeropads a number, should that number be an int or str.
     
     Usage example:
         >>> zeropad(5,2)
@@ -283,7 +283,7 @@ def zeropad(num: Union[str,int],
 
     Raises:
         TypeError: Error that arises if floats are passed as an argument.
-    '''
+    """
     if type(num) is float:
         raise TypeError("Only integers and strings can be used with the zeropad function.")
     try:
@@ -296,7 +296,7 @@ def zeropad(num: Union[str,int],
 def add_to_zeropadded(num1: Union[int,str],
                       num2: int
                       ) -> str:
-    '''Adds some specified integer to another zeropadded integer.
+    """Adds some specified integer to another zeropadded integer.
 
     Usage example:
         >>> add_to_zeropadded('005',2)
@@ -312,7 +312,7 @@ def add_to_zeropadded(num1: Union[int,str],
     Raises:
         ValueError: Error that arises if non-integer string representations are passed as an argument for ``num1``.
         TypeError: Error that arise if non-integer arguments are passed for ``num2``, **OR** if floats are passed for either ``num1`` or ``num2``.
-    '''
+    """
     try:
         int(num1)
     except ValueError:
@@ -329,14 +329,14 @@ def add_to_zeropadded(num1: Union[int,str],
         raise TypeError(f"Input {num1} is not a string or integer OR {num2} is not an integer. Please check.")
 
 def get_echo(json_file: str) -> float:
-    '''Reads the echo time (TE) from the NIFTI JSON sidecar and returns it.
+    """Reads the echo time (TE) from the NIFTI JSON sidecar and returns it.
 
     Arguments:
         json_file (string): Absolute path to JSON sidecar.
 
     Returns:
         Echo time as a float.
-    '''
+    """
 
     # Get absolute path to file
     json_file: str = os.path.abspath(json_file)
@@ -350,7 +350,7 @@ def gzip_file(file: str,
               cprss_lvl: int = 6,
               native: bool = True
               ) -> str:
-    '''Gzips file. Native implementation of gzipping files is prefered with
+    """Gzips file. Native implementation of gzipping files is prefered with
     this function provided that the system is UNIX. Otherwise, a pythonic 
     implementation of gzipping is performed.
     
@@ -361,7 +361,7 @@ def gzip_file(file: str,
         
     Returns: 
         Gzipped file.
-    '''
+    """
 
     # Check if native method was enabled.
     if native:
@@ -399,7 +399,7 @@ def gzip_file(file: str,
 def gunzip_file(file: str,
                 native: bool = True
                 ) -> str:
-    '''Gunzips file. Native implementation of gunzipping files is prefered with
+    """Gunzips file. Native implementation of gunzipping files is prefered with
     this function provided that the system is UNIX. Otherwise, a pythonic 
     implementation of gunzipping is performed.
     
@@ -409,7 +409,7 @@ def gunzip_file(file: str,
         
     Returns: 
         Gunzipped file.
-    '''
+    """
 
     # Check if native method was enabled.
     if native:
@@ -444,14 +444,14 @@ def gunzip_file(file: str,
         return out_file
 
 def read_json(json_file: str) -> Dict:
-    '''Reads JavaScript Object Notation (JSON) file.
+    """Reads JavaScript Object Notation (JSON) file.
     
     Arguments:
         json_file: Input file.
         
     Returns: 
         Dictionary of key mapped items from JSON file.
-    '''
+    """
 
     # Get absolute path to file
     if ('.json' in json_file) and os.path.exists(json_file):
@@ -470,7 +470,7 @@ def read_json(json_file: str) -> Dict:
 def write_json(json_file: str,
                dictionary: Dict
                ) -> str:
-    '''Writes python dictionary to a JavaScript Object Notation (JSON) file. The speicifed JSON file need not exist.
+    """Writes python dictionary to a JavaScript Object Notation (JSON) file. The speicifed JSON file need not exist.
     
     Usage example:
         >>> json_file = write_json("file.json",
@@ -483,7 +483,7 @@ def write_json(json_file: str,
 
     Returns:
         String that represents path to written JSON file.
-    '''
+    """
 
     # Check if JSON file exists, if not, then create JSON file
     if not os.path.exists(json_file):
@@ -501,7 +501,7 @@ def write_json(json_file: str,
 def update_json(json_file: str,
                 dictionary: Dict
                 ) -> str:
-    '''Updates JavaScript Object Notation (JSON) file. If the file does not exist, it is created once
+    """Updates JavaScript Object Notation (JSON) file. If the file does not exist, it is created once
     this function is called.
     
     Arguments:
@@ -510,7 +510,7 @@ def update_json(json_file: str,
         
     Returns: 
         Updated JSON file.
-    '''
+    """
     
     # Check if JSON file exists, if not, then create JSON file
     if not os.path.exists(json_file):
@@ -534,7 +534,7 @@ def update_json(json_file: str,
 def dict_multi_update(dictionary: Optional[Dict] = None,
                       **kwargs
                       ) -> Dict:
-    '''Updates a dictionary multiple times depending on the number key word mapped pairs that are provided and 
+    """Updates a dictionary multiple times depending on the number key word mapped pairs that are provided and 
     returns a separate updated dictionary. The dictionary passed as an argument need not exist at runtime.
     
     Example usage:
@@ -551,7 +551,7 @@ def dict_multi_update(dictionary: Optional[Dict] = None,
         
     Returns: 
         New updated dictionary.
-    '''
+    """
     
     # Create new dictionary
     if dictionary:
@@ -566,7 +566,7 @@ def dict_multi_update(dictionary: Optional[Dict] = None,
 
 def get_bvals(bval_file: Optional[str] = ""
               ) -> List[int]:
-    '''Reads the bvals from the (FSL-style) bvalue file and returns a list of unique non-zero bvalues.
+    """Reads the bvals from the (FSL-style) bvalue file and returns a list of unique non-zero bvalues.
     If the bval file does not exist or is not provided, then zero is returned in a list.
     
     Arguments:
@@ -574,7 +574,7 @@ def get_bvals(bval_file: Optional[str] = ""
         
     Returns: 
         List of unique, non-zero bvalues (as ints), or zero in a list.
-    '''
+    """
     if bval_file and os.path.exists(bval_file):
         bval_file: str = os.path.abspath(bval_file)
         vals = np.loadtxt(bval_file)
@@ -588,7 +588,7 @@ def get_metadata(dictionary: Optional[Dict] = None,
                  modality_type: Optional [str] = None,
                  task: Optional[str] = None
                  ) -> Tuple[Dict[str,str],Dict[str,Union[int,str]]]:
-    '''Reads the metadata dictionary and looks for keywords to indicate what metadata should be written to which
+    """Reads the metadata dictionary and looks for keywords to indicate what metadata should be written to which
     dictionary. For example, the keyword 'common' is used to indicate the common information for the imaging
     protocol and may contain information such as: field strength, phase encoding direction, institution name, etc.
     Additional keywords that are BIDS sub-directories names (e.g. anat, func, dwi) will return an additional
@@ -605,7 +605,7 @@ def get_metadata(dictionary: Optional[Dict] = None,
         Tuple:
             * Common metadata dictionary.
             * Modality specific metadata dictionaries.
-    '''
+    """
 
     if dictionary:
         pass
@@ -639,7 +639,7 @@ def get_metadata(dictionary: Optional[Dict] = None,
 def list_in_substr(in_list: List[str],
                    in_str: str
                    ) -> bool:
-    '''Searches a string using a list that contains substrings. Returns boolean 'True' or 'False' 
+    """Searches a string using a list that contains substrings. Returns boolean 'True' or 'False' 
     if any elements of the list are found within the string.
     
     Example usage:
@@ -655,7 +655,7 @@ def list_in_substr(in_list: List[str],
     
     Returns: 
         boolean True or False.
-    '''
+    """
 
     for word in in_list:
         if any(word.lower() in in_str.lower() for element in in_str.lower()):
@@ -688,7 +688,7 @@ def convert_image_data(file: str,
                        dryrun: bool = False,
                        return_obj: bool = False
                        ) -> Union[BIDSimg,Tuple[List[str],List[str],List[str],List[str]]]:
-    '''Converts medical image data (``DICOM``, ``PAR REC``, or ``Bruker``) to ``NIFTI`` (or NRRD, not recommended) using ``dcm2niix``.
+    """Converts medical image data (``DICOM``, ``PAR REC``, or ``Bruker``) to ``NIFTI`` (or NRRD, not recommended) using ``dcm2niix``.
     This is a wrapper function for ``dcm2niix`` (v1.0.20201102+).
 
     NOTE: 
@@ -775,7 +775,7 @@ def convert_image_data(file: str,
     Raises:
         ConversionError: Error that arises if no converted (NIFTI) images are created.
         IndexError: Error that arises if the specified options arrays/lists are of different lengths.
-    '''
+    """
     
     # Get OS platform and construct command line args
     if platform.system().lower() == 'windows':
@@ -881,7 +881,7 @@ def convert_image_data(file: str,
         return imgs, jsons, bvals, bvecs
 
 def glob_dcm(dcm_dir: str) -> List[str]:
-    '''Globs subject DICOM data directories for the top-most DICOM file
+    """Globs subject DICOM data directories for the top-most DICOM file
     in each respective directory.
     
     Example usage:
@@ -892,7 +892,7 @@ def glob_dcm(dcm_dir: str) -> List[str]:
         
     Returns:
         List of strings of image files.
-    '''
+    """
     dcm_dir: str = os.path.abspath(os.path.realpath(dcm_dir))
     dir_search: str = os.path.join(dcm_dir,"*")
     dcm_dir_list: List[str] = glob.glob(dir_search)
@@ -911,7 +911,7 @@ def glob_dcm(dcm_dir: str) -> List[str]:
     return dcm_files
 
 def glob_img(img_dir: str) -> List[str]:
-    '''Globs image data files given a subject image data directory.
+    """Globs image data files given a subject image data directory.
     The image file types that are search for are:
 
         * ``DICOM``
@@ -926,7 +926,7 @@ def glob_img(img_dir: str) -> List[str]:
         
     Returns:
         List of strings of file paths to images.
-    '''
+    """
     img_dir: str = os.path.abspath(os.path.realpath(img_dir))
 
     # Listed in most desirable order
@@ -957,7 +957,7 @@ def glob_img(img_dir: str) -> List[str]:
 def img_exclude(img_list: List[str],
                exclusion_list: Optional[List[str]] = None
                ) -> List[str]:
-    '''Constructs a new list with files that DO NOT contain words in the exclusion list.
+    """Constructs a new list with files that DO NOT contain words in the exclusion list.
     Should this list be empty, then the original input list is returned.
     
     Usage example:
@@ -969,7 +969,7 @@ def img_exclude(img_list: List[str],
         
     Returns:
         List of image files that do not contain words in the exclusion list.
-    '''
+    """
     if (exclusion_list is None) or (len(exclusion_list) == 0):
         img_set: Set = set(img_list)
         new_list: List[str] = list(img_set)
@@ -992,7 +992,7 @@ def img_exclude(img_list: List[str],
 def collect_info(parent_dir: str,
                 exclusion_list: Optional[List[str]] = None
                 ) -> List[SubDataInfo]:
-    '''Collects image data information for each subject for a study, 
+    """Collects image data information for each subject for a study, 
     provided there exists some parent directory. Certain image files 
     can be excluded provided a list of exclusion keywords/terms.
 
@@ -1014,7 +1014,7 @@ def collect_info(parent_dir: str,
         
     Returns:
         List/Array of SubDataInfo objects that corresponds to a subject ID, session ID, and path to medical image data.
-    '''
+    """
     parent_dir: str = os.path.abspath(parent_dir)
     data: List[SubDataInfo] = []
 
@@ -1057,14 +1057,14 @@ def collect_info(parent_dir: str,
     return data
 
 def get_recon_mat(json_file: str) -> Union[float,str]:
-    '''Reads ReconMatrixPE (reconstruction matrix phase encode) value from the JSON sidecar.
+    """Reads ReconMatrixPE (reconstruction matrix phase encode) value from the JSON sidecar.
     
     Arguments:
         json_file: BIDS JSON file.
         
     Returns:
         Recon Matrix PE value (as a float if it exists in the file, or as an empty string if not in the file).
-    '''
+    """
 
     json_file: str = os.path.abspath(json_file)
     
@@ -1077,14 +1077,14 @@ def get_recon_mat(json_file: str) -> Union[float,str]:
         return ''
 
 def get_pix_band(json_file: str) -> Union[float,str]:
-    '''Reads pixel bandwidth value from the JSON sidecar.
+    """Reads pixel bandwidth value from the JSON sidecar.
     
     Arguments:
         json_file (string): BIDS JSON file.
         
     Returns:
         Pixel bandwidth value (as a float if it exists in the file, or as an empty string if not in the file).
-    '''
+    """
     
     json_file: str = os.path.abspath(json_file)
 
@@ -1099,7 +1099,7 @@ def get_pix_band(json_file: str) -> Union[float,str]:
 def calc_read_time(file: str, 
                    json_file: Optional[str] = ""
                    ) -> Union[Tuple[float,float],Tuple[str,str]]:
-    '''Calculates the effective echo spacing and total readout time provided several combinations of parameters.
+    """Calculates the effective echo spacing and total readout time provided several combinations of parameters.
     Several approaches and methods to calculating the effective echo spacing and total readout within this function
     differ and are dependent on the parameters found within the provided JSON sidecar. Currently, there a four 
     approaches for calculating the effective echo space (all with differing values) and two ways of calculating 
@@ -1156,7 +1156,7 @@ def calc_read_time(file: str,
     Returns:
         Tuple:
             Tuple of floats or empty strings if unable to determine either of the values.
-    '''
+    """
     file: str = os.path.abspath(file)
 
     if json_file:
@@ -1213,7 +1213,7 @@ def comp_dict(d1: Dict,
               path: Optional[str] = "", 
               verbose: bool = False
              ) -> Union[bool,None]:
-    '''Compares 2 dictionaries to see if they have matching keys, and that each key maps
+    """Compares 2 dictionaries to see if they have matching keys, and that each key maps
     to a value (that is **NOT** of type None). This is performed recursively.
     
     Usage example:
@@ -1232,7 +1232,7 @@ def comp_dict(d1: Dict,
     Raises:
         KeyError: Error that arises if input dictionaries do not have matching keys.
         ValueError: Error that arises if one or more of the keys in either dictionary map NoneType values.
-    '''
+    """
     for k in d1:
         if (k not in d2):
             if verbose:
@@ -1258,7 +1258,7 @@ def comp_dict(d1: Dict,
     return True
 
 def depth(d: Dict) -> int:
-    '''Uses breadth-first search approach to find the depth of a dictionary.
+    """Uses breadth-first search approach to find the depth of a dictionary.
     
     Usage example:
         >>> depth(d)
@@ -1269,7 +1269,7 @@ def depth(d: Dict) -> int:
         
     Returns:
         Number of levels in dictionary.
-    '''
+    """
     queue = deque([(id(d), d, 1)])
     memo = set()
     while queue:
@@ -1283,7 +1283,7 @@ def depth(d: Dict) -> int:
 
 def list_dict(d: Dict[str,str]
              ) -> List[Dict[str,str]]:
-    '''Creates a list of dictionaries provided a nested dictionary using the
+    """Creates a list of dictionaries provided a nested dictionary using the
     top-most level of the dictionaries as list (array) indices. 
     
     Usage example:
@@ -1295,7 +1295,7 @@ def list_dict(d: Dict[str,str]
         
     Returns:
         List of dictionaries.
-    '''
+    """
     arr: List = []
     for k,v in d.items():
         tmp: Dict = {k:v}
@@ -1305,7 +1305,7 @@ def list_dict(d: Dict[str,str]
 def get_par_scan_tech(par_file: str,
                       search_dict: Dict
                       ) -> Tuple[str,str,str]:
-    '''Searches PAR file header for scan technique/MR modality used in accordance with the search terms provided by the
+    """Searches PAR file header for scan technique/MR modality used in accordance with the search terms provided by the
     nested heursitic search dictionary. A regular expression (regEx) search string is defined and is searched in the 
     PAR header file.
     
@@ -1323,7 +1323,7 @@ def get_par_scan_tech(par_file: str,
             * ``modality_type``: Modality type (e.g. ``anat``, ``func``, etc.)
             * ``modality_label``: Modality label (e.g. ``T1w``, ``bold``, etc.)
             * ``task``: Task name (e.g. ``rest``).
-    '''
+    """
     par_file: str = os.path.abspath(par_file)
 
     search_arr: List[str] = list_dict(d=search_dict)
@@ -1386,7 +1386,7 @@ def get_par_scan_tech(par_file: str,
 def get_dcm_scan_tech(dcm_file: str,
                       search_dict: Dict
                       ) -> Tuple[str,str,str]:
-    '''Searches DICOM file header for scan technique/MR modality used in accordance with the search terms provided by the
+    """Searches DICOM file header for scan technique/MR modality used in accordance with the search terms provided by the
     nested heursitic search dictionary. The DICOM header field searched is a Philips DICOM private tag (2001,1020) [Scanning 
     Technique Description MR]. In the case that matches are found in that field, is empty, or does not exist - then common 
     DICOM tags are searched which include: 
@@ -1409,7 +1409,7 @@ def get_dcm_scan_tech(dcm_file: str,
             * ``modality_type``: Modality type (e.g. ``anat``, ``func``, etc.)
             * ``modality_label``: Modality label (e.g. ``T1w``, ``bold``, etc.)
             * ``task``: Task name (e.g. ``rest``).
-    '''
+    """
     dcm_file: str = os.path.abspath(dcm_file)
 
     search_arr: List[str] = list_dict(d=search_dict)
@@ -1504,7 +1504,7 @@ def get_dcm_scan_tech(dcm_file: str,
 def header_search(img_file: str, 
                   search_dict: Dict
                   ) -> Tuple[str,str,str]:
-    '''Searches a DICOM or PAR file header for relevant scan technique/parameter information provided a nested heursitic search dictionary
+    """Searches a DICOM or PAR file header for relevant scan technique/parameter information provided a nested heursitic search dictionary
     of search terms to map scan acquisitions of interest. Any other image file passed as an argument will return a tuple of empty strings.
 
     Usage example:
@@ -1521,7 +1521,7 @@ def header_search(img_file: str,
             * ``modality_type``: Modality type (e.g. ``anat``, ``func``, etc.)
             * ``modality_label``: Modality label (e.g. ``T1w``, ``bold``, etc.)
             * ``task``: Task name (e.g. ``rest``).
-    '''
+    """
     img_file: str = os.path.abspath(img_file)
 
     if '.dcm' in img_file.lower():

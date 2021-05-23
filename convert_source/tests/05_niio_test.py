@@ -69,7 +69,7 @@ def test_get_num_frames():
 #                        tr: Optional[float] = 2.00,
 #                        task: Optional[str] = ""
 #                        ) -> Tuple[str,str]:
-#     '''Creates an empty NIFTI-2 image using the specified repetition time (TR, in sec.), and number of frames (/TRs).
+#     """Creates an empty NIFTI-2 image using the specified repetition time (TR, in sec.), and number of frames (/TRs).
 #     A corresponding JSON sidecar is also created for the NIFTI-2 file.
 # 
 #     Usage example:
@@ -85,7 +85,7 @@ def test_get_num_frames():
 #         Tuple of strings that represent:
 #             * File path to NIFTI-2 image as a string.
 #             * File path to corresponding JSON sidecar.
-#     '''
+#     """
 #     # Create empty NIFTI-2 file
 #     data = np.arange(4*4*3).reshape(4,4,3)
 #     new_image = nib.Nifti2Image(data, affine=np.eye(4))
