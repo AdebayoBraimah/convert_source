@@ -6,6 +6,7 @@
 #   * Write unit tests
 #   * Integrate database functions into convert_source flow control
 #   * Query database to write scans/sessions TSV for each subject
+#   * Write doc-strings for all functions
 
 import os
 import sqlite3
