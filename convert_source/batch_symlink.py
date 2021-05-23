@@ -6,6 +6,7 @@
 
 # TODO: 
 #   * Write unit tests
+#   * Write doc-strings
 
 import pathlib
 import sys
@@ -18,7 +19,11 @@ from typing import (
     Optional
 )
 
-_pkg_path: str = str(pathlib.Path(os.path.abspath(__file__)).parents[2])
+_pkg_path: str = str(
+    pathlib.Path(
+        os.path.abspath(__file__)
+            ).parents[2])
+
 sys.path.append(_pkg_path)
 
 from convert_source.cs_utils.fileio import LogFile
