@@ -207,6 +207,7 @@ def export_scans_dataframe(database: str,
                 raise DatabaseError(f"Table {table} does not exist in database")
             continue
         
+        # BUG: This SQL query should include the sub_id val in place of '*' for subject exclusivity
         df_tmp: pd.DataFrame = pd.read_sql_query(f"SELECT * FROM {table}", conn)
         df_tmp = df_tmp.drop(labels=list(tables.keys())[0],axis=1)
         df_list.append(df_tmp)
