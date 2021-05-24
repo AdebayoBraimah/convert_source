@@ -6,7 +6,6 @@
 
 # TODO: 
 #   * Write unit tests
-#   * Write doc-strings
 
 import pathlib
 import sys
@@ -35,9 +34,24 @@ def batch_link(study_dir: str,
                 mapfile: str,
                 out_dir: str
                 ) -> List[str]:
-    """Main function.
-    * Parses arguements.
-    * Returns list of sym-linked directories.
+    """Batch function for symbolic linking child subject directories that contain imaging data.
+    The parent directory is assumed to be the study directory that contains all subjects.
+
+    Usage example:
+        >>> sym_link_dirs = batch_link(study_dir='/<parent>/<dir>',
+        ...                            infile='dir_names.txt',
+        ...                            mapfile='bids_names.txt',
+        ...                            out_dir='/<bids>/<outdir>')
+        ...
+
+    Arguments:
+        study_dir: Parent study directory.
+        infile: Input file that contains the names of the child directories to be sym-linked.
+        mapfile: Input file that contains the names to be mapped to.
+        out_dir: Output directory (need not exist at runtime).
+
+    Returns:
+        List of sym-linked subject child directories.
     """
     study_dir: str = os.path.abspath(study_dir)
 
