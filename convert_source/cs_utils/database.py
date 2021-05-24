@@ -502,6 +502,7 @@ def _export_tmp_bids_df(database: str,
     """
     df_tmp: pd.DataFrame = export_scans_dataframe(database,
                                                     False,
+                                                    None,
                                                     'sub_id',
                                                     'ses_id',
                                                     'bids_name',
