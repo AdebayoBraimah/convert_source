@@ -225,8 +225,7 @@ BIDS_PARAM: Dict[str,str] = {
 }
 
 # SQL Database tables/columns names 
-#   mapped to data corresponding 
-#   data types
+#   mapped to corresponding data types
 DB_TABLES: OrderedDict = OrderedDict({
     'file_id':      'TEXT',    # PRIMARY KEY
     'rel_path':     'TEXT',
