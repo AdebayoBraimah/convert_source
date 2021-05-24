@@ -41,6 +41,12 @@ DEFAULT_BIDS_VERSION: str = _bids_version
 #           * bids_param.yml
 #           * README: link to BIDS documentation
 # 
+#   Implementation would likely include importing a
+#       function that includes taking a BIDS version
+#       as argument, and returning a tuple of constants.
+#           * Issue: BIDS version needs to be passed as 
+#               argument prior to other function uses.
+# 
 # Empty BIDS metadata dictionary
 BIDS_INFO: Dict = {
     # Common metadata
