@@ -28,6 +28,19 @@ with open(_bids_version_file, "r") as f:
 
 DEFAULT_BIDS_VERSION: str = _bids_version
 
+# IMPROVEMENT:
+#   Store BIDS_INFO dict in a series of yml
+#       files that correspond to some BIDS
+#       version. 
+# 
+#   Additionally, make seperate directories
+#       for each BIDS version that contains:
+#           * bids_version.txt
+#           * bids_info.yml
+#           * bids_order.txt
+#           * bids_param.yml
+#           * README: link to BIDS documentation
+# 
 # Empty BIDS metadata dictionary
 BIDS_INFO: Dict = {
     # Common metadata
