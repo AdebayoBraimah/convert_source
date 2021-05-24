@@ -51,20 +51,24 @@ class SubInfoError(Exception):
 # Define class(es)
 class SubDataInfo():
     """Class instance that creates a data object that organizes a subject's 
-    identification (ID) number, session ID number, and the 
-    path to the image data directory. This information is then stored for 
+    identification (ID) number, session ID number, the path to the image data 
+    directory, and the unique file ID. This information is then stored for 
     each separate class instance, and can be accessed as shown in the example
     usage.
     
     Usage example:
         >>> sub_info = SubDataInfo(sub="002",
         ...                        data="<path/to/img/data>",
-        ...                        ses="001")
+        ...                        ses="001",
+        ...                        file_id="0000001")
+        ...
         >>> sub_info.sub
         "002"
         >>> 
         >>> sub_info.ses
         "001"
+        >>> sub_info.file_id
+        "0000001"
     
     Arguments:
         sub: Subject ID.
@@ -78,13 +82,15 @@ class SubDataInfo():
     def __init__(self,
                  sub: Union[str,int],
                  data: str,
-                 ses: Optional[Union[str,int]] = None):
+                 ses: Optional[Union[str,int]] = None,
+                 file_id: Optional[Union[str,int]] = None):
         """Init doc-string for the 'SubDataInfo' class. 
         
         Arguments:
             sub: Subject ID.
             data: Path to image data directory.
             ses: Session ID.
+            file_id: Unique file ID for the source image data.
         
         Raises:
             SubInfoError: Error that arises from either not specifying the subject ID or the path to the image file.
@@ -93,20 +99,28 @@ class SubDataInfo():
             self.sub: str = str(sub)
         else:
             raise SubInfoError("Subject ID was not specified")
+
         if data:
             self.data: str = data
         else:
             raise SubInfoError("Subject data was not specified.")
+
         if ses:
             self.ses: str = str(ses)
         else:
             self.ses: str = ""
+        
+        if file_id:
+            self.file_id: str = str(file_id)
+        else:
+            self.file_id: str = ""
     
     def __repr__(self):
         """NOTE: Returns string represented as dictionary."""
         return (str({"sub": self.sub,
                      "ses": self.ses,
-                     "data": self.data}))
+                     "data": self.data,
+                     "file_id": self.file_id}))
 
 class BIDSimg():
     """File collection and organization object intended for handling 
@@ -1051,6 +1065,9 @@ def collect_info(parent_dir: str,
         
         for img in img_list:
             # Collect and organize each subjects' session and data
+            # 
+            #   Add database relevant steps in this loop, prior to the
+            #       SubDataInfo object invokation.
             sub_info: SubDataInfo = SubDataInfo(sub=sub,data=img,ses=ses)
             data.append(sub_info)
     return data
