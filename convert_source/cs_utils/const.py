@@ -8,6 +8,8 @@ The constant variables contained here include:
 """
 import os
 import pathlib
+
+from collections import OrderedDict
 from typing import (
     Dict,
     List
@@ -221,3 +223,17 @@ BIDS_PARAM: Dict[str,str] = {
         }
     }
 }
+
+# SQL Database tables/columns names 
+#   mapped to data corresponding 
+#   data types
+DB_TABLES: OrderedDict = OrderedDict({
+    'file_id':      'TEXT',    # PRIMARY KEY
+    'rel_path':     'TEXT',
+    'file_date':    'TEXT',
+    'acq_date':     'TEXT',
+    'sub_id':       'TEXT',
+    'ses_id':       'TEXT',
+    'bids_name':    'TEXT'
+})
+
