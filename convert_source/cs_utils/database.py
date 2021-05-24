@@ -110,6 +110,14 @@ def construct_db_dict(study_dir: Optional[str] = "",
                                 prim_key='file_id',
                                 value=file_id)
 
+    if ses_id:
+        pass
+    elif file_id:
+        ses_id: str = query_db(database=database,
+                                table='ses_id',
+                                prim_key='file_id',
+                                value=file_id)
+
     if rel_path:
         pass
     elif study_dir and file_name:
@@ -138,6 +146,14 @@ def construct_db_dict(study_dir: Optional[str] = "",
                                 value=file_id)
     else:
         acq_date: str = "N/A"
+    
+    if bids_name:
+        pass
+    elif file_id:
+        bids_name: str = query_db(database=database,
+                                table='bids_name',
+                                prim_key='file_id',
+                                value=file_id)
 
     info: Dict[str,str] = {
         "file_id":      file_id,     
