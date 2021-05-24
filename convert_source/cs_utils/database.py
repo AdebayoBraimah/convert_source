@@ -5,10 +5,8 @@
 #   * Figure out how to store and follow file_id primary key throughout convert_source
 #   * Write unit tests
 #   * Integrate database functions into convert_source flow control
-#   * Query database to write scans/sessions TSV for each subject
 # 
-#   * Write function to construct info dict of table/column and values.
-#   * Make tables a constant (DB_TABLES) and global/optional variable.
+#   * Write function to query existing database to ensure a subject has been processed
 
 import os
 import sqlite3
@@ -28,21 +26,12 @@ from typing import (
     Union
 )
 
+from datetime import datetime
 from collections import OrderedDict
 from copy import deepcopy
 
 from convert_source.cs_utils.utils import zeropad
-
-# Tables dictionary
-tables: OrderedDict = OrderedDict({
-    'file_id':      'TEXT',    # PRIMARY KEY
-    'rel_path':     'TEXT',
-    'file_date':    'TEXT',
-    'acq_date':     'TEXT',
-    'sub_id':       'TEXT',
-    'ses_id':       'TEXT',
-    'bids_name':    'TEXT'
-})
+from convert_source.cs_utils.const import DB_TABLES
 
 def construct_db_dict(study_dir: Optional[str] = "",
                     sub_id: Optional[Union[int,str]] = "",
@@ -57,12 +46,49 @@ def construct_db_dict(study_dir: Optional[str] = "",
                     tables: Optional[OrderedDict] = None,
                     num_zeros: int = 7
                     ) -> Dict[str,str]:
-    """Function that constructs and organizes a dictionary of tables/columns titles to a series of input  values.
+    """Function that constructs and organizes a dictionary of tables/columns names to a series of input values.
 
     Usage example:
+        >>> # In the case that no file_id is provided
+        >>> sub_db_dict = construct_db_dict(study_dir='/<parent>/<dir>',
+        ...                                 sub_id='001',
+        ...                                 ses_id='001',
+        ...                                 file_name='/<parent>/<dir>/<sub_data>/<image_data>/file0001.dcm',
+        ...                                 acq_date='2021-05-23T21:53:01',
+        ...                                 database='file.db')
+        ...
+        >>> # OR using **kwargs
+        >>> sub_db_dict_2 = construct_db_dict(**sub_db_dict)
+        >>>
+        >>> sub_db_dict_2
+        {'file_id': '001',
+        'rel_path': './<dir>/<sub_data>/<image_data>/file0001.dcm',
+        'file_date': '2021-05-24T09:45:14',
+        'acq_date': '2021-05-23T21:53:01',
+        'sub_id': '001',
+        'ses_id': '001',
+        'bids_name': ''}
+
     Argments:
+        study_dir: Path to study image parent directory that contains all the subjects' source image data.
+        sub_id: Unique subject ID.
+        file_id: Unique database file ID used to identify source image data.
+        bids_name: BIDS output filename.
+        ses_id: Session ID.
+        file_name: Image filename.
+        rel_path: Image file relative path. This path includes the parent study directory, and is relative to the study directory.
+        file_date: Date the source image file was added to the database.
+        acq_date: Date the image data was acquired.
+        database: Database filename.
+        tables: (Ordered) dictionary that contains the table/column names of the database as the keys, and the corresponding datatypes as items. The 0th index is the column reserved for the SQL database primary key.
+        num_zeros: Number of zeros used to zeropad the file_id.
+
     Returns:
-        Dictionary of SQL database tables/columns tiles mapped to corresponding input values.
+        Dictionary of SQL database tables/columns names mapped to corresponding input values.
+    
+    Raises:
+        DatabaseError: Error that arises if no file_id OR database to query is provided.
+        TypeError: Error that arises if no relative file path is provided OR the study directory and file name are not provided as arguments.
     """
     if tables:
         pass
@@ -76,7 +102,12 @@ def construct_db_dict(study_dir: Optional[str] = "",
                                     tables=tables,
                                     num_zeros=num_zeros)
     else:
-        raise DatabaseError("No file_id primary key to index.")
+        raise DatabaseError("No file_id primary key to index OR database to query.")
+    
+    # if sub_id:
+    #     pass
+    # else:
+    #     raise TypeError("No subject ID was provided.")
 
     if rel_path:
         pass
@@ -85,6 +116,12 @@ def construct_db_dict(study_dir: Optional[str] = "",
                                                 file_name=file_name)
     else:
         raise TypeError("Unalbe to ascertain relative file path.")
+    
+    if file_date:
+        pass
+    else:
+        now = datetime.now()
+        file_date: str = str(now.strftime("%Y-%m-%dT%H:%M:%S"))
 
     info: Dict[str,str] = {
         "file_id":      file_id,     
@@ -98,7 +135,7 @@ def construct_db_dict(study_dir: Optional[str] = "",
     return info
 
 def create_db(database: str,
-            tables: OrderedDict
+            tables: Optional[OrderedDict] = None
             ) -> str:
     """Creates database provided an ordered dictionary of table names and types.
 
@@ -117,6 +154,11 @@ def create_db(database: str,
     # Create/access database
     conn = sqlite3.connect(database)
     c = conn.cursor()
+
+    if tables:
+        pass
+    else:
+        tables: OrderedDict = deepcopy(DB_TABLES)
 
     # Construct database tables
     for i in range(1,len(tables)):
@@ -145,7 +187,7 @@ def create_db(database: str,
     return database
 
 def insert_row_db(database: str,
-                tables: OrderedDict,
+                tables: Optional[OrderedDict] = None,
                 info: Dict[str,str]) -> str:
     """Inserts rows into existing database tables, provided a dictionary of key mapped items of values.
 
@@ -167,6 +209,11 @@ def insert_row_db(database: str,
     # Access database
     conn = sqlite3.connect(database)
     c = conn.cursor()
+
+    if tables:
+        pass
+    else:
+        tables: OrderedDict = deepcopy(DB_TABLES)
 
     # Insert new rows into database tables
     for i in range(1,len(tables)):
@@ -192,7 +239,7 @@ def insert_row_db(database: str,
     return database
 
 def get_len_rows(database: str, 
-                tables: OrderedDict
+                tables: Optional[OrderedDict] = None
                 ) -> int:
     """Gets the number of rows in a databases' first table.
 
@@ -214,6 +261,11 @@ def get_len_rows(database: str,
     conn = sqlite3.connect(database)
     c = conn.cursor()
 
+    if tables:
+        pass
+    else:
+        tables: OrderedDict = deepcopy(DB_TABLES)
+
     # Perform database query
     query: str = f"SELECT COUNT(*) from {list(tables.keys())[1]}"
     c.execute(query)
@@ -225,7 +277,7 @@ def get_len_rows(database: str,
     return result
 
 def get_file_id(database: str, 
-                tables: OrderedDict,
+                tables: Optional[OrderedDict] = None,
                 num_zeros: int = 7
                 ) -> str:
     """Returns new file_id for file that does not yet exist in the database.
@@ -246,6 +298,10 @@ def get_file_id(database: str,
     Returns:
         Zeropadded string for some unique file_id.
     """
+    if tables:
+        pass
+    else:
+        tables: OrderedDict = deepcopy(DB_TABLES)
     file_id: int = get_len_rows(database, tables) + 1
     file_id: str = zeropad(num=file_id, num_zeros=num_zeros)
     return file_id
@@ -295,7 +351,7 @@ def update_table_row(database: str,
     return database
 
 def export_dataframe(database: str,
-                    tables: OrderedDict
+                    tables: Optional[OrderedDict] = None,
                     ) -> pd.DataFrame:
     """Exports all of the tables from the input database as a dataframe.
 
@@ -313,6 +369,11 @@ def export_dataframe(database: str,
     """
     # Access database
     conn = sqlite3.connect(database)
+
+    if tables:
+        pass
+    else:
+        tables: OrderedDict = deepcopy(DB_TABLES)
 
     df_list: List = []
 
