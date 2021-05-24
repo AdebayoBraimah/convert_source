@@ -28,8 +28,7 @@ from typing import (
 from convert_source.cs_utils.img_dir import img_dir_list
 
 from convert_source.cs_utils.fileio import ( 
-    Command, 
-    DependencyError, 
+    Command,
     ConversionError, 
     TmpDir, 
     LogFile, 
