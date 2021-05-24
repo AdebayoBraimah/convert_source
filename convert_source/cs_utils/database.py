@@ -5,8 +5,6 @@
 #   * Figure out how to store and follow file_id primary key throughout convert_source
 #   * Write unit tests
 #   * Integrate database functions into convert_source flow control
-# 
-#   * Write function to query existing database to ensure a subject has been processed
 
 import os
 import sqlite3
@@ -87,8 +85,8 @@ def construct_db_dict(study_dir: Optional[str] = "",
         Dictionary of SQL database tables/columns names mapped to corresponding input values.
     
     Raises:
-        DatabaseError: Error that arises if no file_id OR database to query is provided.
-        TypeError: Error that arises if no relative file path is provided OR the study directory and file name are not provided as arguments.
+        DatabaseError: Error that arises if no file ID OR database to query is provided.
+        TypeError: Error that arises if no relative file path is provided, no file ID is provided, OR the study directory and file name are not provided as arguments.
     """
     if tables:
         pass
@@ -104,16 +102,24 @@ def construct_db_dict(study_dir: Optional[str] = "",
     else:
         raise DatabaseError("No file_id primary key to index OR database to query.")
     
-    # if sub_id:
-    #     pass
-    # else:
-    #     raise TypeError("No subject ID was provided.")
+    if sub_id:
+        pass
+    elif file_id:
+        sub_id: str = query_db(database=database,
+                                table='sub_id',
+                                prim_key='file_id',
+                                value=file_id)
 
     if rel_path:
         pass
     elif study_dir and file_name:
         rel_path: str = _get_dir_relative_path(study_dir=study_dir,
                                                 file_name=file_name)
+    elif file_id:
+        rel_path: str = query_db(database=database,
+                                table='rel_path',
+                                prim_key='file_id',
+                                value=file_id)
     else:
         raise TypeError("Unalbe to ascertain relative file path.")
     
@@ -122,6 +128,16 @@ def construct_db_dict(study_dir: Optional[str] = "",
     else:
         now = datetime.now()
         file_date: str = str(now.strftime("%Y-%m-%dT%H:%M:%S"))
+    
+    if acq_date:
+        pass
+    elif file_id:
+        acq_date: str = query_db(database=database,
+                                table='acq_date',
+                                prim_key='file_id',
+                                value=file_id)
+    else:
+        acq_date: str = "N/A"
 
     info: Dict[str,str] = {
         "file_id":      file_id,     
@@ -568,3 +584,50 @@ def export_bids_scans_dataframe(database: str,
         return pd.DataFrame(columns=['filename','acq_time'])
     else:
         return pd.concat(df_list,axis=0,join='outer',ignore_index=True)
+
+def query_db(database:str,
+            table: str,
+            prim_key: str,
+            value: Union[int,str],
+            column: Optional[str] = None
+            ) -> str:
+    """Database query wrapper function that writes and performs a query for some provided value.
+
+    NOTE:
+        The SQL query performed in this function assumes that the value is of datatype ``TEXT``.
+
+    Usage example:
+        >>> sub_id = query_db(database='file.db',
+        ...                   table='sub_id',
+        ...                   prim_key='file_id',
+        ...                   value='0000001')
+        ...
+
+    Arguments:
+        database: Input database filename.
+        table: Table name to be queried.
+        prim_key: Primary key or key to be indexed.
+        value: Value to be queried or matched for.
+        column: Column name to be selected during the query. If not provided, the column name is assumed to be the same as the table name.
+    
+    Returns:
+        Subject ID as a string.
+    """
+    # Access database
+    database: str = os.path.abspath(database)
+    conn = sqlite3.connect(database)
+    c = conn.cursor()
+
+    if column:
+        pass
+    else:
+        column: str = table
+
+    # Query database
+    query: str = f"SELECT {column} FROM {table} WHERE {prim_key} = '{value}'"
+    c.execute(query)
+    query_val: str = c.fetchone()[0]
+
+    conn.commit()
+    conn.close()
+    return query_val
