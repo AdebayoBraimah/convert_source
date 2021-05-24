@@ -6,7 +6,9 @@
 #   * Write unit tests
 #   * Integrate database functions into convert_source flow control
 #   * Query database to write scans/sessions TSV for each subject
-#   * Write doc-strings for all functions
+# 
+#   * Write function to construct info dict of table/column and values.
+#   * Make tables a constant (DB_TABLES) and global/optional variable.
 
 import os
 import sqlite3
@@ -27,19 +29,73 @@ from typing import (
 )
 
 from collections import OrderedDict
+from copy import deepcopy
 
 from convert_source.cs_utils.utils import zeropad
 
 # Tables dictionary
 tables: OrderedDict = OrderedDict({
-    'file_id':'TEXT',    # PRIMARY KEY
-    'rel_path':'TEXT',
-    'file_date':'TEXT',
-    'acq_date':'TEXT',
-    'sub_id':'TEXT',
-    'ses_id':'TEXT',
-    'bids_name':'TEXT'
+    'file_id':      'TEXT',    # PRIMARY KEY
+    'rel_path':     'TEXT',
+    'file_date':    'TEXT',
+    'acq_date':     'TEXT',
+    'sub_id':       'TEXT',
+    'ses_id':       'TEXT',
+    'bids_name':    'TEXT'
 })
+
+def construct_db_dict(study_dir: Optional[str] = "",
+                    sub_id: Optional[Union[int,str]] = "",
+                    file_id: Optional[str] = "",
+                    bids_name: Optional[str] = "",
+                    ses_id: Union[int,str] = None,
+                    file_name: Optional[str] = "",
+                    rel_path: Optional[str] = "",
+                    file_date: Optional[str] = "",
+                    acq_date: Optional[str] = "",
+                    database: Optional[str] = "",
+                    tables: Optional[OrderedDict] = None,
+                    num_zeros: int = 7
+                    ) -> Dict[str,str]:
+    """Function that constructs and organizes a dictionary of tables/columns titles to a series of input  values.
+
+    Usage example:
+    Argments:
+    Returns:
+        Dictionary of SQL database tables/columns tiles mapped to corresponding input values.
+    """
+    if tables:
+        pass
+    else:
+        tables: OrderedDict = deepcopy(DB_TABLES)
+    
+    if file_id:
+        pass
+    elif database:
+        file_id: str = get_file_id(database=database,
+                                    tables=tables,
+                                    num_zeros=num_zeros)
+    else:
+        raise DatabaseError("No file_id primary key to index.")
+
+    if rel_path:
+        pass
+    elif study_dir and file_name:
+        rel_path: str = _get_dir_relative_path(study_dir=study_dir,
+                                                file_name=file_name)
+    else:
+        raise TypeError("Unalbe to ascertain relative file path.")
+
+    info: Dict[str,str] = {
+        "file_id":      file_id,     
+        "rel_path":     rel_path,
+        "file_date":    file_date,
+        "acq_date":     acq_date,
+        "sub_id":       sub_id,
+        "ses_id":       ses_id,
+        "bids_name":    bids_name
+    }
+    return info
 
 def create_db(database: str,
             tables: OrderedDict
@@ -197,8 +253,8 @@ def get_file_id(database: str,
 def update_table_row(database: str,
                     prim_key: str,
                     table_name: str, 
-                    col_name: Optional[str], 
-                    value: Optional[Union[int,str]]
+                    col_name: Optional[str] = "", 
+                    value: Optional[Union[int,str]] = None
                     ) -> str:
     """Updates a row in a table in some given database provided a table name and a value.
 
@@ -305,7 +361,7 @@ def export_scans_dataframe(database: str,
     df_list: List = []
 
     for i in args:
-        table = str(i)
+        table: str = str(i)
 
         query: str = f"SELECT count(name) FROM sqlite_master WHERE type='table' AND name='{table}'"
 
@@ -318,12 +374,11 @@ def export_scans_dataframe(database: str,
         else:
             continue
         
-        # BUG: This SQL query should include the sub_id val in place of '*' for subject exclusivity
         df_tmp: pd.DataFrame = pd.read_sql_query(f"SELECT * FROM {table}", conn)
         df_tmp = df_tmp.drop(labels=list(tables.keys())[0],axis=1)
         df_list.append(df_tmp)
 
-    return pd.concat(df_list,axis=1,join='outer')
+    return pd.concat(df_list,axis=1,join='outer',ignore_index=True)
 
 def _get_dir_relative_path(study_dir: str,
                         file_name: str
@@ -346,3 +401,94 @@ def _get_dir_relative_path(study_dir: str,
     path_sep: str = os.path.sep
     dir_tmp = str(pathlib.Path(study_dir).parents[0])
     return file_name.replace(dir_tmp + path_sep,"." + path_sep)
+
+def _export_tmp_bids_df(database: str,
+                        sub_id: str,
+                        modality_type: str,
+                        modality_label: str
+                        ) -> pd.DataFrame:
+    """Helper function that constructs modality specificy dataframes pertaining to scan type and acquisition time.
+
+    Usage example:
+        >>> df = _export_tmp_bids_df(database='file.db',
+        ...                          sub_id='001',
+        ...                          modality_type='anat'
+        ...                          modality_label='T1w')
+        ...
+
+    Arguments:
+        database: Input database filename.
+        sub_id: Subject ID.
+        modality_type: Modality type for the BIDS related modality.
+        modality_label: Modality label for the BIDS related modality.
+
+    Returns:
+        Scan dataframe for the specified subject, modality label, and modality type.
+    """
+    df_tmp: pd.DataFrame = export_scans_dataframe(database,
+                                                    False,
+                                                    'sub_id',
+                                                    'ses_id',
+                                                    'bids_name',
+                                                    'acq_date')
+    # Filter by subject ID
+    df: pd.DataFrame = df_tmp.loc[df_tmp['sub_id'] == f'{sub_id}']
+
+    # Filter by modality type and modality label
+    mod = modality_type + "/"
+    df: pd.DataFrame = df[df['bids_name'].str.contains(f"{modality_label}")]
+    df['bids_name']: pd.DataFrame = f'{mod}' + df['bids_name'].astype(str)
+    df: pd.DataFrame = df.dropna(axis=0)
+
+    df: pd.DataFrame = df.rename(
+                            columns={
+                                "bids_name": "filename", 
+                                "acq_date": "acq_time"}
+                                )
+    
+    df: pd.DataFrame = df.drop(
+                            columns=[
+                                "sub_id",
+                                "ses_id"]
+                                )
+    return df
+
+def export_bids_scans_dataframe(database: str,
+                                sub_id: str,
+                                search_dict: Dict[str,str]
+                                ) -> pd.DataFrame:
+    """Function that constructs BIDS scan dataframe (that can later be exported as a TSV).
+    The resulting dataframe is consistent with the BIDS scan TSV output file 
+    (shown here: https://bids-specification.readthedocs.io/en/v1.4.0/03-modality-agnostic-files.html#scans-file).
+
+    Usage example:
+        >>> df = export_bids_scans_dataframe(database='file.db',
+        ...                                  sub_id='001',
+        ...                                  search_dict=search_dict)
+        ...
+
+    Arguments:
+        database: Input database filename.
+        sub_id: Subject ID.
+        search_dict: Dictionary of modality specific search terms, constructed from the ``read_config`` function.
+
+    Returns:
+        Scan dataframe for a subject.
+    """
+    df_list: List = []
+    for modality_type,labels in search_dict.items():
+        for modality_label,_ in labels.items():
+            df_tmp: pd.DataFrame = _export_tmp_bids_df(database,
+                                                        sub_id,
+                                                        modality_type,
+                                                        modality_label)
+            if len(df_tmp) == 0:
+                continue
+            else:
+                df_list.append(df_tmp)
+
+    if len(df_list) == 0:
+        # Return empty dataframe
+        return pd.DataFrame(columns=['filename','acq_time'])
+    else:
+        return pd.concat(df_list,axis=0,join='outer',ignore_index=True)
