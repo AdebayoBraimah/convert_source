@@ -44,7 +44,7 @@ def construct_db_dict(study_dir: Optional[str] = "",
                     tables: Optional[OrderedDict] = None,
                     num_zeros: int = 7
                     ) -> Dict[str,str]:
-    """Function that constructs and organizes a dictionary of tables/columns names to a series of input values.
+    """Function that constructs and organizes a dictionary of table/column names to a series of input values.
 
     Usage example:
         >>> # In the case that no file_id is provided
