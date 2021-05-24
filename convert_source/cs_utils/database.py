@@ -187,8 +187,9 @@ def create_db(database: str,
     return database
 
 def insert_row_db(database: str,
-                tables: Optional[OrderedDict] = None,
-                info: Dict[str,str]) -> str:
+                info: Dict[str,str],
+                tables: Optional[OrderedDict] = None
+                ) -> str:
     """Inserts rows into existing database tables, provided a dictionary of key mapped items of values.
 
     Usage example:
@@ -310,7 +311,8 @@ def update_table_row(database: str,
                     prim_key: str,
                     table_name: str, 
                     col_name: Optional[str] = "", 
-                    value: Optional[Union[int,str]] = None
+                    value: Optional[Union[int,str]] = None,
+                    tables: Optional[OrderedDict] = None
                     ) -> str:
     """Updates a row in a table in some given database provided a table name and a value.
 
@@ -336,6 +338,11 @@ def update_table_row(database: str,
     conn = sqlite3.connect(database)
     c = conn.cursor()
 
+    if tables:
+        pass
+    else:
+        tables: OrderedDict = deepcopy(DB_TABLES)
+
     if col_name:
         pass
     else:
@@ -351,7 +358,7 @@ def update_table_row(database: str,
     return database
 
 def export_dataframe(database: str,
-                    tables: Optional[OrderedDict] = None,
+                    tables: Optional[OrderedDict] = None
                     ) -> pd.DataFrame:
     """Exports all of the tables from the input database as a dataframe.
 
@@ -392,13 +399,15 @@ def export_dataframe(database: str,
 
 def export_scans_dataframe(database: str,
                             raise_exec: bool = False,
+                            tables: Optional[OrderedDict] = None,
                             *args: str
                             ) -> pd.DataFrame:
     """Exports a dataframe provided table/column IDs.
 
     Usage example:
-        >>> df = export_scans_dataframe(database='file.db',
-        ...                             raise_exec=False,
+        >>> df = export_scans_dataframe('file.db',
+        ...                             False,
+        ...                             None,
         ...                             'sub_id',
         ...                             'ses_id',
         ...                             'bids_name')
@@ -418,6 +427,11 @@ def export_scans_dataframe(database: str,
     # Access database
     conn = sqlite3.connect(database)
     c = conn.cursor()
+
+    if tables:
+        pass
+    else:
+        tables: OrderedDict = deepcopy(DB_TABLES)
 
     df_list: List = []
 
