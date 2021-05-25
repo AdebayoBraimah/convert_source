@@ -272,21 +272,22 @@ class BIDSimg():
         return self.imgs, self.jsons, self.bvals, self.bvecs
 
 # Define function(s)
-def file_to_screen(file: str) -> str:
-    """Reads the contents of a file and prints it to screen.
 
-    Arguments:
-        file: Path to file.
-
-    Returns:
-        File contents returned as string, can be printed to screen.
-    """
-
-    with open(file,"r") as f:
-        file_contents: str = f.read()
-        file_contents: str = file_contents.strip("\n")
-        f.close()
-    return file_contents
+# def file_to_screen(file: str) -> str:
+#     """Reads the contents of a file and prints it to screen.
+# 
+#     Arguments:
+#         file: Path to file.
+# 
+#     Returns:
+#         File contents returned as string, can be printed to screen.
+#     """
+# 
+#     with open(file,"r") as f:
+#         file_contents: str = f.read()
+#         file_contents: str = file_contents.strip("\n")
+#         f.close()
+#     return file_contents
 
 def zeropad(num: Union[str,int],
             num_zeros: int = 2
