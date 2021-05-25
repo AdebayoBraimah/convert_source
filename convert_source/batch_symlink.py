@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Command line wrapper for `convert_source`'s study directory symlink functions. 
    Performs symlinking for a study's subject imaging data.
