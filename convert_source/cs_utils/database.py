@@ -45,6 +45,8 @@ def construct_db_dict(study_dir: Optional[str] = "",
                     num_zeros: int = 7
                     ) -> Dict[str,str]:
     """Function that constructs and organizes a dictionary of table/column names to a series of input values.
+    Should a database filename be provided, it does not need to exist at runtime. The database tables and columns
+    (which are used synomymously) may be specified via the ``tables`` arguments.
 
     Usage example:
         >>> # In the case that no file_id is provided
@@ -92,6 +94,14 @@ def construct_db_dict(study_dir: Optional[str] = "",
         pass
     else:
         tables: OrderedDict = deepcopy(DB_TABLES)
+    
+    if os.path.exists(database):
+        database: str = os.path.abspath(database)
+    elif database and tables:
+        database: str = create_db(database=database,
+                                tables=tables)
+    else:
+        raise DatabaseError("Database was not specified, and thus cannot be queried.")
     
     if file_id:
         pass
