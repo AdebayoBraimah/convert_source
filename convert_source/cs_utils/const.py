@@ -29,8 +29,8 @@ with open(_bids_version_file, "r") as f:
 DEFAULT_BIDS_VERSION: str = _bids_version
 
 # IMPROVEMENT:
-#   Store BIDS_INFO dict in a series of yml
-#       files that correspond to some BIDS
+#   Store BIDS_INFO dict in a series of yml/
+#       JSON files that correspond to some BIDS
 #       version. 
 # 
 #   Additionally, make seperate directories
@@ -46,6 +46,8 @@ DEFAULT_BIDS_VERSION: str = _bids_version
 #       as argument, and returning a tuple of constants.
 #           * Issue: BIDS version needs to be passed as 
 #               argument prior to other function uses.
+#           * Pass BIDS version as an argument to all 
+#               parent and child classes/functions.
 # 
 # Empty BIDS metadata dictionary
 BIDS_INFO: Dict = {
