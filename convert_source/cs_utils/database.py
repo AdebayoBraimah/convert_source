@@ -134,10 +134,13 @@ def construct_db_dict(study_dir: Optional[str] = "",
         rel_path: str = _get_dir_relative_path(study_dir=study_dir,
                                                 file_name=file_name)
     elif file_id:
-        rel_path: str = query_db(database=database,
-                                table='rel_path',
-                                prim_key='file_id',
-                                value=file_id)
+        try:
+            rel_path: str = query_db(database=database,
+                                    table='rel_path',
+                                    prim_key='file_id',
+                                    value=file_id)
+        except TypeError:
+            raise TypeError("Unalbe to ascertain relative file path.")
     else:
         raise TypeError("Unalbe to ascertain relative file path.")
     
@@ -662,13 +665,16 @@ def query_db(database:str,
         column: str = table
 
     # Query database
-    query: str = f"SELECT {column} FROM {table} WHERE {prim_key} = '{value}'"
-    c.execute(query)
-    query_val: str = c.fetchone()[0]
+    try:
+        query: str = f"SELECT {column} FROM {table} WHERE {prim_key} = '{value}'"
+        c.execute(query)
+        query_val: str = c.fetchone()[0]
 
-    conn.commit()
-    conn.close()
-    return query_val
+        conn.commit()
+        conn.close()
+        return query_val
+    except TypeError:
+        return ""
 
 def _zeropad(num: Union[str,int],
              num_zeros: int = 2
