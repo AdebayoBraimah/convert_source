@@ -25,6 +25,7 @@ _bids_version_file: str = os.path.join(str(pathlib.Path(os.path.abspath(__file__
 
 with open(_bids_version_file, "r") as f: 
     _bids_version = f.read().replace('\n','')
+    f.close()
 
 DEFAULT_BIDS_VERSION: str = _bids_version
 
