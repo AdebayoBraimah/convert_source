@@ -26,7 +26,7 @@ sys.path.append(_pkg_path)
 
 from convert_source.cs_utils.fileio import LogFile
 
-__version__ = '0.0.1'
+link_version = '0.0.1'
 
 def batch_link(study_dir: str,
                 infile: str,
@@ -110,7 +110,7 @@ def create_study_sym_links(study_dir: str,
                            infile: str,
                            mapfile: str,
                            outdir: str,
-                           log_file: Optional[LogFile]
+                           log_file: Optional[LogFile] = None
                           ) -> List[str]:
     """Creates another study directory of sym-linked subject directories to the original study directory.
     The input file contains the directory names of subjects in the study directory. The corresponding map 
@@ -140,7 +140,7 @@ def create_study_sym_links(study_dir: str,
 
     if log_file:
         log_file.log("Symbollically linking subject data directories.")
-        log_file.log(f"Performed using: prep_study v{__version__}")
+        log_file.log(f"Performed using: prep_study v{link_version}")
         log_file.log(f"Input study directory: {study_dir}")
         log_file.log(f"Output symbolic link directory: {outdir} \n")
 
@@ -169,9 +169,12 @@ def create_study_sym_links(study_dir: str,
         sub_dir: str = os.path.join(study_dir,i)
         tar_dir: str = os.path.join(outdir,j)
 
-        if os.path.exists(tar_dir):
+        if os.path.exists(tar_dir) and os.path.islink(tar_dir):
             if log_file:
                 log_file.log(f"(Symbolically) linked directory already exists.")
+        elif os.path.exists(tar_dir):
+            if log_file:
+                log_file.log(f"This directory already exists and is likely not a symbolically linked directory.")   
         else:
             if log_file:
                 log_file.log(f"Symbollically linked directories: {i} -> {j}.")
@@ -200,6 +203,6 @@ def log_file(log: str) -> LogFile:
     dt_string = now.strftime("%A %B %d, %Y %H:%M:%S")
 
     log.info(dt_string)
-    log.info(f"prep_study v{__version__}")
+    log.info(f"prep_study v{link_version}")
 
     return log
