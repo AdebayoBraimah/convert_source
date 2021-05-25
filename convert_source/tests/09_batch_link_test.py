@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """Tests for convert_source's batch symbolic linking functions.
 """
-import pytest
-
 import os
 import sys
 import pathlib
