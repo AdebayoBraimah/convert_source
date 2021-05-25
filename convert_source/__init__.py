@@ -1,27 +1,17 @@
 # -*- coding: utf-8 -*-
 """Python package used for the conversion of source DICOM, PAR REC, or NIFTI data to raw BIDS NIFTI data.
 """
-
-name: str = "convert_source"
-
-import pathlib
-import sys
 import os
 
-_pkg_path: str = str(pathlib.Path(os.path.abspath(__file__)).parents[1])
+name: str = "convert_source"
+_version_file: str = os.path.abspath(os.path.join(os.path.dirname(__file__),"version.txt"))
 
-sys.path.append(_pkg_path)
+with open(_version_file,"r") as f:
+    file_contents: str = f.read()
+    _cs_version: str = file_contents.strip("\n")
+    f.close()
 
-_version_file: str = os.path.abspath(
-    os.path.join(
-        os.path.dirname(__file__),
-        "version.txt"
-        )
-    )
-
-from convert_source.cs_utils.utils import file_to_screen
-
-# More on organizing author information:
+# More information about organizing author information:
 # https://stackoverflow.com/questions/1523427/what-is-the-common-header-format-of-python-files
 # http://epydoc.sourceforge.net/manual-fields.html#module-metadata-variables
 
@@ -31,7 +21,7 @@ __credits__ = ["Adebayo Braimah",
                "Imaging Research Center", 
                "CCHMC Dept. of Radiology"]
 __license__ = "GPL"
-__version__ = file_to_screen(_version_file)
+__version__ = _cs_version
 __maintainer__ = "Adebayo Braimah"
 __email__ = "adebayo.braimah@gmail.com"
 __status__ = "Development"
