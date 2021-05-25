@@ -28,7 +28,6 @@ from datetime import datetime
 from collections import OrderedDict
 from copy import deepcopy
 
-from convert_source.cs_utils.utils import zeropad
 from convert_source.cs_utils.const import DB_TABLES
 
 def construct_db_dict(study_dir: Optional[str] = "",
@@ -346,7 +345,7 @@ def get_file_id(database: str,
     else:
         tables: OrderedDict = deepcopy(DB_TABLES)
     file_id: int = get_len_rows(database, tables) + 1
-    file_id: str = zeropad(num=file_id, num_zeros=num_zeros)
+    file_id: str = _zeropad(num=file_id, num_zeros=num_zeros)
     return file_id
 
 def update_table_row(database: str,
@@ -669,3 +668,36 @@ def query_db(database:str,
     conn.commit()
     conn.close()
     return query_val
+
+def _zeropad(num: Union[str,int],
+             num_zeros: int = 2
+             ) -> str:
+    """Zeropads a number, should that number be an int or str.
+
+    NOTE:
+        This function is also defined in ``convert_source/cs_utils/utils`` as ``zeropad``.
+
+    Usage example:
+        >>> zeropad(5,2)
+        '05'
+        >>> zeropad('5',2)
+        '05'
+
+    Arguments:
+        num: Input number (as str or int) to zeropad.
+        num_zeros: Number of zeroes to pad with.
+
+    Returns:
+        Zeropadded string of the number, or the original string if the input string could not be represented as an integer.
+
+    Raises:
+        TypeError: Error that arises if floats are passed as an argument.
+    """
+    if type(num) is float:
+        raise TypeError("Only integers and strings can be used with the zeropad function.")
+    try:
+        num: str = str(num)
+        num: str = num.zfill(num_zeros)
+        return num
+    except ValueError:
+        return num
