@@ -44,6 +44,11 @@ from convert_source.imgio.pario import(
     get_wfs
 )
 
+from convert_source.cs_utils.database import (
+    construct_db_dict,
+    insert_row_db
+)
+
 # Define exceptions
 class SubInfoError(Exception):
     pass
@@ -55,6 +60,12 @@ class SubDataInfo():
     directory, and the unique file ID. This information is then stored for 
     each separate class instance, and can be accessed as shown in the example
     usage.
+
+    Attributes:
+        sub: Subject ID.
+        data: Path to image data directory.
+        ses: Session ID.
+        file_id: Unique file ID for the source image data.
     
     Usage example:
         >>> sub_info = SubDataInfo(sub="002",
@@ -74,6 +85,7 @@ class SubDataInfo():
         sub: Subject ID.
         data: Path to image data directory.
         ses: Session ID.
+        file_id: Unique file ID for the source image data.
     
     Raises:
         SubInfoError: Error that arises from either not specifying the subject ID or the path to the image file.
@@ -1003,6 +1015,7 @@ def img_exclude(img_list: List[str],
         return new_list
 
 def collect_info(parent_dir: str,
+                database: str,
                 exclusion_list: Optional[List[str]] = None
                 ) -> List[SubDataInfo]:
     """Collects image data information for each subject for a study, 
@@ -1011,19 +1024,26 @@ def collect_info(parent_dir: str,
 
     Usage example:
         >>> data = collect_info("<parent/directory>",
+        ...                     "file.db",
         ...                     ["SWI", "PD", "ProtonDensity"])
+        ...
         >>>
         >>> data[0].sub
-        "<subject_ID>"
+        "001"
         >>> 
         >>> data[0].data
         "<path/to/data>"
         >>> 
         >>> data[0].ses
-        "<session_ID>"
+        "001"
+        >>>
+        >>> data[0].file_id
+        "0000001"
     
     Arguments:
         parent_dir: Parent directory that contains each subject.
+        database: Database filename.
+        exclusion_list: Exclusion list that consists of keywords used to exclude files. 
         
     Returns:
         List/Array of SubDataInfo objects that corresponds to a subject ID, session ID, and path to medical image data.
@@ -1068,7 +1088,17 @@ def collect_info(parent_dir: str,
             # 
             #   Add database relevant steps in this loop, prior to the
             #       SubDataInfo object invokation.
-            sub_info: SubDataInfo = SubDataInfo(sub=sub,data=img,ses=ses)
+            db_info: Dict[str,str] = construct_db_dict(study_dir=parent_dir,
+                                                        sub_id=sub,
+                                                        ses_id=ses,
+                                                        file_name=img,
+                                                        database=database)
+            database: str = insert_row_db(database=database,
+                                            info=db_info)
+            sub_info: SubDataInfo = SubDataInfo(sub=sub,
+                                                data=img,
+                                                ses=ses,
+                                                file_id=db_info.get('file_id',''))
             data.append(sub_info)
     return data
 
