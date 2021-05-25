@@ -3,6 +3,7 @@
 """
 
 # TODO:
+#   * Re-order unit tests to correspond in order of importance/intended use
 #   * Add file search for image files with no extensions (DICOMs)
 #   * Add doc building to CI workflow.
 #   * Get and write dcm2niix version to log file.

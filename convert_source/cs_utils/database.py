@@ -4,6 +4,7 @@
 # TODO:
 #   * Figure out how to store and follow file_id primary key throughout convert_source
 #   * Write unit tests
+#       * Update old unit tests to accomdate database module functions
 #   * Integrate database functions into convert_source flow control
 
 import os
