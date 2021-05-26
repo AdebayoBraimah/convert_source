@@ -580,7 +580,7 @@ def _export_tmp_bids_df(database: str,
                                                     'acq_date')
     
     # Rename columns
-    #   NOTE: Columns are renamed as column names are not added from pandas' read SQL query
+    #   NOTE: Columns are renamed as column names are not added from the export_scans_dataframe function
     df_cols: Dict[int,str] = {
         0: 'sub_id',
         1: 'ses_id',
