@@ -6,7 +6,6 @@
     * Logging
     * Wrapper class for command line executables.
 """
-
 import subprocess
 import logging
 import os
