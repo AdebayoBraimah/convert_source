@@ -31,7 +31,6 @@ from convert_source.cs_utils.database import (
     update_table_row,
     export_dataframe,
     export_scans_dataframe,
-    _get_dir_relative_path,
     _export_tmp_bids_df,
     export_bids_scans_dataframe,
     query_db,
