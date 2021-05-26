@@ -265,15 +265,11 @@ def insert_row_db(database: str,
         tables: OrderedDict = deepcopy(DB_TABLES)
     
     # Query database for duplicates
-    rel_path: str = query_db(database=database,
-                            table='rel_path',
-                            prim_key='file_id',
-                            value=info.get('file_id',''))
     file_id: str = query_db(database=database,
                             table='rel_path',
                             prim_key='rel_path',
                             column='file_id',
-                            value=rel_path)
+                            value=info.get('rel_path',''))
 
     if file_id:
         return database
@@ -380,7 +376,7 @@ def update_table_row(database: str,
 
     Usage example:
         >>> db = update_table_row(database='file.db',
-        ...                       prim_key='file_id',
+        ...                       prim_key='0000001',
         ...                       table_name='bids_name',
         ...                       col_name='bids_name',
         ...                       value='sub-001_ses-001_run-01_T1w')
@@ -423,6 +419,8 @@ def export_dataframe(database: str,
                     tables: Optional[OrderedDict] = None
                     ) -> pd.DataFrame:
     """Exports all of the tables from the input database as a dataframe.
+    Mainly intended for constructing (and exporting) of a dataframe for the
+    entire set of study images.
 
     Usage example:
         >>> df = export_dataframe(database='file.db',
@@ -478,6 +476,7 @@ def export_scans_dataframe(database: str,
     Arguments:
         database: Input database filename.
         raise_exec: Boolean to raise exception.
+        tables: Ordered dictionary, in which the 0th key is the primary key, and the items are the data type.
         *args: Name arguments that correspond to table names of the input database.
 
     Returns:
@@ -511,8 +510,8 @@ def export_scans_dataframe(database: str,
         else:
             continue
         
-        df_tmp: pd.DataFrame = pd.read_sql_query(f"SELECT * FROM {table}", conn)
-        df_tmp = df_tmp.drop(labels=list(tables.keys())[0],axis=1)
+        df_tmp: pd.DataFrame = pd.read_sql_query(sql=f"SELECT * FROM {table}", con=conn)
+        df_tmp: pd.DataFrame = df_tmp.drop(labels=list(tables.keys())[0],axis=1)
         df_list.append(df_tmp)
 
     return pd.concat(df_list,axis=1,join='outer',ignore_index=True)
@@ -535,6 +534,8 @@ def _get_dir_relative_path(study_dir: str,
     Returns:
         String that corresponds to the relative path of the imaging data.
     """
+    study_dir: str = os.path.abspath(study_dir)
+    file_name: str = os.path.abspath(file_name)
     path_sep: str = os.path.sep
     dir_tmp = str(pathlib.Path(study_dir).parents[0])
     return file_name.replace(dir_tmp + path_sep,"." + path_sep)
@@ -577,6 +578,18 @@ def _export_tmp_bids_df(database: str,
                                                     'ses_id',
                                                     'bids_name',
                                                     'acq_date')
+    
+    # Rename columns
+    #   NOTE: Columns are renamed as column names are not added from pandas' read SQL query
+    df_cols: Dict[int,str] = {
+        0: 'sub_id',
+        1: 'ses_id',
+        2: 'bids_name',
+        3: 'acq_date'
+    }
+
+    df_tmp: pd.DataFrame = df_tmp.rename(columns=df_cols)
+
     # Filter by subject ID
     df: pd.DataFrame = df_tmp.loc[df_tmp['sub_id'] == f'{sub_id}']
 
@@ -585,6 +598,7 @@ def _export_tmp_bids_df(database: str,
     df: pd.DataFrame = df[df['bids_name'].str.contains(f"{modality_label}")]
     df['bids_name']: pd.DataFrame = f'{mod}' + df['bids_name'].astype(str) + f'{ext}'
     df: pd.DataFrame = df.dropna(axis=0)
+    df: pd.DataFrame = df.reset_index()
 
     df: pd.DataFrame = df.rename(
                             columns={
@@ -594,6 +608,7 @@ def _export_tmp_bids_df(database: str,
     
     df: pd.DataFrame = df.drop(
                             columns=[
+                                "index",
                                 "sub_id",
                                 "ses_id"]
                                 )
@@ -604,7 +619,7 @@ def export_bids_scans_dataframe(database: str,
                                 search_dict: Dict[str,str],
                                 gzipped: bool = True
                                 ) -> pd.DataFrame:
-    """Function that constructs BIDS scan dataframe (that can later be exported as a TSV).
+    """Convenience function that constructs BIDS scan dataframe (that can later be exported as a TSV).
     The resulting dataframe is consistent with the BIDS scan TSV output file 
     (shown here: https://bids-specification.readthedocs.io/en/v1.4.0/03-modality-agnostic-files.html#scans-file).
 
@@ -667,7 +682,7 @@ def query_db(database:str,
         >>> file_id = query_db(database='file.db',
         ...                   table='sub_id',
         ...                   prim_key='sub_id',
-        ...                   column="file_id",
+        ...                   column='file_id',
         ...                   value='001')
         ...
         >>> file_id
