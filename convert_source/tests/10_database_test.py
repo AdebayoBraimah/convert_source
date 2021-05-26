@@ -9,10 +9,7 @@ import urllib.request
 import shutil
 import pandas as pd
 
-from typing import (
-    Dict,
-    List
-)
+from typing import Dict
 
 # Add package/module to PYTHONPATH
 mod_path: str = os.path.join(str(pathlib.Path(os.path.abspath(__file__)).parents[2]))
@@ -268,6 +265,20 @@ def test_export_bids_scans_dataframe():
                                         sub_id='CX009902',
                                         modality_type='anat',
                                         modality_label='flair')
+    assert len(df) == 1
+    assert ('filename' in list(df.columns)) and ('acq_time' in list(df.columns)) == True
+
+    # Construct search dictionary
+    [search_dict,
+     _,
+     _,
+     _,
+     _] = read_config(config_file=test_config1,
+                                   verbose=True)
+
+    df: pd.DataFrame = export_bids_scans_dataframe(database=test_db,
+                                                sub_id='CX009902',
+                                                search_dict=search_dict)
     assert len(df) == 1
     assert ('filename' in list(df.columns)) and ('acq_time' in list(df.columns)) == True
 
