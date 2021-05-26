@@ -23,8 +23,8 @@ from convert_source.cs_utils.database import (
     construct_db_dict,
     create_db,
     insert_row_db,
-    get_len_rows,
     get_file_id,
+    get_len_rows,
     update_table_row,
     export_dataframe,
     export_scans_dataframe,
@@ -60,7 +60,7 @@ dcm_test_data: str = os.path.join(data_dir,'TEST001-UNIT001','data.dicom','ST000
 test_infile: str = os.path.join(scripts_dir,'test.orig_subject_id.txt')
 test_mapfile: str = os.path.join(scripts_dir,'test.map_subject_id.txt')
 
-out_dir: str = os.path.join(os.getcwd(),'test.study.link')
+out_dir: str = os.path.join(os.getcwd(),'test.database.study')
 misc_dir: str = os.path.join(out_dir,'.misc')
 test_db: str = os.path.join(misc_dir,'test.study.db')
 
@@ -151,11 +151,6 @@ def test_construct_db_dict_and_insert_row_db():
 
     create_db(database=test_db)
 
-    # NOTE:
-    #   The file_id's should all be the same because
-    #       the database tables have not had new rows
-    #       inserted.
-
     test_dict_1: Dict[str,str] = construct_db_dict(
                                                     study_dir=data_dir,
                                                     sub_id='001',
@@ -199,3 +194,22 @@ def test_construct_db_dict_and_insert_row_db():
     assert test_dict_2.get('ses_id') == 'BMNC000XDF'
     assert test_dict_2.get('acq_date') == 'N/A'
     assert test_dict_2.get('bids_name') == ''
+
+def test_get_row_len():
+    assert get_len_rows(database=test_db)
+
+def test_get_file_id():
+    assert get_file_id(database=test_db) == '0000004'
+
+def test_zeropad():
+    assert _zeropad(5,3) == '005'
+    assert len(_zeropad(5,3)) == 3
+
+    assert _zeropad(9,9) == '000000009'
+    assert len(_zeropad(9,9)) == 9
+
+def test_query_db():
+    
+    
+
+
