@@ -31,6 +31,7 @@ from datetime import datetime
 from collections import OrderedDict
 from copy import deepcopy
 
+from convert_source.cs_utils.fileio import File
 from convert_source.cs_utils.const import DB_TABLES
 
 def construct_db_dict(study_dir: Optional[str] = "",
@@ -44,7 +45,8 @@ def construct_db_dict(study_dir: Optional[str] = "",
                     acq_date: Optional[str] = "",
                     database: Optional[str] = "",
                     tables: Optional[OrderedDict] = None,
-                    num_zeros: int = 7
+                    num_zeros: int = 7,
+                    use_dcm_dir: bool = False
                     ) -> Dict[str,str]:
     """Function that constructs and organizes a dictionary of table/column names to a series of input values.
     Should a database filename be provided, it does not need to exist at runtime. The database tables and columns
@@ -84,13 +86,14 @@ def construct_db_dict(study_dir: Optional[str] = "",
         database: Database filename.
         tables: (Ordered) dictionary that contains the table/column names of the database as the keys, and the corresponding datatypes as items. The 0th index is the column reserved for the SQL database primary key.
         num_zeros: Number of zeros used to zeropad the file_id.
+        use_dcm_dir: If set to true, then only the DICOM directory relative path is used as opposed to just the relative path (which includes the filename).
 
     Returns:
         Dictionary of SQL database tables/columns names mapped to corresponding input values.
     
     Raises:
-        DatabaseError: Error that arises if no file ID OR database to query is provided.
-        TypeError: Error that arises if no relative file path is provided, no file ID is provided, OR the study directory and file name are not provided as arguments.
+        DatabaseError: Error that arises if no file ID AND / OR database to query is provided.
+        UnboundLocalError: Error that arises if no relative file path is provided, no file ID is provided, OR the study directory and file name are not provided as arguments.
     """
     if tables:
         pass
@@ -134,14 +137,16 @@ def construct_db_dict(study_dir: Optional[str] = "",
         pass
     elif study_dir and file_name:
         rel_path: str = _get_dir_relative_path(study_dir=study_dir,
-                                                file_name=file_name)
-    elif file_id:
+                                                file_name=file_name,
+                                                dcm_dir=use_dcm_dir)
+    elif file_id and database:
         rel_path: str = query_db(database=database,
                                 table='rel_path',
                                 prim_key='file_id',
                                 value=file_id)
     else:
-        raise TypeError("Unalbe to ascertain relative file path.")
+        raise UnboundLocalError("Unalbe to ascertain relative file path. The relative path, \
+            or file ID must be provided, OR the study directory and file name.")
     
     if file_date:
         pass
@@ -517,19 +522,22 @@ def export_scans_dataframe(database: str,
     return pd.concat(df_list,axis=1,join='outer',ignore_index=True)
 
 def _get_dir_relative_path(study_dir: str,
-                        file_name: str
+                        file_name: str,
+                        dcm_dir: bool = False
                         ) -> str:
     """Helper function that returns the relative path provided some parent study directory and some file name - for record keeping purposes.
 
     Usage example:
         >>> _get_dir_relative_path(study_dir='/<parent>/<dir>',
-        ...                        file_name='/<parent>/<dir>/<sub_data>/<image_data>/file0001.dcm')
+        ...                        file_name='/<parent>/<dir>/<sub_data>/<image_data>/file0001.dcm',
+        ...                        dcm_dir=False)
         ...
         './<dir>/<sub_data>/<image_data>/file0001.dcm'
 
     Arguments:
         study_dir: Parent study directory that contains all of the subjects' imaging data.
         file_name: Filename/path of image data.
+        dcm_dir: If set to true, then only the DICOM directory relative path is returned as opposed to just the relative path (which includes the filename).
 
     Returns:
         String that corresponds to the relative path of the imaging data.
@@ -538,7 +546,13 @@ def _get_dir_relative_path(study_dir: str,
     file_name: str = os.path.abspath(file_name)
     path_sep: str = os.path.sep
     dir_tmp = str(pathlib.Path(study_dir).parents[0])
-    return file_name.replace(dir_tmp + path_sep,"." + path_sep)
+
+    if ('.dcm' in file_name) and (dcm_dir):
+        dcm_img_dir: str = _get_dcm_dir(dcm_file=file_name)
+        return dcm_img_dir.replace(dir_tmp + path_sep,"." + path_sep)
+    else:
+        return file_name.replace(dir_tmp + path_sep,"." + path_sep)
+
 
 def _export_tmp_bids_df(database: str,
                         sub_id: str,
@@ -752,3 +766,31 @@ def _zeropad(num: Union[str,int],
         return num
     except ValueError:
         return num
+
+def _get_dcm_dir(dcm_file: str) -> str:
+    """Function that returns the absolute directory path of a DICOM directory (excluding the filename).
+
+    Usage example:
+        >>> dcm_dir = get_dcm_dir(dcm_file='./<path>/<to>/<dcm>/MR00001.dcm')
+        >>> dcm_dir
+        '/<system>/<path>/<to>/<dcm>'
+    
+    Arguments:
+        dcm_file: DICOM file path.
+
+    Returns:
+        Absolute directory path of the DICOM directory as a string.
+
+    Raises:
+        FileNotFoundError: Error that arises if the specified DICOM file does not exist.
+    """
+    if os.path.exists(dcm_file):
+        pass
+    else:
+        raise FileNotFoundError("The specified DICOM file does not exist.")
+
+    with File(file=dcm_file) as f:
+        [dir_path, 
+        _, 
+        _] = f.file_parts()
+    return dir_path

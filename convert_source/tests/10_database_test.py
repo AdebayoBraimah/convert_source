@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Tests for convert_source's database module and its associated functions.
 """
+from sqlite3.dbapi2 import DatabaseError
+import pytest
 import os
 import sys
 import pathlib
@@ -10,6 +12,8 @@ import shutil
 import pandas as pd
 
 from typing import Dict
+
+import pytest
 
 # Add package/module to PYTHONPATH
 mod_path: str = os.path.join(str(pathlib.Path(os.path.abspath(__file__)).parents[2]))
@@ -131,12 +135,23 @@ def test_construct_db_dict_and_insert_row_db():
 
     create_db(database=test_db)
 
+    use_dcm_dir: bool = True
+
+    with pytest.raises(DatabaseError):
+        error_dict: Dict[str,str] = construct_db_dict(
+                                                    study_dir=data_dir,
+                                                    sub_id='001',
+                                                    file_name=test_file_1,
+                                                    use_dcm_dir=use_dcm_dir
+                                                )
+
     test_dict_1: Dict[str,str] = construct_db_dict(
                                                     study_dir=data_dir,
                                                     sub_id='001',
                                                     ses_id='001',
                                                     database=test_db,
-                                                    file_name=test_file_1
+                                                    file_name=test_file_1,
+                                                    use_dcm_dir=use_dcm_dir
                                                 )
     insert_row_db(database=test_db, info=test_dict_1)
     test_dict_2: Dict[str,str] = construct_db_dict(
