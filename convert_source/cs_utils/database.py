@@ -134,13 +134,10 @@ def construct_db_dict(study_dir: Optional[str] = "",
         rel_path: str = _get_dir_relative_path(study_dir=study_dir,
                                                 file_name=file_name)
     elif file_id:
-        try:
-            rel_path: str = query_db(database=database,
-                                    table='rel_path',
-                                    prim_key='file_id',
-                                    value=file_id)
-        except TypeError:
-            raise TypeError("Unalbe to ascertain relative file path.")
+        rel_path: str = query_db(database=database,
+                                table='rel_path',
+                                prim_key='file_id',
+                                value=file_id)
     else:
         raise TypeError("Unalbe to ascertain relative file path.")
     
@@ -157,6 +154,10 @@ def construct_db_dict(study_dir: Optional[str] = "",
                                 table='acq_date',
                                 prim_key='file_id',
                                 value=file_id)
+        if acq_date:
+            pass
+        else:
+            acq_date: str = "N/A"
     else:
         acq_date: str = "N/A"
     

@@ -64,6 +64,29 @@ out_dir: str = os.path.join(os.getcwd(),'test.study.link')
 misc_dir: str = os.path.join(out_dir,'.misc')
 test_db: str = os.path.join(misc_dir,'test.study.db')
 
+test_file_1: str = os.path.join(
+    data_dir,
+    'TEST001-UNIT001',
+    'data.dicom',
+    'ST000000',
+    'SE000001',
+    'MR000009.dcm'
+)
+
+test_file_2: str = os.path.join(
+    data_dir,
+    'TEST001-UNIT001',
+    'data.parrec',
+    'AXIAL.PAR'
+)
+
+test_file_3: str = os.path.join(
+    data_dir,
+    'TEST001-UNIT001',
+    'data.nifti',
+    'FLAIR.nii.gz'
+)
+
 def test_download_prog():
     class PlatformInferError(Exception):
         pass
@@ -119,3 +142,60 @@ def test_create_db():
     assert os.path.exists(create_db(database=test_db)) == True
     shutil.rmtree(out_dir)
     assert os.path.exists(out_dir) == False
+
+def test_construct_db_dict_and_insert_row_db():
+    if os.path.exists(misc_dir):
+        pass
+    else:
+        os.makedirs(misc_dir)
+
+    create_db(database=test_db)
+
+    # NOTE:
+    #   The file_id's should all be the same because
+    #       the database tables have not had new rows
+    #       inserted.
+
+    test_dict_1: Dict[str,str] = construct_db_dict(
+                                                    study_dir=data_dir,
+                                                    sub_id='001',
+                                                    ses_id='001',
+                                                    database=test_db,
+                                                    file_name=test_file_1
+                                                )
+    insert_row_db(database=test_db, info=test_dict_1)
+    test_dict_2: Dict[str,str] = construct_db_dict(
+                                                    study_dir=data_dir,
+                                                    sub_id='101',
+                                                    ses_id='1',
+                                                    database=test_db,
+                                                    file_name=test_file_2
+                                                )
+    insert_row_db(database=test_db, info=test_dict_2)
+    test_dict_3: Dict[str,str] = construct_db_dict(
+                                                    study_dir=data_dir,
+                                                    sub_id='CX009902',
+                                                    ses_id='BMNC000XDF',
+                                                    database=test_db,
+                                                    file_name=test_file_3
+                                                )
+    insert_row_db(database=test_db, info=test_dict_3)
+
+    # Test statements
+    assert test_dict_1.get('file_id') == '0000001'
+    assert test_dict_1.get('sub_id') == '001'
+    assert test_dict_1.get('ses_id') == '001'
+    assert test_dict_1.get('acq_date') == 'N/A'
+    assert test_dict_1.get('bids_name') == ''
+
+    assert test_dict_2.get('file_id') == '0000002'
+    assert test_dict_2.get('sub_id') == '101'
+    assert test_dict_2.get('ses_id') == '1'
+    assert test_dict_2.get('acq_date') == 'N/A'
+    assert test_dict_2.get('bids_name') == ''
+
+    assert test_dict_2.get('file_id') == '0000003'
+    assert test_dict_2.get('sub_id') == 'CX009902'
+    assert test_dict_2.get('ses_id') == 'BMNC000XDF'
+    assert test_dict_2.get('acq_date') == 'N/A'
+    assert test_dict_2.get('bids_name') == ''
