@@ -3,11 +3,8 @@
 """
 # TODO:
 #   * Figure out how to store and follow file_id primary key throughout convert_source
-#   * Write unit tests
-#       * Update old unit tests to accomdate database module functions
+#   * Update old unit tests to accomdate database module functions
 #   * Integrate database functions into convert_source flow control
-#   * Write function that truncates DICOM file paths to remove the file name and extension, 
-#       only leaving the file path / directory name.
 
 import os
 import sqlite3
