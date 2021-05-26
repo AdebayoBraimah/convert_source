@@ -6,6 +6,8 @@
 #   * Write unit tests
 #       * Update old unit tests to accomdate database module functions
 #   * Integrate database functions into convert_source flow control
+#   * Write function that truncates DICOM file paths to remove the file name and extension, 
+#       only leaving the file path / directory name.
 
 import os
 import sqlite3
@@ -261,6 +263,20 @@ def insert_row_db(database: str,
         pass
     else:
         tables: OrderedDict = deepcopy(DB_TABLES)
+    
+    # Query database for duplicates
+    rel_path: str = query_db(database=database,
+                            table='rel_path',
+                            prim_key='file_id',
+                            value=info.get('file_id',''))
+    file_id: str = query_db(database=database,
+                            table='rel_path',
+                            prim_key='rel_path',
+                            column='file_id',
+                            value=rel_path)
+
+    if file_id:
+        return database
 
     # Insert new rows into database tables
     for i in range(1,len(tables)):
@@ -644,6 +660,18 @@ def query_db(database:str,
         ...                   prim_key='file_id',
         ...                   value='0000001')
         ...
+        >>> sub_id
+        '001'
+        >>> # OR
+        >>>
+        >>> file_id = query_db(database='file.db',
+        ...                   table='sub_id',
+        ...                   prim_key='sub_id',
+        ...                   column="file_id",
+        ...                   value='001')
+        ...
+        >>> file_id
+        '0000001'
 
     Arguments:
         database: Input database filename.
