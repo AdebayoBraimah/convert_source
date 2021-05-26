@@ -25,13 +25,13 @@ sys.path.append(_pkg_path)
 
 from convert_source.batch_symlink import (
     batch_link,
-    __version__
+    link_version
 )
 
 def main() -> List[str]:
     """Main function.
-    * Parses arguements.
-    * Returns list of sym-linked directories.
+        * Parses arguements.
+        * Returns list of sym-linked directories.
     """
     args, parser = arg_parser()
 
@@ -43,7 +43,7 @@ def main() -> List[str]:
             parser.print_help()
     
     if args.ps_version:
-        print(f"prep_study v{__version__}")
+        print(f"prep_study v{link_version}")
         sys.exit(0)
     
     if args.study_dir and args.out_dir and args.infile and args.mapfile:
