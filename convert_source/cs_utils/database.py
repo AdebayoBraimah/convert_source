@@ -14,7 +14,7 @@ import sqlite3
 import pandas as pd
 import pathlib
 
-from sqlite3 import (
+from sqlite3.dbapi2 import (
     DatabaseError,
     IntegrityError,
     OperationalError
