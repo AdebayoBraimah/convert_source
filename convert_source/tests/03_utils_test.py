@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 """Tests for the cs_utils' utils module's functions.
+
+NOTE: 
+    * get_metadata is tested elsewhere.
+    * convert_image_data is tested elsewhere.
+    * header_search is tested elsewhere.
+        * This function wraps `get_dcm_scan_tech` and `get_par_scan_tech`.
 """
-
-# NOTE: 
-#     * get_metadata is tested elsewhere.
-#     * convert_image_data is tested elsewhere.
-#     * header_search is tested elsewhere.
-#         * This function wraps `get_dcm_scan_tech` and `get_par_scan_tech`.
-
 import pytest
 
 import os
@@ -28,6 +27,8 @@ from convert_source.cs_utils.fileio import (
     Command,
     File
 )
+
+from convert_source.cs_utils.database import create_db
 
 from convert_source.cs_utils.utils import (
     SubDataInfo,
@@ -51,6 +52,10 @@ from convert_source.cs_utils.utils import (
 scripts_dir: str = os.path.abspath(os.path.join(os.path.dirname(__file__),'helper.scripts'))
 tmp_out: str = os.path.join(os.getcwd(),'tmp.subs.dir')
 tmp_json: str = os.path.join(scripts_dir,'test.orig.json')
+
+out_dir: str = os.path.join(os.getcwd(),'test.database.study')
+misc_dir: str = os.path.join(out_dir,'.misc')
+test_db: str = os.path.join(misc_dir,'test.study.db')
 
 ## Test dictionary
 tmp_dict: Dict = {
@@ -163,7 +168,7 @@ def test_write_json():
 def test_update_json():
     tt: Dict = {"MagneticFieldStrength": 3}
     x: str = update_json("test.json",tt)
-    f: Dict = read_json("test.json")
+    f: Dict = read_json(x)
     assert f['MagneticFieldStrength'] == 3
     os.remove("test.json")
 
@@ -204,11 +209,20 @@ def test_list_in_substr():
     assert list_in_substr(list2,str2) == True
 
 def test_collect_info():
+    if os.path.exists(misc_dir):
+        pass
+    else:
+        os.makedirs(misc_dir)
+    
+    create_db(database=test_db)
+
     if platform.system().lower() != 'windows':
         parent_dir: str = tmp_out
         exclusion_list: List[str] = ['T1','DWI','SWI']
-        data: List[SubDataInfo] = collect_info(parent_dir,exclusion_list)
-        print (len(data))
+        data: List[SubDataInfo] = collect_info(parent_dir=parent_dir,
+                                                database=test_db, 
+                                                exclusion_list=exclusion_list)
+        print(len(data))
         assert len(data) == 252
 
 def test_comp_dict_funcs():
@@ -241,6 +255,7 @@ def test_cleanup_tmp_dir():
         rm_test_dir: Command = Command("rm")
         rm_test_dir.cmd_list.append("-rf")
         rm_test_dir.cmd_list.append(tmp_out)
+        rm_test_dir.cmd_list.append(out_dir)
         rm_test_dir.run()
         assert os.path.exists(tmp_out) == False
 
