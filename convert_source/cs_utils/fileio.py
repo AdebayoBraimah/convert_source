@@ -393,9 +393,6 @@ class NiiFile(File):
         self.file = file
         File.__init__(self,self.file)
 
-# TODO:
-#     * Update/refactor logging class to logging decorator.
-
 class LogFile(File):
     """Class that creates a log file for logging purposes. Due to how this class is constructed - its 
     intended use case requires that this class is instantiated/called once and ONLY once.

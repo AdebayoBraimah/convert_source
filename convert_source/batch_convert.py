@@ -3,13 +3,11 @@
 """
 
 # TODO:
-#   * Re-order unit tests to correspond in order of importance/intended use
 #   * Write integration test(s)
 #   * Separate unit and integration test(s) into different directories
 # 
 #   * Add file search for image files with no extensions (DICOMs)
 #   * Add doc building to CI workflow.
-#   * Get and write dcm2niix version to log file.
 #   * Add README to output directory (via function)
 #       * should include recommended actions to perform post data conversion
 # 
