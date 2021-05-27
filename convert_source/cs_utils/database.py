@@ -390,6 +390,7 @@ def update_table_row(database: str,
         table_name: Table name of table in database to be updated.
         col_name: Column name of the table to be updated. If not provided, then the column name is assumed to be table name.
         value: The value (integer or string) used to update the column in the table/database.
+        tables: Ordered dictionary, in which the 0th key is the primary key, and the items are the data type.
 
     Returns:
         String that corresponds to the database filename.

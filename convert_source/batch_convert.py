@@ -214,6 +214,7 @@ def batch_proc(study_img_dir: str,
             bvecs] = data_to_bids(sub_data=sub_data,
                                 bids_name_dict=bids_name_dict,
                                 out_dir=out_dir,
+                                database=database,
                                 modality_type=modality_type,
                                 modality_label=modality_label,
                                 task=task,
@@ -733,6 +734,7 @@ def make_bids_name(bids_name_dict: Dict,
 def source_to_bids(sub_data: SubDataInfo,
                    bids_name_dict: Dict,
                    out_dir: str,
+                   database: str,
                    modality_type: Optional[str] = "",
                    modality_label: Optional[str] = "",
                    task: Optional[str] = "",
@@ -753,6 +755,7 @@ def source_to_bids(sub_data: SubDataInfo,
         >>> [imgs, jsons, bvals, bvecs] = source_to_bids(sub_obj,
         ...                                              bids_name_dict,
         ...                                              output_dir,
+        ...                                              database,
         ...                                              'anat',
         ...                                              'T1w')
         ...
@@ -761,6 +764,7 @@ def source_to_bids(sub_data: SubDataInfo,
         sub_data: Subject data information object.
         bids_name_dict: BIDS name dictionary.
         out_dir: Output directory.
+        database: Input database filename to be queried and updated.
         modality_type: Modality type (BIDS label e.g. 'anat', 'func', etc).
         modality_label: Modality label (BIDS label  e.g. 'T1w', 'bold', etc).
         task: Task label (BIDS filename task label, e.g. 'rest', 'nback', etc.)
@@ -983,6 +987,12 @@ def source_to_bids(sub_data: SubDataInfo,
                 jsons: List[str] = []
                 bvals: List[str] = []
                 bvecs: List[str] = []
+
+                # Update database
+                database: str = update_table_row(database=database,
+                                                prim_key=sub_data.file_id,
+                                                table_name='bids_name',
+                                                value=bids_names[0])
                 
                 for i in range(0,len(img_data.imgs)):
                     out_name: str = ""
@@ -1031,6 +1041,7 @@ def source_to_bids(sub_data: SubDataInfo,
 def nifti_to_bids(sub_data: SubDataInfo,
                   bids_name_dict: Dict,
                   out_dir: str,
+                  database: str,
                   modality_type: Optional[str] = "",
                   modality_label: Optional[str] = "",
                   task: Optional[str] = "",
@@ -1055,6 +1066,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
         sub_data: Subject data information object.
         bids_name_dict: BIDS name dictionary.
         out_dir: Output directory.
+        database: Input database filename to be queried and updated.
         modality_type: Modality type (BIDS label e.g. 'anat', 'func', etc).
         modality_label: Modality label (BIDS label  e.g. 'T1w', 'bold', etc).
         task: Task label (BIDS filename task label, e.g. 'rest', 'nback', etc.)
@@ -1256,6 +1268,12 @@ def nifti_to_bids(sub_data: SubDataInfo,
             jsons: List[str] = []
             bvals: List[str] = []
             bvecs: List[str] = []
+
+            # Update database
+            database: str = update_table_row(database=database,
+                                            prim_key=sub_data.file_id,
+                                            table_name='bids_name',
+                                            value=bids_names[0])
             
             for i in range(0,len(img_data.imgs)):
                 out_name: str = os.path.join(out_data_dir,bids_names[i])
@@ -1308,6 +1326,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
 def data_to_bids(sub_data: SubDataInfo,
                  bids_name_dict: Dict,
                  out_dir: str,
+                 database: str,
                  modality_type: Optional[str] = "",
                  modality_label: Optional[str] = "",
                  task: Optional[str] = "",
@@ -1329,6 +1348,7 @@ def data_to_bids(sub_data: SubDataInfo,
         >>> [imgs, jsons, bvals, bvecs] = data_to_bids(sub_obj,
         ...                                            bids_name_dict,
         ...                                            output_dir,
+        ...                                            database,
         ...                                            'anat',
         ...                                            'T1w')
         ...
@@ -1337,6 +1357,7 @@ def data_to_bids(sub_data: SubDataInfo,
         sub_data: Subject data information object.
         bids_name_dict: BIDS name dictionary.
         out_dir: Output directory.
+        database: Input database filename to be queried and updated.
         modality_type: Modality type (BIDS label e.g. 'anat', 'func', etc).
         modality_label: Modality label (BIDS label  e.g. 'T1w', 'bold', etc).
         task: Task label (BIDS filename task label, e.g. 'rest', 'nback', etc.)
@@ -1365,6 +1386,7 @@ def data_to_bids(sub_data: SubDataInfo,
          bvecs] = source_to_bids(sub_data=sub_data,
                                  bids_name_dict=bids_name_dict,
                                  out_dir=out_dir,
+                                 database=database,
                                  modality_type=modality_type,
                                  modality_label=modality_label,
                                  task=task,
@@ -1389,6 +1411,7 @@ def data_to_bids(sub_data: SubDataInfo,
          bvecs] = nifti_to_bids(sub_data=sub_data,
                                 bids_name_dict=bids_name_dict,
                                 out_dir=out_dir,
+                                database=database,
                                 modality_type=modality_type,
                                 modality_label=modality_label,
                                 task=task,

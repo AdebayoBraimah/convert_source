@@ -46,7 +46,8 @@ from convert_source.imgio.pario import(
 
 from convert_source.cs_utils.database import (
     construct_db_dict,
-    insert_row_db
+    insert_row_db,
+    query_db
 )
 
 # Define exceptions
@@ -1099,6 +1100,21 @@ def collect_info(parent_dir: str,
                                                         ses_id=ses,
                                                         file_name=img,
                                                         database=database)
+            # file_id: str = query_db(database=database,
+            #                         table='rel_path',
+            #                         prim_key='rel_path',
+            #                         column='file_id',
+            #                         value=db_info.get('rel_path',''))
+            # if file_id:
+            #     continue
+            # else:
+            #     database: str = insert_row_db(database=database,
+            #                                     info=db_info)
+            #     sub_info: SubDataInfo = SubDataInfo(sub=sub,
+            #                                         data=img,
+            #                                         ses=ses,
+            #                                         file_id=db_info.get('file_id',''))
+            #     data.append(sub_info)
             database: str = insert_row_db(database=database,
                                             info=db_info)
             sub_info: SubDataInfo = SubDataInfo(sub=sub,
