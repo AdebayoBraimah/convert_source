@@ -144,7 +144,7 @@ def batch_proc(study_img_dir: str,
     dt_string: str = str(now.strftime("%m_%d_%Y_%H_%M"))
 
     _log: str = os.path.join(misc_dir,f"convert_source_{dt_string}.log")
-    log: LogFile = log_file(log=_log)
+    log: LogFile = log_file(log=_log, verbose=verbose)
 
     # Create file database
     database: str = os.path.join(misc_dir,'convert_source.db')
@@ -182,13 +182,14 @@ def batch_proc(study_img_dir: str,
        
     for sub_data in subs_data:
         log.info(f"Processing: {sub_data.data}")
-        if verbose:
-            print(f"Processing: {sub_data.data}")
+
         data: str = sub_data.data
         bids_name_dict: Dict = deepcopy(BIDS_PARAM)
         bids_name_dict['info']['sub'] = sub_data.sub
+
         if sub_data.ses:
             bids_name_dict['info']['ses'] = sub_data.ses
+        
         [bids_name_dict, 
          modality_type, 
          modality_label, 
@@ -1430,7 +1431,8 @@ def bids_ignore(out_dir: str) -> str:
     
     return new_file
 
-def log_file(log: str) -> LogFile:
+def log_file(log: str,
+            verbose: bool = False) -> LogFile:
     """Initializes log file object for logging purposes.
 
     Usage example:
@@ -1441,13 +1443,14 @@ def log_file(log: str) -> LogFile:
         
     Arguments:
         log: Log file name.
+        verbose: Permits verbose logging to screen (stdout).
 
     Returns:
         LogFile object to be logged to.
     """
     from convert_source import __version__
 
-    log: LogFile = LogFile(log_file=log)
+    log: LogFile = LogFile(log_file=log, print_to_screen=verbose)
 
     now = datetime.now()
     dt_string = now.strftime("%A %B %d, %Y %H:%M:%S")
@@ -1456,6 +1459,39 @@ def log_file(log: str) -> LogFile:
     log.info(f"convert_source v{__version__}")
 
     return log
+
+def get_dcm2niix_version() -> str:
+    """Gets the version of ``dcm2niix`` being used on the current OS. 
+
+    This function assumes that dependency checks have already been performed, and that ``dcm2niix`` is in the system path.
+
+    Usage example:
+        >>> dcm_cmd = Command("dcm2niix)
+        >>> dcm.check_dependency(
+        ...         path_envs=[ '/<path>/<to>/<dcm2niix>' ])
+        ...
+        >>> dcm_version = get_dcm2niix_version()
+        >>> dcm_version
+        'v1.0.20201102'
+
+    Returns:
+        ``dcm2niix`` version used on the current OS.
+    """
+    dcm_ver_txt: str = os.path.join(os.getcwd(),'dcm2niix.version.txt')
+    dcm_ver_err: str = os.path.join(os.getcwd(),'dcm2niix.version.err')
+
+    dcm: Command = Command("dcm2niix")
+    dcm.cmd_list.append("--version")
+    dcm.run(stdout=dcm_ver_txt)
+
+    with open(dcm_ver_txt,'r') as f:
+        lines = f.readlines()
+        lines = [x.strip('\n') for x in lines]
+        f.close()
+    
+    os.remove(dcm_ver_txt)
+    os.remove(dcm_ver_err)
+    return lines[1]
 
 # This function was added for the Mac OS X case in which hidden
 # temporary indexing files are present throughout a given directory.
