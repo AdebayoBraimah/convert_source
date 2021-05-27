@@ -4,6 +4,7 @@
 # TODO:
 #   * Figure out how to store and follow file_id primary key throughout convert_source
 #   * Integrate database functions into convert_source flow control
+#   * Create function to get acquisition date from DICOM/PAR REC files
 
 import os
 import sqlite3
