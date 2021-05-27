@@ -927,13 +927,18 @@ def glob_dcm(dcm_dir: str) -> List[str]:
     
     for dir_ in dcm_dir_list:
         for root, dirs, files in os.walk(dir_):
-            # only need the first DICOM file
+            # Only need the first DICOM file
             tmp_dcm_file = files[0]
             tmp_dcm_dir = root
             tmp_file = os.path.join(tmp_dcm_dir, tmp_dcm_file)
 
+            # Old implementation - need to test with current use cases
             dcm_files.append(tmp_file)
             break
+            
+            # if '.dcm' in tmp_file:
+            #     dcm_files.append(tmp_file)
+            #     break
     return dcm_files
 
 def glob_img(img_dir: str) -> List[str]:
