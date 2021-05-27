@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 """Tests for the imgio's pario module's functions.
 """
-import pytest
-
 import os
 import sys
 import pathlib
+import shutil
 
 from typing import List
 
 # Add package/module to PYTHONPATH
 mod_path: str = os.path.join(str(pathlib.Path(os.path.abspath(__file__)).parents[2]))
 sys.path.append(mod_path)
+
+from convert_source.cs_utils.database import create_db
 
 from convert_source.cs_utils.utils import (
     SubDataInfo,
@@ -28,22 +29,39 @@ from convert_source.imgio.pario import (
     get_flip_angle
 )
 
+# Test variables
 data_dir: str = os.path.abspath(os.path.join(os.path.dirname(__file__),'test.study_dir'))
+
+out_dir: str = os.path.join(os.getcwd(),'test.file.study')
+misc_dir: str = os.path.join(out_dir,'.misc')
+test_db: str = os.path.join(misc_dir,'study.db')
+
+# Create output test directory
+if os.path.exists(misc_dir):
+    pass
+else:
+    os.makedirs(misc_dir)
+
+create_db(database=test_db)
 
 def get_subject_data():
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+                                                database=test_db,
                                                 exclusion_list=[".dcm", ".nii"])
     
     sub: str = subs_data[0].sub
     ses: str = subs_data[0].ses
     data: str = subs_data[0].data
+    file_id: str = subs_data[0].file_id
     
     assert len(subs_data) == 4
     assert sub == 'TEST001'
     assert ses == 'UNIT001'
+    assert file_id == '0000001'
 
 def test_get_etl():
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+                                                database=test_db,
                                                 exclusion_list=[".dcm", ".nii"])
     
     data1: str = subs_data[0].data
@@ -54,6 +72,7 @@ def test_get_etl():
 
 def test_get_wfs():
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+                                                database=test_db,
                                                 exclusion_list=[".dcm", ".nii"])
     
     data1: str = subs_data[0].data
@@ -64,6 +83,7 @@ def test_get_wfs():
 
 def test_get_red_fact():
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+                                                database=test_db,
                                                 exclusion_list=[".dcm", ".nii"])
     
     data1: str = subs_data[0].data
@@ -74,6 +94,7 @@ def test_get_red_fact():
 
 def test_get_mb():
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+                                                database=test_db,
                                                 exclusion_list=[".dcm", ".nii"])
     
     data1: str = subs_data[0].data
@@ -84,6 +105,7 @@ def test_get_mb():
 
 def test_get_scan_time():
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+                                                database=test_db,
                                                 exclusion_list=[".dcm", ".nii"])
     
     data1: str = subs_data[0].data
@@ -94,6 +116,7 @@ def test_get_scan_time():
 
 def test_get_echo_time():
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+                                                database=test_db,
                                                 exclusion_list=[".dcm", ".nii"])
     
     data1: str = subs_data[0].data
@@ -105,6 +128,7 @@ def test_get_echo_time():
 
 def test_get_flip_angle():
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+                                                database=test_db,
                                                 exclusion_list=[".dcm", ".nii"])
     
     data1: str = subs_data[0].data
@@ -112,6 +136,11 @@ def test_get_flip_angle():
 
     assert get_flip_angle(data1) == 11.0
     assert get_flip_angle(data2) == 90.0
+
+def test_cleanup():
+    """NOTE: This test currently FAILS on Windows operating systems."""
+    shutil.rmtree(out_dir)
+    assert os.path.exists(out_dir) == False
 
 # CLI
 # mod_path: str = os.path.join(str(pathlib.Path(os.path.abspath(os.getcwd())).parents[1]))

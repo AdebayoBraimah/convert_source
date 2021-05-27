@@ -24,6 +24,7 @@ from convert_source.cs_utils.fileio import (
     Command
 )
 
+from convert_source.cs_utils.database import create_db
 from convert_source.cs_utils.const import BIDS_PARAM
 from convert_source.cs_utils.bids_info import construct_bids_name
 
@@ -66,6 +67,8 @@ data_dir: str = os.path.abspath(os.path.join(os.path.dirname(__file__),'test.stu
 dcm_test_data: str = os.path.join(data_dir,'TEST001-UNIT001','data.dicom','ST000000')
 
 out_dir: str = os.path.join(os.getcwd(),'test.bids')
+misc_dir: str = os.path.join(out_dir,'.misc')
+test_db: str = os.path.join(misc_dir,'test.study.db')
 
 ## Additional test variables
 meta_dict_1: Dict = {
@@ -76,6 +79,14 @@ meta_dict_1: Dict = {
 }
 
 meta_dict_2: Dict = {}
+
+# Create output test directory
+if os.path.exists(misc_dir):
+    pass
+else:
+    os.makedirs(misc_dir)
+
+create_db(database=test_db)
 
 def test_download_prog():
     class PlatformInferError(Exception):
@@ -162,6 +173,7 @@ def test_read_config():
 
 def get_subject_data():
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+                                                database=test_db,
                                                 exclusion_list=[])
     assert len(subs_data) == 14
 
@@ -174,7 +186,8 @@ def test_bids_id():
     exclusion_list] = read_config(config_file=test_config1,
                                   verbose=verbose)
 
-    subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir, 
+    subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+                                                database=test_db,
                                                 exclusion_list=[])
 
     # DICOM file 1 (incomplete acquisition)
@@ -262,6 +275,7 @@ def test_get_metadata():
                                   verbose=verbose)
 
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir, 
+                                                database=test_db,
                                                 exclusion_list=[])
 
     bids_name_dict: Dict = deepcopy(BIDS_PARAM)
@@ -297,6 +311,7 @@ def test_data_to_bids():
                                   verbose=verbose)
 
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir, 
+                                                database=test_db,
                                                 exclusion_list=[])
 
     # Test 1
@@ -451,11 +466,19 @@ def test_data_to_bids():
     assert bids_bvals[0] == ""
     assert bids_bvecs[0] == ""
 
-def test_tmp_cleanup():
+def test_tmp_cleanup_1():
     shutil.rmtree(out_dir)
     assert os.path.exists(out_dir) == False
 
 def test_make_bids_name():
+    # Create output test directory
+    if os.path.exists(misc_dir):
+        pass
+    else:
+        os.makedirs(misc_dir)
+
+    create_db(database=test_db)
+
     verbose: bool = True
     [search_dict,
     bids_search,
@@ -464,7 +487,8 @@ def test_make_bids_name():
     exclusion_list] = read_config(config_file=test_config1,
                                   verbose=verbose)
 
-    subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir, 
+    subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+                                                database=test_db,
                                                 exclusion_list=[])
 
     bids_name_dict: Dict = deepcopy(BIDS_PARAM)
@@ -496,6 +520,10 @@ def test_make_bids_name():
     assert bids_2 == "sub-TEST001_ses-UNIT001_task-rest_run-02_bold"
     assert bids_3 == "sub-TEST001_ses-UNIT001_task-rest_run-03_bold"
     assert bids_4 == "sub-TEST001_ses-UNIT001_task-rest_run-04_bold"
+
+def test_tmp_cleanup_2():
+    shutil.rmtree(out_dir)
+    assert os.path.exists(out_dir) == False
 
 def test_batch_proc():
     # NOTE: test_config2 excludes PAR file test data, as
