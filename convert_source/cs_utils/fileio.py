@@ -405,26 +405,29 @@ class LogFile(File):
         log_file: Log filename.
     
     Usage examples:
-        >>> log = LogFile("file.log")
+        >>> log = LogFile("file.log",False)
         >>> log
         "file.log"
 
     Args:
         file: Log filename (need not exist at runtime).
+        print_to_screen: If true, prints output to standard output (stdout) as well.
     """
     
     def __init__(self,
-                 log_file: str = "") -> None:
+                 log_file: str = "",
+                 print_to_screen: bool = False) -> None:
         """Init doc-string for LogFile class. Initiates logging and its 
         associated methods.
         
         Usage examples:
-            >>> log = LogFile("file.log")
+            >>> log = LogFile("file.log",False)
             >>> log
             "file.log"
         
         Args:
             file: Log filename (need not exist at runtime).
+            print_to_screen: If true, prints output to standard output (stdout) as well.
         """
         self.log_file: str = log_file
         
@@ -436,17 +439,18 @@ class LogFile(File):
                             filemode='a')
         
         # Define a Handler which writes INFO messages or higher to the sys.stderr
-        self.console = logging.StreamHandler()
-        self.console.setLevel(logging.INFO)
-        
-        # Add the handler to the root logger
-        #   IMPROVEMENT:
-        #       * This adds console logger handler
-        #           which prints info to screen.
-        #               * Add conditional to avoid
-        #                   printing to screen.
-        logging.getLogger().addHandler(self.console)
-        
+        if print_to_screen:
+            self.console = logging.StreamHandler()
+            self.console.setLevel(logging.INFO)
+            
+            # Add the handler to the root logger
+            #   IMPROVEMENT:
+            #       * This adds console logger handler
+            #           which prints info to screen.
+            #               * Add conditional to avoid
+            #                   printing to screen.
+            logging.getLogger().addHandler(self.console)
+            
         # Define logging
         self.logger = logging.getLogger(__name__)
     
