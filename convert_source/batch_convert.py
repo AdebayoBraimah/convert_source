@@ -80,6 +80,8 @@ from convert_source.imgio.niio import (
     get_num_frames
 )
 
+from convert_source.cs_utils.database import create_db
+
 # Define function(s)
 def batch_proc(study_img_dir: str,
                out_dir: str,
@@ -144,11 +146,17 @@ def batch_proc(study_img_dir: str,
     _log: str = os.path.join(misc_dir,f"convert_source_{dt_string}.log")
     log: LogFile = log_file(log=_log)
 
+    # Create file database
+    database: str = os.path.join(misc_dir,'convert_source.db')
+    database: str = create_db(database=database)
+
+    log.info("Creating source image file database \n")
+
     # Write bidsignore
     _ = bids_ignore(out_dir=out_dir)
-    log.info("Init .bidsignore file")
+    log.info("Init .bidsignore file \n")
 
-    log.info("Reading config file")
+    log.info("Reading config file \n")
 
     [search_dict,
      bids_search,
@@ -161,9 +169,10 @@ def batch_proc(study_img_dir: str,
     if comp_dict(d1=bids_search,d2=bids_map):
         pass
     
-    log.info("Collecting subject imaging data")
+    log.info("Collecting subject imaging data \n")
 
     subs_data: List[SubDataInfo] = collect_info(parent_dir=study_img_dir,
+                                                database=database,
                                                 exclusion_list=exclusion_list)
 
     bids_imgs: List = []

@@ -1047,7 +1047,7 @@ def collect_info(parent_dir: str,
         exclusion_list: Exclusion list that consists of keywords used to exclude files. 
         
     Returns:
-        List/Array of SubDataInfo objects that corresponds to a subject ID, session ID, and path to medical image data.
+        List/Array of SubDataInfo objects that corresponds to a subject ID, session ID, path to medical image data, and unique file ID.
     """
     parent_dir: str = os.path.abspath(parent_dir)
     data: List[SubDataInfo] = []
