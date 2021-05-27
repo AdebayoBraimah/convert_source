@@ -12,6 +12,7 @@ import os
 import random
 import shutil
 import platform
+
 from typing import(
     Dict, 
     List, 
@@ -632,7 +633,7 @@ class Command(object):
             dryrun: bool = False,
             path_envs: List[str] = [],
             env: Dict = {},
-            stdout: File = "",
+            stdout: str = "",
             shell: bool = False
            ) -> Tuple[int,File,File]:
         """Uses python's built-in subprocess class to execute (run) a command from an input command list.
