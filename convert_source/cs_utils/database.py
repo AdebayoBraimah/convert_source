@@ -457,6 +457,9 @@ def export_dataframe(database: str,
 
         df_list.append(df_tmp)
 
+    # Commit changes and close the connection
+    conn.commit()
+    conn.close()
     return pd.concat(df_list,axis=1,join='outer')
 
 def export_scans_dataframe(database: str,
@@ -516,6 +519,9 @@ def export_scans_dataframe(database: str,
         df_tmp: pd.DataFrame = df_tmp.drop(labels=list(tables.keys())[0],axis=1)
         df_list.append(df_tmp)
 
+    # Commit changes and close the connection
+    conn.commit()
+    conn.close()
     return pd.concat(df_list,axis=1,join='outer',ignore_index=True)
 
 def _get_dir_relative_path(study_dir: str,
@@ -729,6 +735,9 @@ def query_db(database:str,
         conn.close()
         return query_val
     except TypeError:
+        # Commit changes and close the connection
+        conn.commit()
+        conn.close()
         return ""
 
 def _zeropad(num: Union[str,int],
