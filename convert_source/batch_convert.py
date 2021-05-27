@@ -78,7 +78,10 @@ from convert_source.imgio.niio import (
     get_num_frames
 )
 
-from convert_source.cs_utils.database import create_db
+from convert_source.cs_utils.database import (
+    create_db,
+    update_table_row
+)
 
 # Define function(s)
 def batch_proc(study_img_dir: str,
@@ -202,6 +205,8 @@ def batch_proc(study_img_dir: str,
                                         modality_type=modality_type,
                                         task=task)
         # Convert source data
+        # TODO:
+        #   * Update database with BIDS names
         try:
             [imgs,
             jsons,

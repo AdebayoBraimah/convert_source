@@ -1090,10 +1090,10 @@ def collect_info(parent_dir: str,
         #   are processed.
         
         for img in img_list:
-            # Collect and organize each subjects' session and data
-            # 
-            #   Add database relevant steps in this loop, prior to the
-            #       SubDataInfo object invokation.
+            # TODO:
+            #   * Query database and remove source image data
+            #       that has already been processed, stored, and
+            #       converted.
             db_info: Dict[str,str] = construct_db_dict(study_dir=parent_dir,
                                                         sub_id=sub,
                                                         ses_id=ses,
