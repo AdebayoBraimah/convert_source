@@ -612,7 +612,7 @@ def _export_tmp_bids_df(database: str,
     # Filter by modality type and modality label
     mod = modality_type + "/"
     df: pd.DataFrame = df[df['bids_name'].str.contains(f"{modality_label}")]
-    df['bids_name']: pd.DataFrame = f'{mod}' + df['bids_name'].astype(str) + f'{ext}'
+    df['bids_name'] = f'{mod}' + df['bids_name'].astype(str) + f'{ext}'
     df: pd.DataFrame = df.dropna(axis=0)
     df: pd.DataFrame = df.reset_index()
 
