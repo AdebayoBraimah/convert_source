@@ -4,14 +4,20 @@
 
 # TODO:
 #   * Write integration test(s)
+# 
 #   * Separate unit and integration test(s) into different directories
 # 
 #   * Add file search for image files with no extensions (DICOMs)
 #       * Use is_valid_dicom function when walking through directories
 # 
 #   * Add doc building to CI workflow.
+# 
 #   * Add README to output directory (via function)
 #       * should include recommended actions to perform post data conversion
+# 
+#   * Add load/wait bar
+# 
+#   * Add function to download latest version of dcm2niix
 # 
 #   * Add function that lists files/directories and returns those contents
 #       in a list.
@@ -1520,7 +1526,7 @@ def get_dcm2niix_version() -> str:
 
     with open(dcm_ver_txt,'r') as f:
         lines = f.readlines()
-        lines = [x.strip('\n') for x in lines]
+        lines = [ x.strip('\n') for x in lines ]
         f.close()
     
     os.remove(dcm_ver_txt)
