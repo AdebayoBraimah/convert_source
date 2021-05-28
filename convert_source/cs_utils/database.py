@@ -129,13 +129,13 @@ def construct_db_dict(study_dir: Optional[str] = "",
                                 table='ses_id',
                                 prim_key='file_id',
                                 value=file_id)
-
-    if rel_path:
-        pass
-    elif study_dir and file_name:
+    
+    if study_dir and file_name:
         rel_path: str = _get_dir_relative_path(study_dir=study_dir,
                                                 file_name=file_name,
                                                 dcm_dir=use_dcm_dir)
+    elif rel_path:
+        pass
     elif file_id and database:
         rel_path: str = query_db(database=database,
                                 table='rel_path',

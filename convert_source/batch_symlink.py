@@ -96,7 +96,7 @@ def read_file_to_list(file: str) -> List[str]:
         file: str = os.path.realpath(file)
         with open(file, "r") as file:
             lines: List[str] = file.readlines()
-            lines: List[str] = [x.replace('\n','') for x in lines]
+            lines: List[str] = [ x.replace('\n','') for x in lines ]
             file.close()
     else:
         lines: List[str] = [file]

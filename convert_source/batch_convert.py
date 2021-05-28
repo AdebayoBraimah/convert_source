@@ -165,13 +165,13 @@ def batch_proc(study_img_dir: str,
     database: str = os.path.join(misc_dir,'convert_source.db')
     database: str = create_db(database=database)
 
-    log.info("Creating source image file database \n")
+    log.info("Creating source image file database")
 
     # Write bidsignore
     _ = bids_ignore(out_dir=out_dir)
-    log.info("Init .bidsignore file \n")
+    log.info("Init .bidsignore file")
 
-    log.info("Reading config file \n")
+    log.info("Reading config file")
 
     [search_dict,
      bids_search,
@@ -184,11 +184,12 @@ def batch_proc(study_img_dir: str,
     if comp_dict(d1=bids_search,d2=bids_map):
         pass
     
-    log.info("Collecting subject imaging data \n")
+    log.info("Collecting subject imaging data")
 
     subs_data: List[SubDataInfo] = collect_info(parent_dir=study_img_dir,
                                                 database=database,
-                                                exclusion_list=exclusion_list)
+                                                exclusion_list=exclusion_list,
+                                                log=log)
 
     bids_imgs: List = []
     bids_jsons: List = []
@@ -196,7 +197,7 @@ def batch_proc(study_img_dir: str,
     bids_bvecs: List = []
        
     for sub_data in subs_data:
-        log.info(f"Processing: {sub_data.data}")
+        log.info(f"\n\n Processing: {sub_data.data} \n")
 
         data: str = sub_data.data
         bids_name_dict: Dict = deepcopy(BIDS_PARAM)
@@ -218,9 +219,7 @@ def batch_proc(study_img_dir: str,
          meta_scan_dict] = get_metadata(dictionary=meta_dict,
                                         modality_type=modality_type,
                                         task=task)
-        # Convert source data
-        # TODO:
-        #   * Update database with BIDS names
+                                        
         try:
             [imgs,
             jsons,
@@ -1050,6 +1049,12 @@ def source_to_bids(sub_data: SubDataInfo,
                         bvecs)
             except ConversionError:
                 tmp.rm_tmp_dir()
+
+                # Update database
+                database: str = update_table_row(database=database,
+                                                prim_key=sub_data.file_id,
+                                                table_name='bids_name',
+                                                value="NIFTI FILE CONVERSION FAILED")
                 return [""],[""],[""],[""]
 
 def nifti_to_bids(sub_data: SubDataInfo,
@@ -1440,6 +1445,11 @@ def data_to_bids(sub_data: SubDataInfo,
                 bvals,
                 bvecs)
     else:
+        # Update database
+        database: str = update_table_row(database=database,
+                                        prim_key=sub_data.file_id,
+                                        table_name='bids_name',
+                                        value="NIFTI FILE CONVERSION FAILED")
         return [""],[""],[""],[""]
 
 
@@ -1494,10 +1504,11 @@ def log_file(log: str,
 
     now = datetime.now()
     dt_string = now.strftime("%A %B %d, %Y %H:%M:%S")
+    dcm2niix_version: str = get_dcm2niix_version()
 
-    log.info(dt_string)
+    log.info(f"convert_source start: {dt_string}")
     log.info(f"convert_source v{__version__}")
-
+    log.info(f"dcm2niix {dcm2niix_version}")
     return log
 
 def get_dcm2niix_version() -> str:
@@ -1523,6 +1534,8 @@ def get_dcm2niix_version() -> str:
     dcm: Command = Command("dcm2niix")
     dcm.cmd_list.append("--version")
     dcm.run(stdout=dcm_ver_txt)
+
+    print("\n\n Disregard 'Failed with returncode 3' message - this message arises when obtaining dcm2niix's version. \n")
 
     with open(dcm_ver_txt,'r') as f:
         lines = f.readlines()

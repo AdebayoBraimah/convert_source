@@ -1023,7 +1023,8 @@ def img_exclude(img_list: List[str],
 
 def collect_info(parent_dir: str,
                 database: str,
-                exclusion_list: Optional[List[str]] = None
+                exclusion_list: Optional[List[str]] = None,
+                log: Optional[LogFile] = None
                 ) -> List[SubDataInfo]:
     """Collects image data information for each subject for a study, 
     provided there exists some parent directory. Certain image files 
@@ -1051,6 +1052,7 @@ def collect_info(parent_dir: str,
         parent_dir: Parent directory that contains each subject.
         database: Database filename.
         exclusion_list: Exclusion list that consists of keywords used to exclude files. 
+        log: LogFile object for logging.
         
     Returns:
         List/Array of SubDataInfo objects that corresponds to a subject ID, session ID, path to medical image data, and unique file ID.
@@ -1099,14 +1101,16 @@ def collect_info(parent_dir: str,
                                                         sub_id=sub,
                                                         ses_id=ses,
                                                         file_name=img,
-                                                        database=database)
+                                                        database=database,
+                                                        use_dcm_dir=True)
             # file_id: str = query_db(database=database,
             #                         table='rel_path',
             #                         prim_key='rel_path',
             #                         column='file_id',
             #                         value=db_info.get('rel_path',''))
             # if file_id:
-            #     continue
+            #     if log:
+            #         log.log("\n Imaging data has already been processed and is stored in the database.")
             # else:
             #     database: str = insert_row_db(database=database,
             #                                     info=db_info)

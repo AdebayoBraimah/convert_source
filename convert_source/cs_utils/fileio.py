@@ -6,6 +6,9 @@
     * Logging
     * Wrapper class for command line executables.
 """
+# TODO:
+#   * use super method in classes
+
 import subprocess
 import logging
 import os
@@ -440,17 +443,11 @@ class LogFile(File):
         if print_to_screen:
             self.console = logging.StreamHandler()
             self.console.setLevel(logging.INFO)
-            
-            # Add the handler to the root logger
-            #   IMPROVEMENT:
-            #       * This adds console logger handler
-            #           which prints info to screen.
-            #               * Add conditional to avoid
-            #                   printing to screen.
             logging.getLogger().addHandler(self.console)
             
         # Define logging
         self.logger = logging.getLogger(__name__)
+        File.__init__(self,self.log_file)
     
     def __repr__(self):
         return self.log_file
