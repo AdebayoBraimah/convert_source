@@ -7,9 +7,17 @@
 #   * Separate unit and integration test(s) into different directories
 # 
 #   * Add file search for image files with no extensions (DICOMs)
+#       * Use is_valid_dicom function when walking through directories
+# 
 #   * Add doc building to CI workflow.
 #   * Add README to output directory (via function)
 #       * should include recommended actions to perform post data conversion
+# 
+#   * Add function that lists files/directories and returns those contents
+#       in a list.
+# 
+#   * Add function that writes YAML files for unknown BIDS NIFTI files to be mapped
+#       to a different name.
 # 
 #   * GitHub Issues *
 # 
