@@ -7,6 +7,7 @@ import glob
 import gzip
 import json
 import platform
+from posixpath import abspath
 import re
 import pydicom
 import numpy as np
@@ -1611,14 +1612,31 @@ def header_search(img_file: str,
             modality_label, 
             task)
 
-def _list_dir_files(pathname: str,
+def list_dir_files(pathname: str,
                     pattern: Optional[str] = "",
-                    dir_file_name_only: bool = False
+                    file_name_only: bool = False
                     ) -> List[str]:
-    """working doc-string
+    """List files and/or directories of some parent directory, in addition to pattern matched globbing if provided.
+
+    Usage example:
+        >>> file_list = _list_dir_files(pathname='/<path>/<to>/<directory>',
+        ...                             pattern='<filename>',
+        ...                             file_name_only=False)
+        ...
+
+    Arguments:
+        pathname: Pathname/directory path.
+        pattern: Pattern to be matched should file globbing need to be performed.
+        dir_file_name_only: If true, only the filenames are returned.
+
+    Returns:
+        List of strings that consists of files or file paths.
+
+    Raises:
+        FileNotFoundError: Error that arises if the pattern matched file or directory does not exist.
     """
     if os.path.exists(pathname):
-        pass
+        os.path.abspath(pathname)
     else:
         raise FileNotFoundError("Filepath does not exist.")
     
@@ -1627,7 +1645,7 @@ def _list_dir_files(pathname: str,
     else:
         search: str = pathname
     
-    if dir_file_name_only:
+    if file_name_only:
         path_sep: str = os.path.sep
         file_dir_list: List[str] = [ x.replace(pathname + path_sep,'') for x in glob.glob(pathname=search) ]
         file_dir_list.sort()
