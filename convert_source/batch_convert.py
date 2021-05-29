@@ -19,11 +19,8 @@
 # 
 #   * Add function to download latest version of dcm2niix
 # 
-#   * Add function that lists files/directories and returns those contents
-#       in a list.
-# 
-#   * Add function that writes YAML files for unknown BIDS NIFTI files to be mapped
-#       to a different name.
+#   * Add function that maps unknown BIDS NIFTI files to different modality labels and 
+#       modality types via reading in yml/json file.
 # 
 #   * GitHub Issues *
 # 
@@ -34,6 +31,7 @@
 import os
 import glob
 import yaml
+import json
 
 from copy import deepcopy
 from shutil import copy
@@ -78,7 +76,8 @@ from convert_source.cs_utils.utils import (
     get_metadata,
     convert_image_data,
     dict_multi_update,
-    add_to_zeropadded
+    add_to_zeropadded,
+    _list_dir_files
 )
 
 from convert_source.cs_utils.bids_info import (
@@ -258,6 +257,18 @@ def batch_proc(study_img_dir: str,
             bids_jsons.pop(i)
             bids_bvals.pop(i)
             bids_bvecs.pop(i)
+
+    unknown_bids_dir: str = os.path.join(out_dir,"unknown")
+
+    if os.path.exists(unknown_bids_dir):
+        output_file: str = os.path.join(unknown_bids_dir,"unknown_file_map")
+
+        [unknown_list,
+        yaml_file,
+        json_file] = write_unknown_to_file(bids_unknown_dir=unknown_bids_dir,
+                                        out_name=output_file,
+                                        yaml_file=True,
+                                        json_file=True)
 
     return (bids_imgs,
             bids_jsons,
@@ -1545,6 +1556,59 @@ def get_dcm2niix_version() -> str:
     os.remove(dcm_ver_txt)
     os.remove(dcm_ver_err)
     return lines[1]
+
+def add_readme(out_dir: str) -> str:
+    """working doc-string
+    """
+    pass
+
+def write_unknown_to_file(bids_unknown_dir: str,
+                        out_name: str,
+                        yaml_file: bool = True,
+                        json_file: bool = False
+                        ) -> Tuple[List[str],str,str]:
+    """working doc-string
+    """
+    if (not yaml_file) and (not json_file):
+        raise NameError("Both JSON and YAML options are set to false.")
+
+    unknown_bids: List[str] = _list_dir_files(pathname=bids_unknown_dir,
+                                            pattern="*.nii*",
+                                            dir_file_name_only=True)
+
+    unknown_dict: Dict = {}
+
+    for nii_file in unknown_bids:
+        tmp_dict: Dict[str,str] = {
+            nii_file: 
+            {
+                'modality_type':'',
+                'modality_label':''
+            }
+        }
+        unknown_dict.update(tmp_dict)
+
+    if yaml_file:
+        output_yaml: str = out_name + ".yml"
+        with open(output_yaml, 'w') as outfile:
+            yaml.dump(unknown_dict, 
+                    outfile, 
+                    default_flow_style=False)
+    else:
+        output_yaml: str = ""
+
+    if json_file:
+        output_json: str = out_name + ".json"
+        with open(output_json, 'w') as outfile:
+            json.dump(unknown_dict,
+                        outfile,
+                        indent=4)
+    else:
+        output_json: str = ""
+    
+    return (unknown_bids, 
+            output_yaml, 
+            output_json)
 
 # This function was added for the Mac OS X case in which hidden
 # temporary indexing files are present throughout a given directory.

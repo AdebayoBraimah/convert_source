@@ -1610,3 +1610,29 @@ def header_search(img_file: str,
     return (modality_type, 
             modality_label, 
             task)
+
+def _list_dir_files(pathname: str,
+                    pattern: Optional[str] = "",
+                    dir_file_name_only: bool = False
+                    ) -> List[str]:
+    """working doc-string
+    """
+    if os.path.exists(pathname):
+        pass
+    else:
+        raise FileNotFoundError("Filepath does not exist.")
+    
+    if pattern:
+        search: str = os.path.join(pathname,f"{pattern}")
+    else:
+        search: str = pathname
+    
+    if dir_file_name_only:
+        path_sep: str = os.path.sep
+        file_dir_list: List[str] = [ x.replace(pathname + path_sep,'') for x in glob.glob(pathname=search) ]
+        file_dir_list.sort()
+        return file_dir_list
+    else:
+        file_dir_list: List[str] = glob.glob(pathname=search)
+        file_dir_list.sort()
+        return file_dir_list
