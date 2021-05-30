@@ -1618,6 +1618,9 @@ def list_dir_files(pathname: str,
                     ) -> List[str]:
     """List files and/or directories of some parent directory, in addition to pattern matched globbing if provided.
 
+    NOTE:
+        The output list is sorted.
+
     Usage example:
         >>> file_list = _list_dir_files(pathname='/<path>/<to>/<directory>',
         ...                             pattern='<filename>',

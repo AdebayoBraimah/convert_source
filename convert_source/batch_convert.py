@@ -14,6 +14,9 @@
 # 
 #   * Add load/wait bar
 # 
+#   * [X] Add function to write dataset_description.json file
+#       * Add function to collect and construct dictionary to fill this out
+# 
 #   * Add function to download latest version of dcm2niix
 # 
 #   * Add function that maps unknown BIDS NIFTI files to different modality labels and 
@@ -44,7 +47,8 @@ from typing import (
 
 from convert_source.cs_utils.const import (
     DEFAULT_CONFIG,
-    BIDS_PARAM
+    BIDS_PARAM,
+    DEFAULT_BIDS_VERSION
 )
 
 from convert_source.cs_utils.fileio import (
@@ -161,17 +165,17 @@ def batch_proc(study_img_dir: str,
     database: str = os.path.join(misc_dir,'convert_source.db')
     database: str = create_db(database=database)
 
-    log.info("Creating source image file database")
+    log.info("Created source image file database")
 
     # Write bidsignore
     _ = bids_ignore(out_dir=out_dir)
-    log.info("Write .bidsignore file")
+    log.info("Wrote .bidsignore file")
 
     # Write README file
     _ = add_readme(out_dir=out_dir)
     log.info("Added README file to BIDS directory")
 
-    log.info("Reading config file")
+    log.info("Read configuration file")
 
     [search_dict,
      bids_search,
@@ -179,12 +183,20 @@ def batch_proc(study_img_dir: str,
      meta_dict,
      exclusion_list] = read_config(config_file=config_file,
                                    verbose=verbose)
+
+    dataset_description: str = os.path.join(out_dir,'dataset_description.json')
+
+    if dataset_description:
+        log.info("Dataset description JSON file already exists in BIDS directory")
+    else:
+        _ = add_dataset_description(out_dir=out_dir)
+        log.info("Added dataset description JSON file to BIDS directory")
     
     # Check BIDS search and map dictionaries
     if comp_dict(d1=bids_search,d2=bids_map):
         pass
     
-    log.info("Collecting subject imaging data")
+    log.info("Collected subject imaging data")
 
     subs_data: List[SubDataInfo] = collect_info(parent_dir=study_img_dir,
                                                 database=database,
@@ -264,12 +276,10 @@ def batch_proc(study_img_dir: str,
     if os.path.exists(unknown_bids_dir):
         output_file: str = os.path.join(unknown_bids_dir,"unknown_file_map")
 
-        [unknown_list,
-        yaml_file,
-        json_file] = write_unknown_to_file(bids_unknown_dir=unknown_bids_dir,
-                                        out_name=output_file,
-                                        yaml_file=True,
-                                        json_file=True)
+        _ = write_unknown_to_file(bids_unknown_dir=unknown_bids_dir,
+                                out_name=output_file,
+                                yaml_file=True,
+                                json_file=True)
 
     return (bids_imgs,
             bids_jsons,
@@ -1638,6 +1648,65 @@ def write_unknown_to_file(bids_unknown_dir: str,
             output_yaml, 
             output_json)
 
+def add_dataset_description(out_dir: str) -> str:
+    """Adds the ``dataset_description.json`` (dataset description JSON) file to some BIDS data directory.
+    This is essentially meant to function as a boiler plate dataset_description template.
+
+    NOTE:
+        This template was obtained from: https://bids-specification.readthedocs.io/en/v1.6.0/03-modality-agnostic-files.html#dataset-description
+        Boiler plate dataset_description template.
+    
+    Usage example:
+        >>> ds_json = add_dataset_description(out_dir='<path>/<to>/<BIDS>')
+
+    Arguments:
+        out_dir: Output BIDS directory.
+
+    Returns:
+        File path to dataset_description.json file as a string.
+    """
+    # TODO:
+    # 
+    #   * Function that constructs dictionary for dataset descrtption
+    #   * Perhaps have it read in through config file.
+    data: Dict[str,str] = {
+        'Name':'',
+        'BIDSVersion': DEFAULT_BIDS_VERSION,
+        'HEDVersion':'',
+        'DatasetType':'raw',
+        'License':'',
+        'Authors':[
+            'Author 1',
+            'Author 2',
+            'Author 3'
+        ],
+        'Acknowledgements':'',
+        'HowToAcknowledge':'',
+        'Funding':[
+            'Funding source 1',
+            'Funding source 2'
+        ],
+        'EthicsApprovals':[
+            'IRB 1',
+            'IRB 2'
+        ],
+       'ReferencesAndLinks':[
+           'Link 1',
+           'Link 2',
+           'Reference 1',
+           'Reference 2'
+       ],
+       'DatasetDOI':''
+    }
+
+    output_json: str = os.path.join(out_dir,'dataset_description.json')
+
+    with open(output_json, 'w') as outfile:
+        json.dump(data,
+                outfile,
+                indent=4)
+    return output_json
+
 def add_readme(out_dir: str) -> str:
     """Adds a BIDS README file to some output BIDS directory.
 
@@ -1813,5 +1882,3 @@ related to how the data acquisition went.
         f.touch()
         f.write_txt(txt=read_me_txt)
     return readme_file
-
-    

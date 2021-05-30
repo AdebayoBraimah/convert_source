@@ -155,7 +155,7 @@ class File(object):
         Args:
             txt: Text to be written to file.
         """
-        with open(self.file,"a") as tmp_file:
+        with open(self.file,mode="a",encoding='utf-8') as tmp_file:
             tmp_file.write(txt)
             tmp_file.close()
         return None
