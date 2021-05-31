@@ -7,12 +7,13 @@
 # 
 #   * Separate unit and integration test(s) into different directories
 # 
-#   * [] Add file search for image files with no extensions (DICOMs)
-#       * [] Use is_valid_dicom function when walking through directories
+#   * [-] Add file search for image files with no extensions (DICOMs)
+#       * [-] Use is_valid_dicom function when walking through directories
+#       * NOTE: The implementation for this would require massive additions to
+#           several modules. It would actually be far easier to just rename the
+#           DICOM files and add their extensions.
 # 
 #   * Add doc building to CI workflow.
-# 
-#   * [] Add load/wait bar
 # 
 #   * [X] Add function to write dataset_description.json file
 #       * Add function to collect and construct dictionary to fill this out
@@ -273,7 +274,10 @@ def batch_proc(study_img_dir: str,
         bids_bvals.extend(bvals)
         bids_bvecs.extend(bvecs)
 
-    for i in reversed(range(0,len(bids_imgs))):
+    for i in tqdm(reversed(range(0,len(bids_imgs))),
+                  desc="Verifying converted BIDS NIFTI files",
+                  position=0,
+                  leave=True):
         if (bids_imgs[i] == "") and (bids_jsons[i] == "") and (bids_bvals[i] == "") and (bids_bvecs[i] == ""):
             bids_imgs.pop(i)
             bids_jsons.pop(i)
@@ -283,6 +287,7 @@ def batch_proc(study_img_dir: str,
     unknown_bids_dir: str = os.path.join(out_dir,"unknown")
 
     if os.path.exists(unknown_bids_dir):
+        log.info("Wrote unknown BIDS subject NIFTIs to file")
         output_file: str = os.path.join(unknown_bids_dir,"unknown_file_map")
 
         _ = write_unknown_to_file(bids_unknown_dir=unknown_bids_dir,
@@ -292,15 +297,20 @@ def batch_proc(study_img_dir: str,
 
     # Add option for writing participants and scans TSV
     if write_participants:
+        log.info("Wrote participants.tsv to file")
         [_,_] = create_participant_tsv(out_dir=out_dir)
 
     if write_subs_scans:
+        log.info("Wrote each subject's scans.tsv to file")
         subs_list: List[str] = list_dir_files(pathname=out_dir,
                                             pattern="sub-*",
                                             file_name_only=True)
         subs_list: List[str] = [ x.replace('sub-','') for x in subs_list ]
 
-        for sub in subs_list:
+        for sub in tqdm(subs_list,
+                        desc="Writing scan files",
+                        position=0,
+                        leave=True):
             df: pd.DataFrame = export_bids_scans_dataframe(database=database,
                                                         sub_id=sub,
                                                         search_dict=search_dict,
@@ -1738,10 +1748,13 @@ def add_dataset_description(out_dir: str) -> str:
 
     output_json: str = os.path.join(out_dir,'dataset_description.json')
 
-    with open(output_json, 'w') as outfile:
-        json.dump(data,
-                outfile,
-                indent=4)
+    output_json: str = write_json(json_file=output_json,
+                                  dictionary=data)
+
+    # with open(output_json, 'w') as outfile:
+    #     json.dump(data,
+    #             outfile,
+    #             indent=4)
     return output_json
 
 def create_participant_tsv(out_dir: str) -> Tuple[str,str]:
