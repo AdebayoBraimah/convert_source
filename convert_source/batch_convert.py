@@ -38,12 +38,12 @@ from copy import deepcopy
 from shutil import copy
 from datetime import datetime
 from tqdm import tqdm
+from collections import OrderedDict
 
 from typing import (
     List, 
     Dict, 
     Optional,
-    OrderedDict, 
     Union, 
     Tuple,
     Set
