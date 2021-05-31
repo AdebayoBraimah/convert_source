@@ -59,7 +59,7 @@ def is_valid_dcm(dcm_file: str,
     dcm_file: str = os.path.abspath(dcm_file)
     
     # Read DICOM file header
-    ds = pydicom.dcmread(dcm_file)
+    ds = pydicom.dcmread(dcm_file,force=True)
     
     # Invalid files include secondary image captures, and are not suitable for 
     # NIFTI conversion as they are often not converted and cause problems.
