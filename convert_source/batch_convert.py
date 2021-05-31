@@ -7,19 +7,19 @@
 # 
 #   * Separate unit and integration test(s) into different directories
 # 
-#   * Add file search for image files with no extensions (DICOMs)
-#       * Use is_valid_dicom function when walking through directories
+#   * [] Add file search for image files with no extensions (DICOMs)
+#       * [] Use is_valid_dicom function when walking through directories
 # 
 #   * Add doc building to CI workflow.
 # 
-#   * Add load/wait bar
+#   * [] Add load/wait bar
 # 
 #   * [X] Add function to write dataset_description.json file
 #       * Add function to collect and construct dictionary to fill this out
 # 
-#   * Add function to download latest version of dcm2niix
+#   * [] Add function to download latest version of dcm2niix
 # 
-#   * Add function that maps unknown BIDS NIFTI files to different modality labels and 
+#   * [] Add function that maps unknown BIDS NIFTI files to different modality labels and 
 #       modality types via reading in yml/json file.
 # 
 #   * GitHub Issues *
@@ -214,7 +214,10 @@ def batch_proc(study_img_dir: str,
     bids_bvals: List = []
     bids_bvecs: List = []
        
-    for sub_data in tqdm(subs_data,desc="\n\n Processing source data files. Please wait... \n\n",position=0,leave=True):
+    for sub_data in tqdm(subs_data,
+                         desc="Processing source data files",
+                         position=0,
+                         leave=True):
         log.info(f"\n\n Processing: {sub_data.data} \n")
 
         data: str = sub_data.data
