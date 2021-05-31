@@ -674,7 +674,11 @@ def export_bids_scans_dataframe(database: str,
         # Return empty dataframe
         return pd.DataFrame(columns=['filename','acq_time'])
     else:
-        return pd.concat(df_list,axis=0,join='outer',ignore_index=True)
+        df = pd.concat(df_list,axis=0,join='outer',ignore_index=True)
+        df.sort_values(by='filename',
+                       axis=0,
+                       inplace=True)
+        return df
 
 def query_db(database:str,
             table: str,

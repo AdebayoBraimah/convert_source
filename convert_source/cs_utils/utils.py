@@ -9,13 +9,13 @@ import json
 import platform
 import re
 import pydicom
-import tqdm
 import numpy as np
 
 from collections import deque
 from json import JSONDecodeError
 from copy import deepcopy
 from shutil import copy
+from tqdm import tqdm
 
 from typing import (
     List, 

@@ -30,7 +30,6 @@
 import os
 import glob
 import yaml
-import json
 import pandas as pd
 
 from copy import deepcopy
