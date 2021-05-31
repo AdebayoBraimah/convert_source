@@ -10,8 +10,7 @@ from typing import (
     List, 
     Dict, 
     Optional, 
-    Union, 
-    Tuple
+    Union
 )
 
 from convert_source.imgio.dcmio import(
