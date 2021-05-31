@@ -7,9 +7,9 @@ import glob
 import gzip
 import json
 import platform
-from posixpath import abspath
 import re
 import pydicom
+import tqdm
 import numpy as np
 
 from collections import deque
@@ -1068,7 +1068,10 @@ def collect_info(parent_dir: str,
                                         verbose=False)
 
     # Iterate through each subject image directory
-    for img_dir in dir_list:
+    for img_dir in tqdm(dir_list,
+                        desc="Searching subject directories",
+                        position=0,
+                        leave=True):
         # Set empty variables
         sub: str = ""
         ses: str = ""

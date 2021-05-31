@@ -5,8 +5,9 @@ Currently supports use with: DICOM, PAR REC, and NIFTI files.
 
 import os
 import glob
+
 from typing import(
-    List, 
+    List,
     Tuple
 )
 
@@ -83,14 +84,14 @@ def img_dir_list(directory: str,
                 if '._' in file:
                     # Skip hidden files if they exist.
                     continue
-                if '.dcm' in file.lower() or '.PAR' in file.upper() or '.nii' in file.lower():
-                    file_name = os.path.join(root,file)
+                if ('.dcm' in file.lower()) or ('.PAR' in file.upper()) or ('.nii' in file.lower()):
+                    file_name: str = os.path.join(root,file)
                     if '.dcm' in file.lower():
-                        dir_name = os.path.abspath(os.path.dirname(os.path.dirname(file_name)))
+                        dir_name: str = os.path.abspath(os.path.dirname(os.path.dirname(file_name)))
                     else:
-                        dir_name = os.path.abspath(os.path.dirname(file_name))
+                        dir_name: str= os.path.abspath(os.path.dirname(file_name))
                     # print(dir_name)
-                    tmp_list = [dir_name]
+                    tmp_list: List[str] = [dir_name]
                     dir_names.extend(tmp_list)
                     
     # Create sorted list of unique directory paths
