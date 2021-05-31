@@ -5,6 +5,8 @@
 # TODO:
 #   * Write integration test(s)
 # 
+#   * ISSUE: fmaps are not appearing in scans.tsv files
+# 
 #   * Separate unit and integration test(s) into different directories
 # 
 #   * [-] Add file search for image files with no extensions (DICOMs)
@@ -40,7 +42,8 @@ from tqdm import tqdm
 from typing import (
     List, 
     Dict, 
-    Optional, 
+    Optional,
+    OrderedDict, 
     Union, 
     Tuple,
     Set
@@ -1661,13 +1664,13 @@ def write_unknown_to_file(bids_unknown_dir: str,
     unknown_dict: Dict = {}
 
     for nii_file in unknown_bids:
-        tmp_dict: Dict[str,str] = {
+        tmp_dict: Dict[str,str] = OrderedDict({
             nii_file: 
             {
                 'modality_type':'',
                 'modality_label':''
             }
-        }
+        })
         unknown_dict.update(tmp_dict)
 
     if yaml_file:
