@@ -25,24 +25,25 @@
 #   * GitHub Issues *
 # 
 #   * Add option for renaming identified unknown files
-#   * Add participants TSV
-#   * Add sessions TSV
 
 import os
 import glob
 import yaml
 import json
+import pandas as pd
 
 from copy import deepcopy
 from shutil import copy
 from datetime import datetime
+from tqdm import tqdm
 
 from typing import (
     List, 
     Dict, 
     Optional, 
     Union, 
-    Tuple
+    Tuple,
+    Set
 )
 
 from convert_source.cs_utils.const import (
@@ -94,7 +95,8 @@ from convert_source.imgio.niio import (
 
 from convert_source.cs_utils.database import (
     create_db,
-    update_table_row
+    update_table_row,
+    export_bids_scans_dataframe
 )
 
 # Define function(s)
@@ -107,6 +109,8 @@ def batch_proc(study_img_dir: str,
                zero_pad: int = 2,
                cprss_lvl: int = 6,
                verbose: bool = False,
+               write_participants: bool = False,
+               write_subs_scans: bool = False,
                env: Optional[Dict] = {},
                dryrun: bool = False
                ) -> Tuple[List[str]]:
@@ -129,6 +133,8 @@ def batch_proc(study_img_dir: str,
         zero_pad: Number of zeroes to pad the run number up to (zero_pad=2 is ``01``).
         cprss_lvl: Compression level [1 - 9] - 1 is fastest, 9 is smallest.
         verbose: Enable verbose output.
+        write_participants: If true, writes the ``participants`` TSV and JSON files to the output BIDS directory.
+        write_subs_scans: If true, writes each subject's ``scan.tsv`` to their subject directory.
         env: Path environment dictionary.
         dryrun: Perform dryrun (creates the command, but does not execute it).
 
@@ -208,7 +214,7 @@ def batch_proc(study_img_dir: str,
     bids_bvals: List = []
     bids_bvecs: List = []
        
-    for sub_data in subs_data:
+    for sub_data in tqdm(subs_data,desc="\n\n Processing source data files. Please wait... \n\n",position=0,leave=True):
         log.info(f"\n\n Processing: {sub_data.data} \n")
 
         data: str = sub_data.data
@@ -280,6 +286,32 @@ def batch_proc(study_img_dir: str,
                                 out_name=output_file,
                                 yaml_file=True,
                                 json_file=True)
+
+    # Add option for writing participants and scans TSV
+    if write_participants:
+        [_,_] = create_participant_tsv(out_dir=out_dir)
+
+    if write_subs_scans:
+        subs_list: List[str] = list_dir_files(pathname=out_dir,
+                                            pattern="sub-*",
+                                            file_name_only=True)
+        subs_list: List[str] = [ x.replace('sub-','') for x in subs_list ]
+
+        for sub in subs_list:
+            df: pd.DataFrame = export_bids_scans_dataframe(database=database,
+                                                        sub_id=sub,
+                                                        search_dict=search_dict,
+                                                        gzipped=gzip)
+            if len(df) == 0:
+                pass
+            else:
+                out_name: str = os.path.join(out_dir,f'sub-{sub}',f'sub-{sub}' + '_scans.tsv')
+                df.to_csv(out_name,
+                        sep='\t',
+                        na_rep='',
+                        index=False,
+                        mode="w",
+                        encoding='utf-8')
 
     return (bids_imgs,
             bids_jsons,
@@ -1637,10 +1669,12 @@ def write_unknown_to_file(bids_unknown_dir: str,
 
     if json_file:
         output_json: str = out_name + ".json"
-        with open(output_json, 'w') as outfile:
-            json.dump(unknown_dict,
-                        outfile,
-                        indent=4)
+        output_json: str = write_json(json_file=output_json,
+                                    dictionary=unknown_dict)
+        # with open(output_json, 'w') as outfile:
+        #     json.dump(unknown_dict,
+        #                 outfile,
+        #                 indent=4)
     else:
         output_json: str = ""
     
@@ -1670,33 +1704,33 @@ def add_dataset_description(out_dir: str) -> str:
     #   * Function that constructs dictionary for dataset descrtption
     #   * Perhaps have it read in through config file.
     data: Dict[str,str] = {
-        'Name':'',
-        'BIDSVersion': DEFAULT_BIDS_VERSION,
-        'HEDVersion':'',
-        'DatasetType':'raw',
-        'License':'',
-        'Authors':[
-            'Author 1',
-            'Author 2',
-            'Author 3'
+        "Name":"",
+        "BIDSVersion": DEFAULT_BIDS_VERSION,
+        "HEDVersion":"",
+        "DatasetType":"raw",
+        "License":"",
+        "Authors":[
+            "Author 1",
+            "Author 2",
+            "Author 3"
         ],
-        'Acknowledgements':'',
-        'HowToAcknowledge':'',
-        'Funding':[
-            'Funding source 1',
-            'Funding source 2'
+        "Acknowledgements":"",
+        "HowToAcknowledge":"",
+        "Funding":[
+            "Funding source 1",
+            "Funding source 2"
         ],
-        'EthicsApprovals':[
-            'IRB 1',
-            'IRB 2'
+        "EthicsApprovals":[
+            "IRB 1",
+            "IRB 2"
         ],
-       'ReferencesAndLinks':[
-           'Link 1',
-           'Link 2',
-           'Reference 1',
-           'Reference 2'
+       "ReferencesAndLinks":[
+           "Link 1",
+           "Link 2",
+           "Reference 1",
+           "Reference 2"
        ],
-       'DatasetDOI':''
+       "DatasetDOI":""
     }
 
     output_json: str = os.path.join(out_dir,'dataset_description.json')
@@ -1706,6 +1740,109 @@ def add_dataset_description(out_dir: str) -> str:
                 outfile,
                 indent=4)
     return output_json
+
+def create_participant_tsv(out_dir: str) -> Tuple[str,str]:
+    """Creates or appends/updates the participants TSV file (``participants.tsv``).
+    If the participants TSV file does not exist at runtime, then it is created. 
+    Additionally, the participant JSON file is created. 
+    However once created, it is not updated (as this is intended to be maintained by the user).
+
+    More information can be obtained from: https://bids-specification.readthedocs.io/en/stable/03-modality-agnostic-files.html#participants-file
+
+    Usage example:
+        >>> [participant_tsv,
+        ...  participant_json] = create_participant_tsv(out_dir="<path>/<to>/<BIDS>/<directory>")
+
+    Arguments:
+        out_dir: BIDS output directory.
+
+    Returns:
+        Tuple of strings that consist of:
+            * Absolute file path to the participants TSV file (``participants.tsv``)
+            * Absolute file path to the participants JSON file (``participants.json``)
+    """
+    participant_tsv: str = os.path.join(out_dir,'participant.tsv')
+    participant_json: str = os.path.join(out_dir,'participant.json')
+
+    if os.path.exists(participant_json):
+        pass
+    else:
+        data: Dict[str,str] = {
+            "age": {
+                "Description": "age of participant",
+                "Units": "years"
+            },
+            "sex": {
+                "Description": "sex of the participant as reported by the participant",
+                "Levels": {
+                    "F": "female",
+                    "M": "male"
+                }
+            },
+            "handedness": {
+                "Description": "handedness of the participant as reported by the participant",
+                "Levels": {
+                    "A": "ambidextrous",
+                    "L": "left",
+                    "R": "right"
+                }
+            },
+            "group": {
+                "Description": "experimental group the participant belonged to",
+                "Levels": {
+                    "control": "Control group",
+                    "patient": "Patient group"
+                }
+            }
+        }
+        
+        participant_json: str = write_json(json_file=participant_json,
+                                        dictionary=data)
+        
+    if os.path.exists(participant_tsv):
+        df_old: pd.DataFrame = pd.read_csv(participant_tsv, sep='\t')
+        keys: List[str] = list(df_old.columns)
+
+        subs_set: Set[str] = set(list_dir_files(pathname=out_dir,
+                                                pattern="sub-*",
+                                                file_name_only=True))
+        tmp_set: Set[str] = set(list(df_old['participant_id']))
+        tmp_list: List[str] = list(subs_set.difference(tmp_set))
+
+        df_tmp: pd.DataFrame = pd.DataFrame(columns=keys)
+        df_tmp['participant_id'] = tmp_list
+        df_new: pd.DataFrame = pd.concat([df_old,df_tmp],
+                                        axis=0)
+        df_new: pd.DataFrame = df_new.reset_index()
+        df_new: pd.DataFrame = df_new.drop(columns=['index'])
+        df_new.sort_values(by='participant_id',
+                            axis=0,
+                            inplace=True)
+        df_new.to_csv(participant_tsv,
+                        sep='\t',
+                        na_rep='',
+                        index=False,
+                        mode='w',
+                        encoding='utf-8')
+        return participant_tsv, participant_json
+    else:
+        subs_list: List[str] = list_dir_files(pathname=out_dir,
+                                            pattern="sub-*",
+                                            file_name_only=True)
+        df: pd.DataFrame = pd.DataFrame(columns=[
+                                        'participant_id',
+                                        'age',
+                                        'sex',
+                                        'handedness',
+                                        'group'])
+        df['participant_id'] = subs_list
+        df.to_csv(participant_tsv,
+                    sep='\t',
+                    na_rep='',
+                    index=False,
+                    mode="w",
+                    encoding='utf-8')
+        return participant_tsv, participant_json
 
 def add_readme(out_dir: str) -> str:
     """Adds a BIDS README file to some output BIDS directory.

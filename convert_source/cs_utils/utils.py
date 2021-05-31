@@ -1064,7 +1064,7 @@ def collect_info(parent_dir: str,
     path_sep: str = os.path.sep
     
     # Get image directory information
-    [dir_list, id_list] = img_dir_list(directory=parent_dir,
+    [dir_list, _] = img_dir_list(directory=parent_dir,
                                         verbose=False)
 
     # Iterate through each subject image directory
