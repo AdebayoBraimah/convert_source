@@ -2,8 +2,6 @@
 """Database utility functions for convert_source, which encapsulates creating and querying databases.
 """
 # TODO:
-#   * Figure out how to store and follow file_id primary key throughout convert_source
-#   * Integrate database functions into convert_source flow control
 #   * Create function to get acquisition date from DICOM/PAR REC files
 
 import os
@@ -660,15 +658,34 @@ def export_bids_scans_dataframe(database: str,
     df_list: List = []
     for modality_type,labels in search_dict.items():
         for modality_label,_ in labels.items():
-            df_tmp: pd.DataFrame = _export_tmp_bids_df(database=database,
-                                                        sub_id=sub_id,
-                                                        modality_type=modality_type,
-                                                        modality_label=modality_label,
-                                                        gzipped=gzipped)
-            if len(df_tmp) == 0:
-                continue
+            if modality_type == 'fmap':
+                fmap_mods: List[str] = [
+                    'phase',
+                    'magnitude',
+                    'fieldmap',
+                    'epi'
+                ]
+
+                for fmap_mod in fmap_mods:
+                    df_tmp: pd.DataFrame = _export_tmp_bids_df(database=database,
+                                                            sub_id=sub_id,
+                                                            modality_type=modality_type,
+                                                            modality_label=fmap_mod,
+                                                            gzipped=gzipped)
+                    if len(df_tmp) == 0:
+                        continue
+                    else:
+                        df_list.append(df_tmp)
             else:
-                df_list.append(df_tmp)
+                df_tmp: pd.DataFrame = _export_tmp_bids_df(database=database,
+                                                            sub_id=sub_id,
+                                                            modality_type=modality_type,
+                                                            modality_label=modality_label,
+                                                            gzipped=gzipped)
+                if len(df_tmp) == 0:
+                    continue
+                else:
+                    df_list.append(df_tmp)
 
     if len(df_list) == 0:
         # Return empty dataframe
