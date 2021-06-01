@@ -3,11 +3,8 @@
 """
 
 # TODO:
-#   * Write integration test(s)
-# 
-#   * ISSUE: fmaps are not appearing in scans.tsv files
-# 
-#   * Separate unit and integration test(s) into different directories
+#   * [ ] Write integration test(s)
+#   * [ ] Separate unit and integration test(s) into different directories
 # 
 #   * [-] Add file search for image files with no extensions (DICOMs)
 #       * [-] Use is_valid_dicom function when walking through directories
@@ -16,9 +13,9 @@
 #           DICOM files and add their extensions.
 # 
 #   * [X] Add function to write dataset_description.json file
-#       * Add function to collect and construct dictionary to fill this out
+#       * [ ] Add function to collect and construct dictionary to fill this out
 # 
-#   * [] Add function to download latest version of dcm2niix
+#   * [ ] Add function to download latest version of dcm2niix
 
 import os
 import glob
@@ -1708,9 +1705,8 @@ def add_dataset_description(out_dir: str) -> str:
         File path to dataset_description.json file as a string.
     """
     # TODO:
-    # 
     #   * Function that constructs dictionary for dataset descrtption
-    #   * Perhaps have it read in through config file.
+    #       * Perhaps have it read in through config file.
     data: Dict[str,str] = {
         "Name":"",
         "BIDSVersion": DEFAULT_BIDS_VERSION,
