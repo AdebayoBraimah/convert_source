@@ -1651,7 +1651,7 @@ def write_unknown_to_file(bids_unknown_dir: str,
                                             pattern="*.nii*",
                                             file_name_only=True)
 
-    unknown_dict: Dict = {}
+    unknown_dict: OrderedDict = OrderedDict()
 
     for nii_file in unknown_bids:
         tmp_dict: Dict[str,str] = OrderedDict({
@@ -1937,12 +1937,12 @@ def read_unknown_subs(mapfile: str,
             [bids_name_dict, 
             modality_type, 
             modality_label, 
-            task] = bids_id(s=data,
-                            search_dict=search_dict,
-                            modality_type=modality_type,
-                            modality_label=modality_label,
-                            bids_name_dict=bids_name_dict,
-                            mod_found=True)
+            _] = bids_id(s=data,
+                         search_dict=search_dict,
+                         modality_type=modality_type,
+                         modality_label=modality_label,
+                         bids_name_dict=bids_name_dict,
+                         mod_found=True)
             
             [imgs,
             jsons,
