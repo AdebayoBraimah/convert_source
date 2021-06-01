@@ -32,6 +32,8 @@
 import os
 import glob
 import yaml
+import pathlib
+import json
 import pandas as pd
 
 from copy import deepcopy
@@ -99,7 +101,8 @@ from convert_source.imgio.niio import (
 from convert_source.cs_utils.database import (
     create_db,
     update_table_row,
-    export_bids_scans_dataframe
+    export_bids_scans_dataframe,
+    query_db
 )
 
 # Define function(s)
@@ -1861,6 +1864,122 @@ def create_participant_tsv(out_dir: str) -> Tuple[str,str]:
                     mode="w",
                     encoding='utf-8')
         return participant_tsv, participant_json
+
+def read_unknown_subs(mapfile: str,
+                      config: Optional[str] = "",
+                      verbose: bool = False
+                      ) -> str:
+    """Reads the input JSON or YAML mapfile for unknown BIDS NIFTI files.
+
+    Usage example:
+        >>> subs_bids_data = read_unknown_subs(mapfile)
+
+    Arguments:
+        mapfile: JSON or YAML mapfile that specifies the ``modality_type`` and ``modality_label``.
+        config: Configuration file with search terms.
+        verbose: Enable verbose output.
+
+    Returns:
+        Tuple of lists that consists of: 
+            * List of NIFTI images.
+            * Corresponding list of JSON sidecars.
+            * Corresponding list of bval files.
+            * Corresponding list of bvec files.
+    """
+    mapfile: str = os.path.abspath(mapfile)
+
+    out_dir: str = os.path.join(str(pathlib.Path(os.path.abspath(mapfile)).parents[1]))
+    unknown_dir: str = os.path.join(str(pathlib.Path(os.path.abspath(mapfile)).parents[0]))
+    misc_dir: str = os.path.join(str(pathlib.Path(os.path.abspath(mapfile)).parents[1]),'.misc')
+
+    database: str = os.path.join(misc_dir,'convert_source.db')
+
+    if config:
+        pass
+    else:
+        config: str = DEFAULT_CONFIG
+
+    if ('.yml' in mapfile) or ('.yaml' in mapfile):
+        with open(mapfile) as f:
+            data: Dict[str,str] = yaml.safe_load(f)
+            f.close()
+    elif '.json' in mapfile:
+        with open(mapfile) as f:
+            data: Dict[str,str] = json.load(f)
+            f.close()
+
+    bids_imgs: List = []
+    bids_jsons: List = []
+    bids_bvals: List = []
+    bids_bvecs: List = []
+
+    for key,items in data.items():
+        modality_type = items.get('modality_type','')
+        modality_label = items.get('modality_label','')
+
+        if modality_type and modality_label:
+
+            if '.nii.gz' in key:
+                ext: str = '.nii.gz'
+                gzip: bool = True
+            else:
+                ext: str = '.nii'
+                gzip: bool = False
+            
+            if os.path.exists(os.path.join(unknown_dir,key)):
+                pass
+            else:
+                continue
+
+            sql_val: str = key.replace(ext,'')
+
+            file_id: str = query_db(database=database, table='bids_name', prim_key='bids_name', column='file_id', value=sql_val)
+            sub_id: str = query_db(database=database, table='sub_id', prim_key='file_id', value=file_id)
+            ses_id: str = query_db(database=database, table='ses_id', prim_key='file_id', value=file_id)
+
+            [search_dict,_,_,_,_] = read_config(config_file=config,verbose=verbose)
+
+            sub_data: SubDataInfo = SubDataInfo(sub=sub_id,
+                                                ses=ses_id,
+                                                data=os.path.join(unknown_dir,key),
+                                                file_id=file_id)
+            data: str = sub_data.data
+            bids_name_dict: Dict = deepcopy(BIDS_PARAM)
+            bids_name_dict['info']['sub'] = sub_data.sub
+
+            if sub_data.ses:
+                bids_name_dict['info']['ses'] = sub_data.ses
+            
+            [bids_name_dict, 
+            modality_type, 
+            modality_label, 
+            task] = bids_id(s=data,
+                            search_dict=search_dict,
+                            modality_type=modality_type,
+                            modality_label=modality_label,
+                            bids_name_dict=bids_name_dict,
+                            mod_found=True)
+            
+            [imgs,
+            jsons,
+            bvals,
+            bvecs] = nifti_to_bids(sub_data=sub_data,
+                                   bids_name_dict=bids_name_dict,
+                                   out_dir=out_dir,
+                                   database=database,
+                                   modality_type=modality_type,
+                                   modality_label=modality_label,
+                                   gzip=True)
+
+            bids_imgs.extend(imgs)
+            bids_jsons.extend(jsons)
+            bids_bvals.extend(bvals)
+            bids_bvecs.extend(bvecs)
+
+    return (imgs,
+            jsons,
+            bvals,
+            bvecs)
 
 def add_readme(out_dir: str) -> str:
     """Adds a BIDS README file to some output BIDS directory.
