@@ -15,25 +15,15 @@
 #           several modules. It would actually be far easier to just rename the
 #           DICOM files and add their extensions.
 # 
-#   * Add doc building to CI workflow.
-# 
 #   * [X] Add function to write dataset_description.json file
 #       * Add function to collect and construct dictionary to fill this out
 # 
 #   * [] Add function to download latest version of dcm2niix
-# 
-#   * [] Add function that maps unknown BIDS NIFTI files to different modality labels and 
-#       modality types via reading in yml/json file.
-# 
-#   * GitHub Issues *
-# 
-#   * Add option for renaming identified unknown files
 
 import os
 import glob
 import yaml
 import pathlib
-import json
 import pandas as pd
 
 from copy import deepcopy
@@ -1904,9 +1894,7 @@ def read_unknown_subs(mapfile: str,
             data: Dict[str,str] = yaml.safe_load(f)
             f.close()
     elif '.json' in mapfile:
-        with open(mapfile) as f:
-            data: Dict[str,str] = json.load(f)
-            f.close()
+        data: Dict[str,str] = read_json(json_file=mapfile)
 
     bids_imgs: List = []
     bids_jsons: List = []
