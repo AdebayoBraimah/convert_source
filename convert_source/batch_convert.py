@@ -162,17 +162,30 @@ def batch_proc(study_img_dir: str,
 
     # Create file database
     database: str = os.path.join(misc_dir,'convert_source.db')
-    database: str = create_db(database=database)
-
-    log.info("Created source image file database")
+    
+    if os.path.exists(database):
+        log.info("Source image file database already exists")
+    else:
+        database: str = create_db(database=database)
+        log.info("Created source image file database")
 
     # Write bidsignore
-    _ = bids_ignore(out_dir=out_dir)
-    log.info("Wrote .bidsignore file")
+    ignore_file: str = os.path.join(out_dir,'.bidsignore')
+
+    if os.path.exists(ignore_file):
+        log.info(".bidsignore file already exists")
+    else:
+        _ = bids_ignore(out_dir=out_dir)
+        log.info("Wrote .bidsignore file")
 
     # Write README file
-    _ = add_readme(out_dir=out_dir)
-    log.info("Added README file to BIDS directory")
+    readme_file: str = os.path.join(out_dir,'README')
+
+    if os.path.exists(readme_file):
+        log.info("README file already exists in BIDS directory")
+    else:
+        _ = add_readme(out_dir=out_dir)
+        log.info("Added README file to BIDS directory")
 
     log.info("Read configuration file")
 
@@ -183,6 +196,7 @@ def batch_proc(study_img_dir: str,
      exclusion_list] = read_config(config_file=config_file,
                                    verbose=verbose)
 
+    # Dataset description file
     dataset_description: str = os.path.join(out_dir,'dataset_description.json')
 
     if dataset_description:
@@ -1651,7 +1665,7 @@ def write_unknown_to_file(bids_unknown_dir: str,
                                             pattern="*.nii*",
                                             file_name_only=True)
 
-    unknown_dict: OrderedDict = OrderedDict()
+    unknown_dict: Dict = {}
 
     for nii_file in unknown_bids:
         tmp_dict: Dict[str,str] = OrderedDict({

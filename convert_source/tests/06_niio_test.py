@@ -52,21 +52,45 @@ def test_collect_data():
     assert sub == 'TEST001'
     assert ses == 'UNIT001'
 
+def test_cleanup_1():
+    """NOTE: This test currently FAILS on Windows operating systems."""
+    shutil.rmtree(misc_dir)
+    assert os.path.exists(misc_dir) == False
+
 def test_get_nii_tr():
+    if os.path.exists(misc_dir):
+        pass
+    else:
+        os.makedirs(misc_dir)
+    
+    create_db(database=test_db)
+
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
                                                 database=test_db,
                                                 exclusion_list=[".dcm",".PAR"])
 
     assert get_nii_tr(subs_data[6].data) == 0.893
 
+def test_cleanup_2():
+    """NOTE: This test currently FAILS on Windows operating systems."""
+    shutil.rmtree(misc_dir)
+    assert os.path.exists(misc_dir) == False
+
 def test_get_num_frames():
+    if os.path.exists(misc_dir):
+        pass
+    else:
+        os.makedirs(misc_dir)
+    
+    create_db(database=test_db)
+
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
                                                 database=test_db,
                                                 exclusion_list=[".dcm",".PAR"])
 
     assert get_num_frames(subs_data[6].data) == 500
 
-def test_cleanup():
+def test_cleanup_3():
     """NOTE: This test currently FAILS on Windows operating systems."""
     shutil.rmtree(out_dir)
     assert os.path.exists(out_dir) == False

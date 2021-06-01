@@ -20,8 +20,7 @@ mod_path: str = os.path.join(str(pathlib.Path(os.path.abspath(__file__)).parents
 sys.path.append(mod_path)
 
 from convert_source.cs_utils.fileio import (
-    Command,
-    DependencyError
+    Command
 )
 
 from convert_source.cs_utils.database import create_db
@@ -61,19 +60,13 @@ out_dir: str = os.path.join(os.getcwd(),'test.study')
 misc_dir: str = os.path.join(out_dir,'.misc')
 test_db: str = os.path.join(misc_dir,'study.db')
 
-# Create output test directory
-if os.path.exists(misc_dir):
-    pass
-else:
-    os.makedirs(misc_dir)
+# # Create output test directory
+# if os.path.exists(misc_dir):
+#     pass
+# else:
+#     os.makedirs(misc_dir)
 
-create_db(database=test_db)
-
-if os.path.exists(test_db):
-    pass
-else:
-    sys.exit(1)
-    # raise FileNotFoundError("Misc dir does not exist")
+# create_db(database=test_db)
 
 def test_extract_data():
     dcm_data: str = os.path.join(data_dir,'TEST001-UNIT001','data.dicom','data.1.tar.gz')
@@ -88,16 +81,35 @@ def test_extract_data():
     assert os.path.exists(dcm_test_data) == True
 
 def get_subject_data():
+    if os.path.exists(misc_dir):
+        pass
+    else:
+        os.makedirs(misc_dir)
+    
+    create_db(database=test_db)
+
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
                                                 database=test_db,
                                                 exclusion_list=[".PAR", ".nii"])
     assert len(subs_data) == 3
+
+# def test_cleanup_1():
+#     """NOTE: This test currently FAILS on Windows operating systems."""
+#     shutil.rmtree(misc_dir)
+#     assert os.path.exists(misc_dir) == False
 
 # NOTE: subs_data list of SubDataInfo objects is placed in each test function
 #   as pytest does not allow test functions to execute without first initializing
 #   all global variables.
 
 def test_is_valid_dcm():
+    if os.path.exists(misc_dir):
+        pass
+    else:
+        os.makedirs(misc_dir)
+    
+    create_db(database=test_db)
+
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
                                                 database=test_db,
                                                 exclusion_list=[".PAR", ".nii"])
@@ -109,7 +121,19 @@ def test_is_valid_dcm():
     assert sub == 'TEST001'
     assert ses == 'UNIT001'
 
+def test_cleanup_2():
+    """NOTE: This test currently FAILS on Windows operating systems."""
+    shutil.rmtree(misc_dir)
+    assert os.path.exists(misc_dir) == False
+
 def test_get_scan_time():
+    if os.path.exists(misc_dir):
+        pass
+    else:
+        os.makedirs(misc_dir)
+    
+    create_db(database=test_db)
+
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
                                                 database=test_db,
                                                 exclusion_list=[".PAR", ".nii"])
@@ -119,7 +143,19 @@ def test_get_scan_time():
     data: str = subs_data[0].data
     assert get_scan_time(data) == ''
 
+def test_cleanup_3():
+    """NOTE: This test currently FAILS on Windows operating systems."""
+    shutil.rmtree(misc_dir)
+    assert os.path.exists(misc_dir) == False
+
 def test_get_bwpppe():
+    if os.path.exists(misc_dir):
+        pass
+    else:
+        os.makedirs(misc_dir)
+    
+    create_db(database=test_db)
+
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
                                                 database=test_db,
                                                 exclusion_list=[".PAR", ".nii"])
@@ -129,7 +165,19 @@ def test_get_bwpppe():
     data: str = subs_data[0].data
     assert get_bwpppe(data) == ''
 
+def test_cleanup_4():
+    """NOTE: This test currently FAILS on Windows operating systems."""
+    shutil.rmtree(misc_dir)
+    assert os.path.exists(misc_dir) == False
+
 def test_get_red_fact():
+    if os.path.exists(misc_dir):
+        pass
+    else:
+        os.makedirs(misc_dir)
+    
+    create_db(database=test_db)
+
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
                                                 database=test_db,
                                                 exclusion_list=[".PAR", ".nii"])
@@ -139,7 +187,19 @@ def test_get_red_fact():
     data: str = subs_data[0].data
     assert get_red_fact(data) == 1.0
 
+def test_cleanup_5():
+    """NOTE: This test currently FAILS on Windows operating systems."""
+    shutil.rmtree(misc_dir)
+    assert os.path.exists(misc_dir) == False
+
 def test_get_mb():
+    if os.path.exists(misc_dir):
+        pass
+    else:
+        os.makedirs(misc_dir)
+    
+    create_db(database=test_db)
+
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
                                                 database=test_db,
                                                 exclusion_list=[".PAR", ".nii"])
@@ -149,7 +209,7 @@ def test_get_mb():
     data: str = subs_data[0].data
     assert get_mb(data) == 1
 
-def test_cleanup():
+def test_cleanup_6():
     """NOTE: This test currently FAILS on Windows operating systems."""
     shutil.rmtree(out_dir)
     shutil.rmtree(dcm_test_data)

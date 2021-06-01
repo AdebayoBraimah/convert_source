@@ -1107,29 +1107,29 @@ def collect_info(parent_dir: str,
                                                         file_name=img,
                                                         database=database,
                                                         use_dcm_dir=True)
-            # file_id: str = query_db(database=database,
-            #                         table='rel_path',
-            #                         prim_key='rel_path',
-            #                         column='file_id',
-            #                         value=db_info.get('rel_path',''))
-            # if file_id:
-            #     if log:
-            #         log.log("\n Imaging data has already been processed and is stored in the database.")
-            # else:
-            #     database: str = insert_row_db(database=database,
-            #                                     info=db_info)
-            #     sub_info: SubDataInfo = SubDataInfo(sub=sub,
-            #                                         data=img,
-            #                                         ses=ses,
-            #                                         file_id=db_info.get('file_id',''))
-            #     data.append(sub_info)
-            database: str = insert_row_db(database=database,
-                                            info=db_info)
-            sub_info: SubDataInfo = SubDataInfo(sub=sub,
-                                                data=img,
-                                                ses=ses,
-                                                file_id=db_info.get('file_id',''))
-            data.append(sub_info)
+            file_id: str = query_db(database=database,
+                                    table='rel_path',
+                                    prim_key='rel_path',
+                                    column='file_id',
+                                    value=db_info.get('rel_path',''))
+            if file_id:
+                if log:
+                    log.log("Imaging data has already been processed and is stored in the database.")
+            else:
+                database: str = insert_row_db(database=database,
+                                                info=db_info)
+                sub_info: SubDataInfo = SubDataInfo(sub=sub,
+                                                    data=img,
+                                                    ses=ses,
+                                                    file_id=db_info.get('file_id',''))
+                data.append(sub_info)
+            # database: str = insert_row_db(database=database,
+            #                                 info=db_info)
+            # sub_info: SubDataInfo = SubDataInfo(sub=sub,
+            #                                     data=img,
+            #                                     ses=ses,
+            #                                     file_id=db_info.get('file_id',''))
+            # data.append(sub_info)
     return data
 
 def get_recon_mat(json_file: str) -> Union[float,str]:

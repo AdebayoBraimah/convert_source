@@ -80,13 +80,13 @@ meta_dict_1: Dict = {
 
 meta_dict_2: Dict = {}
 
-# Create output test directory
-if os.path.exists(misc_dir):
-    pass
-else:
-    os.makedirs(misc_dir)
+# # Create output test directory
+# if os.path.exists(misc_dir):
+#     pass
+# else:
+#     os.makedirs(misc_dir)
 
-create_db(database=test_db)
+# create_db(database=test_db)
 
 def test_download_prog():
     class PlatformInferError(Exception):
@@ -172,13 +172,33 @@ def test_read_config():
         assert comp_dict(search_dict,meta_dict) == False
 
 def get_subject_data():
+    if os.path.exists(misc_dir):
+        pass
+    else:
+        os.makedirs(misc_dir)
+    
+    create_db(database=test_db)
+
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
                                                 database=test_db,
                                                 exclusion_list=[])
     assert len(subs_data) == 14
 
+# def test_cleanup_1():
+#     """NOTE: This test currently FAILS on Windows operating systems."""
+#     shutil.rmtree(misc_dir)
+#     assert os.path.exists(misc_dir) == False
+
 def test_bids_id():
+    if os.path.exists(misc_dir):
+        pass
+    else:
+        os.makedirs(misc_dir)
+    
+    create_db(database=test_db)
+
     verbose: bool = True
+
     [search_dict,
     bids_search,
     bids_map,
@@ -265,8 +285,21 @@ def test_bids_id():
     assert modality_label == 'swi'
     assert task == ""
 
+def test_cleanup_2():
+    """NOTE: This test currently FAILS on Windows operating systems."""
+    shutil.rmtree(misc_dir)
+    assert os.path.exists(misc_dir) == False
+
 def test_get_metadata():
+    if os.path.exists(misc_dir):
+        pass
+    else:
+        os.makedirs(misc_dir)
+    
+    create_db(database=test_db)
+
     verbose: bool = True
+
     [search_dict,
     bids_search,
     bids_map,
@@ -300,9 +333,22 @@ def test_get_metadata():
 
     assert meta_com_dict == meta_dict_1
     assert meta_scan_dict == meta_dict_2
+
+def test_cleanup_3():
+    """NOTE: This test currently FAILS on Windows operating systems."""
+    shutil.rmtree(misc_dir)
+    assert os.path.exists(misc_dir) == False
     
 def test_data_to_bids():
+    if os.path.exists(misc_dir):
+        pass
+    else:
+        os.makedirs(misc_dir)
+    
+    create_db(database=test_db)
+
     verbose: bool = True
+
     [search_dict,
     bids_search,
     bids_map,
@@ -469,7 +515,7 @@ def test_data_to_bids():
     assert bids_bvals[0] == ""
     assert bids_bvecs[0] == ""
 
-def test_tmp_cleanup_1():
+def test_tmp_cleanup_4():
     shutil.rmtree(out_dir)
     assert os.path.exists(out_dir) == False
 
@@ -483,6 +529,7 @@ def test_make_bids_name():
     create_db(database=test_db)
 
     verbose: bool = True
+
     [search_dict,
     bids_search,
     bids_map,
@@ -524,7 +571,7 @@ def test_make_bids_name():
     assert bids_3 == "sub-TEST001_ses-UNIT001_task-rest_run-03_bold"
     assert bids_4 == "sub-TEST001_ses-UNIT001_task-rest_run-04_bold"
 
-def test_tmp_cleanup_2():
+def test_tmp_cleanup_5():
     shutil.rmtree(out_dir)
     assert os.path.exists(out_dir) == False
 
@@ -547,7 +594,7 @@ def test_batch_proc():
     assert len(bvals) == 11
     assert len(bvecs) == 11
 
-def test_cleanup():
+def test_cleanup_6():
     """NOTE: This test currently FAILS on Windows operating systems."""
     shutil.rmtree(out_dir)
     assert os.path.exists(out_dir) == False
