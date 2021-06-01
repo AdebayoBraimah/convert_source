@@ -27,7 +27,6 @@ from copy import deepcopy
 from shutil import copy
 from datetime import datetime
 from tqdm import tqdm
-from collections import OrderedDict
 
 from typing import (
     List, 
@@ -1668,13 +1667,13 @@ def write_unknown_to_file(bids_unknown_dir: str,
     unknown_dict: Dict = {}
 
     for nii_file in unknown_bids:
-        tmp_dict: Dict[str,str] = OrderedDict({
+        tmp_dict: Dict[str,str] = {
             nii_file: 
             {
                 'modality_type':'',
                 'modality_label':''
             }
-        })
+        }
         unknown_dict.update(tmp_dict)
 
     if yaml_file:
