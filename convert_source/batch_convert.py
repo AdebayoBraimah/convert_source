@@ -1682,7 +1682,8 @@ def write_unknown_to_file(bids_unknown_dir: str,
         with open(output_yaml, 'w') as outfile:
             yaml.dump(unknown_dict, 
                     outfile, 
-                    default_flow_style=False)
+                    default_flow_style=False,
+                    sort_keys=True)
     else:
         output_yaml: str = ""
 
@@ -1690,10 +1691,6 @@ def write_unknown_to_file(bids_unknown_dir: str,
         output_json: str = out_name + ".json"
         output_json: str = write_json(json_file=output_json,
                                     dictionary=unknown_dict)
-        # with open(output_json, 'w') as outfile:
-        #     json.dump(unknown_dict,
-        #                 outfile,
-        #                 indent=4)
     else:
         output_json: str = ""
     
@@ -1755,11 +1752,6 @@ def add_dataset_description(out_dir: str) -> str:
 
     output_json: str = write_json(json_file=output_json,
                                   dictionary=data)
-
-    # with open(output_json, 'w') as outfile:
-    #     json.dump(data,
-    #             outfile,
-    #             indent=4)
     return output_json
 
 def create_participant_tsv(out_dir: str) -> Tuple[str,str]:
