@@ -12,6 +12,8 @@
 #           several modules. It would actually be far easier to just rename the
 #           DICOM files and add their extensions.
 # 
+#   * [ ] Write wrapper function/script for ``read_unknown_subs`` function.
+# 
 #   * [X] Add function to write dataset_description.json file
 #       * [ ] Add function to collect and construct dictionary to fill this out
 # 
@@ -1948,7 +1950,7 @@ def read_unknown_subs(mapfile: str,
                          modality_label=modality_label,
                          bids_name_dict=bids_name_dict,
                          mod_found=True)
-            
+            # TODO: Add option to set compression level
             [imgs,
             jsons,
             bvals,
@@ -1958,7 +1960,7 @@ def read_unknown_subs(mapfile: str,
                                    database=database,
                                    modality_type=modality_type,
                                    modality_label=modality_label,
-                                   gzip=True)
+                                   gzip=gzip)
 
             bids_imgs.extend(imgs)
             bids_jsons.extend(jsons)

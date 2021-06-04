@@ -167,7 +167,7 @@ def create_study_sym_links(study_dir: str,
 
         if os.path.exists(tar_dir) and os.path.islink(tar_dir):
             if log_file:
-                log_file.log(f"(Symbolically) linked directory already exists.")
+                log_file.log(f"(Symbolically linked) directory already exists: {i} -> {j}.")
         elif os.path.exists(tar_dir):
             if log_file:
                 log_file.log(f"This directory already exists and is likely not a symbolically linked directory.")   
