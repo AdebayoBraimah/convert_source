@@ -1867,6 +1867,9 @@ def read_unknown_subs(mapfile: str,
                       ) -> str:
     """Reads the input JSON or YAML mapfile for unknown BIDS NIFTI files.
 
+    NOTE:
+        Use of this functions requires that the function ``batch_proc`` has already been run.
+
     Usage example:
         >>> subs_bids_data = read_unknown_subs(mapfile)
 
@@ -1889,6 +1892,13 @@ def read_unknown_subs(mapfile: str,
     unknown_dir: str = os.path.join(str(pathlib.Path(os.path.abspath(mapfile)).parents[0]))
     misc_dir: str = os.path.join(str(pathlib.Path(os.path.abspath(mapfile)).parents[1]),'.misc')
 
+    now = datetime.now()
+    dt_string: str = str(now.strftime("%m_%d_%Y_%H_%M"))
+
+    _log: str = os.path.join(misc_dir,f"convert_source_{dt_string}.log")
+    log: LogFile = log_file(log=_log, verbose=verbose)
+
+    log.log("Accessed database.")
     database: str = os.path.join(misc_dir,'convert_source.db')
 
     if config:
@@ -1922,8 +1932,9 @@ def read_unknown_subs(mapfile: str,
                 gzip: bool = False
             
             if os.path.exists(os.path.join(unknown_dir,key)):
-                pass
+                log.log(f"Processing: {key}")
             else:
+                log.log(f"File not found: {key}.")
                 continue
 
             sql_val: str = key.replace(ext,'')
@@ -1966,6 +1977,8 @@ def read_unknown_subs(mapfile: str,
                                    modality_label=modality_label,
                                    cprss_lvl=cprss_lvl,
                                    gzip=gzip)
+
+            log.log(f"Converted: {key} -> {imgs[0]}")
 
             bids_imgs.extend(imgs)
             bids_jsons.extend(jsons)
