@@ -12,14 +12,14 @@
 #           several modules. It would actually be far easier to just rename the
 #           DICOM files and add their extensions.
 # 
-#   * [ ] Write wrapper function/script for ``read_unknown_subs`` function.
-# 
 #   * [X] Add function to write dataset_description.json file
 #       * [ ] Add function to collect and construct dictionary to fill this out
 # 
 #   * [ ] Add function to download latest version of dcm2niix
-# 
 #   * [ ] Convert lists to queues for faster runtime performance
+# 
+#   * [ ] Add compatibility to use Octave/MATLAB and dicm2nii for file conversion
+#       * [ ] Add option to download the most recent version of dicm2nii
 
 import os
 import glob
@@ -202,7 +202,7 @@ def batch_proc(study_img_dir: str,
     # Dataset description file
     dataset_description: str = os.path.join(out_dir,'dataset_description.json')
 
-    if dataset_description:
+    if os.path.exists(dataset_description):
         log.info("Dataset description JSON file already exists in BIDS directory")
     else:
         _ = add_dataset_description(out_dir=out_dir)
