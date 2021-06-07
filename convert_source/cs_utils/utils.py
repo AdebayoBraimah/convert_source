@@ -973,16 +973,6 @@ def glob_img(img_dir: str) -> List[str]:
         tmp_list: List[str] = glob.glob(dir_search)
         img_list.extend(tmp_list)
         
-        # BUG: Need contingency for DICOM file globbing behavior
-        #   here. As written - this will just glob all DICOMs,
-        #   which is undesired behavior.
-        #
-        # GOAL: For DICOMs, glob the image directory, and append
-        #   0th index to new array/list.
-        #
-        # EDIT: Remove 'dcm' from img_types list and rely solely
-        #   glob_dcm to glob DICOMs.
-        
         tmp_list: List[str] = glob_dcm(dcm_dir=img_dir)
         img_list.extend(tmp_list)
     return img_list
@@ -1093,14 +1083,7 @@ def collect_info(parent_dir: str,
         img_list = img_exclude(img_list=img_list,
                                exclusion_list=exclusion_list)
         
-        # BUG: Create set from img_list to ensure only unique files
-        #   are processed.
-        
         for img in img_list:
-            # TODO:
-            #   * Query database and remove source image data
-            #       that has already been processed, stored, and
-            #       converted.
             db_info: Dict[str,str] = construct_db_dict(study_dir=parent_dir,
                                                         sub_id=sub,
                                                         ses_id=ses,
@@ -1123,13 +1106,6 @@ def collect_info(parent_dir: str,
                                                     ses=ses,
                                                     file_id=db_info.get('file_id',''))
                 data.append(sub_info)
-            # database: str = insert_row_db(database=database,
-            #                                 info=db_info)
-            # sub_info: SubDataInfo = SubDataInfo(sub=sub,
-            #                                     data=img,
-            #                                     ses=ses,
-            #                                     file_id=db_info.get('file_id',''))
-            # data.append(sub_info)
     return data
 
 def get_recon_mat(json_file: str) -> Union[float,str]:
