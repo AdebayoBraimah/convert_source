@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Tests for the cs_utils fileio module main classes.
 """
-
 import pytest
 
 import os

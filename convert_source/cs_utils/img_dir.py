@@ -5,8 +5,9 @@ Currently supports use with: DICOM, PAR REC, and NIFTI files.
 
 import os
 import glob
+
 from typing import(
-    List, 
+    List,
     Tuple
 )
 
@@ -14,7 +15,7 @@ from typing import(
 def id_img_file(dir_names: List[str],
                 verbose: bool = False
                 ) -> List[str]:
-    '''Creates list of file-types that either contain the label: DCM (``DICOM``), NII (``NIFTI``), PAR (``PAR REC``), or Unknown.
+    """Creates list of file-types that either contain the label: DCM (``DICOM``), NII (``NIFTI``), PAR (``PAR REC``), or Unknown.
     
     Arguments:
         dir_names: Input directory names list.
@@ -22,8 +23,7 @@ def id_img_file(dir_names: List[str],
     
     Returns:
         List of file-types that corresponds to input directory names list.
-    '''
-    
+    """
     # Init empty list
     file_types: List[str] = list()
     
@@ -55,7 +55,7 @@ def id_img_file(dir_names: List[str],
 def img_dir_list(directory: str,
                  verbose: bool = False
                  ) -> Tuple[List[str],List[str]]:
-    '''Creates list of image file directories and file-types for some parent directy. The image file directories list
+    """Creates list of image file directories and file-types for some parent directy. The image file directories list
     is a sorted list consisting of unique file paths for each image file parent directory. The corresponding file-
     types list consists of labels that are: DCM (``DICOM``), NII (``NIFTI``), PAR (``PAR REC``), or Unknown - depending on the
     file-types in the image file parent directories.
@@ -71,28 +71,27 @@ def img_dir_list(directory: str,
         Tuple:
             List of child directory names that contain image data.
             List of file-types that corresponds to directory names list.
-    '''
-    
+    """
     # Init empty list
     dir_names: List[str] = list()
 
     # Recursively iterate through all files in directory - find parent directory of image files
     if verbose:
         print("Creating list of directories...")
-    for root,dirnames,filenames in os.walk(directory):
+    for root,dirnames,filenames in os.walk(directory, topdown=True, followlinks=True):
         if len(filenames) > 0:
             for file in filenames:
                 if '._' in file:
                     # Skip hidden files if they exist.
                     continue
-                if '.dcm' in file.lower() or '.PAR' in file.upper() or '.nii' in file.lower():
-                    file_name = os.path.join(root,file)
+                if ('.dcm' in file.lower()) or ('.PAR' in file.upper()) or ('.nii' in file.lower()):
+                    file_name: str = os.path.join(root,file)
                     if '.dcm' in file.lower():
-                        dir_name = os.path.abspath(os.path.dirname(os.path.dirname(file_name)))
+                        dir_name: str = os.path.abspath(os.path.dirname(os.path.dirname(file_name)))
                     else:
-                        dir_name = os.path.abspath(os.path.dirname(file_name))
+                        dir_name: str= os.path.abspath(os.path.dirname(file_name))
                     # print(dir_name)
-                    tmp_list = [dir_name]
+                    tmp_list: List[str] = [dir_name]
                     dir_names.extend(tmp_list)
                     
     # Create sorted list of unique directory paths
@@ -112,7 +111,7 @@ def img_dir_list(directory: str,
 def list_to_file(in_list: List[str], 
                  out_file: str
                  ) -> str:
-    '''Writes some input list to some file.
+    """Writes some input list to some file.
     
     Arguments:
         in_list: List of subjects.
@@ -120,8 +119,7 @@ def list_to_file(in_list: List[str],
     
     Returns:
         Output file with list written to file.
-    '''
-
+    """
     # Write list to file
     with open(out_file, "w") as f:
         for sub in in_list:
@@ -135,7 +133,7 @@ def generate_img_list(directory: str,
                       out_prefix: str,
                       verbose: bool = False
                       ) -> Tuple[List[str],List[str],str,str]:
-    '''Generates list of image-containing directories and their corresponding image types from some parent directory. 
+    """Generates list of image-containing directories and their corresponding image types from some parent directory. 
     The full path of the child directories that contain the images are written to file, in addition to their respective
     file types. The written files will contain '.dir_list.txt' and '.type_list.txt' appended to them.
     
@@ -150,8 +148,7 @@ def generate_img_list(directory: str,
             * Corresponding file types to 'dir_names' list.
             * Output file that contains the contents of 'dir_names'.
             * Output file that contains the contents of 'file_types'.
-    '''
-    
+    """
     # Generate directories list and child directories' file types
     [dir_names,file_types] = img_dir_list(directory=directory,verbose=verbose)
     

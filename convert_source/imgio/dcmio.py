@@ -18,14 +18,14 @@ class DICOMerror(Exception):
 
 # Define function(s)
 def get_scan_time(dcm_file: str) -> Union[float,str]:
-    '''Reads the scan time from the DICOM header.
+    """Reads the scan time from the DICOM header.
 
     Arguments:
         dcm_file: DICOM file.
 
     Returns:
         Acquisition duration (scan time, in s) as a float if it exists, or an empty string otherwise.
-    '''
+    """
 
     # Load data
     ds = pydicom.dcmread(dcm_file)
@@ -40,7 +40,7 @@ def is_valid_dcm(dcm_file: str,
                  raise_exc: Optional[bool] = False, 
                  verbose: Optional[bool] = False
                  ) -> bool:
-    '''Checks for a valid DICOM file by inspecting the conversion type label in the DICOM file header.
+    """Checks for a valid DICOM file by inspecting the conversion type label in the DICOM file header.
     This field should be blank. If this label is populated, then it is likely a secondary capture image 
     and thus is not likely to contain meaningful image information.
     
@@ -54,12 +54,12 @@ def is_valid_dcm(dcm_file: str,
     
     Raises:
         DICOMerror: Error that arises if the DICOM in question is not a valid DICOM, and the 'raise_exc' option is set to True.
-    '''
+    """
 
     dcm_file: str = os.path.abspath(dcm_file)
     
     # Read DICOM file header
-    ds = pydicom.dcmread(dcm_file)
+    ds = pydicom.dcmread(dcm_file,force=True)
     
     # Invalid files include secondary image captures, and are not suitable for 
     # NIFTI conversion as they are often not converted and cause problems.
@@ -79,7 +79,7 @@ def is_valid_dcm(dcm_file: str,
         return False
 
 def get_bwpppe(dcm_file: str) -> Union[float,str]:
-    '''Reads the Bandwidth Per Pixel PhaseEncode value from a DICOM header. 
+    """Reads the Bandwidth Per Pixel PhaseEncode value from a DICOM header. 
     
     NOTE: 
         This DICOM field is usually left blank on Philips DICOM headers.
@@ -89,7 +89,7 @@ def get_bwpppe(dcm_file: str) -> Union[float,str]:
         
     Returns:
         Bandwidth Per Pixel PhaseEncode value as a float, or empty string otherwise.
-    '''
+    """
 
     dcm_file: str = os.path.abspath(dcm_file)
     
@@ -106,7 +106,7 @@ def get_bwpppe(dcm_file: str) -> Union[float,str]:
         return ""
 
 def get_red_fact(dcm_file: str) -> float:
-    '''Extracts parallel reduction factor in-plane value (GRAPPA/SENSE) from file description in the DICOM 
+    """Extracts parallel reduction factor in-plane value (GRAPPA/SENSE) from file description in the DICOM 
     header for Philips MR scanners. This reduction factor is assumed to be 1 if a value cannot be found 
     from witin the DICOM header.
     
@@ -115,7 +115,7 @@ def get_red_fact(dcm_file: str) -> float:
         
     Returns:
         Parallel reduction factor in-plane value (e.g. SENSE/GRAPPA factor), or 1.0 if not specified.
-    '''
+    """
 
     dcm_file: str = os.path.abspath(dcm_file)
 
@@ -141,7 +141,7 @@ def get_red_fact(dcm_file: str) -> float:
     return red_fact
 
 def get_mb(dcm_file: str) -> int:
-    '''Extracts multi-band acceleration factor from file description in the DICOM header for (philips MR scanners).
+    """Extracts multi-band acceleration factor from file description in the DICOM header for (philips MR scanners).
     If this information cannont be inferred from the DICOM header file description - then it is assumed to be 1.
     
     NOTE: 
@@ -152,7 +152,7 @@ def get_mb(dcm_file: str) -> int:
         
     Returns:
         Multi-band acceleration factor.
-    '''
+    """
 
     dcm_file: str = os.path.abspath(dcm_file)
 

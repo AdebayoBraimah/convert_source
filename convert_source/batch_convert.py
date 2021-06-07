@@ -3,30 +3,48 @@
 """
 
 # TODO:
-#   * Add option for renaming identified unknown files
-#   * Add file search for image files with no extensions (DICOMs)
-#   * Add doc building to CI workflow.
-#   * Replace triple single quotes (''') with triple double quotes (""")
+#   * [ ] Write integration test(s)
+#   * [ ] Separate unit and integration test(s) into different directories
+# 
+#   * [-] Add file search for image files with no extensions (DICOMs)
+#       * [-] Use is_valid_dicom function when walking through directories
+#       * NOTE: The implementation for this would require massive additions to
+#           several modules. It would actually be far easier to just rename the
+#           DICOM files and add their extensions.
+# 
+#   * [X] Add function to write dataset_description.json file
+#       * [ ] Add function to collect and construct dictionary to fill this out
+# 
+#   * [ ] Add function to download latest version of dcm2niix
+#   * [ ] Convert lists to queues for faster runtime performance
+# 
+#   * [ ] Add compatibility to use Octave/MATLAB and dicm2nii for file conversion
+#       * [ ] Add option to download the most recent version of dicm2nii
 
 import os
 import glob
 import yaml
+import pathlib
+import pandas as pd
 
 from copy import deepcopy
 from shutil import copy
 from datetime import datetime
+from tqdm import tqdm
 
 from typing import (
     List, 
     Dict, 
-    Optional, 
+    Optional,
     Union, 
-    Tuple
+    Tuple,
+    Set
 )
 
 from convert_source.cs_utils.const import (
     DEFAULT_CONFIG,
-    BIDS_PARAM
+    BIDS_PARAM,
+    DEFAULT_BIDS_VERSION
 )
 
 from convert_source.cs_utils.fileio import (
@@ -55,7 +73,8 @@ from convert_source.cs_utils.utils import (
     get_metadata,
     convert_image_data,
     dict_multi_update,
-    add_to_zeropadded
+    add_to_zeropadded,
+    list_dir_files
 )
 
 from convert_source.cs_utils.bids_info import (
@@ -69,6 +88,13 @@ from convert_source.imgio.niio import (
     get_num_frames
 )
 
+from convert_source.cs_utils.database import (
+    create_db,
+    update_table_row,
+    export_bids_scans_dataframe,
+    query_db
+)
+
 # Define function(s)
 def batch_proc(study_img_dir: str,
                out_dir: str,
@@ -79,10 +105,12 @@ def batch_proc(study_img_dir: str,
                zero_pad: int = 2,
                cprss_lvl: int = 6,
                verbose: bool = False,
+               write_participants: bool = False,
+               write_subs_scans: bool = False,
                env: Optional[Dict] = {},
                dryrun: bool = False
                ) -> Tuple[List[str]]:
-    '''Batch processes a study's source image data provided a configuration, the parent directory of the study's imaging data,
+    """Batch processes a study's source image data provided a configuration, the parent directory of the study's imaging data,
     and an output directory to place the BIDS NIFTI data.
 
     Usage example:
@@ -95,12 +123,14 @@ def batch_proc(study_img_dir: str,
         study_img_dir: Path to study image parent directory that contains all the subjects' source image data.
         out_dir: Output directory.
         config_file: Configuration file.
-        path_envs: List of directory paths to append to the system's 'PATH' variable.
+        path_envs: List of directory paths to append to the system's ``PATH`` variable.
         gzip: Gzip output NIFTI files.
         append_dwi_info: RECOMMENDED: Appends DWI acquisition information (unique non-zero b-values, and TE, in msec.) to BIDS acquisition filename.
-        zero_pad: Number of zeroes to pad the run number up to (zero_pad=2 is '01').
+        zero_pad: Number of zeroes to pad the run number up to (zero_pad=2 is ``01``).
         cprss_lvl: Compression level [1 - 9] - 1 is fastest, 9 is smallest.
         verbose: Enable verbose output.
+        write_participants: If true, writes the ``participants`` TSV and JSON files to the output BIDS directory.
+        write_subs_scans: If true, writes each subject's ``scan.tsv`` to their subject directory.
         env: Path environment dictionary.
         dryrun: Perform dryrun (creates the command, but does not execute it).
 
@@ -110,7 +140,7 @@ def batch_proc(study_img_dir: str,
             * Corresponding list of JSON sidecars.
             * Corresponding list of bval files.
             * Corresponding list of bvec files.
-    '''
+    """
     study_img_dir: str = os.path.abspath(study_img_dir)
     
     # Check dependencies
@@ -131,13 +161,36 @@ def batch_proc(study_img_dir: str,
     dt_string: str = str(now.strftime("%m_%d_%Y_%H_%M"))
 
     _log: str = os.path.join(misc_dir,f"convert_source_{dt_string}.log")
-    log: LogFile = log_file(log=_log)
+    log: LogFile = log_file(log=_log, verbose=verbose)
+
+    # Create file database
+    database: str = os.path.join(misc_dir,'convert_source.db')
+    
+    if os.path.exists(database):
+        log.info("Source image file database already exists")
+    else:
+        database: str = create_db(database=database)
+        log.info("Created source image file database")
 
     # Write bidsignore
-    _ = bids_ignore(out_dir=out_dir)
-    log.info("Init .bidsignore file")
+    ignore_file: str = os.path.join(out_dir,'.bidsignore')
 
-    log.info("Reading config file")
+    if os.path.exists(ignore_file):
+        log.info(".bidsignore file already exists")
+    else:
+        _ = bids_ignore(out_dir=out_dir)
+        log.info("Wrote .bidsignore file")
+
+    # Write README file
+    readme_file: str = os.path.join(out_dir,'README')
+
+    if os.path.exists(readme_file):
+        log.info("README file already exists in BIDS directory")
+    else:
+        _ = add_readme(out_dir=out_dir)
+        log.info("Added README file to BIDS directory")
+
+    log.info("Read configuration file")
 
     [search_dict,
      bids_search,
@@ -145,30 +198,45 @@ def batch_proc(study_img_dir: str,
      meta_dict,
      exclusion_list] = read_config(config_file=config_file,
                                    verbose=verbose)
+
+    # Dataset description file
+    dataset_description: str = os.path.join(out_dir,'dataset_description.json')
+
+    if os.path.exists(dataset_description):
+        log.info("Dataset description JSON file already exists in BIDS directory")
+    else:
+        _ = add_dataset_description(out_dir=out_dir)
+        log.info("Added dataset description JSON file to BIDS directory")
     
     # Check BIDS search and map dictionaries
     if comp_dict(d1=bids_search,d2=bids_map):
         pass
     
-    log.info("Collecting subject imaging data")
+    log.info("Collected subject imaging data")
 
     subs_data: List[SubDataInfo] = collect_info(parent_dir=study_img_dir,
-                                                exclusion_list=exclusion_list)
+                                                database=database,
+                                                exclusion_list=exclusion_list,
+                                                log=log)
 
     bids_imgs: List = []
     bids_jsons: List = []
     bids_bvals: List = []
     bids_bvecs: List = []
        
-    for sub_data in subs_data:
-        log.info(f"Processing: {sub_data.data}")
-        if verbose:
-            print(f"Processing: {sub_data.data}")
+    for sub_data in tqdm(subs_data,
+                         desc="Processing source data files",
+                         position=0,
+                         leave=True):
+        log.info(f"\n\n Processing: {sub_data.data} \n")
+
         data: str = sub_data.data
         bids_name_dict: Dict = deepcopy(BIDS_PARAM)
         bids_name_dict['info']['sub'] = sub_data.sub
+
         if sub_data.ses:
             bids_name_dict['info']['ses'] = sub_data.ses
+        
         [bids_name_dict, 
          modality_type, 
          modality_label, 
@@ -182,7 +250,7 @@ def batch_proc(study_img_dir: str,
          meta_scan_dict] = get_metadata(dictionary=meta_dict,
                                         modality_type=modality_type,
                                         task=task)
-        # Convert source data
+                                        
         try:
             [imgs,
             jsons,
@@ -190,6 +258,7 @@ def batch_proc(study_img_dir: str,
             bvecs] = data_to_bids(sub_data=sub_data,
                                 bids_name_dict=bids_name_dict,
                                 out_dir=out_dir,
+                                database=database,
                                 modality_type=modality_type,
                                 modality_label=modality_label,
                                 task=task,
@@ -214,12 +283,57 @@ def batch_proc(study_img_dir: str,
         bids_bvals.extend(bvals)
         bids_bvecs.extend(bvecs)
 
-    for i in reversed(range(0,len(bids_imgs))):
+    for i in tqdm(reversed(range(0,len(bids_imgs))),
+                  desc="Verifying converted BIDS NIFTI files",
+                  position=0,
+                  leave=True):
         if (bids_imgs[i] == "") and (bids_jsons[i] == "") and (bids_bvals[i] == "") and (bids_bvecs[i] == ""):
             bids_imgs.pop(i)
             bids_jsons.pop(i)
             bids_bvals.pop(i)
             bids_bvecs.pop(i)
+
+    unknown_bids_dir: str = os.path.join(out_dir,"unknown")
+
+    if os.path.exists(unknown_bids_dir):
+        log.info("Wrote unknown BIDS subject NIFTIs to file")
+        output_file: str = os.path.join(unknown_bids_dir,"unknown_file_map")
+
+        _ = write_unknown_to_file(bids_unknown_dir=unknown_bids_dir,
+                                out_name=output_file,
+                                yaml_file=True,
+                                json_file=True)
+
+    # Add option for writing participants and scans TSV
+    if write_participants:
+        log.info("Wrote participants.tsv to file")
+        [_,_] = create_participant_tsv(out_dir=out_dir)
+
+    if write_subs_scans:
+        log.info("Wrote each subject's scans.tsv to file")
+        subs_list: List[str] = list_dir_files(pathname=out_dir,
+                                            pattern="sub-*",
+                                            file_name_only=True)
+        subs_list: List[str] = [ x.replace('sub-','') for x in subs_list ]
+
+        for sub in tqdm(subs_list,
+                        desc="Writing scan files",
+                        position=0,
+                        leave=True):
+            df: pd.DataFrame = export_bids_scans_dataframe(database=database,
+                                                        sub_id=sub,
+                                                        search_dict=search_dict,
+                                                        gzipped=gzip)
+            if len(df) == 0:
+                pass
+            else:
+                out_name: str = os.path.join(out_dir,f'sub-{sub}',f'sub-{sub}' + '_scans.tsv')
+                df.to_csv(out_name,
+                        sep='\t',
+                        na_rep='',
+                        index=False,
+                        mode="w",
+                        encoding='utf-8')
 
     return (bids_imgs,
             bids_jsons,
@@ -229,13 +343,13 @@ def batch_proc(study_img_dir: str,
 def read_config(config_file: Optional[str] = "", 
                 verbose: Optional[bool] = False
                 ) -> Tuple[Dict[str,str],Dict,Dict,Dict,List[str]]:
-    '''Reads configuration file and creates a dictionary of search terms for 
+    """Reads configuration file and creates a dictionary of search terms for 
     each modality provided that each BIDS modality is used as a key via the 
-    keyword 'modality_search'. Should BIDS related parameter descriptions need 
+    keyword ``modality_search``. Should BIDS related parameter descriptions need 
     to be used when renaming files, the related search and mapping terms can included 
-    via the keywords 'bids_search' and 'bids_map', respectively. If these keywords 
+    via the keywords ``bids_search`` and ``bids_map``, respectively. If these keywords 
     are not specified, then empty dictionaries are returned. Should exclusions be provided 
-    (via the key 'exclude') then an exclusion list is created. Should this not be provided, 
+    (via the key ``exclude``) then an exclusion list is created. Should this not be provided, 
     then an empty list is returned.
 
     BIDS modalities:
@@ -265,7 +379,7 @@ def read_config(config_file: Optional[str] = "",
     
     Raises:
         ConfigFileReadError: Error that arises if no heuristic search terms are provided.
-    '''
+    """
     class ConfigFileReadError(Exception):
         pass
 
@@ -346,7 +460,7 @@ def bids_id(s:str,
             task: Optional[str] = "",
             mod_found: bool = False
            ) -> Tuple[Dict[str,str],str,str,str]:
-    '''Performs identification of descriptive BIDS information relevant for file naming, provided
+    """Performs identification of descriptive BIDS information relevant for file naming, provided
     a BIDS search dictionary and a BIDS map dictionary. The resulting information is then placed
     in nested dictionary of BIDS related descriptive terms.
     
@@ -372,7 +486,7 @@ def bids_id(s:str,
             * Modality type.
             * Modality label.
             * Task label.
-    '''
+    """
     search_arr: List[str] = list_dict(d=search_dict)
     
     if os.path.exists(s) and parent_dir:
@@ -472,8 +586,8 @@ def _gather_bids_name_args(bids_name_dict: Dict,
                            modality_type: str,
                            param: str
                           ) -> Union[str,bool]:
-    '''Helper function that gathers BIDS naming description arguments for the `construct_bids_name` function. In the case that 'fmap' is passed as the 
-    'modality_type' argument, then the 'param' argument must be either: 'mag2', 'case1', 'case2', 'case3', or 'case4'.
+    """Helper function that gathers BIDS naming description arguments for the ``construct_bids_name`` function. In the case that ``fmap`` is passed as the 
+    ``modality_type`` argument, then the ``param`` argument must be either: ``mag2``, ``case1``, ``case2``, ``case3``, or ``case4``.
     
     Usage example:
         >>> param_name = _gather_bids_name_args(bids_dict,
@@ -487,8 +601,8 @@ def _gather_bids_name_args(bids_name_dict: Dict,
         param: BIDS parameter description.
     
     Returns:
-        String from the BIDS name description dictionary if it exists, or an empty string otherwise. In the case of 'fmap', then a boolean value is returned.
-    '''
+        String from the BIDS name description dictionary if it exists, or an empty string otherwise. In the case of ``fmap``, then a boolean value is returned.
+    """
     if modality_type.lower() == 'fmap' and (param == "case1" or param == "mag2" or param == "case2" or param == "case3" or param == "case4"):
         if param == 'mag2':
             param = 'case1'
@@ -525,7 +639,7 @@ def _gather_bids_name_args(bids_name_dict: Dict,
 def _get_bids_name_args(bids_name_dict: Dict,
                         modality_type: str
                         ) -> Tuple[str,bool]:
-    '''Helper function that wraps the funciton `_gather_bids_name_args`.
+    """Helper function that wraps the funciton ``_gather_bids_name_args``.
     
     Usage example:
         >>> param_tuple = _get_bids_name_args(bids_dict,
@@ -549,7 +663,7 @@ def _get_bids_name_args(bids_name_dict: Dict,
             * case2: bool, fieldmap BIDS case 2.
             * case3: bool, fieldmap BIDS case 3.
             * case4: bool, fieldmap BIDS case 4.
-    '''
+    """
     task: str = ""
     acq: str = ""
     ce: str = ""
@@ -580,7 +694,7 @@ def _get_bids_name_args(bids_name_dict: Dict,
 def make_bids_name(bids_name_dict: Dict,
                     modality_type: str
                    ) -> Tuple[str,str,str,str]:
-    '''Creates a BIDS compliant filename given a BIDS name description dictionary, and the modality type.
+    """Creates a BIDS compliant filename given a BIDS name description dictionary, and the modality type.
 
     Usage example:
         >>> make_bids_name(bids_name_dict=bids_dict,
@@ -594,7 +708,7 @@ def make_bids_name(bids_name_dict: Dict,
 
     Returns:
         BIDS compliant filename string.
-    '''
+    """
     
     bids_keys: List[str] = list(bids_name_dict[modality_type].keys())
     
@@ -709,6 +823,7 @@ def make_bids_name(bids_name_dict: Dict,
 def source_to_bids(sub_data: SubDataInfo,
                    bids_name_dict: Dict,
                    out_dir: str,
+                   database: str,
                    modality_type: Optional[str] = "",
                    modality_label: Optional[str] = "",
                    task: Optional[str] = "",
@@ -723,12 +838,13 @@ def source_to_bids(sub_data: SubDataInfo,
                    env: Optional[Dict] = {},
                    dryrun: bool = False
                    ) -> Tuple[List[str],List[str],List[str],List[str]]:
-    '''Converts source data to BIDS raw data.
+    """Converts source data to BIDS raw data.
     
     Usage example:
         >>> [imgs, jsons, bvals, bvecs] = source_to_bids(sub_obj,
         ...                                              bids_name_dict,
         ...                                              output_dir,
+        ...                                              database,
         ...                                              'anat',
         ...                                              'T1w')
         ...
@@ -737,6 +853,7 @@ def source_to_bids(sub_data: SubDataInfo,
         sub_data: Subject data information object.
         bids_name_dict: BIDS name dictionary.
         out_dir: Output directory.
+        database: Input database filename to be queried and updated.
         modality_type: Modality type (BIDS label e.g. 'anat', 'func', etc).
         modality_label: Modality label (BIDS label  e.g. 'T1w', 'bold', etc).
         task: Task label (BIDS filename task label, e.g. 'rest', 'nback', etc.)
@@ -757,7 +874,7 @@ def source_to_bids(sub_data: SubDataInfo,
             * List of corresponding JSON (sidecar) file(s). Empty string is returned if this file does not exist.
             * List of corresponding FSL-style bval file(s). Empty string is returned if this file does not exist.
             * List of corresponding FSL-style bvec file(s). Empty string is returned if this file does not exist.
-    '''
+    """
     sub: Union[int,str] = sub_data.sub
     ses: Union[int,str] = sub_data.ses
     data: str = sub_data.data
@@ -959,6 +1076,12 @@ def source_to_bids(sub_data: SubDataInfo,
                 jsons: List[str] = []
                 bvals: List[str] = []
                 bvecs: List[str] = []
+
+                # Update database
+                database: str = update_table_row(database=database,
+                                                prim_key=sub_data.file_id,
+                                                table_name='bids_name',
+                                                value=bids_names[0])
                 
                 for i in range(0,len(img_data.imgs)):
                     out_name: str = ""
@@ -1002,11 +1125,18 @@ def source_to_bids(sub_data: SubDataInfo,
                         bvecs)
             except ConversionError:
                 tmp.rm_tmp_dir()
+
+                # Update database
+                database: str = update_table_row(database=database,
+                                                prim_key=sub_data.file_id,
+                                                table_name='bids_name',
+                                                value="NIFTI FILE CONVERSION FAILED")
                 return [""],[""],[""],[""]
 
 def nifti_to_bids(sub_data: SubDataInfo,
                   bids_name_dict: Dict,
                   out_dir: str,
+                  database: str,
                   modality_type: Optional[str] = "",
                   modality_label: Optional[str] = "",
                   task: Optional[str] = "",
@@ -1017,7 +1147,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
                   zero_pad: int = 2,
                   cprss_lvl: int = 6
                   ) -> Tuple[List[str],List[str],List[str],List[str]]:
-    '''Converts existing NIFTI data to BIDS raw data.
+    """Converts existing NIFTI data to BIDS raw data.
     
     Usage example:
         >>> [imgs, jsons, bvals, bvecs] = nifti_to_bids(sub_obj,
@@ -1031,6 +1161,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
         sub_data: Subject data information object.
         bids_name_dict: BIDS name dictionary.
         out_dir: Output directory.
+        database: Input database filename to be queried and updated.
         modality_type: Modality type (BIDS label e.g. 'anat', 'func', etc).
         modality_label: Modality label (BIDS label  e.g. 'T1w', 'bold', etc).
         task: Task label (BIDS filename task label, e.g. 'rest', 'nback', etc.)
@@ -1047,7 +1178,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
             * List of corresponding JSON (sidecar) file(s). Empty string is returned if this file does not exist.
             * List of corresponding FSL-style bval file(s). Empty string is returned if this file does not exist.
             * List of corresponding FSL-style bvec file(s). Empty string is returned if this file does not exist.
-    '''
+    """
     sub: Union[int,str] = sub_data.sub
     ses: Union[int,str] = sub_data.ses
     data: str = sub_data.data
@@ -1232,6 +1363,12 @@ def nifti_to_bids(sub_data: SubDataInfo,
             jsons: List[str] = []
             bvals: List[str] = []
             bvecs: List[str] = []
+
+            # Update database
+            database: str = update_table_row(database=database,
+                                            prim_key=sub_data.file_id,
+                                            table_name='bids_name',
+                                            value=bids_names[0])
             
             for i in range(0,len(img_data.imgs)):
                 out_name: str = os.path.join(out_data_dir,bids_names[i])
@@ -1284,6 +1421,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
 def data_to_bids(sub_data: SubDataInfo,
                  bids_name_dict: Dict,
                  out_dir: str,
+                 database: str,
                  modality_type: Optional[str] = "",
                  modality_label: Optional[str] = "",
                  task: Optional[str] = "",
@@ -1298,13 +1436,14 @@ def data_to_bids(sub_data: SubDataInfo,
                  env: Optional[Dict] = {},
                  dryrun: bool = False
                  ) -> Tuple[List[str],List[str],List[str],List[str]]:
-    '''Converts source data to BIDS compliant data. This functions also
+    """Converts source data to BIDS compliant data. This functions also
     renames already existing NIFTI data so that it can be BIDS compliant.
     
     Usage example:
         >>> [imgs, jsons, bvals, bvecs] = data_to_bids(sub_obj,
         ...                                            bids_name_dict,
         ...                                            output_dir,
+        ...                                            database,
         ...                                            'anat',
         ...                                            'T1w')
         ...
@@ -1313,6 +1452,7 @@ def data_to_bids(sub_data: SubDataInfo,
         sub_data: Subject data information object.
         bids_name_dict: BIDS name dictionary.
         out_dir: Output directory.
+        database: Input database filename to be queried and updated.
         modality_type: Modality type (BIDS label e.g. 'anat', 'func', etc).
         modality_label: Modality label (BIDS label  e.g. 'T1w', 'bold', etc).
         task: Task label (BIDS filename task label, e.g. 'rest', 'nback', etc.)
@@ -1333,7 +1473,7 @@ def data_to_bids(sub_data: SubDataInfo,
             * List of corresponding JSON (sidecar) file(s). Empty string is returned if this file does not exist.
             * List of corresponding FSL-style bval file(s). Empty string is returned if this file does not exist.
             * List of corresponding FSL-style bvec file(s). Empty string is returned if this file does not exist.
-    '''
+    """
     if ('.dcm' in sub_data.data.lower()) or ('.par' in sub_data.data.lower()):
         [imgs,
          jsons,
@@ -1341,6 +1481,7 @@ def data_to_bids(sub_data: SubDataInfo,
          bvecs] = source_to_bids(sub_data=sub_data,
                                  bids_name_dict=bids_name_dict,
                                  out_dir=out_dir,
+                                 database=database,
                                  modality_type=modality_type,
                                  modality_label=modality_label,
                                  task=task,
@@ -1365,6 +1506,7 @@ def data_to_bids(sub_data: SubDataInfo,
          bvecs] = nifti_to_bids(sub_data=sub_data,
                                 bids_name_dict=bids_name_dict,
                                 out_dir=out_dir,
+                                database=database,
                                 modality_type=modality_type,
                                 modality_label=modality_label,
                                 task=task,
@@ -1379,11 +1521,16 @@ def data_to_bids(sub_data: SubDataInfo,
                 bvals,
                 bvecs)
     else:
+        # Update database
+        database: str = update_table_row(database=database,
+                                        prim_key=sub_data.file_id,
+                                        table_name='bids_name',
+                                        value="NIFTI FILE CONVERSION FAILED")
         return [""],[""],[""],[""]
 
 
 def bids_ignore(out_dir: str) -> str:
-    '''Writes '.bidsignore' file. This file functions 
+    """Writes ``.bidsignore`` file. This file functions 
     similarly to the '.gitignore' file.
 
     Usage example:
@@ -1393,8 +1540,8 @@ def bids_ignore(out_dir: str) -> str:
         out_dir: Output directory to place the file.
 
     Returns:
-        String of the file path to the '.bidsignore' file.
-    '''
+        String of the file path to the ``.bidsignore`` file.
+    """
     if os.path.exists(out_dir):
         out_dir: str = os.path.abspath(out_dir)
     else:
@@ -1407,11 +1554,11 @@ def bids_ignore(out_dir: str) -> str:
     with File(new_file) as f:
         f.write_txt(".misc/* \n")
         f.write_txt("unknown/* \n")
-    
     return new_file
 
-def log_file(log: str) -> LogFile:
-    '''Initializes log file object for logging purposes.
+def log_file(log: str,
+            verbose: bool = False) -> LogFile:
+    """Initializes log file object for logging purposes.
 
     Usage example:
         >>> logger = log(log_file)
@@ -1421,77 +1568,600 @@ def log_file(log: str) -> LogFile:
         
     Arguments:
         log: Log file name.
+        verbose: Permits verbose logging to screen (stdout).
 
     Returns:
         LogFile object to be logged to.
-    '''
+    """
     from convert_source import __version__
 
-    log: LogFile = LogFile(log_file=log)
+    log: LogFile = LogFile(log_file=log, print_to_screen=verbose)
 
     now = datetime.now()
     dt_string = now.strftime("%A %B %d, %Y %H:%M:%S")
+    dcm2niix_version: str = get_dcm2niix_version()
 
-    log.info(dt_string)
+    log.info(f"convert_source start: {dt_string}")
     log.info(f"convert_source v{__version__}")
-
+    log.info(f"dcm2niix {dcm2niix_version}")
     return log
 
-# This function was added for the Mac OS X case in which hidden
-# temporary indexing files are present throughout a given directory.
-#
-# This function was designed to handle that use case, however:
-#
-# * Implementation methods are currently unclear
-# * This approach is VERY SLOW as each parent directory is recursively searched.
-#
-# Moreover, this should be included in a later release should this continue to be an
-# issue moving forward.
-#
-# Adebayo Braimah - 12 March 2021
-#
-# def dir_clean_up(directory: str) -> str:
-#     '''Removes temporary indexing files (commonly found on
-#     Mac OS X).
-#
-#     These files are generally problematic as they cause several of
-#     ``convert_source``'s core functions to behave unpredictably.
-#
-#     Any identified tempoary indexing files are removed.
-#
-#     NOTE: The implementation here does work, but is VERY SLOW as the number of 
-#         files and directories is assumed to be large.
-#    
-#     Usage example:
-#         >>> directory = dir_clean_up(directory)
-#         >>>
-#        
-#     Arguments:
-#         directory: Input parent directory to recursively search (for hidden files in).
-#
-#     Returns:
-#         Absolute path to directory as a string.
-#     '''
-#     from shutil import rmtree
-#
-#     if os.path.exists(directory):
-#         directory = os.path.abspath(directory)
-#     else:
-#         raise FileNotFoundError("Input directory does not appear to exist.")
-#
-#     # This works - but is slow | O(n) space and time
-#     for root,dirnames,filenames in os.walk(directory):
-#         if len(dirnames) > 0:
-#             for dirname in dirnames:
-#                 if '._' in dirname:
-#                     hd_name: str = os.path.join(root,dirname)
-#                     rmtree(hd_name)
-#                     print(hd_name)
-#         if len(filenames) > 0:
-#             for file in filenames:
-#                 if '._' in file:
-#                     hf_name: str = os.path.join(root,file)
-#                     # hf_list.append(hf_name)
-#                     os.remove(hf_name)
-#                     print(hf_name)
-#     return directory
+def get_dcm2niix_version() -> str:
+    """Gets the version of ``dcm2niix`` being used on the current OS. 
+
+    This function assumes that dependency checks have already been performed, and that ``dcm2niix`` is in the system path.
+
+    Usage example:
+        >>> dcm_cmd = Command("dcm2niix)
+        >>> dcm.check_dependency(
+        ...         path_envs=[ '/<path>/<to>/<dcm2niix>' ])
+        ...
+        >>> dcm_version = get_dcm2niix_version()
+        >>> dcm_version
+        'v1.0.20201102'
+
+    Returns:
+        ``dcm2niix`` version used on the current OS.
+    """
+    dcm_ver_txt: str = os.path.join(os.getcwd(),'dcm2niix.version.txt')
+    dcm_ver_err: str = os.path.join(os.getcwd(),'dcm2niix.version.err')
+
+    dcm: Command = Command("dcm2niix")
+    dcm.cmd_list.append("--version")
+    dcm.run(stdout=dcm_ver_txt)
+
+    print("\n\n Disregard 'Failed with returncode 3' message - this message arises when obtaining dcm2niix's version. \n")
+
+    with open(dcm_ver_txt,'r') as f:
+        lines = f.readlines()
+        lines = [ x.strip('\n') for x in lines ]
+        f.close()
+    
+    os.remove(dcm_ver_txt)
+    os.remove(dcm_ver_err)
+    return lines[1]
+
+def write_unknown_to_file(bids_unknown_dir: str,
+                        out_name: str,
+                        yaml_file: bool = True,
+                        json_file: bool = False
+                        ) -> Tuple[List[str],str,str]:
+    """Writes unknown BIDS NIFTIs to either a YAML or JSON file to later be identified and renamed to be BIDS compatible.
+    If both the ``yaml_file`` and ``json_file`` options are false, an exception is raised.
+
+    NOTE: 
+        The ``out_name`` argument should only have the file name provided, and not the absolute path, as the ``bids_unknown_dir`` 
+        path is pre-pended to ``out_name``.
+
+    Usage example:
+        >>> [ unknown_list, yml_file, json_file ] = write_unknown_to_file(bids_unknown_dir='<BIDS rawdata directory>/unknown',
+        ...                                                               out_name='unknown',
+        ...                                                               yaml_file=True,
+        ...                                                               json_file=False)
+        ...
+
+    Arguments:
+        bids_unknown_dir: Unknown BIDS directory that contains unknown BIDS files.
+        out_name: Output file prefix (i.e. no file extension).
+        yaml_file: If true, writes the output file as a YAML file.
+        json_file: If true, writes the output file as a JSON file.
+
+    Returns:
+        Tuple that consists of:
+            * List of unknown BIDS NIFTI files.
+            * Output YAML file.
+            * Output JSON file.
+
+    Raises:
+        FileNotFoundError: Error that arises if the specified unknown BIDS directory does not exist.
+        NameError: Error that arises if both YAML and JSON output options are set to false.
+    """
+    if os.path.exists(bids_unknown_dir):
+        pass
+    else:
+        raise FileNotFoundError("The specified unknown BIDS directory does not exist.")
+    
+    if (not yaml_file) and (not json_file):
+        raise NameError("Both JSON and YAML options are set to false.")
+
+    unknown_bids: List[str] = list_dir_files(pathname=bids_unknown_dir,
+                                            pattern="*.nii*",
+                                            file_name_only=True)
+
+    unknown_dict: Dict = {}
+
+    for nii_file in unknown_bids:
+        tmp_dict: Dict[str,str] = {
+            nii_file: 
+            {
+                'modality_type':'',
+                'modality_label':''
+            }
+        }
+        unknown_dict.update(tmp_dict)
+
+    if yaml_file:
+        output_yaml: str = out_name + ".yml"
+        with open(output_yaml, 'w') as outfile:
+            yaml.dump(unknown_dict, 
+                    outfile, 
+                    default_flow_style=False,
+                    sort_keys=True)
+    else:
+        output_yaml: str = ""
+
+    if json_file:
+        output_json: str = out_name + ".json"
+        output_json: str = write_json(json_file=output_json,
+                                    dictionary=unknown_dict)
+    else:
+        output_json: str = ""
+    
+    return (unknown_bids, 
+            output_yaml, 
+            output_json)
+
+def add_dataset_description(out_dir: str) -> str:
+    """Adds the ``dataset_description.json`` (dataset description JSON) file to some BIDS data directory.
+    This is essentially meant to function as a boiler plate dataset_description template.
+
+    NOTE:
+        This template was obtained from: https://bids-specification.readthedocs.io/en/v1.6.0/03-modality-agnostic-files.html#dataset-description
+        Boiler plate dataset_description template.
+    
+    Usage example:
+        >>> ds_json = add_dataset_description(out_dir='<path>/<to>/<BIDS>')
+
+    Arguments:
+        out_dir: Output BIDS directory.
+
+    Returns:
+        File path to dataset_description.json file as a string.
+    """
+    # TODO:
+    #   * Function that constructs dictionary for dataset descrtption
+    #       * Perhaps have it read in through config file.
+    data: Dict[str,str] = {
+        "Name":"",
+        "BIDSVersion": DEFAULT_BIDS_VERSION,
+        "HEDVersion":"",
+        "DatasetType":"raw",
+        "License":"",
+        "Authors":[
+            "Author 1",
+            "Author 2",
+            "Author 3"
+        ],
+        "Acknowledgements":"",
+        "HowToAcknowledge":"",
+        "Funding":[
+            "Funding source 1",
+            "Funding source 2"
+        ],
+        "EthicsApprovals":[
+            "IRB 1",
+            "IRB 2"
+        ],
+       "ReferencesAndLinks":[
+           "Link 1",
+           "Link 2",
+           "Reference 1",
+           "Reference 2"
+       ],
+       "DatasetDOI":""
+    }
+
+    output_json: str = os.path.join(out_dir,'dataset_description.json')
+
+    output_json: str = write_json(json_file=output_json,
+                                  dictionary=data)
+    return output_json
+
+def create_participant_tsv(out_dir: str) -> Tuple[str,str]:
+    """Creates or appends/updates the participants TSV file (``participants.tsv``).
+    If the participants TSV file does not exist at runtime, then it is created. 
+    Additionally, the participant JSON file is created. 
+    However once created, it is not updated (as this is intended to be maintained by the user).
+
+    More information can be obtained from: https://bids-specification.readthedocs.io/en/stable/03-modality-agnostic-files.html#participants-file
+
+    Usage example:
+        >>> [participant_tsv,
+        ...  participant_json] = create_participant_tsv(out_dir="<path>/<to>/<BIDS>/<directory>")
+
+    Arguments:
+        out_dir: BIDS output directory.
+
+    Returns:
+        Tuple of strings that consist of:
+            * Absolute file path to the participants TSV file (``participants.tsv``)
+            * Absolute file path to the participants JSON file (``participants.json``)
+    """
+    participant_tsv: str = os.path.join(out_dir,'participant.tsv')
+    participant_json: str = os.path.join(out_dir,'participant.json')
+
+    if os.path.exists(participant_json):
+        pass
+    else:
+        data: Dict[str,str] = {
+            "age": {
+                "Description": "age of participant",
+                "Units": "years"
+            },
+            "sex": {
+                "Description": "sex of the participant as reported by the participant",
+                "Levels": {
+                    "F": "female",
+                    "M": "male"
+                }
+            },
+            "handedness": {
+                "Description": "handedness of the participant as reported by the participant",
+                "Levels": {
+                    "A": "ambidextrous",
+                    "L": "left",
+                    "R": "right"
+                }
+            },
+            "group": {
+                "Description": "experimental group the participant belonged to",
+                "Levels": {
+                    "control": "Control group",
+                    "patient": "Patient group"
+                }
+            }
+        }
+        
+        participant_json: str = write_json(json_file=participant_json,
+                                        dictionary=data)
+        
+    if os.path.exists(participant_tsv):
+        df_old: pd.DataFrame = pd.read_csv(participant_tsv, sep='\t')
+        keys: List[str] = list(df_old.columns)
+
+        subs_set: Set[str] = set(list_dir_files(pathname=out_dir,
+                                                pattern="sub-*",
+                                                file_name_only=True))
+        tmp_set: Set[str] = set(list(df_old['participant_id']))
+        tmp_list: List[str] = list(subs_set.difference(tmp_set))
+
+        df_tmp: pd.DataFrame = pd.DataFrame(columns=keys)
+        df_tmp['participant_id'] = tmp_list
+        df_new: pd.DataFrame = pd.concat([df_old,df_tmp],
+                                        axis=0)
+        df_new: pd.DataFrame = df_new.reset_index()
+        df_new: pd.DataFrame = df_new.drop(columns=['index'])
+        df_new.sort_values(by='participant_id',
+                            axis=0,
+                            inplace=True)
+        df_new.to_csv(participant_tsv,
+                        sep='\t',
+                        na_rep='',
+                        index=False,
+                        mode='w',
+                        encoding='utf-8')
+        return participant_tsv, participant_json
+    else:
+        subs_list: List[str] = list_dir_files(pathname=out_dir,
+                                            pattern="sub-*",
+                                            file_name_only=True)
+        df: pd.DataFrame = pd.DataFrame(columns=[
+                                        'participant_id',
+                                        'age',
+                                        'sex',
+                                        'handedness',
+                                        'group'])
+        df['participant_id'] = subs_list
+        df.to_csv(participant_tsv,
+                    sep='\t',
+                    na_rep='',
+                    index=False,
+                    mode="w",
+                    encoding='utf-8')
+        return participant_tsv, participant_json
+
+def read_unknown_subs(mapfile: str,
+                      config: Optional[str] = "",
+                      cprss_lvl: int = 6,
+                      verbose: bool = False
+                      ) -> str:
+    """Reads the input JSON or YAML mapfile for unknown BIDS NIFTI files.
+
+    NOTE:
+        Use of this functions requires that the function ``batch_proc`` has already been run.
+
+    Usage example:
+        >>> subs_bids_data = read_unknown_subs(mapfile)
+
+    Arguments:
+        mapfile: JSON or YAML mapfile that specifies the ``modality_type`` and ``modality_label``.
+        config: Configuration file with search terms.
+        cprss_lvl: Compression level [1 - 9] - 1 is fastest, 9 is smallest.
+        verbose: Enable verbose output.
+
+    Returns:
+        Tuple of lists that consists of: 
+            * List of NIFTI images.
+            * Corresponding list of JSON sidecars.
+            * Corresponding list of bval files.
+            * Corresponding list of bvec files.
+    """
+    mapfile: str = os.path.abspath(mapfile)
+
+    out_dir: str = os.path.join(str(pathlib.Path(os.path.abspath(mapfile)).parents[1]))
+    unknown_dir: str = os.path.join(str(pathlib.Path(os.path.abspath(mapfile)).parents[0]))
+    misc_dir: str = os.path.join(str(pathlib.Path(os.path.abspath(mapfile)).parents[1]),'.misc')
+
+    now = datetime.now()
+    dt_string: str = str(now.strftime("%m_%d_%Y_%H_%M"))
+
+    _log: str = os.path.join(misc_dir,f"convert_source_{dt_string}.log")
+    log: LogFile = log_file(log=_log, verbose=verbose)
+
+    log.log("Accessed database.")
+    database: str = os.path.join(misc_dir,'convert_source.db')
+
+    if config:
+        pass
+    else:
+        config: str = DEFAULT_CONFIG
+
+    if ('.yml' in mapfile) or ('.yaml' in mapfile):
+        with open(mapfile) as f:
+            data: Dict[str,str] = yaml.safe_load(f)
+            f.close()
+    elif '.json' in mapfile:
+        data: Dict[str,str] = read_json(json_file=mapfile)
+
+    bids_imgs: List = []
+    bids_jsons: List = []
+    bids_bvals: List = []
+    bids_bvecs: List = []
+
+    for key,items in data.items():
+        modality_type: str = items.get('modality_type','')
+        modality_label: str = items.get('modality_label','')
+
+        if modality_type and modality_label:
+
+            if '.nii.gz' in key:
+                ext: str = '.nii.gz'
+                gzip: bool = True
+            else:
+                ext: str = '.nii'
+                gzip: bool = False
+            
+            if os.path.exists(os.path.join(unknown_dir,key)):
+                log.log(f"Processing: {key}")
+            else:
+                log.log(f"File not found: {key}.")
+                continue
+
+            sql_val: str = key.replace(ext,'')
+
+            file_id: str = query_db(database=database, table='bids_name', prim_key='bids_name', column='file_id', value=sql_val)
+            sub_id: str = query_db(database=database, table='sub_id', prim_key='file_id', value=file_id)
+            ses_id: str = query_db(database=database, table='ses_id', prim_key='file_id', value=file_id)
+
+            [search_dict,_,_,_,_] = read_config(config_file=config,verbose=verbose)
+
+            sub_data: SubDataInfo = SubDataInfo(sub=sub_id,
+                                                ses=ses_id,
+                                                data=os.path.join(unknown_dir,key),
+                                                file_id=file_id)
+            data: str = sub_data.data
+            bids_name_dict: Dict = deepcopy(BIDS_PARAM)
+            bids_name_dict['info']['sub'] = sub_data.sub
+
+            if sub_data.ses:
+                bids_name_dict['info']['ses'] = sub_data.ses
+            
+            [bids_name_dict, 
+            modality_type, 
+            modality_label, 
+            _] = bids_id(s=data,
+                         search_dict=search_dict,
+                         modality_type=modality_type,
+                         modality_label=modality_label,
+                         bids_name_dict=bids_name_dict,
+                         mod_found=True)
+
+            [imgs,
+            jsons,
+            bvals,
+            bvecs] = nifti_to_bids(sub_data=sub_data,
+                                   bids_name_dict=bids_name_dict,
+                                   out_dir=out_dir,
+                                   database=database,
+                                   modality_type=modality_type,
+                                   modality_label=modality_label,
+                                   cprss_lvl=cprss_lvl,
+                                   gzip=gzip)
+
+            log.log(f"Converted: {key} -> {imgs[0]}")
+
+            bids_imgs.extend(imgs)
+            bids_jsons.extend(jsons)
+            bids_bvals.extend(bvals)
+            bids_bvecs.extend(bvecs)
+
+    return (imgs,
+            jsons,
+            bvals,
+            bvecs)
+
+def add_readme(out_dir: str) -> str:
+    """Adds a BIDS README file to some output BIDS directory.
+
+    NOTE: 
+        README template obtained from: https://github.com/bids-standard/bids-starter-kit/tree/master/templates
+
+    Usage example:
+        >>> readme_file = add_readme(out_dir='<path>/<to>/<BIDS>/<directory>')
+
+    Arguments:
+        out_dir: BIDS output directory for the README file.
+
+    Returns:
+        Absolute file path to README file.
+    """
+    read_me_txt: str = """# README
+
+The README is usually the starting point for researchers using your data
+and serves as a guidepost for users of your data. A clear and informative
+README makes your data much more usable.
+
+In general you can include information in the README that is not captured by some other
+files in the BIDS dataset (dataset_description.json, events.tsv, ...).
+
+It can also be useful to also include information that might already be 
+present in another file of the dataset but might be important for users to be aware of 
+before preprocessing or analysing the data.
+
+If the README gets too long you have the possibility to create a `/doc` folder
+and add it to the `.bidsignore` file to make sure it is ignored by the BIDS validator.
+
+More info here: https://neurostars.org/t/where-in-a-bids-dataset-should-i-put-notes-about-individual-mri-acqusitions/17315/3
+
+## Details related to access to the data
+
+- [ ] Data user agreement
+
+If the dataset requires a data user agreement, link to the relevant information.
+
+- [ ] Contact person
+
+Indicate the name and contact details (email and ORCID) of the person responsible for additional information.
+
+- [ ] Practical information to access the data
+
+If there is any special information related to access rights or 
+how to download the data make sure to include it. 
+For example, if the dataset was curated using datalad, 
+make sure to include the relevant section from the datalad handbook:
+http://handbook.datalad.org/en/latest/basics/101-180-FAQ.html#how-can-i-help-others-get-started-with-a-shared-dataset
+
+## Overview
+
+- [ ] Project name (if relevant)
+
+- [ ] Year(s) that the project ran
+
+If no `scans.tsv` is included, this could at least cover when the data acquisition 
+starter and ended. Local time of day is particularly relevant to subject state.
+
+- [ ] Brief overview of the tasks in the experiment
+
+A paragraph giving an overview of the experiment. This should include the 
+goals or purpose and a discussion about how the experiment tries to achieve
+these goals.
+
+- [ ] Description of the contents of the dataset
+
+An easy thing to add is the output of the bids-validator that describes what type of 
+data and the number of subject one can expect to find in the dataset. 
+
+- [ ] Independent variables
+
+A brief discussion of condition variables (sometimes called contrasts
+or independent variables) that were varied across the experiment.
+
+- [ ] Dependent variables
+
+A brief discussion of the response variables (sometimes called the
+dependent variables) that were measured and or calculated to assess
+the effects of varying the condition variables. This might also include
+questionnaires administered to assess behavioral aspects of the experiment.
+
+- [ ] Control variables
+
+A brief discussion of the control variables --- that is what aspects 
+were explicitly controlled in this experiment. The control variables might 
+include subject pool, environmental conditions, set up, or other things 
+that were explicitly controlled.
+
+- [ ] Quality assessment of the data
+
+Provide a short summary of the quality of the data ideally with descriptive statistics if relevant
+and with a link to more comprehensive description (like with MRIQC) if possible.
+
+## Methods  
+
+### Subjects
+
+A brief sentence about the subject pool in this experiment.
+
+Remember that `Control` or `Patient` status should be defined in the `participants.tsv`
+using a group column.
+
+- [ ] Information about the recruitment procedure
+- [ ] Subject inclusion criteria (if relevant)
+- [ ] Subject exclusion criteria (if relevant)
+ 
+### Apparatus
+
+A summary of the equipment and environment setup for the
+experiment. For example, was the experiment performed in a shielded room
+with the subject seated in a fixed position.
+
+### Initial setup
+
+A summary of what setup was performed when a subject arrived.
+
+### Task organization
+
+How the tasks were organized for a session.
+This is particularly important because BIDS datasets usually have task data
+separated into different files.) 
+
+- [ ] Was task order counter-balanced?
+- [ ] What other activities were interspersed between tasks?  
+
+- [ ] In what order were the tasks and other activities performed? 
+
+### Task details
+
+As much detail as possible about the task and the events that were recorded. 
+
+### Additional data acquired
+
+A brief indication of data other than the
+imaging data that was acquired as part of this experiment. In addition
+to data from other modalities and behavioral data, this might include
+questionnaires and surveys, swabs, and clinical information. Indicate
+the availability of this data.
+
+This is especially relevant if the data are not included in a `phenotype` folder.
+https://bids-specification.readthedocs.io/en/stable/03-modality-agnostic-files.html#phenotypic-and-assessment-data
+
+### Experimental location
+
+This should include any additional information regarding the 
+the geographical location and facility that cannot be included
+in the relevant json files.
+
+### Missing data
+
+Mention something if some participants are missing some aspects of the data.
+This can take the form of a processing log and/or abnormalities about the dataset. 
+
+Some examples:
+
+- A brain lesion or defect only present in one participant
+- Some experimental conditions missing on a given run for a participant because
+  of some technical issue.
+- Any noticeable feature of the data for certain participants
+- Differences (even slight) in protocol for certain participants.
+
+### Notes
+
+Any additional information or pointers to information that
+might be helpful to users of the dataset. Include qualitative information 
+related to how the data acquisition went.
+    """
+    readme_file: str = os.path.join(out_dir,'README')
+
+    with File(file=readme_file) as f:
+        f.touch()
+        f.write_txt(txt=read_me_txt)
+    return readme_file

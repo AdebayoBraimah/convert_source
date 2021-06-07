@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 """Tests for the `convert_image_data` function.
+
+NOTE: 
+    * The test DICOM data used here is publicly available:
+        * Referenced citation(s): convert_source/convert_source/tests/test.study_dir/TEST001-UNIT001/data.dicom/citation.[bib][json]
+        * Website: https://zenodo.org/record/16956#.YBw5kI9Kgq0
+        * Download link: https://zenodo.org/api/files/03deb9b8-e9a8-4727-a560-beff99b843db/DICOM.zip
+    * Some parameter data is missing, likely due to the anonymization process.
 """
-
-# NOTE: 
-#     * The test DICOM data used here is publicly available:
-#         * Referenced citation(s): convert_source/convert_source/tests/test.study_dir/TEST001-UNIT001/data.dicom/citation.[bib][json]
-#         * Website: https://zenodo.org/record/16956#.YBw5kI9Kgq0
-#         * Download link: https://zenodo.org/api/files/03deb9b8-e9a8-4727-a560-beff99b843db/DICOM.zip
-#     * Some parameter data is missing, likely due to the anonymization process.
-
 import pytest
 
 import os
@@ -29,6 +28,8 @@ from convert_source.cs_utils.fileio import (
     ConversionError,
     DependencyError
 )
+
+from convert_source.cs_utils.database import create_db
 
 from convert_source.cs_utils.utils import (
     SubDataInfo,
@@ -53,6 +54,10 @@ from convert_source.cs_utils.utils import (
 # Test variables
 data_dir: str = os.path.abspath(os.path.join(os.path.dirname(__file__),'test.study_dir'))
 dcm_test_data: str = os.path.join(data_dir,'TEST001-UNIT001','data.dicom','ST000000')
+
+out_dir: str = os.path.join(os.getcwd(),'test.database.study')
+misc_dir: str = os.path.join(out_dir,'.misc')
+test_db: str = os.path.join(misc_dir,'test.study.db')
 
 def test_download_prog():
     class PlatformInferError(Exception):
@@ -112,7 +117,15 @@ def test_extract_data():
     assert os.path.exists(dcm_test_data) == True
 
 def test_data_conversion():
+    if os.path.exists(misc_dir):
+        pass
+    else:
+        os.makedirs(misc_dir)
+    
+    create_db(database=test_db)
+
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+                                                database=test_db,
                                                 exclusion_list=[".PAR", ".nii"])
     assert len(subs_data) == 3
 
@@ -142,6 +155,7 @@ def test_cleanup():
         rm_test_dir: Command = Command("rm")
         rm_test_dir.cmd_list.append("-rf")
         rm_test_dir.cmd_list.append(dcm_test_data)
+        rm_test_dir.cmd_list.append(out_dir)
         rm_test_dir.run()
         assert os.path.exists(dcm_test_data) == False
     else:

@@ -10,8 +10,7 @@ from typing import (
     List, 
     Dict, 
     Optional, 
-    Union, 
-    Tuple
+    Union
 )
 
 from convert_source.imgio.dcmio import(
@@ -34,7 +33,7 @@ from convert_source.cs_utils.utils import calc_read_time
 
 # Define function(s)
 def get_nii_tr(nii_file: str) -> Union[float,str]:
-    '''Reads the NIFTI file header and returns the repetition time (TR, sec) as a value if it is not zero, otherwise this 
+    """Reads the NIFTI file header and returns the repetition time (TR, sec) as a value if it is not zero, otherwise this 
     function returns an string.
     
     Arguments:
@@ -42,7 +41,7 @@ def get_nii_tr(nii_file: str) -> Union[float,str]:
         
     Returns: 
         Repetition time (TR, sec), if not zero, or an empty string otherwise.
-    '''
+    """
     nii_file: str = os.path.abspath(nii_file)
     
     # Load nifti file
@@ -58,14 +57,14 @@ def get_nii_tr(nii_file: str) -> Union[float,str]:
         return tr
 
 def get_num_frames(nii_file: str) -> int:
-    '''Determines the number of frames/volumes/TRs in a NIFTI-2 file.
+    """Determines the number of frames/volumes/TRs in a NIFTI-2 file.
 
     Arguments:
         nii_file: NIFTI image file.
 
     Returns:
         Number of temporal frames or volumes in NIFTI file.
-    '''
+    """
     nii_file: str = os.path.abspath(nii_file)
     
     try:
@@ -78,7 +77,7 @@ def get_num_frames(nii_file: str) -> int:
 def get_data_params(file: str,
                     json_file: Optional[str] = "", 
                     ) -> Dict:
-    '''Creates a dictionary of key mapped parameter items that are often not written to the BIDS JSON sidecar
+    """Creates a dictionary of key mapped parameter items that are often not written to the BIDS JSON sidecar
     when converting Philips DICOM and PAR REC files.
     
     Arguments:
@@ -87,7 +86,7 @@ def get_data_params(file: str,
     
     Returns:
         Dictionary of BIDS related key mapped items/values.
-    '''
+    """
     if json_file:
         json_file: str = os.path.abspath(json_file)
     else:

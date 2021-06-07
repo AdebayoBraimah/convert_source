@@ -8,6 +8,8 @@ The constant variables contained here include:
 """
 import os
 import pathlib
+
+from collections import OrderedDict
 from typing import (
     Dict,
     List
@@ -23,9 +25,31 @@ _bids_version_file: str = os.path.join(str(pathlib.Path(os.path.abspath(__file__
 
 with open(_bids_version_file, "r") as f: 
     _bids_version = f.read().replace('\n','')
+    f.close()
 
 DEFAULT_BIDS_VERSION: str = _bids_version
 
+# IMPROVEMENT:
+#   Store BIDS_INFO dict in a series of yml/
+#       JSON files that correspond to some BIDS
+#       version. 
+# 
+#   Additionally, make seperate directories
+#       for each BIDS version that contains:
+#           * bids_version.txt
+#           * bids_info.yml
+#           * bids_order.txt
+#           * bids_param.yml
+#           * README: link to BIDS documentation
+# 
+#   Implementation would likely include importing a
+#       function that includes taking a BIDS version
+#       as argument, and returning a tuple of constants.
+#           * Issue: BIDS version needs to be passed as 
+#               argument prior to other function uses.
+#           * Pass BIDS version as an argument to all 
+#               parent and child classes/functions.
+# 
 # Empty BIDS metadata dictionary
 BIDS_INFO: Dict = {
     # Common metadata
@@ -221,3 +245,16 @@ BIDS_PARAM: Dict[str,str] = {
         }
     }
 }
+
+# SQL Database tables/columns names 
+#   mapped to corresponding data types
+DB_TABLES: OrderedDict = OrderedDict({
+    'file_id':      'TEXT',    # PRIMARY KEY
+    'rel_path':     'TEXT',
+    'file_date':    'TEXT',
+    'acq_date':     'TEXT',
+    'sub_id':       'TEXT',
+    'ses_id':       'TEXT',
+    'bids_name':    'TEXT'
+})
+

@@ -10,8 +10,7 @@ from typing import (
     List, 
     Dict, 
     Optional, 
-    Union, 
-    Tuple
+    Union
 )
 
 from convert_source.cs_utils.fileio import TmpDir
@@ -22,7 +21,7 @@ class PARfileReadError(Exception):
 
 # Define function(s)
 def get_etl(par_file: str) -> float:
-    '''Gets EPI factor (Echo Train Length) from Philips' PAR Header.
+    """Gets EPI factor (Echo Train Length) from Philips' PAR Header.
     
     NOTE: 
         This is done via a regEx search as the PAR header is not assumed to change significantly between scanners.
@@ -32,7 +31,7 @@ def get_etl(par_file: str) -> float:
         
     Returns:
         Echo Train Length as float.
-    '''
+    """
     par_file: str = os.path.abspath(par_file)
     regexp: re = re.compile(r'.    EPI factor        <0,1=no EPI>     :   .*?([0-9.-]+)')  # Search string for RegEx
     with open(par_file) as f:
@@ -44,7 +43,7 @@ def get_etl(par_file: str) -> float:
     return etl
 
 def get_wfs(par_file: str) -> float:
-    '''Gets Water Fat Shift from Philips' PAR Header.
+    """Gets Water Fat Shift from Philips' PAR Header.
     
     NOTE: 
         This is done via a regEx search as the PAR header is not assumed to change significantly between scanners.
@@ -54,7 +53,7 @@ def get_wfs(par_file: str) -> float:
         
     Returns:
         Water Fat Shift as a float.
-    '''
+    """
     par_file: str = os.path.abspath(par_file)
     regexp: re = re.compile(
         r'.    Water Fat shift \[pixels\]           :   .*?([0-9.-]+)')  # Search string for RegEx, escape the []
@@ -67,7 +66,7 @@ def get_wfs(par_file: str) -> float:
     return wfs
 
 def get_red_fact(par_file: str) -> float:
-    '''Extracts parallel reduction factor in-plane value (SENSE factor) from the file description in the PAR REC header 
+    """Extracts parallel reduction factor in-plane value (SENSE factor) from the file description in the PAR REC header 
     for Philips MR scanners. This reduction factor is assumed to be 1 if a value cannot be found from witin
     the PAR REC header.
     
@@ -79,7 +78,7 @@ def get_red_fact(par_file: str) -> float:
         
     Returns:
         Parallel reduction factor in-plane value (e.g. SENSE factor, as a float).
-    '''
+    """
     
     # Read file
     par_file: str = os.path.abspath(par_file)
@@ -96,7 +95,7 @@ def get_red_fact(par_file: str) -> float:
     return red_fact
 
 def get_mb(par_file: str) -> int:
-    '''Extracts multi-band acceleration factor from from Philips' PAR Header.
+    """Extracts multi-band acceleration factor from from Philips' PAR Header.
     
     NOTE: 
         This is done via a regEx search as the PAR header does not normally store this value.
@@ -106,7 +105,7 @@ def get_mb(par_file: str) -> int:
         
     Returns:
         Multi-band acceleration factor (as an int).
-    '''
+    """
     par_file: str = os.path.abspath(par_file)
 
     # Initialize mb to 1
@@ -122,7 +121,7 @@ def get_mb(par_file: str) -> int:
     return mb
 
 def get_scan_time(par_file: str) -> Union[float,str]:
-    '''Gets the acquisition duration (scan time, in s) from the PAR header.
+    """Gets the acquisition duration (scan time, in s) from the PAR header.
     
     NOTE: 
         This is done via a regEx search as the PAR header is not assumed to change significantly between scanners.
@@ -132,7 +131,7 @@ def get_scan_time(par_file: str) -> Union[float,str]:
         
     Returns:
         Acquisition duration (scan time, in s). If not in header, an empty string is returned.
-    '''
+    """
     par_file: str = os.path.abspath(par_file)
     scan_time: str = ''
     regexp: re = re.compile(
@@ -148,7 +147,7 @@ def get_scan_time(par_file: str) -> Union[float,str]:
 def get_echo_time(par_file: str,
                  tmp_dir: Optional[str] = None
                  ) -> float:
-    '''Reads the echo time (TE, in sec.) from a PAR header file.
+    """Reads the echo time (TE, in sec.) from a PAR header file.
 
     NOTE: 
         Echo time is obtained from the PAR file header by reading in the PAR header file as a
@@ -166,7 +165,7 @@ def get_echo_time(par_file: str,
         
     Returns:
         Echo time as a float.
-    '''
+    """
     if tmp_dir:
         pass
     else:
@@ -192,7 +191,7 @@ def get_echo_time(par_file: str,
 def get_flip_angle(par_file: str,
                    tmp_dir: Optional[str] = None
                   ) -> float:
-    '''Reads the flip angle (in degrees) from a PAR header file.
+    """Reads the flip angle (in degrees) from a PAR header file.
 
     NOTE: 
         Flip angle is obtained from the PAR file header by reading in the PAR header file as a
@@ -210,7 +209,7 @@ def get_flip_angle(par_file: str,
         
     Returns:
         Flip angle as a float.
-    '''
+    """
     if tmp_dir:
         pass
     else:

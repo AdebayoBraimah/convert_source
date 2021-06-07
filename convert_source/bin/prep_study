@@ -1,0 +1,113 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""Command line wrapper for ``convert_source``'s study directory symlink functions. 
+   Performs symlinking for a study's subject imaging data.
+"""
+import pathlib
+import sys
+import os
+
+from typing import List
+
+import argparse
+
+_pkg_path: str = str(
+    pathlib.Path(
+        os.path.abspath(__file__)
+        ).parents[2]
+    )
+
+sys.path.append(_pkg_path)
+
+from convert_source.batch_symlink import (
+    batch_link,
+    link_version
+)
+
+def main() -> List[str]:
+    """Main function.
+        * Parses arguements.
+        * Returns list of sym-linked directories.
+    """
+    args, parser = arg_parser()
+
+    # Print help message in the case of no arguments
+    try:
+        args = parser.parse_args()
+    except SystemExit as err:
+        if err.code == 2:
+            parser.print_help()
+    
+    if args.ps_version:
+        print(f"prep_study v{link_version}")
+        sys.exit(0)
+    
+    if args.study_dir and args.out_dir and args.infile and args.mapfile:
+        pass
+    else:
+        parser.print_help()
+        sys.exit(1)
+    
+    study_dir: str = args.study_dir
+    out_dir: str = args.out_dir
+    infile: str = args.infile
+    mapfile: str = args.mapfile
+
+    study_dir: str = os.path.abspath(study_dir)
+
+    sym_list: List[str] = batch_link(study_dir=study_dir,
+                                    out_dir=out_dir,
+                                    infile=infile,
+                                    mapfile=mapfile)
+
+    return sym_list
+
+def arg_parser():
+    """Argument parser for ``prep_study``.
+    """
+    # Parse arguments
+    parser = argparse.ArgumentParser(description="Symbolically link parent directories of source data for a study's imaging data to some other directory with arbitrary subject IDs.")
+
+    # Parse Arguments
+
+    # Required Arguments
+    reqoptions = parser.add_argument_group('Required Argument(s)')
+    reqoptions.add_argument('-s','-study','--study-dir',
+                            type=str,
+                            dest="study_dir",
+                            metavar="STUDY_DIR",
+                            required=False,
+                            help="Parent study image directory for all subjects.")
+    reqoptions.add_argument('-o','-out','--out-dir',
+                            type=str,
+                            dest="out_dir",
+                            metavar="OUT_DIR",
+                            required=False,
+                            help="Output directory.")
+    reqoptions.add_argument('-i','-id','--identification-file',
+                            type=str,
+                            dest="infile",
+                            metavar="FILE",
+                            required=False,
+                            help="File that contains each subjects' directory name. NOTE: Must contain the same number of entries as the file used in the '--map-file' option.")
+    reqoptions.add_argument('-m','-map','--map-file',
+                            type=str,
+                            dest="mapfile",
+                            metavar="FILE",
+                            required=False,
+                            help="File that contains the desired output directory name/ID for each subject. NOTE: Must contain the same number of entries as the file used in the '--identification-file' option.")
+    # Optional Arguements
+    optoptions = parser.add_argument_group('Optional Argument(s)')
+    optoptions.add_argument('--version',
+                            dest="ps_version",
+                            required=False,
+                            action='store_true',
+                            default=False,
+                            help="Prints the version, then exits. \n")
+
+    args = parser.parse_args()
+
+    return args,parser
+
+if __name__ == "__main__":
+    main()

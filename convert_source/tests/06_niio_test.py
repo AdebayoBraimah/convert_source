@@ -1,20 +1,18 @@
 # -*- coding: utf-8 -*-
 """Tests for the imgio's niio module's functions.
 """
-
-# NOTE: Unable to reliably write NIFTI header information.
-
-import pytest
-
 import os
 import sys
 import pathlib
+import shutil
 
 from typing import List
 
 # Add package/module to PYTHONPATH
 mod_path: str = os.path.join(str(pathlib.Path(os.path.abspath(__file__)).parents[2]))
 sys.path.append(mod_path)
+
+from convert_source.cs_utils.database import create_db
 
 from convert_source.cs_utils.utils import (
     SubDataInfo,
@@ -30,9 +28,21 @@ from convert_source.imgio.niio import (
 data_dir: str = os.path.abspath(os.path.join(os.path.dirname(__file__),'test.study_dir'))
 nii_test_data: str = os.path.join(data_dir,'TEST001-UNIT001','data.nifti')
 
+out_dir: str = os.path.join(os.getcwd(),'test.database.study')
+misc_dir: str = os.path.join(out_dir,'.misc')
+test_db: str = os.path.join(misc_dir,'test.study.db')
+
 # Begin tests
 def test_collect_data():
+    if os.path.exists(misc_dir):
+        pass
+    else:
+        os.makedirs(misc_dir)
+    
+    create_db(database=test_db)
+
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+                                                database=test_db,
                                                 exclusion_list=[".dcm",".PAR"])
 
     sub: str = subs_data[0].sub
@@ -42,17 +52,48 @@ def test_collect_data():
     assert sub == 'TEST001'
     assert ses == 'UNIT001'
 
+def test_cleanup_1():
+    """NOTE: This test currently FAILS on Windows operating systems."""
+    shutil.rmtree(misc_dir)
+    assert os.path.exists(misc_dir) == False
+
 def test_get_nii_tr():
+    if os.path.exists(misc_dir):
+        pass
+    else:
+        os.makedirs(misc_dir)
+    
+    create_db(database=test_db)
+
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+                                                database=test_db,
                                                 exclusion_list=[".dcm",".PAR"])
 
     assert get_nii_tr(subs_data[6].data) == 0.893
 
+def test_cleanup_2():
+    """NOTE: This test currently FAILS on Windows operating systems."""
+    shutil.rmtree(misc_dir)
+    assert os.path.exists(misc_dir) == False
+
 def test_get_num_frames():
+    if os.path.exists(misc_dir):
+        pass
+    else:
+        os.makedirs(misc_dir)
+    
+    create_db(database=test_db)
+
     subs_data: List[SubDataInfo] = collect_info(parent_dir=data_dir,
+                                                database=test_db,
                                                 exclusion_list=[".dcm",".PAR"])
 
     assert get_num_frames(subs_data[6].data) == 500
+
+def test_cleanup_3():
+    """NOTE: This test currently FAILS on Windows operating systems."""
+    shutil.rmtree(out_dir)
+    assert os.path.exists(out_dir) == False
 
 ##############################################################
 #
@@ -69,7 +110,7 @@ def test_get_num_frames():
 #                        tr: Optional[float] = 2.00,
 #                        task: Optional[str] = ""
 #                        ) -> Tuple[str,str]:
-#     '''Creates an empty NIFTI-2 image using the specified repetition time (TR, in sec.), and number of frames (/TRs).
+#     """Creates an empty NIFTI-2 image using the specified repetition time (TR, in sec.), and number of frames (/TRs).
 #     A corresponding JSON sidecar is also created for the NIFTI-2 file.
 # 
 #     Usage example:
@@ -85,7 +126,7 @@ def test_get_num_frames():
 #         Tuple of strings that represent:
 #             * File path to NIFTI-2 image as a string.
 #             * File path to corresponding JSON sidecar.
-#     '''
+#     """
 #     # Create empty NIFTI-2 file
 #     data = np.arange(4*4*3).reshape(4,4,3)
 #     new_image = nib.Nifti2Image(data, affine=np.eye(4))
