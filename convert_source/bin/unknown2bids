@@ -1,0 +1,106 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""Command line wrapper for ``convert_source``'s functions pertaining to renaming unknown subject scan acquisitions.
+"""
+import pathlib
+import sys
+import os
+
+from typing import (
+    List,
+    Tuple
+)
+
+import argparse
+
+_pkg_path: str = str(
+    pathlib.Path(
+        os.path.abspath(__file__)
+        ).parents[2]
+    )
+
+sys.path.append(_pkg_path)
+
+from convert_source.batch_convert import read_unknown_subs
+from convert_source.cs_utils.const import DEFAULT_CONFIG
+
+def main() -> Tuple[List[str]]:
+   """Main function.
+      * Parses arguements.
+      * Returns 4-tuple of lists of BIDS NIFTI files.
+   """
+   args, parser = arg_parser()
+
+   # Print help message in the case of no arguments
+   try:
+      args = parser.parse_args()
+   except SystemExit as err:
+      if err.code == 2:
+         parser.print_help()
+   
+   # Execute function here
+   imgs: List[str] = []
+   jsons: List[str] = []
+   bvals: List[str] = []
+   bvecs: List[str] = []
+
+   [imgs,
+    jsons,
+    bvals,
+    bvecs] = read_unknown_subs(mapfile=args.mapfile,
+                               config=args.config,
+                               cprss_lvl=args.compression_level,
+                               verbose=args.verbose)
+   return (imgs,
+           jsons,
+           bvals,
+           bvecs)
+
+
+def arg_parser():
+   """Argument parser for ``unknown2bids``.
+   """
+   # Parse arguments
+   parser = argparse.ArgumentParser(description="Renames NIFTI data that could not be categorized appropriately for BIDS compliance.")
+
+   # Parse Arguments
+
+   # Required Arguments
+   reqoptions = parser.add_argument_group('Required Argument(s)')
+   reqoptions.add_argument('-m','-map','--map-file',
+                           type=str,
+                           dest="mapfile",
+                           metavar="FILE",
+                           required=True,
+                           help="File that contains the desired 'modality type' and 'modality label' for each scan.")
+
+   # Optional arguments
+   optoptions = parser.add_argument_group('Optional Argument(s)')
+   optoptions.add_argument('-c','-config','--config-file',
+                           type=str,
+                           dest="config",
+                           metavar="CONFIG.yml",
+                           required=False,
+                           default=DEFAULT_CONFIG,
+                           help="Input YAML configuration file. If no configuration file is provided, then the default configuration file is used.\
+                              NOTE: The same configuration file used when running 'study_proc' should also be used for the best results.")
+   optoptions.add_argument('--compress',
+                           type=int,
+                           dest="compression_level",
+                           metavar="INT",
+                           required=False,
+                           default=6,
+                           help="Compression level [1 - 9] - 1 is fastest, 9 is smallest [default: 6].")
+   optoptions.add_argument('--verbose',
+                            dest="verbose",
+                            required=False,
+                            action='store_true',
+                            default=False,
+                            help="Enables verbose output to the command line.")
+
+   args = parser.parse_args()
+
+   return args,parser
+
+if __name__ == "__main__":
+    main()
