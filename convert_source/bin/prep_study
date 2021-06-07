@@ -63,7 +63,7 @@ def main() -> List[str]:
     return sym_list
 
 def arg_parser():
-    """Argument parser for `prep_study`.
+    """Argument parser for ``prep_study``.
     """
     # Parse arguments
     parser = argparse.ArgumentParser(description="Symbolically link parent directories of source data for a study's imaging data to some other directory with arbitrary subject IDs.")

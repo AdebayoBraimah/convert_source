@@ -26,8 +26,8 @@ from convert_source.cs_utils.const import DEFAULT_CONFIG
 
 def main() -> Tuple[List[str]]:
     """Main function.
-    * Parses arguements.
-    * Returns 4-tuple of lists of BIDS NIFTI files.
+        * Parses arguements.
+        * Returns 4-tuple of lists of BIDS NIFTI files.
     """
     args, parser = arg_parser()
 
