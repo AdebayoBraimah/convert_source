@@ -1919,8 +1919,8 @@ def read_unknown_subs(mapfile: str,
     bids_bvecs: List = []
 
     for key,items in data.items():
-        modality_type = items.get('modality_type','')
-        modality_label = items.get('modality_label','')
+        modality_type: str = items.get('modality_type','')
+        modality_label: str = items.get('modality_label','')
 
         if modality_type and modality_label:
 
