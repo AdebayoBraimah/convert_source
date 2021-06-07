@@ -1,6 +1,13 @@
 CHANGES
 =========
 
+0.2.0a1
+---------
+
+This version is an alpha release that contains a bug fix.
+
+BUG FIX: Executable scripts were not added on package install.
+
 0.2.0a0
 ---------
 
@@ -10,8 +17,7 @@ This version is an alpha release that contains a bug fix, and substantial improv
 * UPDATE: Writes BIDS directory related files, such as the: ``README``, ``dataset_description.json``, and ``.bidsignore`` files.
 * UPDATE: Optionally writes the ``participants.tsv`` and each subject's ``scans.tsv``.
 * UPDATE: Utilizes a database to keep track of which source files have already been processed to avoid converting data that has already been processed.
-* UPDATE: New functionality that symbolically links each subject's directory to the desired directory structure that ``convert_source`` requires.
-  * This allows for mapping a subject's study ID to their BIDS subject ID if these are different.
+* UPDATE: New functionality that symbolically links each subject's directory to the desired directory structure that ``convert_source`` requires. This allows for mapping a subject's study ID to their BIDS subject ID if these are different.
 * UPDATE: Added wait bar to command line interface.
 * UPDATE: Added function and executable to rename unknown scans.
 
