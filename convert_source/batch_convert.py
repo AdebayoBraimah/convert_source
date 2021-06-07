@@ -18,6 +18,8 @@
 #       * [ ] Add function to collect and construct dictionary to fill this out
 # 
 #   * [ ] Add function to download latest version of dcm2niix
+# 
+#   * [ ] Convert lists to queues for faster runtime performance
 
 import os
 import glob
@@ -1860,6 +1862,7 @@ def create_participant_tsv(out_dir: str) -> Tuple[str,str]:
 
 def read_unknown_subs(mapfile: str,
                       config: Optional[str] = "",
+                      cprss_lvl: int = 6,
                       verbose: bool = False
                       ) -> str:
     """Reads the input JSON or YAML mapfile for unknown BIDS NIFTI files.
@@ -1870,6 +1873,7 @@ def read_unknown_subs(mapfile: str,
     Arguments:
         mapfile: JSON or YAML mapfile that specifies the ``modality_type`` and ``modality_label``.
         config: Configuration file with search terms.
+        cprss_lvl: Compression level [1 - 9] - 1 is fastest, 9 is smallest.
         verbose: Enable verbose output.
 
     Returns:
@@ -1950,7 +1954,7 @@ def read_unknown_subs(mapfile: str,
                          modality_label=modality_label,
                          bids_name_dict=bids_name_dict,
                          mod_found=True)
-            # TODO: Add option to set compression level
+
             [imgs,
             jsons,
             bvals,
@@ -1960,6 +1964,7 @@ def read_unknown_subs(mapfile: str,
                                    database=database,
                                    modality_type=modality_type,
                                    modality_label=modality_label,
+                                   cprss_lvl=cprss_lvl,
                                    gzip=gzip)
 
             bids_imgs.extend(imgs)
