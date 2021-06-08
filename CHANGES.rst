@@ -1,6 +1,13 @@
 CHANGES
 =========
 
+0.2.0a3
+---------
+
+This version is an alpha release that contains a bug fix.
+
+BUG FIX: Fixed issue that caused referenced to a ``dictionary`` rather than ``string``.
+
 0.2.0a2
 ---------
 
