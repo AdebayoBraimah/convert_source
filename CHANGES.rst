@@ -6,6 +6,13 @@ CHANGES
 
 This version is an alpha release that contains a bug fix.
 
+BUG FIX: Uncaught ``OperationalError`` exception caused issues with intial queries in the ``sqlite`` database.
+
+0.2.0a1
+---------
+
+This version is an alpha release that contains a bug fix.
+
 BUG FIX: Executable scripts were not added on package install.
 
 0.2.0a0

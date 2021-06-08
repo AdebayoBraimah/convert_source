@@ -756,7 +756,7 @@ def query_db(database:str,
         conn.commit()
         conn.close()
         return query_val
-    except TypeError:
+    except (TypeError, OperationalError):
         # Commit changes and close the connection
         conn.commit()
         conn.close()
