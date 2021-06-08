@@ -426,9 +426,15 @@ def num_runs(directory: Optional[str] = "",
         for item in list(bids_dict[modality_type].keys()):
             if bids_dict[modality_type][item] == "":
                 pass
+            elif isinstance(bids_dict[modality_type][item], dict):
+                for id,name in bids_dict[modality_type][item].items():
+                    if bids_dict[modality_type][item][id] == "":
+                        pass
+                    else:
+                        tmp_list.append(name)
+                        tmp_list.append("*")
             else:
-                # tmp_list.append(bids_dict[modality_type][item])
-                tmp_list.append(bids_dict[modality_type].get(item,''))
+                tmp_list.append(bids_dict[modality_type][item])
                 tmp_list.append("*")
     except KeyError:
         pass
