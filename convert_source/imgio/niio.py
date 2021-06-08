@@ -2,10 +2,14 @@
 """NIFTI specific functions for convert_source. Primarily intended for renaming NIFTI to be BIDS compliant.
 """
 import os
-import shutil
-import random
+# import shutil
+# import random
 import nibabel as nib
+# import nibabel.filebasedimages.ImageFileError
+from nibabel.filebasedimages import ImageFileError
+
 from decimal import Decimal
+
 from typing import (
     List, 
     Dict, 
@@ -44,17 +48,18 @@ def get_nii_tr(nii_file: str) -> Union[float,str]:
     """
     nii_file: str = os.path.abspath(nii_file)
     
-    # Load nifti file
-    img = nib.load(nii_file)
-    
-    # Store nifti image TR
-    tr = float(round(Decimal(float(img.header['pixdim'][4])),3))
-    
-    # Check if TR is likely
-    if tr == 0:
+    try:
+        # Load nifti file and store TR
+        img = nib.load(nii_file)
+        tr = float(round(Decimal(float(img.header['pixdim'][4])),3))
+
+        # Check if TR is likely
+        if tr == 0:
+            return ""
+        else:
+            return tr
+    except ImageFileError:
         return ""
-    else:
-        return tr
 
 def get_num_frames(nii_file: str) -> int:
     """Determines the number of frames/volumes/TRs in a NIFTI-2 file.
@@ -71,7 +76,7 @@ def get_num_frames(nii_file: str) -> int:
         img = nib.load(nii_file)
         dims = img.header.get_data_shape()
         return dims[3]
-    except IndexError:
+    except (IndexError,ImageFileError):
         return  1
 
 def get_data_params(file: str,
