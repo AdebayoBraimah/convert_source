@@ -1,6 +1,14 @@
 CHANGES
 =========
 
+0.2.0a4
+---------
+
+This version is an alpha release that contains two bug fixes.
+
+* BUG FIX: Fixed bug in which loading of ``NIFTI`` images to obtain information may throw errors.
+* BUG FIX: Added better support of iterating and searching through nested dictionary of ``BIDS`` related terms.
+
 0.2.0a3
 ---------
 
