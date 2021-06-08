@@ -427,7 +427,8 @@ def num_runs(directory: Optional[str] = "",
             if bids_dict[modality_type][item] == "":
                 pass
             else:
-                tmp_list.append(bids_dict[modality_type][item])
+                # tmp_list.append(bids_dict[modality_type][item])
+                tmp_list.append(bids_dict[modality_type].get(item,''))
                 tmp_list.append("*")
     except KeyError:
         pass
