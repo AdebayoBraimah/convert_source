@@ -11,7 +11,6 @@ from nibabel.filebasedimages import ImageFileError
 from decimal import Decimal
 
 from typing import (
-    List, 
     Dict, 
     Optional, 
     Union
