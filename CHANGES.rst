@@ -1,6 +1,13 @@
 CHANGES
 =========
 
+0.2.0a5
+---------
+
+This version is an alpha release that contains two bug fixes.
+
+* BUG FIX: Fixed bug in which ``string``s/numbers were not converted to ``float``s/``int``s.
+
 0.2.0a4
 ---------
 
