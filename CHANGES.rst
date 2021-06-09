@@ -6,7 +6,7 @@ CHANGES
 
 This version is an alpha release that contains two bug fixes.
 
-* BUG FIX: Fixed bug in which ``string``s/numbers were not converted to ``float``s/``int``s.
+* BUG FIX: Fixed bug in which strings/numbers were not converted to ``floats/ints``.
 
 0.2.0a4
 ---------
