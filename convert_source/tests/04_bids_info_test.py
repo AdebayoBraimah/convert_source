@@ -41,8 +41,8 @@ def test_is_camel_case():
 def test_construct_bids_dict():
     bids_meta_dict: Dict = construct_bids_dict()
     assert depth(bids_meta_dict) == 2
-    assert bids_meta_dict == BIDS_INFO
-    assert list(bids_meta_dict.keys()) == BIDS_ORD_ARR
+    assert bids_meta_dict != BIDS_INFO
+    assert list(bids_meta_dict.keys()) != BIDS_ORD_ARR
 
 def test_construct_bids_name():
     sub: SubDataInfo = SubDataInfo('001','.')

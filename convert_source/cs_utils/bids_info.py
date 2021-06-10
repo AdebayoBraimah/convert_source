@@ -137,10 +137,19 @@ def construct_bids_dict(meta_dict: Optional[Dict] = None,
     bids_dict: Dict = dict_multi_update(dictionary=bids_dict, **meta_dict)
     bids_dict: Dict = dict_multi_update(dictionary=bids_dict, **json_dict)
     
-    # Create ordered BIDS dictionary
+    # Create ordered BIDS dictionary and drop unfilled metadata fields from ordered BIDS dictionary
     ordered_bids_dict: OrderedDict = OrderedDict()
     for key in ordered_list:
-        ordered_bids_dict[key] = bids_dict[key]
+        val = bids_dict.get(key,'')
+        if (val == "") or (val is None):
+            continue
+        elif (key == "EffectiveEchoSpacing") or (key == "TotalReadoutTime"):
+            # NOTE: These two keys are being excluded entirely, as the current
+            #   calculations fail BIDS validation.
+            # TODO: Accurately compute 'EffectiveEchoSpacing' and 'TotalReadoutTime'
+            continue
+        else:
+            ordered_bids_dict[key] = bids_dict[key]
     
     return ordered_bids_dict
 

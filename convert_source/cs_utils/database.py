@@ -8,6 +8,8 @@ import os
 import sqlite3
 import pandas as pd
 import pathlib
+import re
+import pydicom
 
 from sqlite3.dbapi2 import (
     DatabaseError,
@@ -151,17 +153,13 @@ def construct_db_dict(study_dir: Optional[str] = "",
     
     if acq_date:
         pass
+    elif file_name:
+        acq_date: str = get_acq_time(file=file_name)
     elif file_id:
         acq_date: str = query_db(database=database,
                                 table='acq_date',
                                 prim_key='file_id',
                                 value=file_id)
-        if acq_date:
-            pass
-        else:
-            acq_date: str = "N/A"
-    else:
-        acq_date: str = "N/A"
     
     if bids_name:
         pass
@@ -560,7 +558,8 @@ def _export_tmp_bids_df(database: str,
                         sub_id: str,
                         modality_type: str,
                         modality_label: str,
-                        gzipped: bool = True
+                        gzipped: bool = True,
+                        ses_id: Optional[str] = ""
                         ) -> pd.DataFrame:
     """Helper function that constructs modality specificy dataframes pertaining to scan type and acquisition time.
 
@@ -578,6 +577,7 @@ def _export_tmp_bids_df(database: str,
         modality_type: Modality type for the BIDS related modality.
         modality_label: Modality label for the BIDS related modality.
         gzipped: Whether the output BIDS NIFTI file has been gzipped.
+        ses_id: Session ID.
 
     Returns:
         Scan dataframe for the specified subject, modality label, and modality type.
@@ -609,8 +609,12 @@ def _export_tmp_bids_df(database: str,
     # Filter by subject ID
     df: pd.DataFrame = df_tmp.loc[df_tmp['sub_id'] == f'{sub_id}']
 
+    if ses_id:
+        df: pd.DataFrame = df.loc[df['ses_id'] == f'{ses_id}']
+
     # Filter by modality type and modality label
-    mod = modality_type + "/"
+    mod: str = modality_type + "/"
+
     df: pd.DataFrame = df[df['bids_name'].str.contains(f"{modality_label}")]
     df['bids_name'] = f'{mod}' + df['bids_name'].astype(str) + f'{ext}'
     df: pd.DataFrame = df.dropna(axis=0)
@@ -633,7 +637,8 @@ def _export_tmp_bids_df(database: str,
 def export_bids_scans_dataframe(database: str,
                                 sub_id: str,
                                 search_dict: Dict[str,str],
-                                gzipped: bool = True
+                                gzipped: bool = True,
+                                ses_id: Optional[str] = ""
                                 ) -> pd.DataFrame:
     """Convenience function that constructs BIDS scan dataframe (that can later be exported as a TSV).
     The resulting dataframe is consistent with the BIDS scan TSV output file 
@@ -651,6 +656,7 @@ def export_bids_scans_dataframe(database: str,
         sub_id: Subject ID.
         search_dict: Dictionary of modality specific search terms, constructed from the ``read_config`` function.
         gzipped: Whether the output BIDS NIFTI file has been gzipped.
+        ses_id: Session ID.
 
     Returns:
         Scan dataframe for a subject.
@@ -671,7 +677,8 @@ def export_bids_scans_dataframe(database: str,
                                                             sub_id=sub_id,
                                                             modality_type=modality_type,
                                                             modality_label=fmap_mod,
-                                                            gzipped=gzipped)
+                                                            gzipped=gzipped,
+                                                            ses_id=ses_id)
                     if len(df_tmp) == 0:
                         continue
                     else:
@@ -681,7 +688,8 @@ def export_bids_scans_dataframe(database: str,
                                                             sub_id=sub_id,
                                                             modality_type=modality_type,
                                                             modality_label=modality_label,
-                                                            gzipped=gzipped)
+                                                            gzipped=gzipped,
+                                                            ses_id=ses_id)
                 if len(df_tmp) == 0:
                     continue
                 else:
@@ -822,3 +830,127 @@ def _get_dcm_dir(dcm_file: str) -> str:
         _, 
         _] = f.file_parts()
     return dir_path
+
+def get_file_creation_date(file: str) -> str:
+    """Returns the file creation date or the date the file was last modified.
+
+    Usage example:
+        >>> acq_date_time = get_file_creation_date(file='MR0001.dcm')
+        >>> acq_date_time
+        '2019-04-28T16:34:19'
+
+    Arguments:
+        file: Path to file.
+
+    Returns:
+        Date-time string of the form: ``YYYY-MM-DD(T)hh:mm:ss``
+    """
+    file: str = os.path.abspath(file)
+    ti_c: str = os.path.getctime(file)
+    return datetime.fromtimestamp(ti_c).strftime('%Y-%m-%dT%H:%M:%S')
+
+def get_par_acq_time(par_file: str) -> str:
+    """Returns the acquisition date and time for the input PAR header file if possible, or the file creation date and time otherwise.
+
+    NOTE: 
+        This is performed via a RegEx search of the PAR file header, and is not guaranteed to work on PAR files from other Philips MR scanners.
+
+    Usage example:
+        >>> acq_date_time = get_par_acq_time(par_file='T1_Ax_MPRAGE.PAR')
+        >>> acq_date_time
+        '2018-12-15T09:09:10'
+
+    Arguments:
+        file: Path to PAR header file.
+
+    Returns:
+        Date-time string of the form: ``YYYY-MM-DD(T)hh:mm:ss``
+    """
+    par_file: str = os.path.abspath(par_file)
+
+    regexp: re = re.compile(
+        r'.    Examination date/time              :   .*?([0-9.+ /w :*?*]+)')
+
+    with open(par_file) as f:
+        tmp_acq_date_time: str = ""
+        for line in f:
+            match = regexp.match(line)
+            if match:
+                tmp_acq_date_time: str = match.group(1)
+                break
+        
+        if tmp_acq_date_time == "":
+            return get_file_creation_date(file=par_file)
+    
+    # Date
+    year: str = tmp_acq_date_time[:4]
+    month: str = tmp_acq_date_time[5:7]
+    day: str = tmp_acq_date_time[8:10]
+    date: str = f"{year}-{month}-{day}"
+
+    # Time
+    hr: str = tmp_acq_date_time[13:15]
+    min: str = tmp_acq_date_time[16:18]
+    sec: str = tmp_acq_date_time[19:21]
+    time: str = f"{hr}:{min}:{sec}"
+
+    return f"{date}T{time}"
+
+def get_dcm_acq_time(dcm_file: str) -> str:
+    """Returns the acquisition date and time for the input DICOM file if possible, or the file creation date and time otherwise.
+
+    Usage example:
+        >>> acq_date_time = get_dcm_acq_time(dcm_file='MR0002.dcm')
+        >>> acq_date_time
+        '2016-09-18T20:17:48'
+
+    Arguments:
+        file: Path to DICOM file.
+
+    Returns:
+        Date-time string of the form: ``YYYY-MM-DD(T)hh:mm:ss``
+    """
+    dcm_file: str = os.path.abspath(dcm_file)
+    try:
+        ds = pydicom.dcmread(dcm_file,force=True)
+        tmp_acq_date: str = ds.AcquisitionDate
+        tmp_acq_time: str = ds.AcquisitionTime
+
+        # Date
+        year: str = tmp_acq_date[:4]
+        month: str = tmp_acq_date[4:6]
+        day: str = tmp_acq_date[6:]
+        date: str = f"{year}-{month}-{day}"
+
+        # Time
+        hr: str = tmp_acq_time[:2]
+        min: str = tmp_acq_time[2:4]
+        sec: str = tmp_acq_time[4:6]
+        time: str = f"{hr}:{min}:{sec}"
+
+        return f"{date}T{time}"
+    except (AttributeError,KeyError):
+        return get_file_creation_date(file=dcm_file)
+
+def get_acq_time(file: str) -> str:
+    """Returns the acquisition date and time for the input medical image/file if possible, or the file creation date and time otherwise.
+
+    Usage example:
+        >>> acq_date_time = get_acq_time(file='MR0002.dcm')
+        >>> acq_date_time
+        '2016-09-18T20:17:48'
+
+    Arguments:
+        file: Path to file.
+
+    Returns:
+        Date-time string of the form: ``YYYY-MM-DD(T)hh:mm:ss``
+    """
+    file: str = os.path.abspath(file)
+
+    if '.dcm' in file.lower():
+        return get_dcm_acq_time(dcm_file=file)
+    elif '.par' in file.lower():
+        return get_par_acq_time(par_file=file)
+    else:
+        return get_file_creation_date(file=file)

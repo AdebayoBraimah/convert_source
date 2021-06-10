@@ -1,6 +1,18 @@
 CHANGES
 =========
 
+0.2.0a6
+---------
+
+This version is an alpha release that contains several bug fixes.
+
+* BUG FIX: Removed the ``metadata`` fields ``EffectiveEchoSpacing`` and ``TotalReadoutTime`` as these fields were computed incorrectly, and thus failing BIDS validation.
+* BUG FIX: Fixed issue in which zero and non-zero b-values were included in the ``acq`` tag for ``dwis``, instead of either one or the other.
+* BUG FIX: The ``participants.tsv`` is correctly written to file.
+* BUG FIX: Added functionality to obtain the acqusition date and time for source data.
+* BUG FIX: Dropped unfilled BIDS metadata fields to avoid validation errors.
+* BUG FIX: Fixed output ``scans.tsv`` files to include all the necessary information to pass BIDS validation.
+
 0.2.0a5
 ---------
 
