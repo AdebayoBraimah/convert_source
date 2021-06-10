@@ -613,14 +613,6 @@ def _export_tmp_bids_df(database: str,
         df: pd.DataFrame = df.loc[df['ses_id'] == f'{ses_id}']
 
     # Filter by modality type and modality label
-    # mod: str = f"sub-{sub_id}/"
-
-    # if ses_id:
-    #     df: pd.DataFrame = df.loc[df['ses_id'] == f'{ses_id}']
-    #     mod: str = mod + f"ses-{ses_id}/"
-    
-    # mod: str = mod + modality_type + "/"
-
     mod: str = modality_type + "/"
 
     df: pd.DataFrame = df[df['bids_name'].str.contains(f"{modality_label}")]

@@ -607,7 +607,6 @@ def get_bvals(bval_file: Optional[str] = ""
         bval_file: str = os.path.abspath(bval_file)
         vals = np.loadtxt(bval_file)
         vals_int = [ int(i) for i in vals ]
-        # vals_nonzero = vals_int[vals.astype(bool)]
         vals_nonzero = [ i for i in vals_int if i != 0 ]
         bvals: List[float] = list(np.unique(vals_nonzero))
         return [ int(i) for i in bvals ]
