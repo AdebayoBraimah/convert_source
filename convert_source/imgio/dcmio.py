@@ -6,8 +6,7 @@ import re
 import os
 
 from typing import (
-    List, 
-    Dict, 
+    List,
     Optional, 
     Union
 )
@@ -28,7 +27,7 @@ def get_scan_time(dcm_file: str) -> Union[float,str]:
     """
 
     # Load data
-    ds = pydicom.dcmread(dcm_file)
+    ds = pydicom.dcmread(dcm_file,force=True)
 
     # Gets scan time
     try:
@@ -94,13 +93,13 @@ def get_bwpppe(dcm_file: str) -> Union[float,str]:
     dcm_file: str = os.path.abspath(dcm_file)
     
     # Load data
-    ds = pydicom.dcmread(dcm_file)
+    ds = pydicom.dcmread(dcm_file,force=True)
     
     # Get relevant DICOM field
     try:
         val_str = str(ds[0x0019, 0x1028])
-        val_list = val_str.split(" ")
-        bwpppe = val_list[-1]
+        val_list: List[str] = val_str.split(" ")
+        bwpppe: str = val_list[-1]
         return float(bwpppe)
     except (AttributeError,KeyError):
         return ""
@@ -120,7 +119,7 @@ def get_red_fact(dcm_file: str) -> float:
     dcm_file: str = os.path.abspath(dcm_file)
 
     # Load dicom data
-    ds = pydicom.dcmread(dcm_file)
+    ds = pydicom.dcmread(dcm_file,force=True)
     red_fact = ""
     
     # Get Info
@@ -160,7 +159,7 @@ def get_mb(dcm_file: str) -> int:
     mb = 1
 
     # Load dicom data
-    ds = pydicom.dcmread(dcm_file)
+    ds = pydicom.dcmread(dcm_file,force=True)
 
     # Get image descriptor
     line = ds.SeriesDescription

@@ -7,8 +7,6 @@ import numpy as np
 import pandas as pd
 from decimal import Decimal
 from typing import (
-    List, 
-    Dict, 
     Optional, 
     Union
 )
@@ -20,7 +18,7 @@ class PARfileReadError(Exception):
     pass
 
 # Define function(s)
-def get_etl(par_file: str) -> float:
+def get_etl(par_file: str) -> int:
     """Gets EPI factor (Echo Train Length) from Philips' PAR Header.
     
     NOTE: 
@@ -30,7 +28,7 @@ def get_etl(par_file: str) -> float:
         par_file: PAR header file.
         
     Returns:
-        Echo Train Length as float.
+        Echo Train Length as integer.
     """
     par_file: str = os.path.abspath(par_file)
     regexp: re = re.compile(r'.    EPI factor        <0,1=no EPI>     :   .*?([0-9.-]+)')  # Search string for RegEx
@@ -40,6 +38,7 @@ def get_etl(par_file: str) -> float:
             if match:
                 etl = match.group(1)
                 etl: int = int(etl)
+                break
     return etl
 
 def get_wfs(par_file: str) -> float:
@@ -63,6 +62,7 @@ def get_wfs(par_file: str) -> float:
             if match:
                 wfs = match.group(1)
                 wfs: float = float(wfs)
+                break
     return wfs
 
 def get_red_fact(par_file: str) -> float:
@@ -90,8 +90,11 @@ def get_red_fact(par_file: str) -> float:
             if match:
                 red_fact = match.group(1)
                 red_fact: float = float(red_fact)
-            else:
-                red_fact: float = float(1)
+                break
+    
+        if red_fact == "":
+            red_fact: float = float(1)
+        
     return red_fact
 
 def get_mb(par_file: str) -> int:
@@ -118,6 +121,7 @@ def get_mb(par_file: str) -> int:
             if match:
                 mb = match.group(1)
                 mb: int = int(mb)
+                break
     return mb
 
 def get_scan_time(par_file: str) -> Union[float,str]:
@@ -142,6 +146,7 @@ def get_scan_time(par_file: str) -> Union[float,str]:
             if match:
                 scan_time = match.group(1)
                 scan_time: float = float(scan_time)
+                break
     return scan_time
 
 def get_echo_time(par_file: str,

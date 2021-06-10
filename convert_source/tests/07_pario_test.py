@@ -133,7 +133,7 @@ def test_get_red_fact():
     data2: str = subs_data[3].data
 
     assert get_red_fact(data1) == 1.0
-    assert get_red_fact(data2) == 1.0
+    assert get_red_fact(data2) == 1.3
 
 def test_cleanup_4():
     """NOTE: This test currently FAILS on Windows operating systems."""

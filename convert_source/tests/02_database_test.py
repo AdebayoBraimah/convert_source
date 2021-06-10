@@ -176,19 +176,19 @@ def test_construct_db_dict_and_insert_row_db():
     assert test_dict_1.get('file_id','') == '0000001'
     assert test_dict_1.get('sub_id','') == '001'
     assert test_dict_1.get('ses_id','') == '001'
-    assert test_dict_1.get('acq_date','') == 'N/A'
+    assert test_dict_1.get('acq_date','') == '2015-01-14T13:26:28'
     assert test_dict_1.get('bids_name','') == ''
 
     assert test_dict_2.get('file_id','') == '0000002'
     assert test_dict_2.get('sub_id','') == '101'
     assert test_dict_2.get('ses_id','') == '1'
-    assert test_dict_2.get('acq_date','') == 'N/A'
+    assert test_dict_2.get('acq_date','') == '2018-04-19T09:38:14'
     assert test_dict_2.get('bids_name','') == ''
 
     assert test_dict_3.get('file_id','') == '0000003'
     assert test_dict_3.get('sub_id','') == 'CX009902'
     assert test_dict_3.get('ses_id','') == 'BMNC000XDF'
-    assert test_dict_3.get('acq_date','') == 'N/A'
+    assert test_dict_3.get('acq_date','') == '2021-05-31T10:52:50'
     assert test_dict_3.get('bids_name','') == ''
 
 def test_get_row_len():
@@ -232,7 +232,7 @@ def test_query_db():
 
     assert sub_id == 'CX009902'
     assert ses_id == 'BMNC000XDF'
-    assert acq_date == 'N/A'
+    assert acq_date == '2021-05-31T10:52:50'
     assert bids_name == ''
 
 def test_update_table_row():

@@ -8,6 +8,8 @@ import os
 import sqlite3
 import pandas as pd
 import pathlib
+import re
+import pydicom
 
 from sqlite3.dbapi2 import (
     DatabaseError,
@@ -151,17 +153,13 @@ def construct_db_dict(study_dir: Optional[str] = "",
     
     if acq_date:
         pass
+    elif file_name:
+        acq_date: str = get_acq_time(file=file_name)
     elif file_id:
         acq_date: str = query_db(database=database,
                                 table='acq_date',
                                 prim_key='file_id',
                                 value=file_id)
-        if acq_date:
-            pass
-        else:
-            acq_date: str = "N/A"
-    else:
-        acq_date: str = "N/A"
     
     if bids_name:
         pass
@@ -822,3 +820,127 @@ def _get_dcm_dir(dcm_file: str) -> str:
         _, 
         _] = f.file_parts()
     return dir_path
+
+def get_file_creation_date(file: str) -> str:
+    """Returns the file creation date or the date the file was last modified.
+
+    Usage example:
+        >>> acq_date_time = get_file_creation_date(file='MR0001.dcm')
+        >>> acq_date_time
+        '2019-04-28T16:34:19'
+
+    Arguments:
+        file: Path to file.
+
+    Returns:
+        Date-time string of the form: ``YYYY-MM-DD(T)hh:mm:ss``
+    """
+    file: str = os.path.abspath(file)
+    ti_c: str = os.path.getctime(file)
+    return datetime.fromtimestamp(ti_c).strftime('%Y-%m-%dT%H:%M:%S')
+
+def get_par_acq_time(par_file: str) -> str:
+    """Returns the acquisition date and time for the input PAR header file if possible, or the file creation date and time otherwise.
+
+    NOTE: 
+        This is performed via a RegEx search of the PAR file header, and is not guaranteed to work on PAR files from other Philips MR scanners.
+
+    Usage example:
+        >>> acq_date_time = get_par_acq_time(par_file='T1_Ax_MPRAGE.PAR')
+        >>> acq_date_time
+        '2018-12-15T09:09:10'
+
+    Arguments:
+        file: Path to PAR header file.
+
+    Returns:
+        Date-time string of the form: ``YYYY-MM-DD(T)hh:mm:ss``
+    """
+    par_file: str = os.path.abspath(par_file)
+
+    regexp: re = re.compile(
+        r'.    Examination date/time              :   .*?([0-9.+ /w :*?*]+)')
+
+    with open(par_file) as f:
+        tmp_acq_date_time: str = ""
+        for line in f:
+            match = regexp.match(line)
+            if match:
+                tmp_acq_date_time: str = match.group(1)
+                break
+        
+        if tmp_acq_date_time == "":
+            return get_file_creation_date(file=par_file)
+    
+    # Date
+    year: str = tmp_acq_date_time[:4]
+    month: str = tmp_acq_date_time[5:7]
+    day: str = tmp_acq_date_time[8:10]
+    date: str = f"{year}-{month}-{day}"
+
+    # Time
+    hr: str = tmp_acq_date_time[13:15]
+    min: str = tmp_acq_date_time[16:18]
+    sec: str = tmp_acq_date_time[19:21]
+    time: str = f"{hr}:{min}:{sec}"
+
+    return f"{date}T{time}"
+
+def get_dcm_acq_time(dcm_file: str) -> str:
+    """Returns the acquisition date and time for the input DICOM file if possible, or the file creation date and time otherwise.
+
+    Usage example:
+        >>> acq_date_time = get_dcm_acq_time(dcm_file='MR0002.dcm')
+        >>> acq_date_time
+        '2016-09-18T20:17:48'
+
+    Arguments:
+        file: Path to DICOM file.
+
+    Returns:
+        Date-time string of the form: ``YYYY-MM-DD(T)hh:mm:ss``
+    """
+    dcm_file: str = os.path.abspath(dcm_file)
+    try:
+        ds = pydicom.dcmread(dcm_file,force=True)
+        tmp_acq_date: str = ds.AcquisitionDate
+        tmp_acq_time: str = ds.AcquisitionTime
+
+        # Date
+        year: str = tmp_acq_date[:4]
+        month: str = tmp_acq_date[4:6]
+        day: str = tmp_acq_date[6:]
+        date: str = f"{year}-{month}-{day}"
+
+        # Time
+        hr: str = tmp_acq_time[:2]
+        min: str = tmp_acq_time[2:4]
+        sec: str = tmp_acq_time[4:6]
+        time: str = f"{hr}:{min}:{sec}"
+
+        return f"{date}T{time}"
+    except (AttributeError,KeyError):
+        return get_file_creation_date(file=dcm_file)
+
+def get_acq_time(file: str) -> str:
+    """Returns the acquisition date and time for the input medical image/file if possible, or the file creation date and time otherwise.
+
+    Usage example:
+        >>> acq_date_time = get_acq_time(file='MR0002.dcm')
+        >>> acq_date_time
+        '2016-09-18T20:17:48'
+
+    Arguments:
+        file: Path to file.
+
+    Returns:
+        Date-time string of the form: ``YYYY-MM-DD(T)hh:mm:ss``
+    """
+    file: str = os.path.abspath(file)
+
+    if '.dcm' in file.lower():
+        return get_dcm_acq_time(dcm_file=file)
+    elif '.par' in file.lower():
+        return get_par_acq_time(par_file=file)
+    else:
+        return get_file_creation_date(file=file)
