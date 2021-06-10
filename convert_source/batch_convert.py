@@ -320,20 +320,55 @@ def batch_proc(study_img_dir: str,
                         desc="Writing scan files",
                         position=0,
                         leave=True):
-            df: pd.DataFrame = export_bids_scans_dataframe(database=database,
-                                                        sub_id=sub,
-                                                        search_dict=search_dict,
-                                                        gzipped=gzip)
-            if len(df) == 0:
-                pass
+            try:
+                ses_list: List[str] = list_dir_files(pathname=os.path.join(out_dir,f"sub-{sub}"),
+                                                pattern="ses-*",
+                                                file_name_only=True)
+                ses_list: List[str] = [ x.replace('ses-','') for x in ses_list ]
+            except FileNotFoundError:
+                ses_list: List = []
+            
+            if len(ses_list) == 0:
+                df: pd.DataFrame = export_bids_scans_dataframe(database=database,
+                                                            sub_id=sub,
+                                                            search_dict=search_dict,
+                                                            gzipped=gzip)
+                
+                if len(df) == 0:
+                    continue
+                else:
+                    out_name: str = os.path.join(out_dir,f'sub-{sub}',f'sub-{sub}' + '_scans.tsv')
+                    
+                    if os.path.exists(out_name):
+                        os.remove(out_name)
+                        
+                    df.to_csv(out_name,
+                            sep='\t',
+                            na_rep='n/a',
+                            index=False,
+                            mode="a",
+                            encoding='utf-8')
             else:
-                out_name: str = os.path.join(out_dir,f'sub-{sub}',f'sub-{sub}' + '_scans.tsv')
-                df.to_csv(out_name,
-                        sep='\t',
-                        na_rep='',
-                        index=False,
-                        mode="w",
-                        encoding='utf-8')
+                for ses in ses_list:
+                    df: pd.DataFrame = export_bids_scans_dataframe(database=database,
+                                                            sub_id=sub,
+                                                            search_dict=search_dict,
+                                                            gzipped=gzip,
+                                                            ses_id=ses)
+                    if len(df) == 0:
+                        continue
+                    else:
+                        out_name: str = os.path.join(out_dir,f'sub-{sub}',f'ses-{ses}',f'sub-{sub}_ses-{ses}' + '_scans.tsv')
+                        
+                        if os.path.exists(out_name):
+                            os.remove(out_name)
+                            
+                        df.to_csv(out_name,
+                                sep='\t',
+                                na_rep='n/a',
+                                index=False,
+                                mode="a",
+                                encoding='utf-8')
 
     return (bids_imgs,
             bids_jsons,
