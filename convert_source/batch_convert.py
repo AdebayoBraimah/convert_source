@@ -941,7 +941,7 @@ def source_to_bids(sub_data: SubDataInfo,
 
                         if (modality_type.lower() == 'dwi' or modality_label.lower() == 'dwi') and append_dwi_info:
                             bvals: List[int] = get_bvals(img_data.bvals[i])
-                            echo_time: Union[int,str] = bids_dict["EchoTime"]
+                            echo_time: Union[int,str] = bids_dict.get("EchoTime",'')
                             _label: str = ""
                             for bval in bvals:
                                 _label += f"b{bval}"
@@ -1313,7 +1313,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
 
             if (modality_type.lower() == 'dwi' or modality_label.lower() == 'dwi') and append_dwi_info:
                 bvals: List[int] = get_bvals(img_data.bvals[0])
-                echo_time: Union[int,str] = bids_dict["EchoTime"]
+                echo_time: Union[int,str] = bids_dict.get("EchoTime",'')
                 _label: str = ""
                 for bval in bvals:
                     _label += f"b{bval}"
