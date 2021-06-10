@@ -1841,7 +1841,7 @@ def create_participant_tsv(out_dir: str) -> Tuple[str,str]:
                             inplace=True)
         df_new.to_csv(participant_tsv,
                         sep='\t',
-                        na_rep='',
+                        na_rep='n/a',
                         index=False,
                         mode='w',
                         encoding='utf-8')
@@ -1859,7 +1859,7 @@ def create_participant_tsv(out_dir: str) -> Tuple[str,str]:
         df['participant_id'] = subs_list
         df.to_csv(participant_tsv,
                     sep='\t',
-                    na_rep='',
+                    na_rep='n/a',
                     index=False,
                     mode="w",
                     encoding='utf-8')
