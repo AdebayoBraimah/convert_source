@@ -143,6 +143,11 @@ def construct_bids_dict(meta_dict: Optional[Dict] = None,
         val = bids_dict.get(key,'')
         if (val == "") or (val is None):
             continue
+        elif (key == "EffectiveEchoSpacing") or (key == "TotalReadoutTime"):
+            # NOTE: These two keys are being excluded entirely, as the current
+            #   calculations fail BIDS validation.
+            # TODO: Accurately compute 'EffectiveEchoSpacing' and 'TotalReadoutTime'
+            continue
         else:
             ordered_bids_dict[key] = bids_dict[key]
     
