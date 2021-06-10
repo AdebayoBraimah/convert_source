@@ -945,6 +945,8 @@ def source_to_bids(sub_data: SubDataInfo,
                             _label: str = ""
                             for bval in bvals:
                                 _label += f"b{bval}"
+                            if int(bvals[0]) == 0:
+                                modality_label: str = "sbref"
                             if echo_time:
                                 echo_time: float = float(echo_time) * 1000
                                 _label += f"TE{int(echo_time)}"
@@ -986,8 +988,6 @@ def source_to_bids(sub_data: SubDataInfo,
                     num_frames = get_num_frames(img_data.imgs[0])
                     if num_frames == 1:
                         modality_label: str = "sbref"
-                elif modality_type.lower() == 'dwi' and (len(img_data.bvals) == 0 and len(img_data.bvecs) == 0):
-                    modality_label: str = "sbref"
                 
                 # Re-write BIDS name dictionary and update to reflect NIFTI data
                 bids_name_dict: Dict = construct_bids_name(sub_data=sub_data,
@@ -1308,8 +1308,6 @@ def nifti_to_bids(sub_data: SubDataInfo,
                 num_frames = get_num_frames(img_data.imgs[0])
                 if num_frames == 1:
                     modality_label: str = "sbref"
-            elif modality_type.lower() == 'dwi' and (len(img_data.bvals) == 0 and len(img_data.bvecs) == 0):
-                modality_label: str = "sbref"
 
             if (modality_type.lower() == 'dwi' or modality_label.lower() == 'dwi') and append_dwi_info:
                 bvals: List[int] = get_bvals(img_data.bvals[0])
@@ -1317,6 +1315,8 @@ def nifti_to_bids(sub_data: SubDataInfo,
                 _label: str = ""
                 for bval in bvals:
                     _label += f"b{bval}"
+                if int(bvals[0]) == 0:
+                    modality_label: str = "sbref"
                 if echo_time:
                     echo_time: float = float(echo_time) * 1000
                     _label += f"TE{int(echo_time)}"
