@@ -105,7 +105,6 @@ BIDS_INFO: Dict = {
     "ContrastBolusIngredient":"",
     # Func
     "RepetitionTime":"",
-    "VolumeTiming":"",
     "TaskName":"",
     "NumberOfVolumesDiscardedByScanner":"",
     "NumberOfVolumesDiscardedByUser":"",
@@ -169,7 +168,6 @@ BIDS_ORD_ARR: List[str] = [
     "InstitutionalDepartmentName",
     "ContrastBolusIngredient",
     "RepetitionTime",
-    "VolumeTiming",
     "TaskName",
     "NumberOfVolumesDiscardedByScanner",
     "NumberOfVolumesDiscardedByUser",

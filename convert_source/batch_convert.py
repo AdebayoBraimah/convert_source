@@ -1780,8 +1780,8 @@ def create_participant_tsv(out_dir: str) -> Tuple[str,str]:
             * Absolute file path to the participants TSV file (``participants.tsv``)
             * Absolute file path to the participants JSON file (``participants.json``)
     """
-    participant_tsv: str = os.path.join(out_dir,'participant.tsv')
-    participant_json: str = os.path.join(out_dir,'participant.json')
+    participant_tsv: str = os.path.join(out_dir,'participants.tsv')
+    participant_json: str = os.path.join(out_dir,'participants.json')
 
     if os.path.exists(participant_json):
         pass
