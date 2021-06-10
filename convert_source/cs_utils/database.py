@@ -558,7 +558,8 @@ def _export_tmp_bids_df(database: str,
                         sub_id: str,
                         modality_type: str,
                         modality_label: str,
-                        gzipped: bool = True
+                        gzipped: bool = True,
+                        ses_id: Optional[str] = ""
                         ) -> pd.DataFrame:
     """Helper function that constructs modality specificy dataframes pertaining to scan type and acquisition time.
 
@@ -576,6 +577,7 @@ def _export_tmp_bids_df(database: str,
         modality_type: Modality type for the BIDS related modality.
         modality_label: Modality label for the BIDS related modality.
         gzipped: Whether the output BIDS NIFTI file has been gzipped.
+        ses_id: Session ID.
 
     Returns:
         Scan dataframe for the specified subject, modality label, and modality type.
@@ -607,8 +609,20 @@ def _export_tmp_bids_df(database: str,
     # Filter by subject ID
     df: pd.DataFrame = df_tmp.loc[df_tmp['sub_id'] == f'{sub_id}']
 
+    if ses_id:
+        df: pd.DataFrame = df.loc[df['ses_id'] == f'{ses_id}']
+
     # Filter by modality type and modality label
-    mod = modality_type + "/"
+    # mod: str = f"sub-{sub_id}/"
+
+    # if ses_id:
+    #     df: pd.DataFrame = df.loc[df['ses_id'] == f'{ses_id}']
+    #     mod: str = mod + f"ses-{ses_id}/"
+    
+    # mod: str = mod + modality_type + "/"
+
+    mod: str = modality_type + "/"
+
     df: pd.DataFrame = df[df['bids_name'].str.contains(f"{modality_label}")]
     df['bids_name'] = f'{mod}' + df['bids_name'].astype(str) + f'{ext}'
     df: pd.DataFrame = df.dropna(axis=0)
@@ -631,7 +645,8 @@ def _export_tmp_bids_df(database: str,
 def export_bids_scans_dataframe(database: str,
                                 sub_id: str,
                                 search_dict: Dict[str,str],
-                                gzipped: bool = True
+                                gzipped: bool = True,
+                                ses_id: Optional[str] = ""
                                 ) -> pd.DataFrame:
     """Convenience function that constructs BIDS scan dataframe (that can later be exported as a TSV).
     The resulting dataframe is consistent with the BIDS scan TSV output file 
@@ -649,6 +664,7 @@ def export_bids_scans_dataframe(database: str,
         sub_id: Subject ID.
         search_dict: Dictionary of modality specific search terms, constructed from the ``read_config`` function.
         gzipped: Whether the output BIDS NIFTI file has been gzipped.
+        ses_id: Session ID.
 
     Returns:
         Scan dataframe for a subject.
@@ -669,7 +685,8 @@ def export_bids_scans_dataframe(database: str,
                                                             sub_id=sub_id,
                                                             modality_type=modality_type,
                                                             modality_label=fmap_mod,
-                                                            gzipped=gzipped)
+                                                            gzipped=gzipped,
+                                                            ses_id=ses_id)
                     if len(df_tmp) == 0:
                         continue
                     else:
@@ -679,7 +696,8 @@ def export_bids_scans_dataframe(database: str,
                                                             sub_id=sub_id,
                                                             modality_type=modality_type,
                                                             modality_label=modality_label,
-                                                            gzipped=gzipped)
+                                                            gzipped=gzipped,
+                                                            ses_id=ses_id)
                 if len(df_tmp) == 0:
                     continue
                 else:
