@@ -357,7 +357,8 @@ def get_echo(json_file: str) -> float:
 
 def gzip_file(file: str,
               cprss_lvl: int = 6,
-              native: bool = True
+              native: bool = True,
+              log: Optional[LogFile] = None
               ) -> str:
     """Gzips file. Native implementation of gzipping files is prefered with
     this function provided that the system is UNIX. Otherwise, a pythonic 
@@ -367,6 +368,7 @@ def gzip_file(file: str,
         file: Input file.
         cprss_lvl: Compression level [1 - 9] - 1 is fastest, 9 is smallest.
         native: Uses native implementation of gzip.
+        log: LogFile object that writes to some output log file.
         
     Returns: 
         Gzipped file.
@@ -378,6 +380,28 @@ def gzip_file(file: str,
         else:
             native = True
     
+    # Check if the file exists
+    if os.path.exists(file):
+        pass
+    elif os.path.exists(file + '.gz'):
+        file: str = file + ".gz"
+    elif os.path.exists(file[:-3]):
+        file: str = file[:-3]
+
+    # Check if the file is already gzipped
+    if _is_gzipped(file=file) and ('.gz' in file.lower()):
+        return file
+    elif _is_gzipped(file=file) and ('.gz' not in file.lower()):
+        file_tmp: str = file + ".gz"
+        os.rename(file,file_tmp)
+        return file_tmp
+    elif (not _is_gzipped(file=file)) and ('.gz' in file.lower()):
+        file_tmp: str = file[:-3]
+        os.rename(file,file_tmp)
+        file: str = file_tmp
+    elif (not _is_gzipped(file=file)) and ('.gz' not in file.lower()):
+        pass
+    
     if native:
         # Native implementation
         tmp_file: str = file
@@ -387,13 +411,16 @@ def gzip_file(file: str,
         gzip_cmd: Command = Command("gzip")
         gzip_cmd.cmd_list.append(f"-{cprss_lvl}")
         gzip_cmd.cmd_list.append(file)
-        gzip_cmd.run()
+        gzip_cmd.run(log=log)
         return out_file
     else:
         # Define tempory file for I/O buffer stream
         tmp_file: File = File(file)
         [path, filename, ext] = tmp_file.file_parts()
         out_file: str = os.path.join(path,filename + ext + '.gz')
+
+        if log:
+            log.log(f"gzipping: {file}")
         
         # Pythonic gzip
         with open(file,"rb") as in_file:
@@ -405,7 +432,8 @@ def gzip_file(file: str,
         return out_file
 
 def gunzip_file(file: str,
-                native: bool = True
+                native: bool = True,
+                log: Optional[LogFile] = None
                 ) -> str:
     """Gunzips file. Native implementation of gunzipping files is prefered with
     this function provided that the system is UNIX. Otherwise, a pythonic 
@@ -414,6 +442,7 @@ def gunzip_file(file: str,
     Arguments:
         file: Input file.
         native: Uses native implementation of gunzip.
+        log: LogFile object that writes to some output log file.
         
     Returns: 
         Gunzipped file.
@@ -425,6 +454,28 @@ def gunzip_file(file: str,
         else:
             native = True
     
+    # Check if the file exists
+    if os.path.exists(file):
+        pass
+    elif os.path.exists(file + '.gz'):
+        file: str = file + ".gz"
+    elif os.path.exists(file[:-3]):
+        file: str = file[:-3]
+    
+    # Check if the file is alrady gunzipped
+    if _is_gzipped(file=file) and ('.gz' in file.lower()):
+        pass
+    elif _is_gzipped(file=file) and ('.gz' not in file.lower()):
+        file_tmp: str = file + ".gz"
+        os.rename(file,file_tmp)
+        file: str = file_tmp
+    elif (not _is_gzipped(file=file)) and ('.gz' in file.lower()):
+        file_tmp: str = file[:-3]
+        os.rename(file,file_tmp)
+        return file_tmp
+    elif (not _is_gzipped(file=file)) and ('.gz' not in file.lower()):
+        return file
+    
     if native:
         # Native implementation
         tmp_file: str = file
@@ -433,13 +484,16 @@ def gunzip_file(file: str,
         out_file: str = os.path.join(path,filename + ext[:-3])
         gunzip_cmd: Command = Command("gunzip")
         gunzip_cmd.cmd_list.append(file)
-        gunzip_cmd.run()
+        gunzip_cmd.run(log=log)
         return out_file
     else:
         # Define tempory file for I/O buffer stream
         tmp_file: File = File(file)
         [path, filename, ext] = tmp_file.file_parts()
         out_file: str = os.path.join(path,filename + ext[:-3])
+
+        if log:
+            log.log(f"gunzipping: {file}")
         
         # Pythonic gunzip
         with gzip.GzipFile(file,"rb") as in_file:
@@ -1616,3 +1670,26 @@ def list_dir_files(pathname: str,
         file_dir_list: List[str] = glob.glob(pathname=search)
         file_dir_list.sort()
         return file_dir_list
+
+def _is_gzipped(file: str) -> bool:
+    """Helper function that determines if a file is actually gzipped or not.
+    The file extension is ignored as the file itself is checked.
+
+    Usage example:
+        >>> _is_gzipped(file='MR0001.nii.gz')
+        'True'
+
+    Arguments:
+        file: Input file name.
+
+    Returns:
+        Boolean - ``True`` if the file is gzipped, and ``false`` otherwise.
+    """
+    GZIP_MAGIC_NUMBER = "1f8b"
+    with open(file=file,mode='r') as f:
+        try:
+            # This should fail if the file is actually gzipped, as the 
+            #   'utf-8' codec cannot decode byte 0x8b in position 1.
+            return f.read(2).encode("utf-8").hex() == GZIP_MAGIC_NUMBER
+        except UnicodeDecodeError:
+            return True
