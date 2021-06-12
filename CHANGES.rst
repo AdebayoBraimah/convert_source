@@ -6,7 +6,7 @@ CHANGES
 
 This version is an alpha release that contains several bug fixes and updates.
 
-* BUG FIX: Fix bug in which ``sbrefs`` were not written to subjects' ``scans.tsv`` files.
+* BUG FIX: Fixed bug in which ``sbrefs`` were not written to subjects' ``scans.tsv`` files.
 * BUG FIX: Fixed bug in which diffusion weighted image information was appended, despite not being indicated to do so.
 * BUG FIX: Fixed bug in which either corrupted or inaptly named were either not compressed/uncompressed.
 * UPDATE: Log output has been re-formatted to be more readable.
