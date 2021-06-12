@@ -559,7 +559,8 @@ def _export_tmp_bids_df(database: str,
                         modality_type: str,
                         modality_label: str,
                         gzipped: bool = True,
-                        ses_id: Optional[str] = ""
+                        ses_id: Optional[str] = "",
+                        task: Optional[bool] = False
                         ) -> pd.DataFrame:
     """Helper function that constructs modality specificy dataframes pertaining to scan type and acquisition time.
 
@@ -578,6 +579,7 @@ def _export_tmp_bids_df(database: str,
         modality_label: Modality label for the BIDS related modality.
         gzipped: Whether the output BIDS NIFTI file has been gzipped.
         ses_id: Session ID.
+        task: If modality type/label of interest is associated with a task.
 
     Returns:
         Scan dataframe for the specified subject, modality label, and modality type.
@@ -611,6 +613,11 @@ def _export_tmp_bids_df(database: str,
 
     if ses_id:
         df: pd.DataFrame = df.loc[df['ses_id'] == f'{ses_id}']
+    
+    if task:
+        df: pd.DataFrame = df[df["bids_name"].str.contains("task")]
+    else:
+        df: pd.DataFrame = df[~df["bids_name"].str.contains("task")]
 
     # Filter by modality type and modality label
     mod: str = modality_type + "/"
@@ -679,6 +686,43 @@ def export_bids_scans_dataframe(database: str,
                                                             modality_label=fmap_mod,
                                                             gzipped=gzipped,
                                                             ses_id=ses_id)
+                    if len(df_tmp) == 0:
+                        continue
+                    else:
+                        df_list.append(df_tmp)
+            elif modality_type == 'dwi':
+                dwi_mods: List[str] = [
+                    'dwi',
+                    'sbref'
+                ]
+
+                for dwi_mod in dwi_mods:
+                    df_tmp: pd.DataFrame = _export_tmp_bids_df(database=database,
+                                                            sub_id=sub_id,
+                                                            modality_type=modality_type,
+                                                            modality_label=dwi_mod,
+                                                            gzipped=gzipped,
+                                                            ses_id=ses_id)
+                    if len(df_tmp) == 0:
+                        continue
+                    else:
+                        df_list.append(df_tmp)
+            elif modality_type == 'func':
+                func_mods: List[str] = [
+                    'bold',
+                    'cbv',
+                    'phase',
+                    'sbref'
+                ]
+
+                for func_mod in func_mods:
+                    df_tmp: pd.DataFrame = _export_tmp_bids_df(database=database,
+                                                            sub_id=sub_id,
+                                                            modality_type=modality_type,
+                                                            modality_label=func_mod,
+                                                            gzipped=gzipped,
+                                                            ses_id=ses_id,
+                                                            task=True)
                     if len(df_tmp) == 0:
                         continue
                     else:
