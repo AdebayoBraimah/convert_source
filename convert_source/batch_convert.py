@@ -1626,10 +1626,11 @@ def log_file(log: str,
 
     now = datetime.now()
     dt_string = now.strftime("%A %B %d, %Y %H:%M:%S")
-    dcm2niix_version: str = get_dcm2niix_version(log=log)
 
     log.info(f"convert_source start: {dt_string}")
     log.info(f"convert_source v{__version__}")
+
+    dcm2niix_version: str = get_dcm2niix_version(log=log)
     log.info(f"dcm2niix {dcm2niix_version}")
     return log
 
