@@ -515,7 +515,6 @@ class LogFile(File):
         Args:
             log_cmd: Message to be written to log file
         """
-
         # Log command/message
         self.info(log_cmd)
 
@@ -662,15 +661,14 @@ class Command(object):
                 * Standard output writtent to file should the 'stdout' option be used.
                 * Standard error writtent to file should the 'stdout' option be used.
         """
-        
         # Create command str for log
         cmd: str = ' '.join(self.cmd_list) # Join list for logging purposes
         
         if log:
             if debug:
-                log.debug(f"Running: {cmd}")
+                log.debug(f"Running:\t\t {cmd}")
             else:
-                log.info(f"Running: {cmd}")
+                log.info(f"Running:\t\t {cmd}")
         
         if log:
             if dryrun:
