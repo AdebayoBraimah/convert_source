@@ -228,7 +228,7 @@ def batch_proc(study_img_dir: str,
                          desc="Processing source data files",
                          position=0,
                          leave=True):
-        log.info(f"\n\n Processing: {sub_data.data} \n")
+        log.info(f"Processing:\t {sub_data.data}")
 
         data: str = sub_data.data
         bids_name_dict: Dict = deepcopy(BIDS_PARAM)
@@ -1183,7 +1183,8 @@ def nifti_to_bids(sub_data: SubDataInfo,
                   gzip: bool = True,
                   append_dwi_info: bool = True,
                   zero_pad: int = 2,
-                  cprss_lvl: int = 6
+                  cprss_lvl: int = 6,
+                  log: Optional[LogFile] = None
                   ) -> Tuple[List[str],List[str],List[str],List[str]]:
     """Converts existing NIFTI data to BIDS raw data.
     
@@ -1209,6 +1210,7 @@ def nifti_to_bids(sub_data: SubDataInfo,
         append_dwi_info: Appends DWI acquisition information (unique non-zero b-values, and TE, in msec.) to BIDS acquisition filename.
         zero_pad: Number of zeroes to pad the run number up to (zero_pad=2 is '01').
         cprss_lvl: Compression level [1 - 9] - 1 is fastest, 9 is smallest.
+        log: LogFile object for logging.
 
     Returns:
         Tuple of lists that contains:
@@ -1425,17 +1427,21 @@ def nifti_to_bids(sub_data: SubDataInfo,
                 
                 if gzip and ('.nii.gz' in out_nii):
                     out_tmp: str = gunzip_file(file=out_nii,
-                                            native=True)
+                                            native=True,
+                                            log=log)
                     out_nii = gzip_file(file=out_tmp,
                                         cprss_lvl=cprss_lvl,
-                                        native=True)
+                                        native=True,
+                                        log=log)
                 elif (not gzip) and ('.nii.gz' in out_nii):
                     out_nii = gunzip_file(file=out_nii,
-                                        native=True)
+                                        native=True,
+                                        log=log)
                 elif gzip and ('.nii' in out_nii):
                     out_nii = gzip_file(file=out_nii,
                                         cprss_lvl=cprss_lvl,
-                                        native=True)
+                                        native=True,
+                                        log=log)
                 
                 imgs.append(out_nii)
                 jsons.append(out_json)
@@ -1555,7 +1561,8 @@ def data_to_bids(sub_data: SubDataInfo,
                                 gzip=gzip,
                                 append_dwi_info=append_dwi_info,
                                 zero_pad=zero_pad,
-                                cprss_lvl=cprss_lvl)
+                                cprss_lvl=cprss_lvl,
+                                log=log)
         return (imgs,
                 jsons,
                 bvals,
@@ -1619,14 +1626,14 @@ def log_file(log: str,
 
     now = datetime.now()
     dt_string = now.strftime("%A %B %d, %Y %H:%M:%S")
-    dcm2niix_version: str = get_dcm2niix_version()
+    dcm2niix_version: str = get_dcm2niix_version(log=log)
 
     log.info(f"convert_source start: {dt_string}")
     log.info(f"convert_source v{__version__}")
     log.info(f"dcm2niix {dcm2niix_version}")
     return log
 
-def get_dcm2niix_version() -> str:
+def get_dcm2niix_version(log: Optional[LogFile] = None) -> str:
     """Gets the version of ``dcm2niix`` being used on the current OS. 
 
     This function assumes that dependency checks have already been performed, and that ``dcm2niix`` is in the system path.
@@ -1639,6 +1646,9 @@ def get_dcm2niix_version() -> str:
         >>> dcm_version = get_dcm2niix_version()
         >>> dcm_version
         'v1.0.20201102'
+    
+    Arguments:
+        log: LogFile object for logging.
 
     Returns:
         ``dcm2niix`` version used on the current OS.
@@ -1648,9 +1658,12 @@ def get_dcm2niix_version() -> str:
 
     dcm: Command = Command("dcm2niix")
     dcm.cmd_list.append("--version")
-    dcm.run(stdout=dcm_ver_txt)
+    dcm.run(stdout=dcm_ver_txt,log=log)
 
-    print("\n\n Disregard 'Failed with returncode 3' message - this message arises when obtaining dcm2niix's version. \n")
+    if log:
+        log.log("Disregard 'Failed with returncode 3' message - this message arises when obtaining dcm2niix's version.")
+    else:
+        print("\n\n Disregard 'Failed with returncode 3' message - this message arises when obtaining dcm2niix's version. \n")
 
     with open(dcm_ver_txt,'r') as f:
         lines = f.readlines()
