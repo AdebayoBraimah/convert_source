@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# -*- coding: utf-8 -*-
+
+# TODO:
+#   * [ ] Finish scripting the deployment process
 
 # Commands for deploying a package to PyPI
 
@@ -25,3 +29,21 @@ twine upload dist/*
 
 # curl https://bootstrap.pypa.io/get-pip.py | python
 # pip install --upgrade setuptools
+
+if [[ ${package_dir}/build ]]; then
+    cd ${package_dir}
+    rm -rf build .eggs *.egg* dist
+    cd ${cwd}
+fi
+
+cd ${package_dir}
+
+python setup.py sdist bdist_wheel
+
+if [[ "${check_dist}" = "true" ]]; then
+    twine check dist/*
+fi
+
+if [[ "${test_dist}" = "true" ]]; then
+    twine upload dist/*
+fi

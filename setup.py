@@ -34,7 +34,7 @@ setup(name                           = 'convert_source',                    # Re
       long_description               = readme,
       long_description_content_type  = 'text/markdown',
       author                         = 'Adebayo Braimah',
-      author_email                   = 'adebayo.braimah@cchmc.org',
+      author_email                   = 'adebayo.braimah@gmail.com',
       include_package_data           = True,
       url                            = 'https://github.com/AdebayoBraimah/convert_source'
       # entry_points                   = {'console_scripts': ['study_proc=convert_source.bin.study_proc:main']}
