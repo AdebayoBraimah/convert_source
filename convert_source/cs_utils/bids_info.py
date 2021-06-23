@@ -503,6 +503,7 @@ def search_bids(s: str,
             bids_name_dict[modality_type]['modality_label'] = modality_label
         return bids_name_dict
     
+    # Use dict.get method here
     if depth(bids_search[modality_type]) == 3:
         try:
             for (k1,v1),(k2,v2) in zip(bids_search[modality_type][modality_label].items(),bids_map[modality_type][modality_label].items()):
