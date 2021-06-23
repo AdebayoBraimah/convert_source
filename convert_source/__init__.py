@@ -12,16 +12,16 @@ with open(_version_file,"r") as f:
     f.close()
 
 # More information about organizing author information:
-# https://stackoverflow.com/questions/1523427/what-is-the-common-header-format-of-python-files
-# http://epydoc.sourceforge.net/manual-fields.html#module-metadata-variables
+#   * https://stackoverflow.com/questions/1523427/what-is-the-common-header-format-of-python-files
+#   * http://epydoc.sourceforge.net/manual-fields.html#module-metadata-variables
 
-__author__ = "Adebayo Braimah"
-__credits__ = ["Adebayo Braimah",
-               "Cincinnati Children's Hospital Medical Center", 
-               "Imaging Research Center", 
-               "CCHMC Dept. of Radiology"]
-__license__ = "GPL"
-__version__ = _cs_version
-__maintainer__ = "Adebayo Braimah"
-__email__ = "adebayo.braimah@gmail.com"
-__status__ = "Development"
+__author__          = "Adebayo Braimah"
+__credits__         = ["Adebayo Braimah",
+                       "Cincinnati Children's Hospital Medical Center", 
+                       "Imaging Research Center", 
+                       "CCHMC Dept. of Radiology"]
+__license__         = "GPL"
+__version__         = _cs_version
+__maintainer__      = "Adebayo Braimah"
+__email__           = "adebayo.braimah@gmail.com"
+__status__          = "Development"
