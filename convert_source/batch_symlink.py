@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Command line wrapper for `convert_source`'s study directory symlink functions. 
+"""Command line wrapper for ``convert_source``'s study directory symlink functions. 
    Performs symlinking for a study's subject imaging data.
 """
 import pathlib
@@ -14,13 +14,14 @@ from typing import (
 )
 
 _pkg_path: str = str(
-    pathlib.Path(
-        os.path.abspath(__file__)
-            ).parents[2])
+                    pathlib.Path(
+                        os.path.abspath(__file__)
+                            ).parents[2])
 
 sys.path.append(_pkg_path)
 
 from convert_source.cs_utils.fileio import LogFile
+from convert_source.cs_utils.utils import sym_link
 
 link_version = '0.0.1'
 
@@ -106,6 +107,8 @@ def create_study_sym_links(study_dir: str,
                            infile: str,
                            mapfile: str,
                            outdir: str,
+                           native: Optional[bool] = True,
+                           overwrite: Optional[bool] = False,
                            log_file: Optional[LogFile] = None
                           ) -> List[str]:
     """Creates another study directory of sym-linked subject directories to the original study directory.
@@ -124,13 +127,15 @@ def create_study_sym_links(study_dir: str,
         infile: Input file of directories to be mapped.
         mapfile: Corresponding file that contains the subject directories to be mapped to.
         outdir: Output directory for all symlinked directories.
+        native: Use native UNIX linking tool instead of python's symbolic linking tool.
+        overwrite: Overwrite symbolic link if it already exists.
         log_file: LogFile object for logging.
     
     Returns:
         List of sym-linked directories.
         
     Raises:
-        IndexError is raised if the number of entries in ``infile`` and ``mapfile`` are not equal.
+        IndexError: Raised if the number of entries in ``infile`` and ``mapfile`` are not equal.
     """
     study_dir: str = os.path.abspath(study_dir)
 
@@ -165,7 +170,10 @@ def create_study_sym_links(study_dir: str,
         sub_dir: str = os.path.join(study_dir,i)
         tar_dir: str = os.path.join(outdir,j)
 
-        if os.path.exists(tar_dir) and os.path.islink(tar_dir):
+        if os.path.exists(tar_dir) and os.path.islink(tar_dir) and overwrite:
+            if log_file:
+                log_file.log(f"(Symbolically linked) directory has been overwritten, linking the following: {i} -> {j}.")
+        elif os.path.exists(tar_dir) and os.path.islink(tar_dir):
             if log_file:
                 log_file.log(f"(Symbolically linked) directory already exists: {i} -> {j}.")
         elif os.path.exists(tar_dir):
@@ -174,7 +182,9 @@ def create_study_sym_links(study_dir: str,
         else:
             if log_file:
                 log_file.log(f"Symbollically linked directories: {i} -> {j}.")
-            os.symlink(sub_dir,tar_dir)
+            sym_link(src=sub_dir,
+                     tar=tar_dir,
+                     native=native)
         dir_list.append(tar_dir)
     return dir_list
 
