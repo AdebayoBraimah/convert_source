@@ -1,6 +1,16 @@
 CHANGES
 =========
 
+0.2.0a8
+---------
+
+This version is an alpha release that contains several bug fixes and updates.
+
+* BUG FIX: Fixed bug in which an unexpected parent DICOM directory could throw errors.
+* BUG FIX: Fixed bug in which BIDS related parameters were not added to the output file name.
+* UPDATE: More robust and reliable BIDS file naming.
+* ENHANCEMENT: Added support for native symbolic linking.
+
 0.2.0a7
 ---------
 

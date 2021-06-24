@@ -376,9 +376,9 @@ def gzip_file(file: str,
     # Check if native method was enabled.
     if native:
         if platform.system().lower() == 'windows':
-            native = False
+            native: bool = False
         else:
-            native = True
+            native: bool = True
     
     # Check if the file exists
     if os.path.exists(file):
@@ -450,9 +450,9 @@ def gunzip_file(file: str,
     # Check if native method was enabled.
     if native:
         if platform.system().lower() == 'windows':
-            native = False
+            native: bool = False
         else:
-            native = True
+            native: bool = True
     
     # Check if the file exists
     if os.path.exists(file):
@@ -963,18 +963,21 @@ def glob_dcm(dcm_dir: str) -> List[str]:
     
     for dir_ in dcm_dir_list:
         for root, dirs, files in os.walk(dir_):
-            # Only need the first DICOM file
-            tmp_dcm_file = files[0]
-            tmp_dcm_dir = root
-            tmp_file = os.path.join(tmp_dcm_dir, tmp_dcm_file)
+            try:
+                # Only need the first DICOM file
+                tmp_dcm_file = files[0]
+                tmp_dcm_dir = root
+                tmp_file = os.path.join(tmp_dcm_dir, tmp_dcm_file)
 
-            # Old implementation - need to test with current use cases
-            dcm_files.append(tmp_file)
-            break
-            
-            # if '.dcm' in tmp_file:
-            #     dcm_files.append(tmp_file)
-            #     break
+                # Old implementation - need to test with current use cases
+                dcm_files.append(tmp_file)
+                break
+                
+                # if '.dcm' in tmp_file:
+                #     dcm_files.append(tmp_file)
+                #     break
+            except IndexError:
+                continue
     return dcm_files
 
 def glob_img(img_dir: str) -> List[str]:
@@ -1317,7 +1320,6 @@ def comp_dict(d1: Dict,
         
     Raises:
         KeyError: Error that arises if input dictionaries do not have matching keys.
-        ValueError: Error that arises if one or more of the keys in either dictionary map NoneType values.
     """
     for k in d1:
         if (k not in d2):
@@ -1340,7 +1342,6 @@ def comp_dict(d1: Dict,
                         print (path, ":")
                         print (" - ", k," : ", d1[k])
                         print (" + ", k," : ", d2[k])
-                    raise ValueError("One or both input BIDS dictionaries map to NoneType values.")
     return True
 
 def depth(d: Dict) -> int:
@@ -1693,3 +1694,54 @@ def _is_gzipped(file: str) -> bool:
             return f.read(2).encode("utf-8").hex() == GZIP_MAGIC_NUMBER
         except UnicodeDecodeError:
             return True
+
+def sym_link(src: str,
+             tar: str,
+             native: Optional[bool] = False
+            ) -> None:
+    """Performs symbolic linking of some input source file or directory
+    to some target output file. The symbolic linking can be performed using 
+    the UNIX system's native linking tools or via python's linking tools.
+
+    NOTE:
+        * ``Windows`` platforms require running this funciton with elevated privileges as this operation cannot be performed otherwise. 
+
+    Usage example:
+        >>> sym_link(src='<source_file/directory>',
+                     tar='<target_file>',
+                     native=True)
+        ...
+
+    Arguments:
+        src: Input source file or directory.
+        tar: Output target file that is linked to the source file or directory.
+        native: Use native UNIX linking tool instead of python's symbolic linking tool.
+
+    Returns:
+        None
+    
+    Raises:
+        FileNotFoundError: Error that arises should the source directory/file not exist.
+    """
+    # Check if native method was enabled.
+    if native:
+        if platform.system().lower() == 'windows':
+            native: bool = False
+        else:
+            native: bool = True
+    
+    # Check if source file or directory exists
+    if os.path.exists(src):
+        pass
+    else:
+        raise FileNotFoundError("Cannot symbollicaly link a file or directory that does not exist.")
+    
+    # Perform native of pythonic symbolic linking
+    if native:
+        link_cmd: Command = Command("ln")
+        link_cmd.cmd_list.append("-s")
+        link_cmd.cmd_list.append(src)
+        link_cmd.cmd_list.append(tar)
+        link_cmd.run()
+    else:
+        os.symlink(src,tar)

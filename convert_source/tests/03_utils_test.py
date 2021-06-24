@@ -238,8 +238,13 @@ def test_comp_dict_funcs():
     assert comp_dict(d1,d2) == True
     with pytest.raises(KeyError):
         assert comp_dict(d1,d3) == False
-    with pytest.raises(ValueError):
-        assert comp_dict(d3,d4)
+    # This assertion is no longer valid
+    #   as a result of allowing NoneType
+    #   values to be mapped in either
+    #   dictionary.
+    # 
+    # with pytest.raises(ValueError):
+    #     assert comp_dict(d3,d4)
     assert depth(d1) == 3
     assert depth(d2) == 3
     assert depth(d3) == 3

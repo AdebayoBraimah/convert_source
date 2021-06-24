@@ -9,7 +9,7 @@
 
 #######################################
 # Usage function. Prints help and then
-# exits.
+#   exits.
 # Globals:
 #   None
 # Arguments:
