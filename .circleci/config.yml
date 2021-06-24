@@ -12,7 +12,7 @@ jobs:
     steps:
       - checkout
       - run:
-          command: python -m pip install pytest pytest-html -r requirements.txt --user
+          command: python -m pip install pytest pytest-html pytest-cov -r requirements.txt --user
           name: Install-deps
       - run:
           command: chmod -R 755 convert_source/tests
