@@ -1320,7 +1320,6 @@ def comp_dict(d1: Dict,
         
     Raises:
         KeyError: Error that arises if input dictionaries do not have matching keys.
-        ValueError: Error that arises if one or more of the keys in either dictionary map NoneType values.
     """
     for k in d1:
         if (k not in d2):
@@ -1343,7 +1342,6 @@ def comp_dict(d1: Dict,
                         print (path, ":")
                         print (" - ", k," : ", d1[k])
                         print (" + ", k," : ", d2[k])
-                    raise ValueError("One or both input BIDS dictionaries map to NoneType values.")
     return True
 
 def depth(d: Dict) -> int:

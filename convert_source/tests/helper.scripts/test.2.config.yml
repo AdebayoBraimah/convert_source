@@ -25,7 +25,6 @@ modality_search:
             rest: 
                 - rsfMR
                 - rest
-                - FFE
                 - FEEPI
         # ASL (arterial spin labeling) contrast
         cbv:
@@ -72,11 +71,6 @@ bids_search:
         # BOLD contrast
         bold: 
             rest:
-                acq:
-                ce:
-                dir:
-                rec:
-            visualstrobe:
                 acq:
                 ce:
                 dir:
@@ -129,11 +123,6 @@ bids_map:
         # BOLD contrast
         bold: 
             rest:
-                acq:
-                ce:
-                dir:
-                rec:
-            visualstrobe:
                 acq:
                 ce:
                 dir:
