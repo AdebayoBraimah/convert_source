@@ -6,10 +6,7 @@
 #######################################
 # NOTES                               #
 #######################################
-#
-# TODO                      
-#   * [ ] Finish scripting the deployment process
-#
+# 
 # Commands for deploying a package to PyPI
 #
 # Markdown badges
