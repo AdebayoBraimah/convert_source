@@ -43,8 +43,6 @@ function Usage() {
     -s, --setup-file    Python setup file.
 
   Optional arguments:
-    -w,--work-dir       Working directory to be used. If not specified, the 
-                          current working directory is used instead.
     --check-dist        Check whether distribution’s long description will 
                           render correctly on PyPI [RECOMMENDED].
     --test-dist         Perform a test upload to Test PyPI.
@@ -189,12 +187,10 @@ function check_dependency() {
 scripts_dir=$(realpath $(dirname ${0}))
 cleanup=true
 test_dist=false
-workdir=$(pwd)
 cwd=$(pwd)
 
 while [[ ${#} -gt 0 ]]; do
   case "${1}" in
-    -w|--work-dir) shift; workdir=${1} ;;
     -s|--setup-file) shift; setup_file=${1} ;;
     --test-dist) test_dist=true ;;
     --check-dist) check_dist=true ;;
@@ -230,18 +226,7 @@ done
 # DEPLOY PACKAGE                      #
 #######################################
 
-# workdir=${workdir}/tmp
-# 
-# if [[ ! -d ${workdir}/build ]]; then
-#   echo_blue "Creating working directory."
-#   mkdir -p ${workdir}/build
-#   workdir=$(realpath ${workdir})
-# fi
-# 
-# cd ${workdir}
-
 cd ${package_dir}
-
 python ${setup_file} sdist bdist_wheel
 
 if [[ ${check_dist} = true ]]; then
@@ -260,46 +245,16 @@ fi
 cd ${cwd}
 
 if [[ ${cleanup} = true ]]; then
-  # rm -rf ${workdir}
   rm -rf build .eggs *.egg* dist
 fi
 
 # Old example code
 # 
-# pip install twine
-# rm -rf build .eggs *.egg* dist
+# Upgrade pip if needed
+# curl https://bootstrap.pypa.io/get-pip.py | python
+# pip install --upgrade setuptools
 # 
-# python setup.py sdist bdist_wheel
-# 
-# # Test
-# twine check dist/*
-# twine upload --repository-url https://test.pypi.org/legacy/ dist/*
-# 
-# # Upload/deploy
-# twine upload dist/*
-# 
-# # Testing env
-# # conda create --name test1 python=3 
-# # conda activate test1
-# # conda remove --name test1 --all
-# 
-# # curl https://bootstrap.pypa.io/get-pip.py | python
-# # pip install --upgrade setuptools
-# 
-# if [[ ${package_dir}/build ]]; then
-#     cd ${package_dir}
-#     rm -rf build .eggs *.egg* dist
-#     cd ${cwd}
-# fi
-# 
-# cd ${package_dir}
-# 
-# python setup.py sdist bdist_wheel
-# 
-# if [[ "${check_dist}" = "true" ]]; then
-#     twine check dist/*
-# fi
-# 
-# if [[ "${test_dist}" = "true" ]]; then
-#     twine upload dist/*
-# fi
+# Testing env
+# conda create --name test1 python=3 
+# conda activate test1
+# conda remove --name test1 --all
