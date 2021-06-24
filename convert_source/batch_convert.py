@@ -712,7 +712,7 @@ def _get_bids_name_args(bids_name_dict: Dict,
     case4: bool = False
 
     params_var: List[str] = [task, acq, ce, acq_dir, rec, echo, case1, mag2, case2, case3, case4]
-    params_str: List[str] = ["task", "acq", "ce", "acq_dir", "rec", "echo", "case1", "mag2", "case2", "case3", "case4"]
+    params_str: List[str] = ["task", "acq", "ce", "dir", "rec", "echo", "case1", "mag2", "case2", "case3", "case4"]
 
     if len(params_str) == len(params_var):
         pass
