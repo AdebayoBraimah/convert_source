@@ -1566,36 +1566,39 @@ def get_dcm_scan_tech(dcm_file: str,
     dcm_fields: List[str] = ['SeriesDescription', 'ImageType', 'ProtocolName']
 
     for dcm_field in dcm_fields:
+        try:
             dcm_scan_tech_str: str = str(eval(f"ds.{dcm_field}")) # This makes me dangerously uncomfortable
+        except AttributeError:
+            dcm_scan_tech_str: str = ""
 
-            # Use dictionary to search in string
-            for i in search_arr:
-                if mod_found:
-                    break
-                for k,v in i.items():
-                    if depth(i) == 3:
-                        for k2,v2 in v.items():
+        # Use dictionary to search in string
+        for i in search_arr:
+            if mod_found:
+                break
+            for k,v in i.items():
+                if depth(i) == 3:
+                    for k2,v2 in v.items():
+                        mod_type: str = k
+                        mod_label: str = k2
+                        mod_task: str = ""
+                        mod_search: List[str] = v2
+                        if list_in_substr(in_list=mod_search,in_str=dcm_scan_tech_str):
+                            mod_found: bool = True
+                            modality_type: str = mod_type
+                            modality_label: str = mod_label
+                            task: str = mod_task
+                elif depth(i) == 4:
+                    for k2,v2 in v.items():
+                        for k3,v3 in v2.items():
                             mod_type: str = k
                             mod_label: str = k2
-                            mod_task: str = ""
-                            mod_search: List[str] = v2
+                            mod_task: str = k3
+                            mod_search: List[str] = v3
                             if list_in_substr(in_list=mod_search,in_str=dcm_scan_tech_str):
                                 mod_found: bool = True
                                 modality_type: str = mod_type
                                 modality_label: str = mod_label
                                 task: str = mod_task
-                    elif depth(i) == 4:
-                        for k2,v2 in v.items():
-                            for k3,v3 in v2.items():
-                                mod_type: str = k
-                                mod_label: str = k2
-                                mod_task: str = k3
-                                mod_search: List[str] = v3
-                                if list_in_substr(in_list=mod_search,in_str=dcm_scan_tech_str):
-                                    mod_found: bool = True
-                                    modality_type: str = mod_type
-                                    modality_label: str = mod_label
-                                    task: str = mod_task
 
     return (modality_type, 
             modality_label, 
