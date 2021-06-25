@@ -27,6 +27,7 @@ from typing import (
     Optional, 
     Set, 
     Tuple,
+    Type,
     Union
 )
 
@@ -649,8 +650,16 @@ def get_bvals(bval_file: Optional[str] = ""
     if bval_file and os.path.exists(bval_file):
         bval_file: str = os.path.abspath(bval_file)
         vals = np.loadtxt(bval_file)
-        vals_int = [ int(i) for i in vals ]
-        vals_nonzero = [ i for i in vals_int if i != 0 ]
+        
+        # NOTE: This try-except statement is here for situtions
+        #   in which a singular b-value is found in the b-value
+        #   text file.
+        try:
+            vals_int: List[int] = [ int(i) for i in vals ]
+        except TypeError:
+            vals_int: List[int] = [ int(vals) ]
+        
+        vals_nonzero: List[int] = [ i for i in vals_int if i != 0 ]
         bvals: List[float] = list(np.unique(vals_nonzero))
         return [ int(i) for i in bvals ]
     else:
@@ -1142,6 +1151,7 @@ def collect_info(parent_dir: str,
                                     prim_key='rel_path',
                                     column='file_id',
                                     value=db_info.get('rel_path',''))
+                                    
             if file_id:
                 if log:
                     log.log("Imaging data has already been processed and is stored in the database.")
