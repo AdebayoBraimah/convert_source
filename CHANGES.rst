@@ -1,6 +1,13 @@
 CHANGES
 =========
 
+0.2.0a11
+---------
+
+This version is an alpha release that contains several bug fixes and updates.
+
+* BUG FIX: 
+
 0.2.0a10
 ---------
 
