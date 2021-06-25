@@ -27,7 +27,6 @@ from typing import (
     Optional, 
     Set, 
     Tuple,
-    Type,
     Union
 )
 
