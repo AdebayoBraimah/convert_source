@@ -1,6 +1,14 @@
 CHANGES
 =========
 
+0.2.0a12
+---------
+
+This version is an alpha release that contains several bug fixes and updates.
+
+* BUG FIX: Fixed bug in which if a singular b-value was read from a b-value text file, then errors would be thrown.
+* BUG FIX: Fixed bug in which unprocessed source data was not converted to BIDS NIFTI data.
+
 0.2.0a11
 ---------
 
