@@ -150,7 +150,8 @@ def get_scan_time(par_file: str) -> Union[float,str]:
     return scan_time
 
 def get_echo_time(par_file: str,
-                 tmp_dir: Optional[str] = None
+                 tmp_dir: Optional[str] = None,
+                 raise_exc: Optional[bool] = False
                  ) -> float:
     """Reads the echo time (TE, in sec.) from a PAR header file.
 
@@ -167,9 +168,14 @@ def get_echo_time(par_file: str,
     Arguments:
         par_file: PAR header file.
         tmp_dir: Path to temporary directory.
+        raise_exc: Raise exception in the case of multi-echo acquisitions.
         
     Returns:
-        Echo time as a float.
+        Echo time as a float or ``None`` in the case of multi-echo data.
+    
+    Raises:
+        PARfileReadError: Exception that is raised if multi-echo PAR files 
+            are used as inputs.
     """
     if tmp_dir:
         pass
@@ -189,12 +195,16 @@ def get_echo_time(par_file: str,
         _ = tmp.rm_tmp_dir(rm_parent=False)
     
     if len(list(np.unique(mat[0:,16]))) > 1:
-        raise PARfileReadError(f"Two or more unique echo times were found in {par_file}. Please check.")
+        if raise_exc:
+            raise PARfileReadError(f"Two or more unique echo times were found in {par_file}. Please check.")
+        else:
+            return None
     else:
         return float(round(Decimal(float(np.unique(mat[0:,16]))/1000),4))
 
 def get_flip_angle(par_file: str,
-                   tmp_dir: Optional[str] = None
+                   tmp_dir: Optional[str] = None,
+                   raise_exc: Optional[bool] = False
                   ) -> float:
     """Reads the flip angle (in degrees) from a PAR header file.
 
@@ -211,9 +221,13 @@ def get_flip_angle(par_file: str,
     Arguments:
         par_file: PAR header file.
         tmp_dir: Path to temporary directory.
+        raise_exc: Raise exception in the case of multiple flip angles are found.
         
     Returns:
-        Flip angle as a float.
+        Flip angle as a float or None if multiple flip angles are found.
+    
+    Raises:
+        PARfileReadError: Exception that is raised if input PAR file contains multiple flip angles.
     """
     if tmp_dir:
         pass
@@ -233,6 +247,9 @@ def get_flip_angle(par_file: str,
         _ = tmp.rm_tmp_dir(rm_parent=False)
     
     if len(list(np.unique(mat[0:,21]))) > 1:
-        raise PARfileReadError(f"Two or more unique flip angles were found in {par_file}. Please check.")
+        if raise_exc:
+            raise PARfileReadError(f"Two or more unique flip angles were found in {par_file}. Please check.")
+        else:
+            return None
     else:
         return float(np.unique(mat[0:,21]))

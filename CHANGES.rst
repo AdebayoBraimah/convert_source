@@ -1,6 +1,16 @@
 CHANGES
 =========
 
+0.2.0a9
+---------
+
+This version is an alpha release that contains several bug fixes and updates.
+
+* BUG FIX: Fixed issue in which multiple converted NIFTI files would throw index error exception during BIDS renaming.
+* BUG FIX: Added minimal type checking for several BIDS metadata fields
+* BUG FIX: Fixed bug in which if par/nii was in the filepath, the source image file could be misclassified - thus subsequently throwing errors.
+* UPDATE: Added option to throw exceptions for PAR multi-echo data. At the moment, without test data correctly handling cases of multi-echo data are not possible for PAR REC data.
+
 0.2.0a8
 ---------
 

@@ -727,22 +727,25 @@ def _get_bids_name_args(bids_name_dict: Dict,
     return tuple(params_var)
 
 def make_bids_name(bids_name_dict: Dict,
-                    modality_type: str
-                   ) -> Tuple[str,str,str,str]:
+                    modality_type: str,
+                    num_imgs: Optional[int] = 4
+                   ) -> List[str]:
     """Creates a BIDS compliant filename given a BIDS name description dictionary, and the modality type.
 
     Usage example:
         >>> make_bids_name(bids_name_dict=bids_dict,
-        ...                 modality_type="anat")
+        ...                modality_type="anat",
+        ...                num_imgs=1)
         ...
         "sub-001_ses-001_run-01_T1w"
         
     Arguments:
         bids_name_dict: BIDS name description dictionary.
         modality_type: Modality type.
+        num_imgs: Number of medical images to be re-named.
 
     Returns:
-        BIDS compliant filename string.
+        List of BIDS compliant filenames.
     """
     
     bids_keys: List[str] = list(bids_name_dict[modality_type].keys())
@@ -785,75 +788,56 @@ def make_bids_name(bids_name_dict: Dict,
     if rec and ('rec' in bids_keys):
         f_name += f"_rec-{rec}"
 
-    # Set multiple run names
-    run1: str = str(run)
-    run2: str = add_to_zeropadded(run,1)
-    run3: str = add_to_zeropadded(run,2)
-    run4: str = add_to_zeropadded(run,3)
+    # Set name list in the case of 
+    #   multiple images
+    name_list: List[str] = []
 
-    f_name1: str = f_name + f"_run-{run1}"
-    f_name2: str = f_name + f"_run-{run2}"
-    f_name3: str = f_name + f"_run-{run3}"
-    f_name4: str = f_name + f"_run-{run4}"
+    for run_num in range(0,num_imgs):
+        run_id: str = add_to_zeropadded(run,run_num)
+        f_name_tmp: str = f_name + f"_run-{run_id}"
 
-    if echo and ('echo' in bids_keys):
-        f_name1 += f"_echo-{echo}"
-        f_name2 += f"_echo-{echo}"
-        f_name3 += f"_echo-{echo}"
-        f_name4 += f"_echo-{echo}"
+        if echo and ('echo' in bids_keys):
+            f_name_tmp += f_name_tmp + f"_echo-{echo}"
+        
+        name_list.append(f_name_tmp)
     
     if modality_type.lower() == 'fmap':
         if case1 and mag2:
-            f_name1: str = f_name1 + "_phasediff"
-            f_name2: str = f_name1 + "_magnitude1"
-            f_name3: str = f_name1 + "_magnitude2"
-            return (f_name1,
-                   f_name2,
-                   f_name3,
-                   "")
+            f_name1: str = name_list[0] + "_phasediff"
+            f_name2: str = name_list[0] + "_magnitude1"
+            f_name3: str = name_list[0] + "_magnitude2"
+            return ([f_name1,
+                     f_name2,
+                     f_name3])
         elif case1:
-            f_name1: str = f_name1 + "_phasediff"
-            f_name2: str = f_name1 + "_magnitude1"
-            return (f_name1,
-                   f_name2,
-                   "",
-                   "")
+            f_name1: str = name_list[0] + "_phasediff"
+            f_name2: str = name_list[0] + "_magnitude1"
+            return ([f_name1,
+                     f_name2])
         elif case2:
-            f_name1: str = f_name1 + "_phase1"
-            f_name2: str = f_name1 + "_phase2"
-            f_name3: str = f_name1 + "_magnitude1"
-            f_name4: str = f_name1 + "_magnitude2"
-            return (f_name1,
-                   f_name2,
-                   f_name3,
-                   f_name4)
+            f_name1: str = name_list[0] + "_phase1"
+            f_name2: str = name_list[0] + "_phase2"
+            f_name3: str = name_list[0] + "_magnitude1"
+            f_name4: str = name_list[0] + "_magnitude2"
+            return ([f_name1,
+                     f_name2,
+                     f_name3,
+                     f_name4])
         elif case3:
-            f_name1: str = f_name1 + "_magnitude"
-            f_name2: str = f_name1 + "_fieldmap"
-            return (f_name1,
-                   f_name2,
-                   "",
-                   "")
+            f_name1: str = name_list[0] + "_magnitude"
+            f_name2: str = name_list[0] + "_fieldmap"
+            return ([f_name1,
+                     f_name2])
         elif case4:
             modality_label = bids_name_dict[modality_type]['modality_label']
-            f_name1 += f"_{modality_label}"
-            f_name2 += f"_{modality_label}"
-            f_name3 += f"_{modality_label}"
-            f_name4 += f"_{modality_label}"
-            return (f_name1,
-                    f_name2,
-                    f_name3,
-                    f_name4)
+            for i in range(0,len(name_list)):
+                name_list[i] += f"_{modality_label}"
+            return name_list
     else:
         modality_label = bids_name_dict[modality_type]['modality_label']
-        f_name1 += f"_{modality_label}"
-        f_name2 += f"_{modality_label}"
-        f_name3 += f"_{modality_label}"
-        f_name4 += f"_{modality_label}"
-        return (f_name1,
-                f_name2,
-                f_name3,
-                f_name4)
+        for i in range(0,len(name_list)):
+                name_list[i] += f"_{modality_label}"
+        return name_list
 
 def source_to_bids(sub_data: SubDataInfo,
                    bids_name_dict: Dict,
@@ -1043,7 +1027,7 @@ def source_to_bids(sub_data: SubDataInfo,
                                                            out_dir=out_data_dir)
 
                 # Ensure that DWI and Fieldmap data are not kept as unknown
-                # by calling nifti_to_bids if that is the case.
+                #   by calling nifti_to_bids if that is the case.
                 if img_data.bvals[0] and img_data.bvecs[0] and not modality_type:
                     modality_type = 'dwi'
                     modality_label = 'dwi'
@@ -1103,11 +1087,10 @@ def source_to_bids(sub_data: SubDataInfo,
                     pass
                 else:
                     modality_type: str = "unknown"
-                
-                [bids_1, bids_2, bids_3, bids_4] = make_bids_name(bids_name_dict=bids_name_dict,
-                                                                   modality_type=modality_type)
 
-                bids_names: List[str] = [bids_1, bids_2, bids_3, bids_4]
+                bids_names: List[str] = make_bids_name(bids_name_dict=bids_name_dict,
+                                                       modality_type=modality_type,
+                                                       num_imgs=len(img_data.imgs))
                 
                 # Image data return lists
                 imgs: List[str] = []
@@ -1394,11 +1377,10 @@ def nifti_to_bids(sub_data: SubDataInfo,
                 pass
             else:
                 modality_type: str = "unknown"
-            
-            [bids_1, bids_2, bids_3, bids_4] = make_bids_name(bids_name_dict=bids_name_dict,
-                                                            modality_type=modality_type)
-            
-            bids_names: List[str] = [bids_1, bids_2, bids_3, bids_4]
+
+            bids_names: List[str] = make_bids_name(bids_name_dict=bids_name_dict,
+                                                   modality_type=modality_type,
+                                                   num_imgs=len(img_data.imgs))
             
             # Image data return lists
             imgs: List[str] = []

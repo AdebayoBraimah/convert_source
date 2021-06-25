@@ -116,6 +116,9 @@ def construct_bids_dict(meta_dict: Optional[Dict] = None,
     
     # Update BIDS ordered array
     meta_list: List[str] = list(meta_dict.keys())
+    json_list: List[str] = list(json_dict.keys())
+
+    ordered_array.extend(json_list)
     ordered_array.extend(meta_list)
     ordered_list: List[str] = []
 

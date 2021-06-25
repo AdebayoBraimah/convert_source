@@ -112,7 +112,7 @@ def get_data_params(file: str,
                          "TotalReadoutTime": tot_read_time,
                          "AcquisitionDuration": scan_time,
                          "SourceDataFormat": source_format})
-    elif 'par' in file.lower():
+    elif '.par' in file.lower():
         wfs: float = get_wfs(file)
         red_fact: float = par_red_fact(file)
         mb: int = par_mb(file)
@@ -133,7 +133,7 @@ def get_data_params(file: str,
                          "EchoTime": echo_time,
                          "FlipAngle": flip_angle,
                          "SourceDataFormat": source_format})
-    elif 'nii' in file.lower():
+    elif '.nii' in file.lower():
         tr: Union[float,str] = get_nii_tr(file)
         source_format: str = "NIFTI"
         tmp_dict.update({"RepetitionTime": tr,
