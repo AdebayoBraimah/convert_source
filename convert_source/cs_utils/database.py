@@ -758,7 +758,8 @@ def query_db(database:str,
     """Database query wrapper function that writes and performs a query for some provided value.
 
     NOTE:
-        The SQL query performed in this function assumes that the value is of datatype ``TEXT``.
+        * The SQL query performed in this function assumes that the value is of datatype ``TEXT``.
+        * If ``column`` is not provided, then it is assumed that ``table`` and ``column`` share the same name.
 
     Usage example:
         >>> sub_id = query_db(database='file.db',
