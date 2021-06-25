@@ -1150,8 +1150,13 @@ def collect_info(parent_dir: str,
                                     prim_key='rel_path',
                                     column='file_id',
                                     value=db_info.get('rel_path',''))
+
+            bids_name: str = query_db(database=database, 
+                                      table='bids_name', 
+                                      prim_key='file_id', 
+                                      value=file_id)
                                     
-            if file_id:
+            if file_id and bids_name:
                 if log:
                     log.log("Imaging data has already been processed and is stored in the database.")
             else:
