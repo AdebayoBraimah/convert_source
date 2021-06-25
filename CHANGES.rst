@@ -6,7 +6,7 @@ CHANGES
 
 This version is an alpha release that contains several bug fixes and updates.
 
-* BUG FIX: 
+* BUG FIX: Fixed bug in which DICOM header scan technique could not be read, and would thus throw exceptions. This now handled more gracefully.
 
 0.2.0a10
 ---------
