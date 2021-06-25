@@ -11,11 +11,15 @@ import re
 import pydicom
 import numpy as np
 
-from collections import deque
 from json import JSONDecodeError
 from copy import deepcopy
 from shutil import copy
 from tqdm import tqdm
+
+from collections import (
+    deque,
+    OrderedDict
+)
 
 from typing import (
     List, 
@@ -572,7 +576,6 @@ def update_json(json_file: str,
     Returns: 
         Updated JSON file.
     """
-    
     # Check if JSON file exists, if not, then create JSON file
     if not os.path.exists(json_file):
         with open(json_file,"w"): pass
@@ -618,11 +621,12 @@ def dict_multi_update(dictionary: Optional[Dict] = None,
     if dictionary:
         new_dict: Dict = deepcopy(dictionary)
     else:
-        new_dict: Dict = {}
+        new_dict: OrderedDict = OrderedDict({})
     
     for key,item in kwargs.items():
         tmp_dict: Dict = {key:item}
-        new_dict.update(tmp_dict)
+        if (isinstance(item,int))or (isinstance(item,float)) or (isinstance(item,str)) or (isinstance(item,list)):
+            new_dict.update(tmp_dict)
     return new_dict
 
 def get_bvals(bval_file: Optional[str] = ""
@@ -1511,7 +1515,10 @@ def get_dcm_scan_tech(dcm_file: str,
     ds = pydicom.dcmread(dcm_file)
 
     # Search DICOM header for Scan Technique
-    dcm_scan_tech_str = str(ds[0x2001,0x1020])
+    try:
+        dcm_scan_tech_str: str = str(ds[0x2001,0x1020])
+    except KeyError:
+        dcm_scan_tech_str: str = ""
 
     # Use dictionary to search in string
     for i in search_arr:
@@ -1553,7 +1560,7 @@ def get_dcm_scan_tech(dcm_file: str,
     dcm_fields: List[str] = ['SeriesDescription', 'ImageType', 'ProtocolName']
 
     for dcm_field in dcm_fields:
-            dcm_scan_tech_str = str(eval(f"ds.{dcm_field}")) # This makes me dangerously uncomfortable
+            dcm_scan_tech_str: str = str(eval(f"ds.{dcm_field}")) # This makes me dangerously uncomfortable
 
             # Use dictionary to search in string
             for i in search_arr:
