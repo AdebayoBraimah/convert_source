@@ -1,6 +1,14 @@
 CHANGES
 =========
 
+0.2.0a10
+---------
+
+This version is an alpha release that contains several bug fixes and updates.
+
+* BUG FIX: Removed gzip/gunzip file checks, as this caused file and BIDS validation issues.
+* BUG FIX: Added support for all caps BIDS metadata, and exclusion of non-BIDS metadata rather than raising exceptions.
+
 0.2.0a9
 ---------
 

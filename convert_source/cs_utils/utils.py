@@ -392,19 +392,22 @@ def gzip_file(file: str,
     elif os.path.exists(file[:-3]):
         file: str = file[:-3]
 
-    # Check if the file is already gzipped
-    if _is_gzipped(file=file) and ('.gz' in file.lower()):
-        return file
-    elif _is_gzipped(file=file) and ('.gz' not in file.lower()):
-        file_tmp: str = file + ".gz"
-        os.rename(file,file_tmp)
-        return file_tmp
-    elif (not _is_gzipped(file=file)) and ('.gz' in file.lower()):
-        file_tmp: str = file[:-3]
-        os.rename(file,file_tmp)
-        file: str = file_tmp
-    elif (not _is_gzipped(file=file)) and ('.gz' not in file.lower()):
-        pass
+    # NOTE: Removing gzip file checks as this caused
+    #   file and BIDS validation issues.
+    # 
+    # # Check if the file is already gzipped
+    # if _is_gzipped(file=file) and ('.gz' in file.lower()):
+    #     return file
+    # elif _is_gzipped(file=file) and ('.gz' not in file.lower()):
+    #     file_tmp: str = file + ".gz"
+    #     os.rename(file,file_tmp)
+    #     return file_tmp
+    # elif (not _is_gzipped(file=file)) and ('.gz' in file.lower()):
+    #     file_tmp: str = file[:-3]
+    #     os.rename(file,file_tmp)
+    #     file: str = file_tmp
+    # elif (not _is_gzipped(file=file)) and ('.gz' not in file.lower()):
+    #     pass
     
     if native:
         # Native implementation
@@ -466,19 +469,22 @@ def gunzip_file(file: str,
     elif os.path.exists(file[:-3]):
         file: str = file[:-3]
     
-    # Check if the file is alrady gunzipped
-    if _is_gzipped(file=file) and ('.gz' in file.lower()):
-        pass
-    elif _is_gzipped(file=file) and ('.gz' not in file.lower()):
-        file_tmp: str = file + ".gz"
-        os.rename(file,file_tmp)
-        file: str = file_tmp
-    elif (not _is_gzipped(file=file)) and ('.gz' in file.lower()):
-        file_tmp: str = file[:-3]
-        os.rename(file,file_tmp)
-        return file_tmp
-    elif (not _is_gzipped(file=file)) and ('.gz' not in file.lower()):
-        return file
+    # NOTE: Removing gunzip file checks as this caused
+    #   file and BIDS validation issues.
+    # 
+    # # Check if the file is alrady gunzipped
+    # if _is_gzipped(file=file) and ('.gz' in file.lower()):
+    #     pass
+    # elif _is_gzipped(file=file) and ('.gz' not in file.lower()):
+    #     file_tmp: str = file + ".gz"
+    #     os.rename(file,file_tmp)
+    #     file: str = file_tmp
+    # elif (not _is_gzipped(file=file)) and ('.gz' in file.lower()):
+    #     file_tmp: str = file[:-3]
+    #     os.rename(file,file_tmp)
+    #     return file_tmp
+    # elif (not _is_gzipped(file=file)) and ('.gz' not in file.lower()):
+    #     return file
     
     if native:
         # Native implementation
@@ -1679,28 +1685,31 @@ def list_dir_files(pathname: str,
         file_dir_list.sort()
         return file_dir_list
 
-def _is_gzipped(file: str) -> bool:
-    """Helper function that determines if a file is actually gzipped or not.
-    The file extension is ignored as the file itself is checked.
-
-    Usage example:
-        >>> _is_gzipped(file='MR0001.nii.gz')
-        'True'
-
-    Arguments:
-        file: Input file name.
-
-    Returns:
-        Boolean - ``True`` if the file is gzipped, and ``false`` otherwise.
-    """
-    GZIP_MAGIC_NUMBER = "1f8b"
-    with open(file=file,mode='r') as f:
-        try:
-            # This should fail if the file is actually gzipped, as the 
-            #   'utf-8' codec cannot decode byte 0x8b in position 1.
-            return f.read(2).encode("utf-8").hex() == GZIP_MAGIC_NUMBER
-        except UnicodeDecodeError:
-            return True
+# NOTE: Commenting out this helper function as no other function depends on this
+#   helper function.
+# 
+# def _is_gzipped(file: str) -> bool:
+#     """Helper function that determines if a file is actually gzipped or not.
+#     The file extension is ignored as the file itself is checked.
+# 
+#     Usage example:
+#         >>> _is_gzipped(file='MR0001.nii.gz')
+#         'True'
+# 
+#     Arguments:
+#         file: Input file name.
+# 
+#     Returns:
+#         Boolean - ``True`` if the file is gzipped, and ``false`` otherwise.
+#     """
+#     GZIP_MAGIC_NUMBER = "1f8b"
+#     with open(file=file,mode='r') as f:
+#         try:
+#             # This should fail if the file is actually gzipped, as the 
+#             #   'utf-8' codec cannot decode byte 0x8b in position 1.
+#             return f.read(2).encode("utf-8").hex() == GZIP_MAGIC_NUMBER
+#         except UnicodeDecodeError:
+#             return True
 
 def sym_link(src: str,
              tar: str,

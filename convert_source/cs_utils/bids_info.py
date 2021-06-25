@@ -62,12 +62,13 @@ def is_camel_case(s: str,
         Boolean.
     """
     if bids_case:
-        return s != s.lower() and s != s.upper() and s[0].isupper() and "_" not in s
+        return (s != s.lower() and s != s.upper() and s[0].isupper() and "_" not in s) or (s == s.upper())
     else:
         return s != s.lower() and s != s.upper() and "_" not in s
 
 def construct_bids_dict(meta_dict: Optional[Dict] = None,
                         json_dict: Optional[Dict] = None,
+                        raise_exec: Optional[bool] = False
                         ) -> Dict:
     """Constructs dictionary of relevant BIDS related information that includes subject and session IDs, in addition
     to various metadata. Custom BIDS fields can also be added through the metadata dictionary.
@@ -83,12 +84,14 @@ def construct_bids_dict(meta_dict: Optional[Dict] = None,
     Arguments:
         meta_dict: Metadata dictionary that contains the relevant BIDS metadata.
         json_dict: Dictionary constructed from the BIDS JSON file, or some secondary dictionary.
+        raise_exec: Raises exception in the case that BIDS Metadata is not ``CamelCase``.
 
     Returns:
         Dictionary containing BIDS related metadata.
     
     Raises:
         IndexError: Error that arises if constant variables ``BIDS_INFO``'s keys and ``BIDS_ORD_ARR`` are of different lengths.
+        BIDSMetaDataError: Exception that is raised in the case that the one of the metadata fields are not ``CamelCase``.
     """
     # BIDS informatino dictionary
     bids_info: Dict = deepcopy(BIDS_INFO)
@@ -127,7 +130,10 @@ def construct_bids_dict(meta_dict: Optional[Dict] = None,
         if is_camel_case(word,bids_case=True):
             pass
         else:
-            raise BIDSMetaDataError(f"Input metadata: {word} is not BIDS compliant.")
+            if raise_exec:
+                raise BIDSMetaDataError(f"Input metadata: {word} is not BIDS compliant.")
+            else:
+                continue
         
         # Add field to ordered array
         if word in ordered_list:
