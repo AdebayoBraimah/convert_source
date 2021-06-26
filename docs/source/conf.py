@@ -42,8 +42,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinxarg.ext',
-    'sphinx_autodoc_typehints',
-    # 'sphinx_autodoc_napoleon_typehints'
+    'sphinx_autodoc_typehints'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
