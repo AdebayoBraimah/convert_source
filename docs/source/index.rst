@@ -9,7 +9,7 @@
 .. toctree::
    :maxdepth: 3
 
-   installation
+   setup
    usage
    examples
    outputs

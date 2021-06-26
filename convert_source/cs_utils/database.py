@@ -70,7 +70,7 @@ def construct_db_dict(study_dir: Optional[str] = "",
         'ses_id': '001',
         'bids_name': ''}
 
-    Argments:
+    Arguments:
         study_dir: Path to study image parent directory that contains all the subjects' source image data.
         sub_id: Unique subject ID.
         file_id: Unique database file ID used to identify source image data.
@@ -888,7 +888,7 @@ def get_file_creation_date(file: str) -> str:
         file: Path to file.
 
     Returns:
-        Date-time string of the form: ``YYYY-MM-DD(T)hh:mm:ss``
+        Date-time string of the form ``YYYY-MM-DD(T)hh:mm:ss``
     """
     file: str = os.path.abspath(file)
     ti_c: str = os.path.getctime(file)
@@ -909,7 +909,7 @@ def get_par_acq_time(par_file: str) -> str:
         file: Path to PAR header file.
 
     Returns:
-        Date-time string of the form: ``YYYY-MM-DD(T)hh:mm:ss``
+        Date-time string of the form ``YYYY-MM-DD(T)hh:mm:ss``
     """
     par_file: str = os.path.abspath(par_file)
 
@@ -953,7 +953,7 @@ def get_dcm_acq_time(dcm_file: str) -> str:
         file: Path to DICOM file.
 
     Returns:
-        Date-time string of the form: ``YYYY-MM-DD(T)hh:mm:ss``
+        Date-time string of the form ``YYYY-MM-DD(T)hh:mm:ss``
     """
     dcm_file: str = os.path.abspath(dcm_file)
     try:
@@ -989,7 +989,7 @@ def get_acq_time(file: str) -> str:
         file: Path to file.
 
     Returns:
-        Date-time string of the form: ``YYYY-MM-DD(T)hh:mm:ss``
+        Date-time string of the form ``YYYY-MM-DD(T)hh:mm:ss``
     """
     file: str = os.path.abspath(file)
 

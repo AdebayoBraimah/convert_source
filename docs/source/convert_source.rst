@@ -21,6 +21,13 @@ convert\_source.batch\_convert module
    :undoc-members:
    :show-inheritance:
 
+convert\_source.batch\_symlink module
+-------------------------------------
+
+.. automodule:: convert_source.batch_symlink
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 Module contents
 ---------------

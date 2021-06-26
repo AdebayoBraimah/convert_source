@@ -20,6 +20,14 @@ convert\_source.cs\_utils.const module
    :undoc-members:
    :show-inheritance:
 
+convert\_source.cs\_utils.database module
+-----------------------------------------
+
+.. automodule:: convert_source.cs_utils.database
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 convert\_source.cs\_utils.fileio module
 ---------------------------------------
 
@@ -43,7 +51,6 @@ convert\_source.cs\_utils.utils module
    :members:
    :undoc-members:
    :show-inheritance:
-
 
 Module contents
 ---------------
