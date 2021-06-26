@@ -6,7 +6,7 @@ The ``convert_source`` package can be installed via ``pip`` using the command:
 
 .. code-block:: bash
 
-    pip install convert_source [--user]
+   pip install convert_source [--user]
 
 
 External Dependencies

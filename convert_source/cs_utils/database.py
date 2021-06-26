@@ -239,7 +239,6 @@ def insert_row_db(database: str,
     """Inserts rows into existing database tables, provided a dictionary of key mapped items of values.
 
     Usage example:
-        Usage example:
         >>> db = insert_row_db(database='file.db',
         ...                     tables=db_tables,
         ...                     info=table_vals)
@@ -301,7 +300,6 @@ def get_len_rows(database: str,
     """Gets the number of rows in a databases' first table.
 
     Usage example:
-        Usage example:
         >>> get_len_rows(database='file.db',
         ...              tables=db_tables)
         ...
@@ -340,7 +338,6 @@ def get_file_id(database: str,
     """Returns new file_id for file that does not yet exist in the database.
 
     Usage example:
-        Usage example:
         >>> get_file_id(database='file.db',
         ...             tables=db_tables,
         ...             num_zeros=7)
@@ -897,8 +894,8 @@ def get_file_creation_date(file: str) -> str:
 def get_par_acq_time(par_file: str) -> str:
     """Returns the acquisition date and time for the input PAR header file if possible, or the file creation date and time otherwise.
 
-    NOTE: 
-        This is performed via a RegEx search of the PAR file header, and is not guaranteed to work on PAR files from other Philips MR scanners.
+    WARNING: 
+        This is performed via a ``RegEx`` search of the PAR file header, and is not guaranteed to work on PAR files from other Philips MR scanners.
 
     Usage example:
         >>> acq_date_time = get_par_acq_time(par_file='T1_Ax_MPRAGE.PAR')

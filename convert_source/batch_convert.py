@@ -135,11 +135,10 @@ def batch_proc(study_img_dir: str,
         dryrun: Perform dryrun (creates the command, but does not execute it).
 
     Returns:
-        Tuple of lists that consists of: 
-            * List of NIFTI images.
-            * Corresponding list of JSON sidecars.
-            * Corresponding list of bval files.
-            * Corresponding list of bvec files.
+        * List of NIFTI images.
+        * Corresponding list of JSON sidecars.
+        * Corresponding list of bval files.
+        * Corresponding list of bvec files.
     """
     study_img_dir: str = os.path.abspath(study_img_dir)
     
@@ -377,7 +376,7 @@ def batch_proc(study_img_dir: str,
 
 def read_config(config_file: Optional[str] = "", 
                 verbose: Optional[bool] = False
-                ) -> Tuple[Dict[str,str],Dict,Dict,Dict,List[str]]:
+               ) -> Tuple[Dict[str,str],List[str]]:
     """Reads configuration file and creates a dictionary of search terms for 
     each modality provided that each BIDS modality is used as a key via the 
     keyword ``modality_search``. Should BIDS related parameter descriptions need 
@@ -387,16 +386,6 @@ def read_config(config_file: Optional[str] = "",
     (via the key ``exclude``) then an exclusion list is created. Should this not be provided, 
     then an empty list is returned.
 
-    BIDS modalities:
-        - anat:
-            - T1w, T2w, FLAIR, etc.
-        - func:
-            - bold
-                - task:
-                    - resting state, <task-name>
-        - dwi
-        - fmap
-
     Usage example:
         >>> [search_dict, bids_search, bids_map, meta_dict, exclusion_list] = read_config(config_file)
     
@@ -405,12 +394,11 @@ def read_config(config_file: Optional[str] = "",
         verbose: Prints additional information to screen.
     
     Returns: 
-        Tuple of dictionaries and a list that consists of:
-            * search_dict: Nested dictionary of heuristic modality search terms for BIDS modalities.
-            * bids_search: Nested dictionary of heuristic BIDS search terms.
-            * bids_map: Corresponding nested dictionary of BIDS mapping terms to rename files to.
-            * meta_dict: Nested dictionary of metadata terms to write to JSON file(s).
-            * exclusion_list: List of exclusion terms.
+        * search_dict: Nested dictionary of heuristic modality search terms for BIDS modalities.
+        * bids_search: Nested dictionary of heuristic BIDS search terms.
+        * bids_map: Corresponding nested dictionary of BIDS mapping terms to rename files to.
+        * meta_dict: Nested dictionary of metadata terms to write to JSON file(s).
+        * exclusion_list: List of exclusion terms.
     
     Raises:
         ConfigFileReadError: Error that arises if no heuristic search terms are provided.
@@ -516,11 +504,10 @@ def bids_id(s:str,
         mod_found: Boolean value that indicates if the (BIDS) modality or matching modality has been identified/found.
 
     Returns:
-        Tuple that consists of:
-            * Nested dictionary of BIDS descriptive naming related terms.
-            * Modality type.
-            * Modality label.
-            * Task label.
+        * Nested dictionary of BIDS descriptive naming related terms.
+        * Modality type.
+        * Modality label.
+        * Task label.
     """
     search_arr: List[str] = list_dict(d=search_dict)
     
@@ -888,11 +875,10 @@ def source_to_bids(sub_data: SubDataInfo,
         dryrun: Perform dryrun (creates the command, but does not execute it).
 
     Returns:
-        Tuple of lists that contains:
-            * List of image data file(s). Empty string is returned if this file does not exist.
-            * List of corresponding JSON (sidecar) file(s). Empty string is returned if this file does not exist.
-            * List of corresponding FSL-style bval file(s). Empty string is returned if this file does not exist.
-            * List of corresponding FSL-style bvec file(s). Empty string is returned if this file does not exist.
+        * List of image data file(s). Empty string is returned if this file does not exist.
+        * List of corresponding JSON (sidecar) file(s). Empty string is returned if this file does not exist.
+        * List of corresponding FSL-style bval file(s). Empty string is returned if this file does not exist.
+        * List of corresponding FSL-style bvec file(s). Empty string is returned if this file does not exist.
     """
     sub: Union[int,str] = sub_data.sub
     ses: Union[int,str] = sub_data.ses
@@ -1196,11 +1182,10 @@ def nifti_to_bids(sub_data: SubDataInfo,
         log: LogFile object for logging.
 
     Returns:
-        Tuple of lists that contains:
-            * List of image data file(s). Empty string is returned if this file does not exist.
-            * List of corresponding JSON (sidecar) file(s). Empty string is returned if this file does not exist.
-            * List of corresponding FSL-style bval file(s). Empty string is returned if this file does not exist.
-            * List of corresponding FSL-style bvec file(s). Empty string is returned if this file does not exist.
+        * List of image data file(s). Empty string is returned if this file does not exist.
+        * List of corresponding JSON (sidecar) file(s). Empty string is returned if this file does not exist.
+        * List of corresponding FSL-style bval file(s). Empty string is returned if this file does not exist.
+        * List of corresponding FSL-style bvec file(s). Empty string is returned if this file does not exist.
     """
     sub: Union[int,str] = sub_data.sub
     ses: Union[int,str] = sub_data.ses
@@ -1496,11 +1481,10 @@ def data_to_bids(sub_data: SubDataInfo,
         dryrun: Perform dryrun (creates the command, but does not execute it).
 
     Returns:
-        Tuple of lists that contains:
-            * List of image data file(s). Empty string is returned if this file does not exist.
-            * List of corresponding JSON (sidecar) file(s). Empty string is returned if this file does not exist.
-            * List of corresponding FSL-style bval file(s). Empty string is returned if this file does not exist.
-            * List of corresponding FSL-style bvec file(s). Empty string is returned if this file does not exist.
+        * List of image data file(s). Empty string is returned if this file does not exist.
+        * List of corresponding JSON (sidecar) file(s). Empty string is returned if this file does not exist.
+        * List of corresponding FSL-style bval file(s). Empty string is returned if this file does not exist.
+        * List of corresponding FSL-style bvec file(s). Empty string is returned if this file does not exist.
     """
     if ('.dcm' in sub_data.data.lower()) or ('.par' in sub_data.data.lower()):
         [imgs,
@@ -1683,10 +1667,9 @@ def write_unknown_to_file(bids_unknown_dir: str,
         json_file: If true, writes the output file as a JSON file.
 
     Returns:
-        Tuple that consists of:
-            * List of unknown BIDS NIFTI files.
-            * Output YAML file.
-            * Output JSON file.
+        * List of unknown BIDS NIFTI files.
+        * Output YAML file.
+        * Output JSON file.
 
     Raises:
         FileNotFoundError: Error that arises if the specified unknown BIDS directory does not exist.
@@ -1809,9 +1792,8 @@ def create_participant_tsv(out_dir: str) -> Tuple[str,str]:
         out_dir: BIDS output directory.
 
     Returns:
-        Tuple of strings that consist of:
-            * Absolute file path to the participants TSV file (``participants.tsv``)
-            * Absolute file path to the participants JSON file (``participants.json``)
+        * Absolute file path to the participants TSV file (``participants.tsv``)
+        * Absolute file path to the participants JSON file (``participants.json``)
     """
     participant_tsv: str = os.path.join(out_dir,'participants.tsv')
     participant_json: str = os.path.join(out_dir,'participants.json')
@@ -1900,7 +1882,7 @@ def read_unknown_subs(mapfile: str,
                       config: Optional[str] = "",
                       cprss_lvl: int = 6,
                       verbose: bool = False
-                      ) -> str:
+                      ) -> Tuple[List[str]]:
     """Reads the input JSON or YAML mapfile for unknown BIDS NIFTI files.
 
     NOTE:
@@ -1916,11 +1898,10 @@ def read_unknown_subs(mapfile: str,
         verbose: Enable verbose output.
 
     Returns:
-        Tuple of lists that consists of: 
-            * List of NIFTI images.
-            * Corresponding list of JSON sidecars.
-            * Corresponding list of bval files.
-            * Corresponding list of bvec files.
+        * List of NIFTI images.
+        * Corresponding list of JSON sidecars.
+        * Corresponding list of bval files.
+        * Corresponding list of bvec files.
     """
     mapfile: str = os.path.abspath(mapfile)
 

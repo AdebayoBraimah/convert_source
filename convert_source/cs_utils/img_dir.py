@@ -69,8 +69,8 @@ def img_dir_list(directory: str,
 
     Returns:
         Tuple:
-            List of child directory names that contain image data.
-            List of file-types that corresponds to directory names list.
+            * List of child directory names that contain image data.
+            * List of file-types that corresponds to directory names list.
     """
     # Init empty list
     dir_names: List[str] = list()
@@ -145,9 +145,9 @@ def generate_img_list(directory: str,
     Returns:
         Tuple:
             * Child directories that contain medical images.
-            * Corresponding file types to 'dir_names' list.
-            * Output file that contains the contents of 'dir_names'.
-            * Output file that contains the contents of 'file_types'.
+            * Corresponding file types to ``dir_names`` list.
+            * Output file that contains the contents of ``dir_names``.
+            * Output file that contains the contents of ``file_types``.
     """
     # Generate directories list and child directories' file types
     [dir_names,file_types] = img_dir_list(directory=directory,verbose=verbose)
