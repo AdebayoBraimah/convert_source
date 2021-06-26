@@ -8,8 +8,11 @@
 #######################################
 # 
 # Commands for deploying a package to PyPI
+# 
+# Google style guide:
+#   * https://google.github.io/styleguide/shellguide.html
 #
-# Markdown badges
+# Markdown badges:
 #   * https://github.com/Naereen/badges
 
 #######################################
