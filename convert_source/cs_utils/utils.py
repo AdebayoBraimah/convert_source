@@ -659,8 +659,12 @@ def get_bvals(bval_file: Optional[str] = ""
             vals_int: List[int] = [ int(vals) ]
         
         vals_nonzero: List[int] = [ i for i in vals_int if i != 0 ]
-        bvals: List[float] = list(np.unique(vals_nonzero))
-        return [ int(i) for i in bvals ]
+
+        if vals_nonzero == []:
+            return [0]
+        else:
+            bvals: List[float] = list(np.unique(vals_nonzero))
+            return [ int(i) for i in bvals ]
     else:
         return [0]
 
